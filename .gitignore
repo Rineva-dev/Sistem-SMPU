@@ -1,0 +1,19 @@
+# File rahasia & environment
+.env
+*.env
+
+# Database (jangan upload file .db ke GitHub)
+*.db
+*.sqlite3
+instance/
+
+# Folder dependensi
+venv/
+env/
+.venv/
+
+# File sistem
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
