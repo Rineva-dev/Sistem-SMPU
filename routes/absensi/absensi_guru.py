@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, g, request, jsonify, make_response
 from models import Guru, AbsensiGuru, TahunPelajaran, GajiGuru, db, User
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import extract
 import qrcode
 import io
@@ -104,7 +104,7 @@ def ambil_tahun_pelajaran():
     Mengembalikan (tgl_mulai_tp, tgl_selesai_tp, label_tp)
     berdasarkan g.tahun_pelajaran atau tahun pelajaran aktif
     """
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     tp_terpilih = None
 
     if g.tahun_pelajaran:
@@ -130,6 +130,10 @@ def ambil_tahun_pelajaran():
 
     return tgl_mulai_tp, tgl_selesai_tp, label_tp
 
+def waktu_wita():
+    return datetime.now(timezone.utc) + timedelta(hours=8)
+
+
 @absensi_guru_bp.route('/dashboard')
 def dashboard():
     if not (
@@ -145,7 +149,7 @@ def dashboard():
     if not guru:
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     absensi_hari_ini = AbsensiGuru.query.filter_by(
         guru_id=guru.id,
         tanggal=hari_ini
@@ -243,7 +247,7 @@ def absensi_harian():
     if not guru:
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     absensi_hari_ini = AbsensiGuru.query.filter_by(
         guru_id=guru.id,
         tanggal=hari_ini
@@ -319,8 +323,8 @@ def absen_masuk():
         flash('Akun tidak valid.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
-    hari_ini = date.today()
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    hari_ini = waktu_wita().date()
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     alasan_telat = request.form.get('alasan_keterlambatan', '').strip()
     
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
@@ -380,8 +384,8 @@ def absen_pulang():
         flash('Akun tidak valid.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
-    hari_ini = date.today()
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    hari_ini = waktu_wita().date()
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
     if not absensi or not absensi.jam_masuk:
@@ -408,7 +412,7 @@ def qr_absensi_data():
     guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
     if not guru:
         return jsonify({"status": "error", "pesan": "Data guru tidak ditemukan"}), 404
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     hari_ini_str = hari_ini.strftime("%Y-%m-%d")
     absensi_hari_ini = AbsensiGuru.query.filter_by(
         guru_id=guru.id, tanggal=hari_ini
@@ -452,7 +456,7 @@ def qr_absensi():
     if not guru:
         flash('Akun tidak valid.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
-    hari_ini = date.today().strftime("%Y-%m-%d")
+    hari_ini = waktu_wita().date().strftime("%Y-%m-%d")
     data_qr = f"guru:{guru.id}:tanggal:{hari_ini}:tipe:masuk:pembuat:guru"
     qr_img = qrcode.make(data_qr)
     buffered = io.BytesIO()
@@ -467,7 +471,7 @@ def qr_absensi():
 
 @absensi_guru_bp.route('/scan-qr-proses', methods=['POST'])
 def scan_qr_proses():
-    hari_ini_date = date.today()
+    hari_ini_date = waktu_wita().date()
     hari_ini_str = hari_ini_date.strftime("%Y-%m-%d")
 
     # === CEK BATAS WAKTU ===
@@ -647,8 +651,8 @@ def api_mesin_absen():
     if not guru:
         return jsonify({"status": "error", "pesan": "Kartu tidak terdaftar"}), 404
     
-    hari_ini = date.today()
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    hari_ini = waktu_wita().date()
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
     
     if tipe == "masuk":
@@ -699,7 +703,7 @@ def rekap_absensi():
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
     
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     
     # === Ambil Tahun Pelajaran Aktif ===
     tp_terpilih = None
@@ -817,7 +821,7 @@ def export_rekap_absensi():
     tahun_akhir = request.form.get('tahun_akhir', type=int)
 
     # === 2. Tentukan Rentang Tanggal berdasarkan TAHUN PELAJARAN ===
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     tgl_mulai_tp, tgl_selesai_tp, label_tp = None, None, ""
 
     if g.tahun_pelajaran:
@@ -976,7 +980,7 @@ def rincian_gaji():
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
 
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
 
     filter_bulan = request.args.get('bulan', type=int) or hari_ini.month
     filter_tahun = request.args.get('tahun', type=int) or hari_ini.year
