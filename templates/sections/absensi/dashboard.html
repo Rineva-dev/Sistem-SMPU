@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+{% set active_page = "dashboard" %}
+{% set halaman_aktif = "absensi" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/dashboard.css') }}">
+
+<div class="absensi-dashboard-wrapper">
+    <!-- HEADER -->
+    <div class="page-header">
+        <h3>Dashboard Absensi</h3>
+        <p>Ringkasan kehadiran Anda per tahun pelajaran saat ini.</p>
+    </div>
+
+    <!-- KARTU STATISTIK -->
+    <div class="stats-row">
+        <div class="stat-card stat-hadir">
+            <div class="stat-icon"><i class="fas fa-check"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ statistik.hadir or 0 }}</div>
+                <div class="stat-label">Hadir</div>
+            </div>
+        </div>
+        <div class="stat-card stat-terlambat">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ statistik.terlambat or 0 }}</div>
+                <div class="stat-label">Terlambat</div>
+            </div>
+        </div>
+        <div class="stat-card stat-izin">
+            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ statistik.izin or 0 }}</div>
+                <div class="stat-label">Izin / Sakit</div>
+            </div>
+        </div>
+        <div class="stat-card stat-alfa">
+            <div class="stat-icon"><i class="fas fa-times"></i></div>
+            <div class="stat-info">
+                <div class="stat-value">{{ statistik.alfa or 0 }}</div>
+                <div class="stat-label">Alfa</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRAFIK + AKTIVITAS -->
+    <div class="content-grid">
+        <!-- GRAFIK -->
+        <div class="chart-card">
+            <h5 class="card-title">
+                <i class="fas fa-chart-bar"></i> Grafik Kehadiran
+                <span class="d-block fw-semibold">{{ label_tp }}</span>
+            </h5>
+            <div style="height: 280px;">
+                <canvas id="grafikAbsensi"></canvas>
+            </div>
+        </div>
+
+        <!-- AKTIVITAS TERBARU -->
+        <div class="activity-card">
+            <h5 class="card-title"><i class="fas fa-history"></i> Aktivitas Terbaru</h5>
+            <div class="activity-list">
+                {% if riwayat_terbaru and riwayat_terbaru|length > 0 %}
+                    {% for item in riwayat_terbaru %}
+                        <div class="activity-item">
+                            {% if item.status == 'hadir' %}
+                                <div class="activity-icon hadir"><i class="fas fa-check"></i></div>
+                            {% elif item.status == 'terlambat' %}
+                                <div class="activity-icon terlambat"><i class="fas fa-clock"></i></div>
+                            {% elif item.status in ['izin', 'sakit'] %}
+                                <div class="activity-icon izin"><i class="fas fa-file-alt"></i></div>
+                            {% else %}
+                                <div class="activity-icon alfa"><i class="fas fa-times"></i></div>
+                            {% endif %}
+                            <div class="activity-body">
+                                <div class="activity-title">
+                                    {% if item.status == 'hadir' %}
+                                        Hadir tepat waktu
+                                    {% elif item.status == 'terlambat' %}
+                                        Terlambat ({{ item.jam_masuk or '-' }})
+                                    {% elif item.status == 'izin' %}
+                                        Izin
+                                    {% elif item.status == 'sakit' %}
+                                        Sakit
+                                    {% else %}
+                                        Tidak hadir
+                                    {% endif %}
+                                </div>
+                                <div class="activity-date">{{ item.tanggal.strftime('%d %B %Y') }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox fa-2x" style="color:#cbd5e1; margin-bottom:10px;"></i>
+                        <p>Belum ada riwayat aktivitas absensi.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data untuk Grafik (disembunyikan) -->
+<script type="application/json" id="data-label-bulan">{{ label_bulan | tojson }}</script>
+<script type="application/json" id="data-hadir">{{ data_hadir | tojson }}</script>
+<script type="application/json" id="data-terlambat">{{ data_terlambat | tojson }}</script>
+<script type="application/json" id="data-izin">{{ data_izin | tojson }}</script>
+<script type="application/json" id="data-alfa">{{ data_alfa | tojson }}</script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/absensi/dashboard.js') }}"></script>
+{% endblock %}

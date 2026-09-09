@@ -1,0 +1,379 @@
+/* ==============================================
+   CSS KHUSUS: EKSTRAKURIKULER
+   Tema Modern, Bersih, Konsisten & Fleksibel
+============================================== */
+
+/* --- Header Halaman --- */
+.page-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+}
+.page-header h3 {
+  color: #1e293b;
+  font-weight: 700;
+}
+.page-header h3 i {
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+/* --- Tabel Utama --- */
+.table {
+  font-size: 0.925rem;
+}
+.table thead th {
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.4px;
+}
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+.table tbody tr:hover {
+  background-color: #f8fafc;
+}
+.table td {
+  vertical-align: middle;
+  padding: 0.7rem 0.75rem;
+}
+
+/* --- Badge Status --- */
+.badge {
+  padding: 0.4em 0.75em;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* --- Kartu --- */
+.card {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+.card-body-anggota {
+  padding: 1.5rem 0.65rem !important;
+}
+
+/* ==============================================
+   MODAL: KHUSUS EKSKUL – TIDAK IKUT GAYA UMUM
+   ✅ DIPERBAIKI: TIDAK DIPAKSA TINGGI PENUH
+============================================== */
+#modalTambah .modal-content,
+#modalEdit .modal-content,
+#modalHapus .modal-content,
+#modalLibur .modal-content {
+  border: none !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+  overflow: hidden;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+#modalTambah .modal-header,
+#modalEdit .modal-header,
+#modalHapus .modal-header,
+#modalLibur .modal-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.25rem 1.5rem;
+}
+#modalTambah .modal-title,
+#modalEdit .modal-title,
+#modalHapus .modal-title,
+#modalLibur .modal-title {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1.15rem;
+}
+#modalTambah .modal-body,
+#modalEdit .modal-body,
+#modalHapus .modal-body,
+#modalLibur .modal-body {
+  padding: 1.5rem;
+  background: #ffffff;
+  flex: 0 0 auto !important;
+}
+#modalTambah .modal-footer,
+#modalEdit .modal-footer,
+#modalHapus .modal-footer,
+#modalLibur .modal-footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+}
+
+/* ==============================================
+   ✨ KHUSUS MODAL ANGGOTA – LEBIH MEWAH & MODERN
+   ✅ DIPERBAIKI: TINGGI MENYESUAIKAN ISI SAJA
+============================================== */
+#modalAnggota .modal-content {
+  box-shadow: 0 25px 50px rgba(59, 130, 246, 0.15) !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: 90vh;
+}
+
+#modalAnggota .modal-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-bottom: 1px solid #bfdbfe !important;
+  padding: 1.5rem;
+}
+#modalAnggota .modal-title {
+  font-weight: 700;
+  color: #1e40af;
+  font-size: 1.25rem;
+}
+#modalAnggota .modal-header p {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+#modalAnggota .modal-body {
+  background: #f8fafc;
+  padding: 1.75rem !important;
+  flex: 0 0 auto !important;
+  overflow-y: auto;
+}
+
+#modalAnggota .modal-footer {
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 1.25rem 1.75rem;
+}
+
+/* --- Kotak Daftar Siswa di Modal Anggota --- */
+#modalAnggota .card {
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: #ffffff;
+}
+
+/* --- Baris Siswa yang Bisa Diklik --- */
+.pilih-siswa {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+.pilih-siswa:hover {
+  background-color: #eff6ff;
+  border-left-color: #93c5fd;
+}
+.pilih-siswa.table-active {
+  background-color: #dbeafe;
+  border-left-color: #3b82f6;
+  font-weight: 500;
+  color: #1e40af;
+}
+
+/* --- Tabel di Dalam Modal Anggota --- */
+#daftarBelum, #daftarSudah {
+  font-size: 0.875rem;
+}
+#daftarBelum th, #daftarSudah th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+#daftarBelum td, #daftarSudah td {
+  padding: 0.55rem 0.75rem;
+  vertical-align: middle;
+}
+
+/* --- Tombol Pindah di Tengah --- */
+#btnTambahSiswa, #btnKeluarkanSiswa {
+  min-width: 120px;
+  border-radius: 0.6rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+#btnTambahSiswa:hover {
+  transform: translateX(3px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+#btnKeluarkanSiswa:hover {
+  transform: translateX(-3px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+}
+
+/* --- Label Form --- */
+.form-label {
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.4rem;
+}
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  border-color: #e2e8f0;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.925rem;
+  transition: all 0.2s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+
+/* --- Ikon & Tulisan NISN --- */
+.font-monospace {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ==============================================
+   CUSTOM DATE PICKER – DIPERBAIKI KHUSUS MODAL
+   ✅ IKON TIDAK TERTUTUP, LEBAR SESUAI KOLOM
+============================================== */
+.custom-date {
+    position: relative;
+    width: 100% !important; /* Paksa penuh sesuai kolom */
+    font-size: 0.925rem;
+    display: block;
+}
+
+/* Kotak pembungkus input + ikon */
+.custom-date__trigger {
+    width: 100%;
+    min-height: 42px; /* Tinggi standar form */
+    padding: 0;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Jarak aman antara tulisan & ikon */
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+/* Area ketik tanggal */
+.custom-date__input-manual {
+    flex: 1 1 auto; /* Ambil sisa ruang yang ada */
+    min-width: 0; /* Agar tidak memaksa melebar berlebih */
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.55rem 0.85rem;
+    font-size: inherit;
+    color: #1e293b;
+}
+
+/* Ikon Kalender - DIPERLEBAR AREANYA AGAR TIDAK TERTUTUP */
+.custom-date__icon {
+    font-size: 18px;
+    color: #94a3b8;
+    flex: 0 0 auto; /* Ukuran tetap, tidak mengecil */
+    width: 36px; /* Lebar khusus untuk ikon */
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem; /* Jarak dari pinggir kotak */
+    border-radius: 0.35rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.custom-date__icon:hover {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+/* Sembunyikan input asli */
+.custom-date > input[type="date"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+/* Efek fokus & hover */
+.custom-date:hover .custom-date__trigger {
+    border-color: #cbd5e1;
+}
+.custom-date:has(.custom-date__input-manual:focus) .custom-date__trigger,
+.custom-date.open .custom-date__trigger {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+}
+
+/* --- Kalender Popup (tetap sama bagusnya) --- */
+.custom-date__calendar {
+    position: absolute;
+    width: 280px;
+    max-width: calc(100vw - 2rem);
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+}
+.custom-date__calendar.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.calendar-nav {
+    background: #f8fafc;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+.calendar-nav:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+.calendar-day {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #334155;
+}
+.calendar-day:hover:not(.other-month) {
+    background: #eff6ff;
+    color: #2563eb;
+}
+.calendar-day.today {
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+.calendar-day.selected {
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+}

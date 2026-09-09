@@ -1,0 +1,60 @@
+<div class="dashboard-container">
+
+    <!-- Header Halaman -->
+    <div class="welcome-box">
+        <div>
+            <h2>{{ 'Ubah Data' if mode=='ubah' else 'Tambah Mata Pelajaran' }}</h2>
+            <p class="text-muted mb-0">Isi data mata pelajaran secara umum</p>
+        </div>
+        <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="btn btn-sm btn-light">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Kartu Form -->
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" class="form-layout">
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Kode Mata Pelajaran <span class="text-danger">*</span></label>
+                        <input type="text" name="kode" class="form-control" required 
+                               value="{{ mapel.kode if mapel else '' }}" 
+                               placeholder="Contoh: MAT, BIN, ING">
+                    </div>
+                    <div class="form-group half">
+                        <label>Kelompok Mata Pelajaran</label>
+                        <select name="kelompok" class="form-control">
+                            <option value="">Pilih Kelompok</option>
+                            {% for k in ['Wajib','Muatan Lokal','Pilihan','Kejuruan'] %}
+                            <option value="{{k}}" {{ 'selected' if mapel and mapel.kelompok==k else '' }}>{{k}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>Nama Mata Pelajaran <span class="text-danger">*</span></label>
+                    <input type="text" name="nama_pelajaran" class="form-control" required 
+                           value="{{ mapel.nama_pelajaran if mapel else '' }}"
+                           placeholder="Contoh: Matematika, Bahasa Indonesia">
+                </div>
+
+                <div class="form-group full">
+                    <label>Keterangan</label>
+                    <textarea name="keterangan" class="form-control" rows="3">{{ mapel.keterangan if mapel else '' }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="btn btn-cancel">
+                        Batal
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> {{ 'Perbarui' if mode=='ubah' else 'Simpan' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

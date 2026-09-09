@@ -1,0 +1,292 @@
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/tu/tambah_surat_keluar.css') }}">
+{% endblock %}
+
+<div class="page-header">
+    <h2>Ubah Surat Keluar</h2>
+    <p class="text-muted mt-1">Perbarui data surat yang sudah tersimpan</p>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <!-- Action diarahkan ke rute ubah -->
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate action="/surat-menyurat/ubah-surat-keluar/{{ surat.id }}">
+      <div class="row g-4">
+
+        <!-- Nomor Surat -->
+        <div class="col-md-6">
+          <label for="nomor_surat" class="form-label">Nomor Surat</label>
+          <input type="text" name="nomor_surat" id="nomor_surat" class="form-control" 
+                 placeholder="Contoh: 026/SMP.U/Hamzanwadi/VI/2026" 
+                 value="{{ surat.nomor_surat }}" required>
+        </div>
+
+        <!-- Tanggal Surat -->
+        <div class="col-md-6 custom-date">
+          <label for="tanggal_surat" class="form-label">Tanggal Surat</label>
+          <input type="date" name="tanggal_surat" id="tanggal_surat" class="form-control" 
+                 value="{{ surat.tanggal_surat.strftime('%Y-%m-%d') }}" required>
+        </div>
+
+        <!-- Lampiran -->
+        <div class="col-md-6">
+          <label for="lampiran" class="form-label">Lampiran</label>
+          <input type="text" name="lampiran" id="lampiran" class="form-control" 
+                 placeholder="Contoh: 1 rangkap / -" 
+                 value="{{ surat.lampiran or '' }}">
+        </div>
+
+        <!-- Perihal -->
+        <div class="col-md-6">
+          <label for="perihal" class="form-label">Perihal</label>
+          <input type="text" name="perihal" id="perihal" class="form-control" 
+                 placeholder="Contoh: Permakluman Kegiatan" 
+                 value="{{ surat.perihal }}" required>
+        </div>
+
+        <!-- Tujuan Surat -->
+        <div class="col-md-12">
+          <label class="form-label fw-bold">Kepada / Tujuan Surat</label>
+
+          <div class="mb-2">
+            <label for="tujuan_isi" class="form-label small">Isi Tujuan (setiap baris = baris baru)</label>
+            <textarea id="tujuan_isi" class="form-control" rows="3" required>{{ surat.tujuan_mentah or '' }}</textarea>
+            <small class="text-muted">Cukup tulis tiap barisnya saja, penjorokan akan diatur otomatis</small>
+          </div>
+
+          <div class="mb-3">
+            <label for="tujuan_lokasi" class="form-label small">Bagian Akhir (setelah "di")</label>
+            <input type="text" id="tujuan_lokasi" class="form-control" 
+                   placeholder="Contoh: Tempat / Selong / Mataram" 
+                   value="{{ surat.tujuan_lokasi or 'Tempat' }}" required>
+          </div>
+
+          <input type="hidden" name="tujuan" id="tujuan" value="{{ surat.tujuan }}">
+        </div>
+
+        <!-- Isi Surat -->
+        <div class="col-md-12">
+          <label class="form-label fw-bold">Isi Surat</label>
+          <div id="wrapper_editor_isi"></div>
+          <input type="hidden" name="isi_surat" id="isi_surat" value="{{ surat.isi_surat or '' }}" required>
+          <small class="text-muted mt-1 d-block">
+            * Gunakan tombol Tab untuk jarak, lalu klik <b>Rapikan :</b> agar posisi titik dua sejajar rapi
+          </small>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label fw-bold">Daftar Penandatangan</label>
+          <div id="daftar-penandatangan">
+            <!-- Baris Pertama -->
+            <div class="baris-penandatangan d-flex flex-wrap align-items-center gap-2 mb-3">
+              <!-- Dropdown Jabatan / Tugas -->
+              <div class="flex-grow-1 custom-select">
+                <select name="jenis_ttd[]" class="form-select jenis-ttd" required>
+                  <option value="">Pilih Jabatan / Tugas</option>
+                  
+                  <!-- Kelompok Jabatan Utama -->
+                  <optgroup label="📋 Jabatan Utama">
+                    {% for jab, daftar in daftar_jabatan_tugas.items() %}
+                      {% if jab in ["Kepala Sekolah", "Guru", "Tata Usaha"] %}
+                        <option 
+                          value="{{ jab|replace(' ', '_') }}" 
+                          data-jumlah="{{ daftar|length }}" 
+                          data-id="{{ daftar[0].id if daftar|length == 1 else '' }}"
+                          data-nama="{{ daftar[0].nama if daftar|length == 1 else '' }}"
+                          data-jabatan-asli="{{ jab }}"
+                        >
+                          {{ jab }}
+                        </option>
+                      {% endif %}
+                    {% endfor %}
+                  </optgroup>
+
+                  <!-- Kelompok Tugas Tambahan -->
+                  <optgroup label="📌 Tugas Tambahan">
+                    {% for jab, daftar in daftar_jabatan_tugas.items() %}
+                      {% if jab not in ["Kepala Sekolah", "Guru", "Tata Usaha"] %}
+                        <option 
+                          value="{{ jab|replace(' ', '_') }}" 
+                          data-jumlah="{{ daftar|length }}" 
+                          data-id="{{ daftar[0].id if daftar|length == 1 else '' }}"
+                          data-nama="{{ daftar[0].nama if daftar|length == 1 else '' }}"
+                          data-jabatan-asli="{{ jab }}"
+                        >
+                          {{ jab }}
+                        </option>
+                      {% endif %}
+                    {% endfor %}
+                  </optgroup>
+
+                  <!-- Kelompok Khusus / Panitia -->
+                  <optgroup label="📝 Khusus / Panitia">
+                    <option value="khusus-ketua" data-jumlah="0" data-jabatan-asli="Ketua Panitia">Ketua Panitia</option>
+                    <option value="khusus-sekretaris" data-jumlah="0" data-jabatan-asli="Sekretaris Panitia">Sekretaris Panitia</option>
+                    <option value="khusus-bendahara" data-jumlah="0" data-jabatan-asli="Bendahara Panitia">Bendahara Panitia</option>
+                    <option value="khusus-supervisor" data-jumlah="0" data-jabatan-asli="Supervisor">Supervisor</option>
+                    <option value="khusus-lain" data-jumlah="0" data-jabatan-asli="">Lainnya (Isi Sendiri)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- Dropdown Nama: Muncul jika jumlah > 1 -->
+              <div class="flex-grow-1 div-pilih-nama" style="display: none;">
+                <div class="custom-select">
+                  <select name="id_guru_ttd[]" class="form-select select-nama">
+                    <option value="">-- Pilih Nama --</option>
+                    {% for jab, daftar in daftar_jabatan_tugas.items() %}
+                      {% for g in daftar %}
+                        <option 
+                          value="{{ g.id }}" 
+                          data-nama="{{ g.nama }}" 
+                          data-jabatan="{{ jab }}"
+                          class="opsi-{{ jab|replace(' ', '_') }}"
+                        >
+                          {{ g.nama }}
+                        </option>
+                      {% endfor %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <!-- Input Nama: Terisi otomatis / bisa diisi manual -->
+              <div class="flex-grow-1 div-input-nama">
+                <input 
+                  type="text" 
+                  name="nama_ttd[]" 
+                  class="form-control nama-ttd" 
+                  placeholder="Nama Lengkap" 
+                  required 
+                  readonly
+                >
+              </div>
+
+              <!-- Input Jabatan: Hanya bisa diedit jika = Guru atau Khusus -->
+              <div class="flex-grow-1 div-input-jabatan">
+                <input 
+                  type="text" 
+                  name="jabatan_ttd[]" 
+                  class="form-control jabatan-ttd" 
+                  placeholder="Jabatan" 
+                  required 
+                  readonly
+                >
+              </div>
+              
+              <button type="button" class="btn btn-sm btn-outline-danger hapus-ttd" style="display:none;">×</button>
+            </div>
+          </div>
+          <button type="button" id="tambah-ttd" class="btn btn-sm btn-outline-primary mt-1">
+            <i class="fas fa-plus me-1"></i> Tambah Penandatangan
+          </button>
+          <small class="text-muted d-block mt-1">* Bisa tambah sampai 4 penandatangan sesuai kebutuhan surat</small>
+        </div>
+
+        <!-- Status -->
+        <div class="col-md-6">
+          <label for="jenis_pembuatan" class="form-label">Cara Pembuatan Surat</label>
+          <select name="jenis_pembuatan" id="jenis_pembuatan" class="form-select" required>
+            <option value="langsung" {{ 'selected' if surat.status in ['Tersimpan', 'Disetujui'] else '' }}>
+              Tersimpan Langsung (Sudah Ada Tanda Tangan Manual)
+            </option>
+            <option value="ajukan" {{ 'selected' if surat.status == 'Diajukan' else '' }}>
+              Ajukan untuk Persetujuan & Tanda Tangan Elektronik
+            </option>
+          </select>
+          <small class="text-muted">Pilih sesuai kebutuhan: simpan arsip atau ajukan persetujuan</small>
+        </div>
+
+        <div class="col-md-6">
+          <label for="status" class="form-label">Status Surat</label>
+          <input type="text" name="status" id="status" class="form-control" readonly value="{{ surat.status }}">
+          <small class="text-muted">Status diatur otomatis oleh sistem</small>
+        </div>
+
+        <!-- Upload File -->
+        <div class="col-md-12">
+          <label class="form-label">File Surat / Pendukung</label>
+          {% if surat.file_path %}
+            <p class="text-muted small mb-2">
+              File saat ini: <a href="{{ url_for('static', filename=surat.file_path) }}" target="_blank">Lihat File</a>
+              <br>Kosongkan jika tidak ingin mengganti file
+            </p>
+          {% endif %}
+          <div class="upload-area">
+            <input type="file" name="file_surat" id="file_surat" class="form-control upload-input" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="upload-info">
+              <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-primary"></i>
+              <p class="mb-1">Klik atau seret file ke sini</p>
+              <small class="text-muted">Format: PDF, JPG, PNG | Maksimal 2MB</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="col-md-12 d-flex justify-content-end gap-2 pt-2">
+          <a href="/surat-menyurat" class="btn btn-outline-secondary">Batal</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Simpan Perubahan
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+window.DATA_SURAT = {
+  isi_surat: {{ (surat.isi_surat or '') | tojson | safe }},
+  tujuan_mentah: {{ (surat.tujuan_mentah or '') | tojson | safe }},
+  tujuan_lokasi: {{ (surat.tujuan_lokasi or 'Tempat') | tojson | safe }},
+  ttd: {{ daftar_ttd | tojson | safe }}
+};
+
+// --- SUSUN FORMAT TUJUAN ---
+const inputIsi = document.getElementById('tujuan_isi');
+const inputLokasi = document.getElementById('tujuan_lokasi');
+const inputHasil = document.getElementById('tujuan');
+
+function susunFormatTujuan() {
+  const isiMentah = inputIsi.value.trim();
+  const lokasi = inputLokasi.value.trim() || 'Tempat';
+  if (!isiMentah) { inputHasil.value = ''; return; }
+  const daftarBaris = isiMentah.split('\n').map(b => b.trim());
+  const barisTerformat = daftarBaris.map((baris, i) => i === 0 ? baris : `        ${baris}`);
+  inputHasil.value = `Kepada\nYth. ${barisTerformat.join('\n')}\ndi _\n        ${lokasi}`;
+}
+
+inputIsi.addEventListener('input', susunFormatTujuan);
+inputLokasi.addEventListener('input', susunFormatTujuan);
+
+// --- INISIALISASI AWAL ---
+document.addEventListener('DOMContentLoaded', function() {
+  susunFormatTujuan();
+
+  document.getElementById('jenis_pembuatan').addEventListener('change', function() {
+    const status = document.getElementById('status');
+    const tombol = document.querySelector('button[type="submit"]');
+    if (this.value === 'ajukan') {
+      status.value = 'Diajukan';
+      tombol.innerHTML = `<i class="fas fa-paper-plane me-1"></i> Ajukan Perubahan`;
+    } else {
+      status.value = 'Tersimpan';
+      tombol.innerHTML = `<i class="fas fa-save me-1"></i> Simpan Perubahan`;
+    }
+  });
+
+  // ✅ Tunggu JS siap, lalu muat data
+  const tungguSiap = setInterval(() => {
+    if (window.muatPenandatangan && window.DATA_SURAT?.ttd?.length > 0) {
+      clearInterval(tungguSiap);
+      window.muatPenandatangan(window.DATA_SURAT.ttd);
+    }
+  }, 50);
+});
+</script>
+
+<!-- JS Utama -->
+<script src="{{ url_for('static', filename='js/sections/tu/surat_keluar.js') }}"></script>
+{% endblock %}

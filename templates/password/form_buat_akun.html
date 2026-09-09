@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/password/buat_akun.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="card">
+        <div class="card-header">
+            <h4>Buat Akun Login Guru</h4>
+            <p class="header-subtitle">Isi data akses dan verifikasi identitas guru</p>
+        </div>
+
+        <div class="card-body">
+            <div class="row-layout">
+                <!-- KIRI: Form Buat Akun -->
+                <div class="col-form">
+                    <h5 class="section-title">
+                        <i class="fas fa-key me-2"></i>Data Akses
+                    </h5>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label>Username <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" required placeholder="Contoh: budi_santoso">
+                        </div>
+                        <div class="form-group">
+                            <label>Password <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" required minlength="6" placeholder="Minimal 6 karakter">
+                        </div>
+
+                        <div class="form-actions mt-4">
+                            <a href="{{ url_for('data_guru.halaman_data_guru') }}" class="btn btn-cancel">Kembali</a>
+                            <button type="submit" class="btn btn-primary">Buat Akun Sekarang</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Garis Pemisah -->
+                <div class="divider-vertical"></div>
+
+                <!-- KANAN: Biodata Guru (Hanya yang Dibutuhkan) -->
+                <div class="col-biodata">
+                    <h5 class="section-title">
+                        <i class="fas fa-user-circle me-2"></i>Identitas Guru
+                    </h5>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="info-label">Nama Lengkap</span>
+                            <span class="info-value">{{ guru.nama }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Jabatan</span>
+                            <span class="info-value">{{ guru.jabatan }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tempat & Tanggal Lahir</span>
+                            <span class="info-value">
+                                {{ guru.tempat_lahir or '-' }}, 
+                                {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

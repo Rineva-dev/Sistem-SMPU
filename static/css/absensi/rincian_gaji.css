@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.rincian-gaji-wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ===== FILTER ===== */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.filter-dropdown {
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    min-width: 160px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    color: #374151;
+    cursor: pointer;
+}
+
+/* ===== KARTU SLIP GAJI — GAYA RESI ===== */
+.slip-gaji-container {
+    background: #f3f4f6;
+    padding: 24px;
+    border-radius: 16px;
+}
+.slip-gaji-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 40px 36px;
+    box-shadow: 0 4px 24px rgba(17, 24, 39, 0.06);
+    position: relative;
+    overflow: hidden;
+}
+.slip-gaji-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #10b981 100%);
+}
+
+/* ===== HEADER SLIP ===== */
+.slip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.logo-box {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+}
+.nama-perusahaan {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 0.3px;
+}
+.alamat-perusahaan {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+.periode-box {
+    text-align: right;
+    padding: 10px 16px;
+    background: #eff6ff;
+    border-radius: 10px;
+    border: 1px solid #bfdbfe;
+}
+.label-periode {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+.nilai-periode {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e40af;
+    margin-top: 2px;
+}
+
+/* ===== GARIS PEMISAH ===== */
+.garis-pemisah {
+    margin: 20px 0;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #e5e7eb, #e5e7eb 8px, transparent 8px, transparent 12px);
+}
+.garis-pemisah.tipis {
+    height: 1px;
+    background: #e5e7eb;
+}
+.garis-pemisah.tebal {
+    height: 3px;
+    background: linear-gradient(90deg, #111827 0%, #4b5563 50%, #111827 100%);
+    border-radius: 2px;
+    margin: 24px 0;
+}
+
+/* ===== INFO PEGAWAI GRID ===== */
+.info-pegawai-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 24px;
+}
+.info-pegawai-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.info-pegawai-item .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+.info-pegawai-item .nilai {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* ===== BAGIAN TABEL ===== */
+.bagian-tabel {
+    margin: 20px 0;
+}
+.judul-tabel {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+.judul-tabel.penerimaan { color: #059669; }
+.judul-tabel.potongan { color: #dc2626; }
+
+.isi-tabel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.baris-data {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 4px;
+    font-size: 14px;
+    color: #374151;
+}
+.baris-data:nth-child(even) {
+    background: #f9fafb;
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+.baris-data .angka {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.baris-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+    margin-top: 8px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+}
+.baris-total.penerimaan {
+    background: #f0fdf4;
+    color: #166534;
+}
+.baris-total.potongan {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+/* ===== GAJI BERSIH ===== */
+.bagian-bersih {
+    text-align: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 12px;
+    color: white;
+    margin: 8px 0;
+}
+.label-bersih {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+.nominal-bersih {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 6px 0 4px;
+    font-variant-numeric: tabular-nums;
+}
+.terbilang {
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.8;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ===== TANDA TANGAN ===== */
+.bagian-tanda-tangan {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+}
+.tanda-tangan-kiri, .tanda-tangan-kanan {
+    text-align: center;
+    font-size: 13px;
+    color: #4b5563;
+}
+.nama-tanda {
+    border-top: 1px solid #9ca3af;
+    padding-top: 6px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* ===== FOOTER SLIP ===== */
+.slip-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    line-height: 1.5;
+    padding-top: 12px;
+    border-top: 1px dashed #e5e7eb;
+}
+
+/* ===== TOMBOL AKSI ===== */
+.tombol-aksi {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+.btn-cetak, .btn-unduh {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+.btn-cetak {
+    background: #1f2937;
+    color: white;
+}
+.btn-cetak:hover {
+    background: #111827;
+    transform: translateY(-1px);
+}
+.btn-unduh {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+.btn-unduh:hover {
+    background: #dbeafe;
+}
+
+/* ===== KOSONG ===== */
+.kosong-container {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e5e7eb;
+    color: #6b7280;
+}
+.kosong-container i {
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+.kosong-container h4 {
+    font-size: 18px;
+    color: #374151;
+    margin-bottom: 8px;
+}
+.kosong-container p {
+    font-size: 14px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .slip-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .periode-box {
+        text-align: center;
+    }
+    .info-pegawai-grid {
+        grid-template-columns: 1fr;
+    }
+    .bagian-tanda-tangan {
+        flex-direction: column;
+        gap: 24px;
+    }
+    .nominal-bersih {
+        font-size: 24px;
+    }
+    .tombol-aksi {
+        flex-direction: column;
+    }
+    .btn-cetak, .btn-unduh {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ===== CETAK ===== */
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+    .filter-bar, .tombol-aksi {
+        display: none !important;
+    }
+    .rincian-gaji-wrapper {
+        padding: 0;
+    }
+    .slip-gaji-container {
+        padding: 0;
+        background: white;
+    }
+    .slip-gaji-card {
+        box-shadow: none;
+        padding: 20px 0;
+    }
+}

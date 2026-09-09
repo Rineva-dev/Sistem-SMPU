@@ -1,0 +1,174 @@
+<style>
+@import url("/static/css/jabatan/waka_kurikulum/dashboard_wakakur.css");
+</style>
+
+
+<!-- HANYA konten saja -->
+<div class="dashboard-container">
+    <!-- Header Selamat Datang -->
+    <div class="welcome-box">
+        <div class="garis-1"></div>
+        <div class="garis-2"></div>
+        <div class="titik titik-1"></div>
+        <div class="titik titik-2"></div>
+        <div class="titik titik-3"></div>
+        <div>
+            <h2>Selamat Datang, {{ user_name }}!</h2>
+            <p class="text-muted">Peran Tambahan: <strong>Waka Kurikulum</strong> | Hari ini: <strong>{{ today_date_long }}</strong></p>
+            {% if daftar_tugas %}
+            <p class="text-primary mt-1">
+                <i class="fas fa-user-tag"></i> Tugas: {{ daftar_tugas | join(', ') }}
+            </p>
+            {% endif %}
+        </div>
+        <div class="date-box">
+            <a href="{{ url_for('kalender.halaman_kalender') }}?asal=dashboard" class="text-decoration-none text-dark d-block w-100 h-100">
+                <i class="far fa-calendar-alt"></i>
+                <span>{{ today_date }}</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Kartu Statistik Utama -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_kegiatan | default('0') }}</h3>
+                <p>Total Kegiatan</p>
+                <span class="stat-change neutral">Semester {{ semester_aktif | capitalize }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_hari_efektif | default('0') }}</h3>
+                <p>Hari Efektif Belajar</p>
+                <span class="stat-change neutral">Selama Semester</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ persen_kelengkapan_kalender | default('0') }}%</h3>
+                <p>Kelengkapan Kalender</p>
+                <span class="stat-change {{ 'positive' if persen_kelengkapan_kalender >= 90 else 'warning' }}">
+                    Target Minimal 100%
+                </span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ hari_menuju_ujian | default('0') }}</h3>
+                <p>Hari Menuju Akhir Semester</p>
+                <span class="stat-change neutral">Persiapan Ujian</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Akses Cepat & Status -->
+    <div class="content-grid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-tools me-2"></i> Akses Cepat</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/kurikulum/jadwal" class="btn btn-outline-primary w-100-sm">
+                        <i class="fas fa-calendar-alt me-1"></i> Atur Jadwal Pelajaran
+                    </a>
+                    <a href="/kurikulum/mapel" class="btn btn-outline-success w-100-sm">
+                        <i class="fas fa-book me-1"></i> Kelola Mata Pelajaran
+                    </a>
+                    <a href="/kurikulum/nilai" class="btn btn-outline-info w-100-sm">
+                        <i class="fas fa-chart-bar me-1"></i> Pantau Nilai Siswa
+                    </a>
+                    <a href="/kalender" class="btn btn-outline-secondary w-100-sm">
+                        <i class="fas fa-calendar-week me-1"></i> Kalender Pendidikan
+                    </a>
+                    <a href="/tahun-pelajaran" class="btn btn-outline-dark w-100-sm">
+                        <i class="fas fa-calendar-check me-1"></i> Pengaturan Tahun Ajaran
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-check-circle me-2"></i> Status Kalender</h4>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Jumlah Kegiatan Terdaftar</span>
+                        <span class="badge bg-primary">{{ total_kegiatan | default('0') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Persentase Disetujui</span>
+                        <span class="badge bg-{{ 'success' if persen_disetujui >= 90 else 'warning' }}">
+                            {{ persen_disetujui | default('0') }}%
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Kesiapan Kalender</span>
+                        <span class="badge bg-{{ 'success' if kalender_siap else 'danger' }}">
+                            {{ 'Siap' if kalender_siap else 'Belum Lengkap' }}
+                        </span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Tahun Pelajaran Aktif</span>
+                        <span class="badge bg-dark">{{ tahun_pelajaran_nama }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agenda Kegiatan -->
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4><i class="fas fa-calendar-alt"></i> Agenda Kegiatan</h4>
+            <a href="/agenda" class="btn-link small">Lihat Semua</a>
+        </div>
+        <div class="card-body p-0">
+            {% if agenda_kurikulum %}
+            <div class="agenda-list p-3">
+                {% for agenda in agenda_kurikulum %}
+                <div class="agenda-item">
+                    <div class="agenda-tanggal tanggal-{{ agenda.status | lower | replace(' ', '-') }}">
+                        <span class="agenda-hari">{{ agenda.tgl_mulai_obj.strftime('%d') }}</span>
+                        <span class="agenda-bulan">{{ agenda.tgl_mulai_obj.strftime('%b') }}</span>
+                    </div>
+                    <div class="agenda-info">
+                        <h5 class="agenda-judul">{{ agenda.judul }}</h5>
+                        <div class="agenda-meta">
+                            <span><i class="far fa-clock"></i> {{ agenda.tgl_mulai_obj.strftime('%H:%M') }}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> {{ agenda.lokasi or '-' }}</span>
+                            <span class="agenda-status status-{{ agenda.status | lower | replace(' ', '-') }}">{{ agenda.status }}</span>
+                        </div>
+                    </div>
+                    <a href="/agenda/detail/{{ agenda.id }}" class="btn btn-sm btn-light">Detail</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                <p>Belum ada agenda kegiatan terdaftar</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

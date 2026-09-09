@@ -1,0 +1,130 @@
+<div class="dashboard-container">
+
+    <!-- Header Selamat Datang -->
+    <div class="welcome-box">
+        <div class="garis-1"></div>
+        <div class="garis-2"></div>
+        <div class="titik titik-1"></div>
+        <div class="titik titik-2"></div>
+        <div class="titik titik-3"></div>
+
+        <div>
+            <h2>Selamat Datang, {{ user_name | default('Kepala Sekolah') }}!</h2>
+            <p class="text-muted">Anda masuk sebagai <strong>Kepala Sekolah</strong> - Pemantau Utama Operasional Sekolah</p>
+        </div>
+
+        <div class="date-box">
+            <i class="far fa-calendar-alt"></i>
+            <span>{{ today_date | default('Tanggal tidak tersedia') }}</span>
+        </div>
+    </div>
+
+    <!-- Kartu Ringkasan Data Sekolah -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_siswa | default('0') }}</h3>
+                <p>Jumlah Siswa Aktif</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_guru | default('0') }}</h3>
+                <p>Jumlah Guru</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-user-cog"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_staf | default('0') }}</h3>
+                <p>Jumlah Staf Tata Usaha</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ rata_kehadiran | default('0') }}%</h3>
+                <p>Rata-rata Kehadiran</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik & Agenda Kegiatan -->
+    <div class="content-grid">
+        <!-- Bagian Kiri: Grafik -->
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-chart-line"></i> Perkembangan Akademik & Kehadiran</h4>
+            </div>
+            <div class="card-body">
+                <canvas id="performaChart" height="280"></canvas>
+            </div>
+        </div>
+
+        <!-- Bagian Kanan: Agenda & Kegiatan Mendatang -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-calendar-alt"></i> Agenda & Kegiatan Mendatang</h4>
+                <a href="/agenda" class="btn-link small">Lihat Semua</a>
+            </div>
+            <div class="card-body p-0">
+                {% if daftar_agenda and daftar_agenda|length > 0 %}
+                <div class="agenda-list p-3">
+                    {% for agenda in daftar_agenda[:5] %} <!-- Tampilkan maksimal 5 agenda terdekat -->
+                    <div class="agenda-item">
+                        <div class="agenda-tanggal tanggal-{{ agenda.status|lower|replace(' ', '-') }}">
+                            <span class="agenda-hari">{{ agenda.tanggal.strftime('%d') }}</span>
+                            <span class="agenda-bulan">{{ agenda.tanggal.strftime('%b') }}</span>
+                        </div>
+                        <div class="agenda-info">
+                            <h5 class="agenda-judul">{{ agenda.nama_kegiatan }}</h5>
+                            <div class="agenda-meta">
+                                <span><i class="far fa-clock"></i> {{ agenda.waktu_mulai }} - {{ agenda.waktu_selesai }}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> {{ agenda.tempat or 'Tempat belum ditentukan' }}</span>
+                                <span class="agenda-status status-{{ agenda.status|lower|replace(' ', '-') }}">
+                                    {{ agenda.status }}
+                                </span>
+                            </div>
+                        </div>
+                        <a href="/agenda/detail/{{ agenda.id }}" class="btn btn-sm btn-light">Detail</a>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Tombol lihat semua jika ada lebih dari 5 -->
+                    {% if daftar_agenda|length > 5 %}
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <a href="/agenda" class="btn btn-sm btn-outline-primary">Lihat Semua Agenda</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                    <p class="mb-1">Belum ada agenda kegiatan yang terjadwal</p>
+                    <small>Agenda akan ditampilkan di sini setelah dibuat</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    window.chartData = {{ chart_data | tojson }};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/sections/kepsek/dashboard.js') }}"></script>

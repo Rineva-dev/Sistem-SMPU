@@ -1,0 +1,167 @@
+/* ==========================================
+   GLOBAL STYLE - TOMBOL / BUTTON
+========================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    line-height: 1.5;
+    border-radius: 0.375rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+/* Ukuran Tombol */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.btn-lg {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Warna Dasar */
+.btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    text-decoration: none;
+}
+.btn-primary:active {
+    background-color: #1e40af;
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    color: #ffffff;
+}
+.btn-secondary:hover {
+    background-color: #4b5563;
+    color: #ffffff;
+}
+
+.btn-success {
+    background-color: #10b981;
+    color: #ffffff;
+}
+.btn-success:hover {
+    background-color: #059669;
+}
+
+.btn-warning {
+    background-color: #f59e0b;
+    color: #ffffff;
+}
+.btn-warning:hover {
+    background-color: #d97706;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* Gaya Garis / Outline */
+.btn-outline-primary {
+    background-color: transparent;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+}
+.btn-outline-primary:hover {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    border: 1px solid #6b7280;
+    color: #6b7280;
+}
+.btn-outline-secondary:hover {
+    background-color: #6b7280;
+    color: #ffffff;
+}
+
+.btn-outline-warning {
+    background-color: transparent;
+    border: 1px solid #f59e0b;
+    color: #f59e0b;
+}
+.btn-outline-warning:hover {
+    background-color: #f59e0b;
+    color: #ffffff;
+}
+
+.btn-outline-success {
+    background-color: transparent;
+    border: 1px solid #198754;
+    color: #198754;
+}
+
+.btn-outline-success:hover {
+    background-color: #198754;
+    color: #ffffff;
+}
+
+.btn-outline-info {
+    background-color: transparent;
+    border: 1px solid #0dcaf0;
+    color: #0dcaf0;
+}
+
+.btn-outline-danger {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+.btn-outline-danger:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+/* Tombol Tidak Aktif */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    background: #ffffff;
+    color: #2563eb;
+    border: 1.5px solid #2563eb;
+}
+
+.btn-cancel:hover {
+    background: #2563eb;
+    color:#ffffff
+}
+
+.btn-save {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+}

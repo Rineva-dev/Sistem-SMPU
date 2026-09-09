@@ -1,0 +1,87 @@
+<!-- Bagian Tambahan: Waka Sarana & Prasarana -->
+<div class="dashboard-container mt-5">
+    <div class="card border-info">
+        <div class="card-header bg-info bg-opacity-10 border-bottom border-info">
+            <h4 class="mb-0">
+                <i class="fas fa-building text-info"></i>
+                Tugas Tambahan: Waka Sarana & Prasarana
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_ruangan | default('0') }}</h3>
+                        <p>Total Ruangan</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_ruangan_layak | default('0') }}</h3>
+                        <p>Ruangan Layak Pakai</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_perbaikan | default('0') }}</h3>
+                        <p>Dalam Perbaikan</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-secondary">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_inventaris | default('0') }}</h3>
+                        <p>Total Inventaris</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie"></i> Kondisi Sarana</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="saranaChart" height="220"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-exclamation-circle"></i> Daftar Perbaikan</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-perbaikan">
+                            <li class="perbaikan-item">
+                                <span>AC Ruang Kelas 9B</span>
+                                <span class="badge bg-warning">Proses</span>
+                            </li>
+                            <li class="perbaikan-item">
+                                <span>Kursi Ruang Guru</span>
+                                <span class="badge bg-success">Selesai</span>
+                            </li>
+                            <li class="perbaikan-item">
+                                <span>Atap Aula</span>
+                                <span class="badge bg-danger">Segera</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

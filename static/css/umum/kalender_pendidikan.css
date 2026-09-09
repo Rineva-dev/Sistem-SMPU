@@ -1,0 +1,314 @@
+/* ==========================================
+   STYLE KALENDER PENDIDIKAN - VERSI SAAS
+   ========================================== */
+
+/* Reset agar sesuai tata letak global */
+.container-fluid.px-4 {
+    padding: 0 !important;
+    max-width: 100%;
+}
+
+.kalender-header {
+    margin: 0 0 1.5rem 0 !important;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Judul halaman */
+.kalender-header h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+}
+
+.kalender-header p {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.kalender-header p strong {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+/* Tombol aksi */
+.kalender-header .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.kalender-header .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+
+/* Kartu Semester */
+.kalender-card {
+    border: none;
+    border-radius: 0.85rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+    background: #ffffff;
+}
+
+.kalender-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
+}
+
+.kalender-card .card-header {
+    padding: 1.1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-bottom: none;
+    letter-spacing: 0.2px;
+}
+
+.kalender-card .card-body {
+    padding: 0;
+}
+
+/* Daftar Kegiatan */
+.kegiatan-item {
+    padding: 1.2rem 1.5rem;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.kegiatan-item:hover {
+    background-color: #f8fafc;
+    border-left-color: #3b82f6;
+}
+
+.kegiatan-tanggal {
+    font-weight: 600;
+    color: #1d4ed8;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+.kegiatan-nama {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #0f172a;
+    margin: 0.4rem 0 0.6rem 0;
+    line-height: 1.4;
+}
+
+/* Warna badge sesuai jenis kegiatan */
+.badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.35rem 0.8rem;
+    border-radius: 9999px;
+}
+
+.badge-akademik {
+    background-color: #0284c7;
+    color: #ffffff;
+}
+
+.badge-libur {
+    background-color: #7c3aed;
+    color: #ffffff;
+}
+
+.badge-kegiatan {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+.badge-hari-besar {
+    background-color: #d97706;
+    color: #ffffff;
+}
+
+/* Tombol aksi pada daftar */
+.aksi-kegiatan {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.aksi-kegiatan a,
+.aksi-kegiatan button {
+    font-size: 1.1rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.4rem;
+    background: transparent;
+    border: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.aksi-kegiatan a:hover,
+.aksi-kegiatan button:hover {
+    transform: scale(1.15);
+    background-color: #f1f5f9;
+}
+
+.aksi-kegiatan .text-warning {
+    color: #d97706 !important;
+}
+
+.aksi-kegiatan .text-danger {
+    color: #dc2626 !important;
+}
+
+/* Status Persetujuan */
+.status-kalender {
+    border-radius: 0.7rem;
+    padding: 1rem 1.4rem;
+    font-weight: 500;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.status-kalender.alert-success {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.status-kalender.alert-warning {
+    background-color: #fffbeb;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+/* Modal */
+.modal-kalender .modal-content {
+    border-radius: 0.85rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.modal-kalender .modal-header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-kalender .modal-title {
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #1e293b;
+}
+
+.modal-kalender .modal-body {
+    padding: 1.5rem;
+}
+
+.modal-kalender .form-label {
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.modal-kalender .form-control,
+.modal-kalender .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    padding: 0.6rem 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.modal-kalender .form-control:focus,
+.modal-kalender .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    outline: none;
+}
+
+.modal-kalender .modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 768px) {
+    .container-fluid.px-4 {
+        padding: 1rem !important;
+    }
+
+    .kalender-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+
+    .kalender-header .btn {
+        width: 100%;
+    }
+
+    .kegiatan-item {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.8rem;
+    }
+
+    .aksi-kegiatan {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Perkecil ukuran tanggal di kalender */
+#kalenderUtama .fc-daygrid-day-number {
+  font-size: 0.9rem;
+  padding: 4px 6px;
+}
+
+/* Sesuaikan tinggi kotak tanggal agar tidak terlalu besar */
+#kalenderUtama .fc-daygrid-day-frame {
+  min-height: 60px;
+}
+
+/* Lebih rapi untuk tampilan keseluruhan */
+#kalenderUtama {
+  font-size: 0.95rem;
+}
+
+#kalenderUtama .fc-toolbar-title {
+  font-size: 1.2rem;
+}
+
+/* Atur tampilan latar kegiatan */
+.fc-bg-event {
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-radius: 2px !important;
+}
+
+/* Ukuran & jarak kotak tanggal */
+#kalenderUtama {
+  font-size: 0.85rem;
+}
+
+.fc-daygrid-day-number {
+  font-size: 0.9rem !important;
+  padding: 4px 6px !important;
+}
+
+.fc-daygrid-day-frame {
+  min-height: 55px !important;
+}
+
+/* Nonaktifkan animasi agar lebih ringan */
+.fc-event {
+  transition: none !important;
+}
+
+/* Untuk tampilan 6 bulan */
+.fc-dayGrid6bulan .fc-daygrid-day {
+  min-height: 45px;
+}

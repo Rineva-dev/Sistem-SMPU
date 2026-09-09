@@ -1,0 +1,187 @@
+/* ==========================================
+   CUSTOM TIME - TATA LETAK RESPONSIF
+========================================== */
+.custom-time {
+    position: relative;
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+.custom-time__tombol {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.15s ease-in-out;
+    min-height: 38px;
+    box-sizing: border-box;
+}
+
+.custom-time__tombol:hover {
+    border-color: #86b7fe;
+}
+
+.custom-time__nilai {
+    color: #212529;
+}
+
+.custom-time__ikon {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* POPUP UTAMA */
+.custom-time__popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 1.5rem;
+    z-index: 99999 !important;
+    min-width: 260px;
+    max-width: 90%;
+}
+
+.time-popup-judul {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    color: #212529;
+}
+
+/* BUNGKUS ISI UTAMA: DI ATUR RESPONSIF */
+.time-bungkus-isi {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-direction: column; /* Default: HP = bawah */
+}
+
+/* PILIHAN JAM & MENIT */
+.time-popup-pilihan {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.time-kolom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-btn-naik, .time-btn-turun {
+    width: 40px;
+    height: 32px;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    transition: all 0.1s;
+    padding: 0;
+    line-height: 1;
+}
+
+.time-btn-naik:hover, .time-btn-turun:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.time-angka {
+    width: 45px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0.3rem;
+    color: #212529;
+    cursor: text;
+}
+
+.time-angka:focus {
+    background: #e9ecef;
+    border-radius: 0.25rem;
+}
+
+.time-pemisah {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #6c757d;
+    padding-bottom: 1.7rem;
+}
+
+/* TOMBOL AKSI */
+.time-popup-aksi {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    width: 100%;
+}
+
+.time-btn-batal {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ced4da;
+    background: #fff;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: #495057;
+}
+
+.time-btn-ok {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #0d6efd;
+    color: white;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.time-btn-ok:hover {
+    background: #0a58ca;
+}
+
+.time-kolom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.time-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ==========================================
+   KHUSUS DESKTOP: TOMBOL PINDAH KE KANAN
+========================================== */
+@media (min-width: 576px) {
+    .time-bungkus-isi {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .time-popup-aksi {
+        flex-direction: column;
+        width: auto;
+    }
+}

@@ -1,0 +1,481 @@
+<div class="dashboard-container">
+    <div class="welcome-box">
+        <div>
+            <h2>{{ kelas.nama_kelas }}</h2>
+            <p class="text-muted">Wali Kelas: <strong>{{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}</strong></p>
+        </div>
+        <div class="date-box">
+            <i class="fas fa-users"></i>
+            <span>Jumlah Siswa: {{ daftar_siswa | length }}</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-list"></i> Daftar Siswa</h5>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
+                    <i class="fas fa-users-cog"></i> Kelola Siswa
+                </button>
+
+                <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
+                    <i class="fas fa-book-open me-1"></i> Pengaturan Mapel
+                </button>
+
+                <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="btn btn-sm btn-warning text-dark">
+                    <i class="fas fa-calendar-alt me-1"></i> Jadwal Pelajaran
+                </a>
+
+                {% if tahun_dipilih.endswith('-1') or "Ganjil" in tahun_dipilih %}
+                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
+                    <i class="fas fa-forward me-1"></i> Lanjutkan ke Genap
+                </button>
+                {% endif %}
+
+                {% if tahun_dipilih.endswith('-2') or "Genap" in tahun_dipilih %}
+                <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
+                    <i class="fas fa-arrow-up me-1"></i> Naik Kelas
+                </button>
+                {% endif %}
+
+                <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn btn-sm btn-secondary">Kembali</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>NISN</th>
+                            <th>Nama Lengkap</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if daftar_siswa %}
+                            {% for siswa in daftar_siswa %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ siswa.nisn }}</td>
+                                <td>{{ siswa.nama }}</td>
+                                <td>{{ siswa.jenis_kelamin }}</td>
+                                <td><span class="badge bg-success">{{ siswa.status }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('data_siswa.detail_siswa', id=siswa.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="6" class="text-center text-muted py-4">Belum ada siswa di kelas ini</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ MODAL KELOLA SISWA -->
+<div class="modal fade" id="modalKelolaSiswa" tabindex="-1" aria-labelledby="modalKelolaSiswaLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalKelolaSiswaLabel">
+                    <i class="fas fa-users-cog me-2"></i>Kelola Siswa - {{ kelas.nama_kelas }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" id="tombolTutupModal" aria-label="Tutup"></button>
+            </div>
+
+            <form method="POST" action="{{ url_for('data_kelas.kelola_siswa_di_kelas', kelas_id=kelas.id) }}" id="formKelolaSiswa">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+                <div class="modal-body" style="min-height: 68vh; overflow-y: auto;">
+                    <div class="row g-4">
+                        <!-- Bagian Kiri: Siswa Belum Masuk Kelas -->
+                        <div class="col-md-6 border-end">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-success mb-0"><i class="fas fa-user-plus"></i> Siswa Belum Masuk Kelas</h6>
+                                <button type="button" id="btnMasukkan" class="btn btn-sm btn-success">
+                                    <i class="fas fa-arrow-right me-1"></i> Masukkan ke Kelas
+                                </button>
+                            </div>
+                            <input type="text" class="form-control form-control-sm mb-3" id="cariBelum" placeholder="Cari NIS / Nama...">
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="pilihSemuaBelum">
+                                <label class="form-check-label fw-bold" for="pilihSemuaBelum">Pilih Semua</label>
+                            </div>
+                            <hr>
+                            <!-- Kontainer untuk data asli -->
+                            <div id="dataAsliBelum" style="display: none;">
+                                {% if siswa_belum_masuk %}
+                                    {% for siswa in siswa_belum_masuk %}
+                                    <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}" data-nama="{{ siswa.nama }}"></div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="daftar-siswa" id="daftarBelum">
+                                <!-- Akan diisi ulang setiap kali modal dibuka -->
+                            </div>
+                        </div>
+
+                        <!-- Bagian Kanan: Siswa Sudah Ada di Kelas -->
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-danger mb-0"><i class="fas fa-user-minus"></i> Siswa Sudah di Kelas Ini</h6>
+                                <button type="button" id="btnKeluarkan" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-arrow-left me-1"></i> Keluarkan dari Kelas
+                                </button>
+                            </div>
+                            <input type="text" class="form-control form-control-sm mb-3" id="cariSudah" placeholder="Cari NIS / Nama...">
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="pilihSemuaSudah">
+                                <label class="form-check-label fw-bold" for="pilihSemuaSudah">Pilih Semua</label>
+                            </div>
+                            <hr>
+                            <!-- Kontainer untuk data asli -->
+                            <div id="dataAsliSudah" style="display: none;">
+                                {% if daftar_siswa %}
+                                    {% for siswa in daftar_siswa %}
+                                    <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}" data-nama="{{ siswa.nama }}"></div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="daftar-siswa" id="daftarSudah">
+                                <!-- Akan diisi ulang setiap kali modal dibuka -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ✅ Footer tetap di paling bawah -->
+                <div class="modal-footer border-top mt-2">
+                    <button type="button" class="btn btn-secondary" id="tombolBatal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="tombolSimpan">
+                        <i class="fas fa-save me-1"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ MODAL LANJUTKAN KE SEMESTER GENAP -->
+<div class="modal fade" id="modalLanjutkan" tabindex="-1" aria-labelledby="modalLanjutkanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalLanjutkanLabel">
+                    <i class="fas fa-forward me-2"></i>Lanjutkan ke Semester Genap - {{ kelas.nama_kelas }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('data_kelas.lanjutkan_semester_genap', kelas_id=kelas.id) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="kode_genap" value="{{ tahun_dipilih.replace('-1','-2') }}">
+                    <p class="text-muted">Pilih siswa yang akan tetap bersekolah di semester Genap. Riwayat Semester Ganjil <strong>tidak akan berubah</strong>.</p>
+                    <hr>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="pilihSemuaLanjut" {% if siswa_lanjutkan %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="pilihSemuaLanjut">Pilih Semua Siswa</label>
+                        </div>
+                        <hr>
+
+                        {% if siswa_lanjutkan %}
+                            {% for siswa in siswa_lanjutkan %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input lanjut-check" type="checkbox" name="siswa_id" value="{{ siswa.id }}" id="l_{{ siswa.id }}" checked>
+                                <label class="form-check-label" for="l_{{ siswa.id }}">{{ siswa.nis }} - {{ siswa.nama }}</label>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center text-muted py-3">
+                                Semua siswa sudah ada di Semester Genap atau sudah naik tingkat. Hapus dulu dari daftar Genap jika ingin melanjutkan ulang.
+                            </p>
+                        {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Lanjutkan Siswa Terpilih</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ MODAL NAIK KELAS -->
+<div class="modal fade" id="modalNaikKelas" tabindex="-1" aria-labelledby="modalNaikKelasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalNaikKelasLabel">
+                    <i class="fas fa-arrow-up me-2"></i>Naik Kelas - {{ kelas.nama_kelas }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('data_kelas.naik_kelas', kelas_id=kelas.id) }}">
+                <div class="modal-body">
+                    <p class="text-muted">Pilih siswa yang akan naik ke tingkat berikutnya. Data tahun ini <strong>tetap tersimpan sebagai arsip</strong>.</p>
+                    <hr>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="pilihSemuaNaik" checked>
+                        <label class="form-check-label fw-bold" for="pilihSemuaNaik">Pilih Semua Siswa</label>
+                    </div>
+                    <hr>
+                    {% if daftar_siswa %}
+                        {% for siswa in daftar_siswa %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input naik-check" type="checkbox" name="siswa_id" value="{{ siswa.id }}" id="n_{{ siswa.id }}" checked>
+                            <label class="form-check-label" for="n_{{ siswa.id }}">{{ siswa.nis }} - {{ siswa.nama }}</label>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted">Belum ada siswa di kelas ini</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-warning text-dark">Proses Naik Kelas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ MODAL PENGATURAN MATA PELAJARAN -->
+<div class="modal fade" id="modalPengaturanMapel" tabindex="-1" aria-labelledby="modalPengaturanMapelLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- ✅ HEADER: DILUAR FORM -->
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalPengaturanMapelLabel">
+                    <i class="fas fa-book-open me-2"></i>Pengaturan Mata Pelajaran - {{ kelas.nama_kelas }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- ✅ FORM: HANYA MULAI SETELAH HEADER -->
+            <form method="POST" action="{{ url_for('data_kelas.simpan_pengaturan_mapel', kelas_id=kelas.id) }}">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+                
+                <!-- ✅ BODY: BAGIAN YANG AKAN SCROLL -->
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Masukkan Jumlah Jam Pelajaran (JP). Mapel dengan JP <strong>lebih dari 0</strong> akan aktif dan muncul di jadwal.</p>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="40">No</th>
+                                    <th width="100">Kode Mapel</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th width="220">Guru Pengampu</th>
+                                    <th width="100" class="text-center">Jumlah JP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if daftar_mapel %}
+                                    {% for mapel in daftar_mapel %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td><code>{{ mapel.kode }}</code></td>
+                                        <td>{{ mapel.nama_pelajaran }}</td>
+                                        <td>
+                                            <select class="form-select form-select-sm" name="guru_id_{{ mapel.id }}">
+                                                <option value="">-- Pilih Guru --</option>
+                                                {% for guru in daftar_guru %}
+                                                <option value="{{ guru.id }}" {% if mapel.guru_terpilih == guru.id %}selected{% endif %}>
+                                                    {{ guru.nama }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="jp_{{ mapel.id }}" class="form-control form-control-sm text-center"
+                                                   min="0" value="{{ mapel.jumlah_jp or 0 }}">
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="5" class="text-center text-muted py-4">Belum ada data mata pelajaran</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ✅ FOOTER: DALAM FORM, DI BAWAH BODY -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Simpan Pengaturan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ SCRIPT AKHIR - PASTI BERJALAN -->
+<script>
+let adaPerubahan = false;
+
+// Saat modal dibuka, isi daftar dari data asli
+document.getElementById('modalKelolaSiswa').addEventListener('show.bs.modal', function() {
+    adaPerubahan = false;
+    document.getElementById('cariBelum').value = '';
+    document.getElementById('cariSudah').value = '';
+    document.getElementById('pilihSemuaBelum').checked = false;
+    document.getElementById('pilihSemuaSudah').checked = false;
+
+    const daftarBelum = Array.from(document.querySelectorAll('#dataAsliBelum .item-asli')).map(el => ({
+        id: el.dataset.id, nis: el.dataset.nis, nama: el.dataset.nama
+    }));
+
+    const daftarSudah = Array.from(document.querySelectorAll('#dataAsliSudah .item-asli')).map(el => ({
+        id: el.dataset.id, nis: el.dataset.nis, nama: el.dataset.nama
+    }));
+
+    // Daftar kiri: belum masuk → bisa dipindah
+    const kontenBelum = daftarBelum.length 
+        ? daftarBelum.map(s => `
+            <div class="form-check" data-id="${s.id}">
+                <input class="form-check-input belum-check" type="checkbox" value="${s.id}" id="b_${s.id}">
+                <label class="form-check-label" for="b_${s.id}">${s.nis} - ${s.nama}</label>
+            </div>`).join('')
+        : '<div class="text-muted p-2">Tidak ada siswa</div>';
+
+    // Daftar kanan: sudah masuk → bisa dipindah keluar
+    const kontenSudah = daftarSudah.length 
+        ? daftarSudah.map(s => `
+            <div class="form-check" data-id="${s.id}">
+                <input class="form-check-input sudah-check" type="checkbox" value="${s.id}" id="s_${s.id}">
+                <label class="form-check-label" for="s_${s.id}">${s.nis} - ${s.nama}</label>
+            </div>`).join('')
+        : '<div class="text-muted p-2">Belum ada siswa</div>';
+
+    document.getElementById('daftarBelum').innerHTML = kontenBelum;
+    document.getElementById('daftarSudah').innerHTML = kontenSudah;
+});
+
+function tandai() { adaPerubahan = true; }
+
+// Pilih semua
+document.getElementById('pilihSemuaBelum').addEventListener('change', function() {
+    document.querySelectorAll('#daftarBelum .belum-check').forEach(cb => cb.checked = this.checked);
+});
+document.getElementById('pilihSemuaSudah').addEventListener('change', function() {
+    document.querySelectorAll('#daftarSudah .sudah-check').forEach(cb => cb.checked = this.checked);
+});
+
+// Pencarian
+document.getElementById('cariBelum').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#daftarBelum .form-check').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+document.getElementById('cariSudah').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#daftarSudah .form-check').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+
+// ✅ Pindah KIRI → KANAN = DIMASUKKAN ke kelas
+document.getElementById('btnMasukkan').addEventListener('click', function() {
+    const dipilih = document.querySelectorAll('#daftarBelum .belum-check:checked');
+    if (!dipilih.length) return alert('Pilih siswa dulu!');
+
+    dipilih.forEach(cb => {
+        const item = cb.closest('.form-check');
+        const id = item.dataset.id;
+        const teks = item.querySelector('label').textContent;
+
+        // Pindah ke kanan + TAMBAHKAN name="tambah_id" agar dikirim
+        const baru = document.createElement('div');
+        baru.className = 'form-check';
+        baru.dataset.id = id;
+        baru.innerHTML = `
+            <input type="hidden" name="tambah_id" value="${id}">
+            <input class="form-check-input sudah-check" type="checkbox" value="${id}" id="s_${id}">
+            <label class="form-check-label" for="s_${id}">${teks}</label>`;
+
+        document.getElementById('daftarSudah').appendChild(baru);
+        item.remove();
+    });
+
+    document.getElementById('pilihSemuaBelum').checked = false;
+    tandai();
+});
+
+// ✅ Pindah KANAN → KIRI = DIKELUARKAN dari kelas
+document.getElementById('btnKeluarkan').addEventListener('click', function() {
+    const dipilih = document.querySelectorAll('#daftarSudah .sudah-check:checked');
+    if (!dipilih.length) return alert('Pilih siswa dulu!');
+
+    dipilih.forEach(cb => {
+        const item = cb.closest('.form-check');
+        const id = item.dataset.id;
+        const teks = item.querySelector('label').textContent;
+
+        // Hapus input tambah_id jika ada, lalu beri name="keluarkan_id"
+        const inputTambah = item.querySelector('input[name="tambah_id"]');
+        if (inputTambah) inputTambah.remove();
+
+        const baru = document.createElement('div');
+        baru.className = 'form-check';
+        baru.dataset.id = id;
+        baru.innerHTML = `
+            <input type="hidden" name="keluarkan_id" value="${id}">
+            <input class="form-check-input belum-check" type="checkbox" value="${id}" id="b_${id}">
+            <label class="form-check-label" for="b_${id}">${teks}</label>`;
+
+        document.getElementById('daftarBelum').appendChild(baru);
+        item.remove();
+    });
+
+    document.getElementById('pilihSemuaSudah').checked = false;
+    tandai();
+});
+
+// ✅ Cek sebelum kirim
+document.getElementById('formKelolaSiswa').addEventListener('submit', function(e) {
+    const adaTambah = document.querySelectorAll('input[name="tambah_id"]').length;
+    const adaKeluarkan = document.querySelectorAll('input[name="keluarkan_id"]').length;
+
+    if (!adaTambah && !adaKeluarkan) {
+        alert('Tidak ada perubahan yang akan disimpan!');
+        e.preventDefault();
+        return;
+    }
+
+    const ok = confirm(`Yakin simpan?\n• Masukkan: ${adaTambah} siswa\n• Keluarkan: ${adaKeluarkan} siswa`);
+    if (!ok) e.preventDefault();
+    else adaPerubahan = false;
+});
+
+// ✅ Tutup modal
+function tutupModal() {
+    if (adaPerubahan && !confirm('Perubahan belum disimpan! Yakin menutup?')) return;
+    bootstrap.Modal.getInstance(document.getElementById('modalKelolaSiswa')).hide();
+    adaPerubahan = false;
+}
+document.getElementById('tombolTutupModal').addEventListener('click', tutupModal);
+document.getElementById('tombolBatal').addEventListener('click', tutupModal);
+
+document.getElementById('pilihSemuaLanjut')?.addEventListener('change', function(){
+    document.querySelectorAll('.lanjut-check').forEach(cb => cb.checked = this.checked);
+});
+
+document.getElementById('pilihSemuaNaik')?.addEventListener('change', function(){
+    document.querySelectorAll('.naik-check').forEach(cb => cb.checked = this.checked);
+});
+
+</script>

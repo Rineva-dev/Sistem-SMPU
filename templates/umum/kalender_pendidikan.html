@@ -1,0 +1,246 @@
+{% extends "layout.html" %}
+
+{% block title %}Kalender Pendidikan - Sistem Sekolah{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/umum/kalender_pendidikan.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <!-- Judul Halaman -->
+  <div class="d-flex justify-content-between align-items-center my-4 kalender-header">
+    <div>
+      <h2 class="mb-1"><i class="fas fa-calendar-week me-2"></i>Kalender Pendidikan</h2>
+      <p class="text-muted mb-0">
+        Tahun Pelajaran: <strong>{{ tahun_pelajaran }}</strong>
+        {% if semester_aktif %}
+          &nbsp; • &nbsp; Semester Aktif: <strong>{{ 'Ganjil' if semester_aktif == 'ganjil' else 'Genap' }}</strong>
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- Tombol aksi -->
+    <div>
+      {% if bisa_kelola %}
+      <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalTambah">
+        <i class="fas fa-plus me-1"></i> Tambah Kegiatan
+      </button>
+      {% endif %}
+
+      {% if bisa_setujui %}
+      <form action="{{ url_for('kalender.setujui_kalender') }}" method="POST" style="display: inline;">
+        <button type="submit" class="btn btn-success" id="tombolSetuju">
+          <i class="fas fa-check me-1"></i> Setujui Kalender
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Status Persetujuan -->
+  <div class="alert {% if disetujui %}alert-success{% else %}alert-warning{% endif %} mb-4 status-kalender">
+    {% if disetujui %}
+      <i class="fas fa-check-circle me-2"></i> Kalender pendidikan sudah disetujui dan berlaku.
+    {% else %}
+      <i class="fas fa-exclamation-triangle me-2"></i> Kalender masih berupa draf, belum disahkan.
+    {% endif %}
+  </div>
+
+  <!-- ✅ Tampilkan Hanya Semester yang Aktif -->
+  <div class="row g-4 justify-content-center">
+    {% if semester_aktif == 'ganjil' %}
+    <!-- Kartu Semester Ganjil -->
+    <div class="col-md-8">
+      <div class="card shadow-sm kalender-card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-book me-2"></i>Semester Ganjil</h5>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            {% for kegiatan in daftar_kegiatan if kegiatan.semester == 'ganjil' %}
+            <li class="list-group-item kegiatan-item d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="kegiatan-tanggal">
+                        {{ kegiatan.tanggal_mulai.strftime('%d %b %Y') }}
+                        {% if kegiatan.tanggal_selesai != kegiatan.tanggal_mulai %}
+                            &nbsp; s.d. &nbsp; {{ kegiatan.tanggal_selesai.strftime('%d %b %Y') }}
+                        {% endif %}
+                    </div>
+                    <div class="kegiatan-nama">{{ kegiatan.nama_kegiatan }}</div>
+                    <span class="badge {% if kegiatan.jenis == 'Akademik' %}badge-akademik{% elif kegiatan.jenis == 'Libur' %}badge-libur{% elif kegiatan.jenis == 'Kegiatan' %}badge-kegiatan{% elif kegiatan.jenis == 'Hari Besar' %}badge-hari-besar{% endif %}">
+                        {{ kegiatan.jenis }}
+                    </span>
+                </div>
+                {% if bisa_kelola %}
+                <div class="aksi-kegiatan">
+                    <a href="#" class="text-warning me-2" title="Ubah" data-bs-toggle="modal" data-bs-target="#modalUbah{{ kegiatan.id }}"><i class="fas fa-edit"></i></a>
+                    <form action="{{ url_for('kalender.hapus_kegiatan', id=kegiatan.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus kegiatan ini?')">
+                      <button type="submit" class="text-danger border-0 bg-transparent" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endif %}
+            </li>
+            {% else %}
+            <li class="list-group-item text-center text-muted py-4">Belum ada kegiatan untuk semester ini</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {% elif semester_aktif == 'genap' %}
+    <!-- Kartu Semester Genap -->
+    <div class="col-md-8">
+      <div class="card shadow-sm kalender-card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Semester Genap</h5>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush">
+            {% for kegiatan in daftar_kegiatan if kegiatan.semester == 'genap' %}
+            <li class="list-group-item kegiatan-item d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="kegiatan-tanggal">
+                        {{ kegiatan.tanggal_mulai.strftime('%d %b %Y') }}
+                        {% if kegiatan.tanggal_selesai != kegiatan.tanggal_mulai %}
+                            &nbsp; s.d. &nbsp; {{ kegiatan.tanggal_selesai.strftime('%d %b %Y') }}
+                        {% endif %}
+                    </div>
+                    <div class="kegiatan-nama">{{ kegiatan.nama_kegiatan }}</div>
+                    <span class="badge {% if kegiatan.jenis == 'Akademik' %}badge-akademik{% elif kegiatan.jenis == 'Libur' %}badge-libur{% elif kegiatan.jenis == 'Kegiatan' %}badge-kegiatan{% elif kegiatan.jenis == 'Hari Besar' %}badge-hari-besar{% endif %}">
+                        {{ kegiatan.jenis }}
+                    </span>
+                </div>
+                {% if bisa_kelola %}
+                <div class="aksi-kegiatan">
+                    <a href="#" class="text-warning me-2" title="Ubah" data-bs-toggle="modal" data-bs-target="#modalUbah{{ kegiatan.id }}"><i class="fas fa-edit"></i></a>
+                    <form action="{{ url_for('kalender.hapus_kegiatan', id=kegiatan.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus kegiatan ini?')">
+                      <button type="submit" class="text-danger border-0 bg-transparent" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+                {% endif %}
+            </li>
+            {% else %}
+            <li class="list-group-item text-center text-muted py-4">Belum ada kegiatan untuk semester ini</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="col-md-8">
+      <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-2"></i> Silakan pilih Tahun Pelajaran terlebih dahulu dari menu di atas.
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal Tambah Kegiatan -->
+  {% if bisa_kelola %}
+  <div class="modal fade modal-kalender" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ url_for('kalender.tambah_kegiatan') }}" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTambahLabel"><i class="fas fa-calendar-plus me-2"></i>Tambah Kegiatan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nama Kegiatan</label>
+              <input type="text" name="nama_kegiatan" class="form-control" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="tanggal_mulai" class="form-control" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date" name="tanggal_selesai" class="form-control" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Semester</label>
+              <select name="semester" class="form-select" required>
+                <option value="ganjil" {{ 'selected' if semester_aktif == 'ganjil' else '' }}>Semester Ganjil</option>
+                <option value="genap" {{ 'selected' if semester_aktif == 'genap' else '' }}>Semester Genap</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Jenis Kegiatan</label>
+              <select name="jenis" class="form-select" required>
+                <option value="Akademik">Akademik / Penilaian</option>
+                <option value="Libur">Hari Libur / Cuti</option>
+                <option value="Kegiatan">Kegiatan Sekolah</option>
+                <option value="Hari Besar">Hari Besar / Peringatan</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i> Batal</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ubah Kegiatan -->
+  {% for kegiatan in daftar_kegiatan %}
+  <div class="modal fade modal-kalender" id="modalUbah{{ kegiatan.id }}" tabindex="-1" aria-labelledby="modalUbahLabel{{ kegiatan.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ url_for('kalender.ubah_kegiatan', id=kegiatan.id) }}" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalUbahLabel{{ kegiatan.id }}"><i class="fas fa-edit me-2"></i>Ubah Kegiatan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nama Kegiatan</label>
+              <input type="text" name="nama_kegiatan" class="form-control" value="{{ kegiatan.nama_kegiatan }}" required>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label">Tanggal Mulai</label>
+                <input type="date" name="tanggal_mulai" class="form-control" value="{{ kegiatan.tanggal_mulai.strftime('%Y-%m-%d') }}" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Tanggal Selesai</label>
+                <input type="date" name="tanggal_selesai" class="form-control" value="{{ kegiatan.tanggal_selesai.strftime('%Y-%m-%d') }}" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Semester</label>
+              <select name="semester" class="form-select" required>
+                <option value="ganjil" {{ 'selected' if kegiatan.semester == 'ganjil' else '' }}>Semester Ganjil</option>
+                <option value="genap" {{ 'selected' if kegiatan.semester == 'genap' else '' }}>Semester Genap</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Jenis Kegiatan</label>
+              <select name="jenis" class="form-select" required>
+                <option value="Akademik" {{ 'selected' if kegiatan.jenis == 'Akademik' else '' }}>Akademik / Penilaian</option>
+                <option value="Libur" {{ 'selected' if kegiatan.jenis == 'Libur' else '' }}>Hari Libur / Cuti</option>
+                <option value="Kegiatan" {{ 'selected' if kegiatan.jenis == 'Kegiatan' else '' }}>Kegiatan Sekolah</option>
+                <option value="Hari Besar" {{ 'selected' if kegiatan.jenis == 'Hari Besar' else '' }}>Hari Besar / Peringatan</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times me-1"></i> Batal</button>
+            <button type="submit" class="btn btn-warning"><i class="fas fa-save me-1"></i> Perbarui</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+</div>
+{% endblock %}

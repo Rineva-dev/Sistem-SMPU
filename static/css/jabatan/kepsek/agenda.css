@@ -1,0 +1,471 @@
+/* ==========================================
+   AGENDA & KEGIATAN - GAYA UTAMA
+========================================== */
+.container-fluid.px-4 {
+    padding: 0 !important;
+}
+/* --- Halaman Umum --- */
+.page-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+}
+
+.page-subtitle {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* --- Tombol Tampilan --- */
+.btn-group .btn-outline-primary {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-group .btn-outline-primary.active {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-group .btn-outline-primary:hover:not(.active) {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+
+/* --- Kartu Konten --- */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* --- Tabel Daftar Kegiatan --- */
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 0.85rem 1rem;
+    text-align: left;
+}
+
+.table td {
+    padding: 1rem;
+    font-size: 0.95rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.table tr:hover {
+    background-color: #fbfdff;
+}
+
+/* --- Badge Status --- */
+.badge {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 6px;
+    text-transform: capitalize;
+}
+
+.badge.bg-primary { background-color: #2563eb !important; }
+.badge.bg-success { background-color: #16a34a !important; }
+.badge.bg-secondary { background-color: #64748b !important; }
+.badge.bg-danger { background-color: #dc2626 !important; }
+.badge.bg-warning { background-color: #f59e0b !important; color: #ffffff !important; }
+
+/* --- Tombol Aksi --- */
+.btn-sm {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    margin-right: 0.3rem;
+}
+
+.btn-outline-warning {
+    border: 1px solid #f59e0b;
+    color: #d97706;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-warning:hover {
+    background-color: #fef3c7;
+    border-color: #d97706;
+    color: #92400e;
+}
+
+.btn-outline-danger {
+    border: 1px solid #ef4444;
+    color: #dc2626;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #fee2e2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+/* --- Tampilan Kosong --- */
+.text-center.py-5 {
+    padding: 3rem 1rem;
+    color: #94a3b8;
+}
+
+.text-center.py-5 i {
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+}
+
+/* ✅ PERBAIKAN UTAMA: Aturan Perpindahan Tampilan */
+/* Pastikan aturan ini paling kuat dan tidak tertimpa */
+#tampilanDaftar,
+#tampilanKalender {
+    width: 100%;
+    transition: opacity 0.25s ease;
+}
+
+.tampilan-aktif {
+    display: block !important;
+    opacity: 1;
+}
+
+.d-none {
+    display: none !important;
+    opacity: 0;
+}
+
+/* --- Kalender FullCalendar --- */
+#kalenderKegiatan {
+    min-height: 650px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    width: 100%;
+    overflow: visible;
+}
+
+.fc {
+    --fc-border-color: #e2e8f0;
+    --fc-today-bg-color: #eff6ff;
+    --fc-neutral-bg-color: #f8fafc;
+    --fc-event-border-color: transparent;
+    --fc-event-text-color: #ffffff;
+    --fc-page-bg-color: #ffffff;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.fc-toolbar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.fc-button {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    margin: 0 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.fc-button:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.fc-button-primary {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.fc-button-primary:hover {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+/* ✅ Perbaikan Tampilan Kotak Agenda */
+.fc-event {
+    border-radius: 4px;
+    padding: 4px 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    border: none;
+    margin: 2px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    color: #ffffff !important;
+    overflow: hidden;
+    gap: 6px;
+}
+
+/* ✅ Pisahkan gaya khusus untuk jam dan judul */
+.fc-event-time {
+    font-size: 0.75rem; /* Ukuran jam lebih kecil */
+    font-weight: 400;
+    opacity: 0.9;
+    display: block; /* Paksa tampil di baris baru */
+    margin-bottom: 2px;
+}
+
+.fc-event-title {
+    font-size: 0.85rem; /* Judul lebih jelas */
+    font-weight: 500;
+    display: block;
+    line-height: 1.3;
+}
+
+/* Warna status tetap sama */
+.fc-event.terjadwal { 
+    background-color: #2563eb; 
+    border-color: #2563eb; 
+    color: #ffffff !important;
+}
+.fc-event.berlangsung { 
+    background-color: #16a34a; 
+    border-color: #16a34a; 
+    color: #ffffff !important;
+}
+.fc-event.selesai { 
+    background-color: #64748b; 
+    border-color: #64748b; 
+    color: #ffffff !important;
+    opacity: 0.9;
+}
+.fc-event.dibatalkan { 
+    background-color: #dc2626; 
+    border-color: #dc2626; 
+    color: #ffffff !important;
+    text-decoration: line-through;
+    opacity: 0.9;
+}
+
+/* Gaya untuk isi modal detail */
+.modal-body-custom {
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.6;
+}
+
+/* Atur agar titik dua sejajar */
+.detail-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.detail-label {
+    width: 170px; /* Sesuaikan angka ini jika perlu */
+    font-weight: 500;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Jarak ikon dan teks */
+}
+
+/* Posisi titik dua tetap */
+.detail-separator {
+    width: 15px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Isi data */
+.detail-value {
+    color: #475569;
+}
+
+/* Untuk baris yang isinya banyak */
+.detail-row.align-top {
+    align-items: flex-start;
+}
+
+.detail-row > span:first-child {
+    min-width: 160px; /* Sesuaikan lebar ini agar semua teks label rata kiri */
+    font-weight: 500;
+    color: #334155;
+    display: flex;
+    align-items: center;
+}
+
+.detail-row > span:nth-child(2) {
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+    font-weight: 500;
+}
+
+.detail-row > span:last-child {
+    flex: 1;
+    color: #475569;
+}
+
+/* --- Modal Detail Kegiatan --- */
+.modal-detail {
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.modal-detail h5 {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.modal-detail p {
+    margin: 0.5rem 0;
+    color: #475569;
+}
+
+/* ==========================================
+   FORM TAMBAH & EDIT AGENDA
+========================================== */
+.form-container {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-col {
+    flex: 1 1 300px;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* --- Responsif --- */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    /* Penyesuaian kalender di HP */
+    .fc-toolbar {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    #kalenderKegiatan {
+        min-height: 500px;
+    }
+}
+
+.fc .fc-daygrid-day-number {
+    text-decoration: none;
+}

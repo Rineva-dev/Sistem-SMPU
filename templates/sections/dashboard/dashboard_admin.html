@@ -1,0 +1,118 @@
+<div class="dashboard-container">
+
+    <!-- Header Selamat Datang -->
+    <div class="welcome-box">
+        <div class="garis-1"></div>
+        <div class="garis-2"></div>
+        <div class="titik titik-1"></div>
+        <div class="titik titik-2"></div>
+        <div class="titik titik-3"></div>
+
+        <div>
+            <h2>Selamat Datang, {{ user_name | default('Admin Sistem') }}!</h2>
+            <p class="text-muted">Pengelola Data & Administrasi Sekolah
+        </div>
+
+        <div class="date-box">
+            <i class="far fa-calendar-alt"></i>
+            <span>{{ today_date | default('Tanggal tidak tersedia') }}</span>
+        </div>
+    </div>
+
+    <!-- Kartu Ringkasan Data Sekolah -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon bg-blue">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_siswa | default('0') }}</h3>
+                <p>Jumlah Siswa Aktif</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-green">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_guru | default('0') }}</h3>
+                <p>Jumlah Guru & Staf</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-orange">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_kelas | default('0') }}</h3>
+                <p>Jumlah Rombel</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-red">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ data_belum_lengkap | default('0') }}</h3>
+                <p>Data Belum Lengkap</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Cepat & Log Perubahan Data -->
+    <div class="content-grid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-pencil-alt"></i> Pengelolaan Data Utama</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="menu-grid p-3">
+                    <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-item-dev">
+                        <i class="fas fa-calendar-check"></i> Tahun Pelajaran
+                    </a>
+                    <a href="/siswa" class="menu-item-dev">
+                        <i class="fas fa-user-graduate"></i> Data Siswa
+                    </a>
+                    <a href="/guru" class="menu-item-dev">
+                        <i class="fas fa-chalkboard-teacher"></i> Data Guru & Staf
+                    </a>
+                    <a href="/kelas" class="menu-item-dev">
+                        <i class="fas fa-building"></i> Data Kelas
+                    </a>
+                    <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="menu-item-dev">
+                        <i class="fas fa-book"></i> Mata Pelajaran
+                    </a>
+                    <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-item-dev">
+                        <i class="fas fa-calendar-week"></i> Kalender Pendidikan
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-history"></i> Perubahan Data Terkini</h4>
+            </div>
+            <div class="card-body p-0">
+                <ul class="activity-list">
+                    {% if riwayat_perubahan %}
+                        {% for item in riwayat_perubahan %}
+                        <li class="activity-item">
+                            <span class="activity-time">{{ item.waktu }}</span>
+                            <span class="activity-text">{{ item.uraian }}</span>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="text-center text-muted py-4">Belum ada perubahan data hari ini</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/admin/dashboard_admin.css') }}">

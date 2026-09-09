@@ -1,0 +1,291 @@
+/* ======================================
+   EDITOR SURAT - GAYA MIRIP MICROSOFT WORD
+====================================== */
+
+/* Kontainer Toolbar */
+[data-editor-toolbar] {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 8px 12px !important;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  min-height: 48px;
+}
+
+/* Tombol Format - SERAGAM SEMUA */
+[data-editor-toolbar] .btn {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 3px !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  transition: all 0.15s ease;
+  color: #222 !important;
+}
+
+[data-editor-toolbar] .btn:hover {
+  background: #e9ecef !important;
+  border-color: #ced4da !important;
+}
+
+[data-editor-toolbar] .btn.active {
+  background: #e2e6ea !important;
+  border-color: #adb5bd !important;
+}
+
+/* Dropdown Font & Ukuran */
+[data-editor-toolbar] .form-select-sm {
+  height: 36px !important;
+  padding: 0 24px 0 8px !important;
+  font-size: 13px !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 3px !important;
+  min-width: 130px !important;
+  max-width: 170px !important;
+  background: #fff !important;
+  vertical-align: middle !important;
+}
+
+[data-editor-toolbar] .form-select-sm:focus {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15) !important;
+  outline: none !important;
+}
+
+/* Dropdown Gaya Paragraf */
+#style-block {
+  min-width: 140px !important;
+  max-width: 180px !important;
+}
+
+/* Garis Pemisah Antar Grup */
+[data-editor-toolbar] .vr {
+  height: 24px !important;
+  width: 1px !important;
+  background: #dee2e6 !important;
+  margin: 0 8px !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* Grup Warna */
+.color-group {
+  display: inline-flex !important;
+  gap: 4px !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+}
+
+/* Garis Bawah Indikator Warna */
+[data-editor-toolbar] .btn-color {
+  position: relative !important;
+}
+[data-editor-toolbar] .btn-color::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background-color: currentColor;
+  opacity: 0.8;
+}
+
+/* Input Warna Tersembunyi */
+.input-warna-tersembunyi {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Dropdown Jarak Baris */
+#dropdown-jarak {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  position: relative !important;
+}
+
+#tombol-jarak {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+#menu-jarak {
+  min-width: 220px !important;
+  padding: 6px 0 !important;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  background: #ffffff !important;
+  border: 1px solid #d0d0d0 !important;
+  border-radius: 3px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  z-index: 9999 !important;
+  margin-top: 4px !important;
+}
+
+#menu-jarak .dropdown-item {
+  position: relative !important;
+  padding: 7px 28px !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  text-align: left !important;
+  width: 100% !important;
+  color: #222 !important;
+}
+
+#menu-jarak .dropdown-item:hover {
+  background: #e5eff9 !important;
+}
+
+#menu-jarak .dropdown-item.aktif {
+  background: #e5eff9 !important;
+  font-weight: 500 !important;
+}
+
+#menu-jarak .cek-tanda {
+  position: absolute !important;
+  left: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  visibility: hidden !important;
+  color: #0067c0 !important;
+  font-weight: bold !important;
+}
+
+#menu-jarak .dropdown-item.aktif .cek-tanda {
+  visibility: visible !important;
+}
+
+#menu-jarak hr {
+  margin: 6px 0 !important;
+  border-color: #e5e5e5 !important;
+}
+
+/* Area Editor - ✅ PERBAIKAN: Hapus line-height dari inline & CSS global */
+[data-editor-area] {
+  border: 1px solid #dee2e6 !important;
+  border-top: none !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  min-height: 380px !important;
+  padding: 20px 24px !important;
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 12pt !important;
+  /* ❌ JANGAN SET DI SINI: line-height: 1.15 !important; */
+  text-align: justify !important;
+  background: #ffffff !important;
+  overflow-y: auto !important;
+  color: #000 !important;
+}
+
+/* ✅ Paragraf dapat diatur jaraknya */
+[data-editor-area] p,
+[data-editor-area] div,
+[data-editor-area] li {
+  margin: 0 !important;
+  /* ✅ Tidak pakai !important agar JS bisa ganti */
+  line-height: inherit;
+}
+
+/* Daftar */
+[data-editor-area] ul,
+[data-editor-area] ol {
+  padding-left: 32px !important;
+  margin: 8px 0 !important;
+  list-style-position: outside !important;
+}
+
+[data-editor-area] li {
+  margin: 4px 0 !important;
+}
+
+/* Fokus Editor */
+[data-editor-area]:focus {
+  outline: none !important;
+  border-color: #86b7fe !important;
+  box-shadow: inset 0 0 0 1px #86b7fe !important;
+}
+
+/* Modal Pengaturan Paragraf */
+#modalJarakParagraf .modal-dialog {
+  max-width: 360px !important;
+  margin: 1.75rem auto !important;
+}
+
+#modalJarakParagraf .modal-content {
+  border: 1px solid #b8b8b8 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+}
+
+#modalJarakParagraf .modal-header {
+  background: #f8f9fa !important;
+  border-bottom: 1px solid #dee2e6 !important;
+  padding: 10px 14px !important;
+}
+
+#modalJarakParagraf .modal-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+#modalJarakParagraf .modal-body {
+  padding: 16px !important;
+}
+
+#modalJarakParagraf .form-control-sm,
+#modalJarakParagraf .form-select-sm {
+  height: 30px !important;
+  font-size: 13px !important;
+  border: 1px solid #b8b8b8 !important;
+  border-radius: 3px !important;
+}
+
+#modalJarakParagraf .btn-sm {
+  font-size: 12.5px !important;
+  padding: 4px 12px !important;
+  border-radius: 3px !important;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  [data-editor-toolbar] {
+    gap: 5px !important;
+    padding: 6px !important;
+  }
+  [data-editor-toolbar] .btn {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 14px !important;
+  }
+  [data-editor-toolbar] .form-select-sm {
+    height: 34px !important;
+    min-width: 110px !important;
+  }
+  [data-editor-area] {
+    padding: 16px !important;
+    min-height: 320px !important;
+  }
+}

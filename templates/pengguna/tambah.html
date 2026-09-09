@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block title %}Tambah Pengguna{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fas fa-user-plus"></i> Tambah Pengguna Baru</h2>
+</div>
+
+{% with pesan = get_flashed_messages(with_categories=true) %}
+{% if pesan %}
+    {% for kategori, isi in pesan %}
+        <div class="alert alert-{{ kategori }}">{{ isi }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<form action="{{ url_for('pengguna.tambah_pengguna') }}" method="POST" class="form-container">
+    <div class="form-group">
+        <label>NIP / ID Pengguna <span class="text-danger">*</span></label>
+        <input type="text" name="nip" class="form-input" required>
+    </div>
+
+    <div class="form-group">
+        <label>Nama Lengkap <span class="text-danger">*</span></label>
+        <input type="text" name="nama" class="form-input" required>
+    </div>
+
+    <div class="form-group">
+        <label>Jabatan <span class="text-danger">*</span></label>
+        <select name="jabatan" class="form-input" required>
+            <option value="">-- Pilih Jabatan --</option>
+            <option value="Guru">Guru</option>
+            <option value="Kepala Sekolah">Kepala Sekolah</option>
+            <option value="TU">TU / Tata Usaha</option>
+            <!-- ❌ Tidak ada opsi Admin -->
+        </select>
+        <small class="text-muted">Tugas tambahan bisa diatur nanti di menu Data Guru</small>
+    </div>
+
+    <div class="form-group">
+        <label>Kata Sandi <span class="text-danger">*</span></label>
+        <input type="password" name="sandi" class="form-input" required>
+    </div>
+
+    <div class="form-action">
+        <a href="{{ url_for('pengguna.daftar_pengguna') }}" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">Simpan Pengguna</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,130 @@
+<!-- ==========================================
+     TAMBAHAN: GURU BIMBINGAN & KONSELING (BK)
+     ========================================== -->
+<div class="dashboard-container mt-4">
+    <div class="card border-indigo">
+        <div class="card-header bg-indigo bg-opacity-10 border-bottom border-indigo">
+            <h4 class="mb-0 text-dark">
+                <i class="fas fa-comments me-2 text-indigo"></i>
+                Tugas Tambahan: Guru Bimbingan & Konseling
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-indigo">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ total_siswa_binaan | default('0') }}</h3>
+                        <p>Siswa Binaan</p>
+                        <span class="stat-change neutral">Seluruh Jenjang</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ kasus_ditangani_bulan | default('0') }}</h3>
+                        <p>Kasus Ditangani Bulan Ini</p>
+                        <span class="stat-change {{ 'positive' if kasus_ditangani_bulan > 0 else 'neutral' }}">
+                            {{ kasus_selesai | default('0') }} Selesai
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ kasus_berlangsung | default('0') }}</h3>
+                        <p>Kasus Dalam Proses</p>
+                        <span class="stat-change warning">Perlu Dipantau</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-teal">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ kegiatan_bimbingan | default('0') }}</h3>
+                        <p>Kegiatan Bimbingan</p>
+                        <span class="stat-change positive">Semester Ini</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid mt-4">
+                <!-- Daftar Kasus Terkini -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list-alt me-1"></i> Kasus & Permasalahan Terkini</h5>
+                        <a href="/bk/kasus" class="btn-link small">Lihat Semua</a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if daftar_kasus %}
+                        <ul class="list-group list-group-flush">
+                            {% for kasus in daftar_kasus[:5] %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-medium">{{ kasus.nama_siswa }}</span>
+                                    <span class="text-muted small ms-2">Kelas {{ kasus.kelas }}</span>
+                                    <p class="mb-0 small text-muted mt-1">{{ kasus.jenis_kasus | truncate(50) }}</p>
+                                </div>
+                                <span class="badge 
+                                    {% if kasus.status == 'Selesai' %}bg-success
+                                    {% elif kasus.status == 'Proses' %}bg-warning
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ kasus.status }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i>
+                            <p>Tidak ada kasus yang tercatat saat ini</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Jadwal & Akses Cepat -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-calendar-alt me-1"></i> Jadwal & Layanan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="text-muted">Jam Layanan Konseling</h6>
+                            <ul class="list-unstyled">
+                                <li>Senin - Kamis: 07.00 - 15.00</li>
+                                <li>Jumat: 07.00 - 11.30</li>
+                            </ul>
+                        </div>
+
+                        <h6 class="text-muted mt-4 mb-2">Akses Cepat</h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="/bk/catat-kasus" class="btn btn-sm btn-outline-indigo">
+                                <i class="fas fa-plus me-1"></i> Catat Kasus
+                            </a>
+                            <a href="/bk/data-siswa" class="btn btn-sm btn-outline-blue">
+                                <i class="fas fa-search me-1"></i> Data Siswa
+                            </a>
+                            <a href="/bk/laporan" class="btn btn-sm btn-outline-teal">
+                                <i class="fas fa-file-alt me-1"></i> Laporan BK
+                            </a>
+                            <a href="/bk/jadwal" class="btn btn-sm btn-outline-orange">
+                                <i class="fas fa-calendar me-1"></i> Jadwal Bimbingan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

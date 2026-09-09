@@ -1,0 +1,95 @@
+<div class="dashboard-container">
+
+    <!-- ✅ HEADER HALAMAN -->
+    <div class="welcome-box">
+        <div>
+            <h2>Jadwal Pelajaran</h2>
+            <p class="text-muted">{{ kelas.nama_kelas }} &nbsp;|&nbsp; Wali Kelas: <strong>{{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}</strong></p>
+        </div>
+        <div class="date-box">
+            <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Kembali ke Kelas
+            </a>
+        </div>
+    </div>
+
+    <!-- ✅ KONTEN UTAMA -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-calendar-alt"></i> Pengaturan Jadwal - {{ kelas.nama_kelas }}</h5>
+            <button type="button" class="btn btn-sm btn-success" id="btnTambahHari">
+                <i class="fas fa-plus me-1"></i> Tambah Hari
+            </button>
+        </div>
+
+        <form method="POST">
+            <div class="card-body">
+                <p class="text-muted mb-3">Atur jam pelajaran per hari. Pilih Mata Pelajaran yang sudah diaktifkan, Guru akan otomatis mengikuti pengaturan sebelumnya.</p>
+
+                <!-- ✅ DATA MAPEL HANYA NAMA -->
+                <script type="application/json" id="data-daftar-mapel-json">
+                [
+                    {% for m in daftar_mapel %}
+                    {"id": "{{ m.id }}", "nama": "{{ m.nama_pelajaran }}"}
+                    {% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+                </script>
+
+                <div id="wadahDaftarHari">
+                    {% set hari_awal = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"] %}
+                    {% for hari in hari_awal %}
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center fw-bold">
+                            <i class="fas fa-calendar-day me-2"></i> {{ hari }}
+                            <button type="button" class="btn btn-sm btn-outline-danger hapus-hari" data-hari="{{ hari }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="baris-jadwal d-flex gap-2 align-items-center mb-2">
+                                <input type="hidden" name="hari[]" value="{{ hari }}">
+
+                                <!-- ✅ INPUT JAM DENGAN CUSTOM-TIME -->
+                                <div class="custom-time">
+                                    <input type="time" name="jam_mulai[]" class="form-control" required>
+                                </div>
+                                <span class="text-muted">-</span>
+                                <div class="custom-time">
+                                    <input type="time" name="jam_selesai[]" class="form-control" required>
+                                </div>
+
+                                <!-- ✅ SELECT MAPEL HANYA NAMA -->
+                                <div class="custom-select">
+                                    <select name="mapel_id[]" class="form-select" required>
+                                        <option value="">-- Pilih Mapel --</option>
+                                        <option value="imtaq">Imtaq</option>
+                                        <option value="upacara">Upacara Bendera</option>
+                                        {% for m in daftar_mapel %}
+                                        <option value="{{ m.id }}">{{ m.nama_pelajaran }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <button type="button" class="btn btn-outline-danger btn-sm hapus-baris">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary tambah-baris">
+                                <i class="fas fa-plus me-1"></i> Tambah Jam
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" class="btn btn-secondary">Batal</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Simpan Semua Jadwal
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

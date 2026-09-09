@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block title %}Agenda & Kegiatan | Sistem Sekolah{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/kepsek/agenda.css') }}">
+<!-- FullCalendar CSS -->
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title">Agenda & Kegiatan Sekolah</h2>
+            <p class="page-subtitle">Daftar dan jadwal kegiatan untuk seluruh Guru dan Staf</p>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- Tombol Pindah Tampilan -->
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="btnTampilanDaftar">Daftar</button>
+                <button type="button" class="btn btn-outline-primary" id="btnTampilanKalender">Kalender</button>
+            </div>
+            {% if role == 'Kepala Sekolah' %}
+            <a href="{{ url_for('agenda.tambah_agenda') }}" class="btn btn-primary">
+                <i class="fa fa-plus me-1"></i> Tambah Agenda
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tampilan Daftar -->
+    <div id="tampilanDaftar" class="tampilan-aktif">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Daftar Kegiatan</h5>
+                <span class="text-muted small">Diurutkan dari tanggal terdekat</span>
+            </div>
+            <div class="card-body p-0">
+                {% if daftar_agenda %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tanggal & Waktu</th>
+                                <th>Judul Kegiatan</th>
+                                <th>Lokasi</th>
+                                <th>Penanggung Jawab</th>
+                                <th>Status</th>
+                                {% if role == 'Kepala Sekolah' %}<th>Aksi</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in daftar_agenda %}
+                            <tr>
+                                <td>
+                                    {{ a.tanggal_mulai.strftime('%d %b %Y') }}<br>
+                                    <small class="text-muted">{{ a.tanggal_mulai.strftime('%H:%M') }} - {{ a.tanggal_selesai.strftime('%H:%M') if a.tanggal_selesai else 'Selesai' }}</small>
+                                </td>
+                                <td><strong>{{ a.judul }}</strong><br><small class="text-muted">{{ a.deskripsi[:60] }}{% if a.deskripsi|length > 60 %}...{% endif %}</small></td>
+                                <td>{{ a.lokasi or '-' }}</td>
+                                <td>{{ a.penanggung_jawab or '-' }}</td>
+                                <td>
+                                    {% if a.status == 'Terjadwal' %}
+                                        <span class="badge bg-primary">Terjadwal</span>
+                                    {% elif a.status == 'Berlangsung' %}
+                                        <span class="badge bg-success">Berlangsung</span>
+                                    {% elif a.status == 'Selesai' %}
+                                        <span class="badge bg-secondary">Selesai</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Dibatalkan</span>
+                                    {% endif %}
+                                </td>
+                                {% if role == 'Kepala Sekolah' %}
+                                <td>
+                                    <a href="{{ url_for('agenda.edit_agenda', id=a.id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    <a href="{{ url_for('agenda.hapus_agenda', id=a.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin ingin menghapus agenda ini?')">Hapus</a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fa fa-calendar-times fa-3x mb-3"></i>
+                    <p>Belum ada agenda kegiatan yang ditambahkan</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tampilan Kalender -->
+    <div id="tampilanKalender" class="d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0">Kalender Kegiatan</h5>
+            </div>
+            <div class="card-body">
+                <div id="kalenderKegiatan"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Deklarasi variabel GLOBAL terlebih dahulu -->
+<script>
+    window.agendaData = {{ events | default([]) | tojson | safe }};
+    window.userRole = "{{ role | default('') | escape }}";
+</script>
+
+<!-- Baru panggil file agenda.js -->
+<script src="{{ url_for('static', filename='js/sections/kepsek/agenda.js') }}"></script>
+{% endblock %}

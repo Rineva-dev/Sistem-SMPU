@@ -1,0 +1,41 @@
+<!-- PEMILIH TAMPILAN BERDASARKAN HALAMAN AKTIF -->
+
+<!-- ✅ Jika sedang di Halaman Utama -->
+{% if halaman_aktif == 'utama' %}
+    <!-- Tampilan sesuai jabatan -->
+    {% if role == "Admin" %}
+        {% include "sections/dashboard/dashboard_dev.html" %}
+    {% elif role == "Tata Usaha" or role == "TU" %}
+        {% include "sections/dashboard/tata_usaha.html" %}
+    {% elif role == "Kepala Sekolah" %}
+        {% include "sections/dashboard/kepala_sekolah.html" %}
+    {% elif role == "Guru" %}
+        {% include "sections/dashboard/base.html" %}
+    {% endif %}
+
+<!-- ✅ Jika sedang di Halaman Admin Sistem -->
+{% elif halaman_aktif == 'admin_sistem' %}
+    {% include "sections/dashboard/dashboard_admin.html" %}
+
+<!-- ✅ Jika sedang di Halaman Bendahara -->
+{% elif halaman_aktif == 'bendahara' %}
+    {% include "sections/dashboard/bendahara.html" %}
+
+<!-- ✅ Jika sedang di Halaman Wali Kelas -->
+{% elif halaman_aktif == 'wali_kelas' %}
+    {% include "sections/dashboard/wali_kelas.html" %}
+
+<!-- ✅ Jika sedang di Halaman Waka Kurikulum -->
+{% elif halaman_aktif == 'waka_kurikulum' %}
+    {% include "sections/dashboard/waka_kurikulum.html" %}
+
+<!-- ✅ Jika sedang di Halaman Waka Kesiswaan -->
+{% elif halaman_aktif == 'waka_kesiswaan' %}
+    {% include "sections/dashboard/waka_kesiswaan.html" %}
+
+<!-- ✅ Jika sedang di Halaman Pembina Ekskul -->
+{% elif halaman_aktif == 'pembina_ekskul' %}
+    {% include "sections/dashboard/pembina_ekskul.html" %}
+
+<!-- ✅ Jika ada tugas lain yang belum terdaftar, bisa ditambahkan di sini -->
+{% endif %}

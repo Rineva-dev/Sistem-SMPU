@@ -1,0 +1,79 @@
+<!-- ==========================================
+     TAMBAHAN: WALI KELAS
+     ========================================== -->
+<div class="dashboard-container mt-4">
+    <div class="card border-warning">
+        <div class="card-header bg-warning bg-opacity-10 border-bottom border-warning">
+            <h4 class="mb-0 text-dark">
+                <i class="fas fa-user-tie me-2"></i> Tugas Tambahan: Wali Kelas {{ nama_kelas | default('-') }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_siswa_kelas | default('0') }}</h3>
+                        <p>Jumlah Siswa</p>
+                        <span class="stat-change neutral">Laki-laki: {{ jml_laki | default('0') }} | Perempuan: {{ jml_perempuan | default('0') }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ persen_hadir_kelas | default('0') }}%</h3>
+                        <p>Kehadiran Hari Ini</p>
+                        <span class="stat-change {{ 'positive' if persen_hadir_kelas >= 90 else 'warning' }}">
+                            {{ jml_hadir | default('0') }} hadir
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jml_tidak_hadir | default('0') }}</h3>
+                        <p>Siswa Tidak Hadir</p>
+                        <span class="stat-change neutral">Sakit: {{ jml_sakit | default('0') }} | Izin: {{ jml_izin | default('0') }} | Alfa: {{ jml_alfa | default('0') }}</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jml_belum_lunas | default('0') }}</h3>
+                        <p>Belum Lunas Pembayaran</p>
+                        <span class="stat-change warning">Perlu ditindaklanjuti</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h5 class="mb-3">Akses Cepat</h5>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/absensi/kelas/{{ id_kelas }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-clipboard-check me-1"></i> Absensi Kelas
+                    </a>
+                    <a href="/siswa/kelas/{{ id_kelas }}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-list me-1"></i> Data Siswa
+                    </a>
+                    <a href="/nilai/kelas/{{ id_kelas }}" class="btn btn-sm btn-outline-warning">
+                        <i class="fas fa-chart-bar me-1"></i> Lihat Nilai
+                    </a>
+                    <a href="/laporan/kelas/{{ id_kelas }}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-file-alt me-1"></i> Laporan Kelas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

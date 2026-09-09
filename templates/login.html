@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Manajemen Guru SMP Unggulan Hamzanwadi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <!-- Bagian Kiri: Informasi Sekolah -->
+        <div class="school-info">
+            <div class="logo-wrapper">
+                <!-- Logo lengkap sekolah -->
+                <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo SMP Unggulan Hamzanwadi" class="logo-sekolah">
+            </div>
+            <h2>Sistem Manajemen Guru</h2>
+            <div class="divider"></div>
+            <p class="desc">
+                Akses sistem pengelolaan data, jadwal mengajar, dan administrasi tenaga pendidik secara mudah, aman, dan terintegrasi.
+            </p>
+            <div class="copyright">&copy; 2026 SMP Unggulan Hamzanwadi</div>
+        </div>
+
+        <!-- Bagian Kanan: Form Login -->
+        <div class="login-form-section">
+            <div class="form-header">
+                <h3>Masuk ke Sistem</h3>
+                <p>Silakan masukkan Username dan kata sandi Anda</p>
+            </div>
+
+            <form id="formLogin" action="/proses-login" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="fa fa-user"></i>
+                        <input type="text" id="username" name="username" required placeholder="Masukkan username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Kata Sandi</label>
+                    <div class="input-wrapper">
+                        <i class="fa fa-lock"></i>
+                        <input type="password" id="password" name="password" required placeholder="Masukkan kata sandi">
+                        <button type="button" class="toggle-password" onclick="lihatSandi()">
+                            <i id="iconMata" class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Ingat Saya
+                    </label>
+                    <a href="#" class="forgot-pass">Lupa Kata Sandi?</a>
+                </div>
+
+                <button type="submit" class="btn-login">Masuk ke Sistem</button>
+            </form>
+
+            <div class="contact-info">
+                <p>Butuh bantuan? Hubungi bagian administrasi</p>
+                <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function lihatSandi() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('iconMata');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!-- DASHBOARD TATA USAHA -->
+<!-- Header Selamat Datang -->
+<div class="welcome-box">
+    <div class="garis-1"></div>
+    <div class="garis-2"></div>
+    <div class="titik titik-1"></div>
+    <div class="titik titik-2"></div>
+    <div class="titik titik-3"></div>
+
+    <div>
+        <h2>Selamat Datang, {{ user_name }}!</h2>
+        <p class="text-muted">Peran: <strong>Tata Usaha</strong> | Hari ini: <strong>{{ today_date_long }}</strong></p>
+        <p class="text-primary mt-1">
+            <i class="fas fa-briefcase"></i> Mengelola data dan administrasi sekolah
+        </p>
+    </div>
+
+    <div class="date-box">
+        <i class="far fa-calendar-alt"></i>
+        <span>{{ today_date }}</span>
+    </div>
+</div>
+
+<!-- Kartu Ringkasan Utama -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon bg-primary">
+      <i class="fas fa-user-graduate"></i>
+    </div>
+    <div class="stat-info">
+      <h3>{{ total_siswa | default('0') }}</h3>
+      <p>Total Siswa</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon bg-success">
+      <i class="fas fa-chalkboard-teacher"></i>
+    </div>
+    <div class="stat-info">
+      <h3>{{ total_guru | default('0') }}</h3>
+      <p>Total Guru</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon bg-info">
+      <i class="fas fa-building"></i>
+    </div>
+    <div class="stat-info">
+      <h3>{{ total_kelas | default('0') }}</h3>
+      <p>Total Kelas</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon bg-warning">
+      <i class="fas fa-envelope"></i>
+    </div>
+    <div class="stat-info">
+      <h3>{{ jumlah_surat_masuk + jumlah_surat_keluar | default('0') }}</h3>
+      <p>Jumlah Surat</p>
+    </div>
+  </div>
+</div>
+
+<!-- Bagian Tengah: Surat & Kepegawaian -->
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="fas fa-envelope-open-text me-2"></i>Surat Menyurat</h5>
+        <a href="/surat-menyurat" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>Surat Masuk Bulan Ini</span>
+          <strong>{{ jumlah_surat_masuk | default('0') }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span>Surat Keluar Bulan Ini</span>
+          <strong>{{ jumlah_surat_keluar | default('0') }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>Surat Belum Diproses</span>
+          <strong class="text-danger">{{ jumlah_surat_belum_proses | default('0') }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="fas fa-id-card me-2"></i>Data Kepegawaian</h5>
+        <a href="/data-kepegawaian" class="btn btn-sm btn-outline-primary">Kelola</a>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>Guru Aktif</span>
+          <strong>{{ (guru_laki | default(0)) + (guru_perempuan | default(0)) }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span>Tenaga Kependidikan</span>
+          <strong>{{ jumlah_tu | default('0') }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>Total Pegawai</span>
+          <strong>{{ jumlah_pegawai | default('0') }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pengumuman Sekolah -->
+<div class="card mt-4">
+  <div class="card-header">
+    <h5><i class="fas fa-bullhorn me-2"></i>Pengumuman Sekolah</h5>
+  </div>
+  <div class="card-body p-0">
+    <ul class="list-group list-group-flush">
+      {% for peng in pengumuman %}
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div>
+          <h6>{{ peng.judul }}</h6>
+          <p class="text-muted mb-0">{{ peng.isi }}</p>
+        </div>
+        <small class="text-muted">{{ peng.tanggal }}</small>
+      </li>
+      {% else %}
+      <li class="list-group-item text-center text-muted">Belum ada pengumuman</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

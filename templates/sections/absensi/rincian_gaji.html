@@ -1,0 +1,190 @@
+{% extends "layout.html" %}
+{% set active_page = "rincian_gaji" %}
+{% set halaman_aktif = "absensi" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rincian_gaji.css') }}">
+
+<div class="rincian-gaji-wrapper">
+    <!-- Filter Periode -->
+    <div class="filter-bar">
+        <select class="filter-dropdown" id="filter-bulan" onchange="terapkanFilter()">
+            <option value="">Semua Bulan</option>
+            {% for bln in range(1,13) %}
+            <option value="{{ bln }}" {% if filter_bulan == bln %}selected{% endif %}>
+                {{ ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][bln] }}
+            </option>
+            {% endfor %}
+        </select>
+        <select class="filter-dropdown" id="filter-tahun" onchange="terapkanFilter()">
+            <option value="2026" {% if filter_tahun == 2026 %}selected{% endif %}>2026</option>
+            <option value="2025" {% if filter_tahun == 2025 %}selected{% endif %}>2025</option>
+        </select>
+    </div>
+
+    {% if rincian %}
+    <!-- ✅ SLIP GAJI BERGAYA RESI PERUSAHAAN -->
+    <div class="slip-gaji-container">
+        <div class="slip-gaji-card">
+            <!-- Header Slip -->
+            <div class="slip-header">
+                <div class="brand-section">
+                    <div class="logo-box">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="brand-info">
+                        <h4 class="nama-perusahaan">Nama Perusahaan</h4>
+                        <p class="alamat-perusahaan">Jl. Alamat Perusahaan No. 123, Kota — Indonesia</p>
+                    </div>
+                </div>
+                <div class="periode-box">
+                    <span class="label-periode">PERIODE</span>
+                    <span class="nilai-periode">{{ nama_bulan }} {{ tahun }}</span>
+                </div>
+            </div>
+
+            <div class="garis-pemisah"></div>
+
+            <!-- Info Pegawai -->
+            <div class="info-pegawai-grid">
+                <div class="info-pegawai-item">
+                    <span class="label">Nama Pegawai</span>
+                    <span class="nilai">{{ rincian.nama }}</span>
+                </div>
+                <div class="info-pegawai-item">
+                    <span class="label">NIP / NIK</span>
+                    <span class="nilai">{{ rincian.nip }}</span>
+                </div>
+                <div class="info-pegawai-item">
+                    <span class="label">Jabatan</span>
+                    <span class="nilai">{{ rincian.jabatan or '-' }}</span>
+                </div>
+                <div class="info-pegawai-item">
+                    <span class="label">Tanggal Cetak</span>
+                    <span class="nilai">{{ tanggal_cetak or hari_ini }}</span>
+                </div>
+            </div>
+
+            <div class="garis-pemisah tipis"></div>
+
+            <!-- ✅ TABEL PENERIMAAN -->
+            <div class="bagian-tabel">
+                <h5 class="judul-tabel penerimaan">
+                    <i class="fas fa-plus-circle"></i> KOMPONEN PENERIMAAN
+                </h5>
+                <div class="isi-tabel">
+                    <div class="baris-data">
+                        <span>Gaji Pokok</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.gaji_pokok) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Tunjangan Jabatan</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.tunjangan_jabatan) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Tunjangan Fungsional</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.tunjangan_fungsional) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Tunjangan Lainnya</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.tunjangan_lain) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Insentif / Bonus</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.bonus) }}</span>
+                    </div>
+                </div>
+                <div class="baris-total penerimaan">
+                    <span>TOTAL PENERIMAAN</span>
+                    <span class="angka">Rp {{ "{:,.2f}".format(rincian.total_penerimaan) }}</span>
+                </div>
+            </div>
+
+            <!-- ⚠️ TABEL POTONGAN -->
+            <div class="bagian-tabel">
+                <h5 class="judul-tabel potongan">
+                    <i class="fas fa-minus-circle"></i> KOMPONEN POTONGAN
+                </h5>
+                <div class="isi-tabel">
+                    <div class="baris-data">
+                        <span>BPJS Ketenagakerjaan & Kesehatan</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.potongan_wajib) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Pajak Penghasilan (PPh 21)</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.pph) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Potongan Keterlambatan</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.potongan_terlambat) }}</span>
+                    </div>
+                    <div class="baris-data">
+                        <span>Pinjaman / Koperasi</span>
+                        <span class="angka">Rp {{ "{:,.2f}".format(rincian.pinjaman) }}</span>
+                    </div>
+                </div>
+                <div class="baris-total potongan">
+                    <span>TOTAL POTONGAN</span>
+                    <span class="angka">Rp {{ "{:,.2f}".format(rincian.total_potongan) }}</span>
+                </div>
+            </div>
+
+            <div class="garis-pemisah tebal"></div>
+
+            <!-- 💰 GAJI BERSIH -->
+            <div class="bagian-bersih">
+                <div class="label-bersih">GAJI BERSIH DITERIMA</div>
+                <div class="nominal-bersih">Rp {{ "{:,.2f}".format(rincian.gaji_bersih) }}</div>
+                <div class="terbilang">{{ rincian.terbilang or 'Terbilang akan muncul di sini' }}</div>
+            </div>
+
+            <div class="garis-pemisah tipis"></div>
+
+            <!-- Tanda Tangan -->
+            <div class="bagian-tanda-tangan">
+                <div class="tanda-tangan-kiri">
+                    <p>Diterima Oleh,</p>
+                    <br><br><br>
+                    <p class="nama-tanda">( {{ rincian.nama }} )</p>
+                </div>
+                <div class="tanda-tangan-kanan">
+                    <p>Ditetapkan Oleh,</p>
+                    <br><br><br>
+                    <p class="nama-tanda">( Bendahara Gaji )</p>
+                </div>
+            </div>
+
+            <!-- Footer Slip -->
+            <div class="slip-footer">
+                <p>Dokumen ini dicetak secara otomatis dan sah tanpa tanda tangan basah. <br>
+                Verifikasi keaslian melalui: <strong>kode-{{ rincian.kode_verifikasi or '000000' }}</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Aksi -->
+    <div class="tombol-aksi">
+        <button class="btn-cetak" onclick="window.print()">
+            <i class="fas fa-print"></i> Cetak Slip Gaji
+        </button>
+        <button class="btn-unduh">
+            <i class="fas fa-file-pdf"></i> Unduh PDF
+        </button>
+    </div>
+
+    {% else %}
+    <div class="kosong-container">
+        <i class="fas fa-file-invoice-dollar fa-3x"></i>
+        <h4>Belum Ada Data Gaji</h4>
+        <p>Pilih bulan dan tahun untuk menampilkan slip gaji.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function terapkanFilter() {
+    const bulan = document.getElementById('filter-bulan').value;
+    const tahun = document.getElementById('filter-tahun').value;
+    window.location.href = `?bulan=${bulan}&tahun=${tahun}`;
+}
+</script>
+{% endblock %}

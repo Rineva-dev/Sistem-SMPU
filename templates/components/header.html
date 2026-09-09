@@ -1,0 +1,50 @@
+<!-- Header Atas - Gaya SaaS Modern -->
+<header class="header">
+  <div class="header-left">
+    <button class="toggle-sidebar" id="toggleSidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+    <h2 class="page-title">Dashboard</h2>
+  </div>
+
+  <div class="header-right d-flex align-items-center gap-3">
+    <!-- PEMILIH TAHUN PELAJARAN -->
+    <div class="tahun-pemilih">
+      <form action="{{ url_for('umum.ganti_tahun') }}" method="POST">
+        <div class="custom-select"> <!-- ✅ PEMBUNGKUS BARU -->
+          <select name="tahun_pelajaran" onchange="this.form.submit()">
+            {% set daftar_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all() %}
+            {% for tp in daftar_tahun %}
+            <option value="{{ tp.kode }}" {{ 'selected' if g.tahun_pelajaran == tp.kode else '' }}>
+                {% set potong = tp.nama.replace('Tahun Pelajaran ', '').split(' - ') %}
+                {% if potong | length == 2 %}
+                    {% set nomor_semester = potong[1].replace('Semester ', '') %}
+                    {% set nama_semester = 'Ganjil' if nomor_semester == '1' else 'Genap' %}
+                    {{ potong[0] }} - {{ nama_semester }}
+                {% else %}
+                    {{ tp.nama }}
+                {% endif %}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <!-- Notifikasi -->
+    <button class="notification-btn">
+      <i class="fas fa-bell"></i>
+      <span class="notification-badge">3</span>
+    </button>
+
+    <!-- Profil Pengguna -->
+    <div class="user-profile">
+      <div class="user-avatar">AD</div>
+      <div class="user-info">
+        <div class="user-name">Admin Sekolah</div>
+        <div class="user-role">Pengelola Sistem</div>
+      </div>
+      <i class="fas fa-chevron-down text-muted"></i>
+    </div>
+  </div>
+</header>

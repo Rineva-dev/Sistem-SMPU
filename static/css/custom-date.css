@@ -1,0 +1,322 @@
+/* ==========================================
+   CUSTOM DATE PICKER - SESUAI DENGAN FORM INPUT
+========================================== */
+
+/* Pembungkus utama */
+.custom-date {
+    position: relative;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: inherit;
+    display: block;
+}
+
+/* Kotak input utama - SAMA PERSIS DENGAN .form-input */
+.custom-date__trigger {
+    width: 100%;
+    padding: 0;
+    background-color: #f8fafc; /* ← Sama */
+    border: 1px solid #e2e8f0; /* ← Sama */
+    border-radius: 0.75rem; /* ← Sama */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    min-height: auto; /* ← Hapus tinggi tetap, ikuti padding */
+    color: #0f172a; /* ← Sama */
+    user-select: none;
+    overflow: hidden;
+}
+
+/* Input manual yang bisa diketik */
+.custom-date__input-manual {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.85rem 1rem; /* ← Sama persis dengan .form-input */
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+}
+
+/* Placeholder format */
+.custom-date__input-manual::placeholder {
+    color: #94a3b8; /* ← Sama */
+}
+
+/* Ikon kalender */
+.custom-date__icon {
+    font-size: 18px;
+    color: #64748b;
+    flex-shrink: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem 0 0.5rem;
+    cursor: pointer;
+}
+
+/* Efek hover */
+.custom-date:hover .custom-date__trigger {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+/* ✅ Cara ini langsung menargetkan induknya tanpa perlu kelas JS */
+.custom-date__input-manual:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* ✅ Saat input manual fokus → ubah gaya kotak pembungkusnya */
+.custom-date:has(.custom-date__input-manual:focus) .custom-date__trigger,
+.custom-date.open .custom-date__trigger {
+    background-color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    outline: none !important;
+}
+
+/* Sembunyikan input asli */
+.custom-date > input[type="date"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+/* ==========================================
+   KALENDER - TETAP UKURAN KECIL SESUAI PERMINTAAN
+========================================== */
+.custom-date__calendar {
+    position: absolute;
+    width: 260px;
+    max-width: calc(100vw - 1.5rem);
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    border: 1px solid #e2e8f0;
+    padding: 0.7rem;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+}
+
+.custom-date__calendar.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Header kalender */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.calendar-nav {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #475569;
+    transition: background 0.15s ease;
+}
+
+.calendar-nav:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.calendar-title {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.calendar-title:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+/* Hari dalam seminggu */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #006aff;
+    margin-bottom: 0.35rem;
+}
+
+/* Tanggal */
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.18rem;
+    text-align: center;
+}
+
+.calendar-day {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.4rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #1e293b;
+    margin: 0 auto;
+}
+
+.calendar-day:hover:not(.other-month):not(.today):not(.selected) {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.calendar-day.other-month {
+    color: #cbd5e1;
+    cursor: default;
+}
+
+.calendar-day.today {
+    background-color: #dbeafe;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.calendar-day.selected {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* Daftar Bulan & Tahun */
+.calendar-months {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    padding: 0.25rem 0;
+}
+
+.month-item {
+    padding: 0.55rem 0.25rem;
+    text-align: center;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.15s ease;
+}
+
+.month-item:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.month-item.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.calendar-years {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.25rem 0;
+}
+
+.year-item {
+    padding: 0.5rem 0.2rem;
+    text-align: center;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.15s ease;
+}
+
+.year-item:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.year-item.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+/* ==========================================
+   TAMBAHAN UNTUK INPUT JAM
+========================================== */
+.calendar-time {
+    margin-top: 0.7rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.calendar-time label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-inputs input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.35rem;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #1e293b;
+    background: #fff;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.time-inputs input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.time-inputs span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+}

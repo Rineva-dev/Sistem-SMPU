@@ -1,0 +1,540 @@
+<div class="card form-wrapper">
+    <div class="card-header">
+        <h4>{{ 'Ubah Data Siswa' if mode == 'ubah' else 'Tambah Data Siswa' }}</h4>
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for kategori, pesan in messages %}
+                    <div class="alert alert-{{ kategori }}">{{ pesan }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="form-layout" id="formSiswa">
+
+            <input type="hidden" id="tahunPelajaranAktif" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+
+            <div class="form-group full">
+                <label>Jenis Pendaftaran <span class="text-danger">*</span></label>
+                <div class="custom-select">
+                    <select name="jenis_pendaftaran" id="jenisPendaftaran" required>
+                        <option value="">-- Pilih Jenis --</option>
+                        <option value="baru" {{ 'selected' if siswa and siswa.jenis_pendaftaran == 'baru' else '' }}>Siswa Baru</option>
+                        <option value="pindahan" {{ 'selected' if siswa and siswa.jenis_pendaftaran == 'pindahan' else '' }}>Siswa Pindahan</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Baris 1: NIS & NISN -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>NIS <span class="text-danger">*</span></label>
+                    <input type="text" name="nis" class="form-input" required value="{{ siswa.nis if siswa else '' }}">
+                </div>
+                <div class="form-group half">
+                    <label>NISN <span class="text-danger">*</span></label>
+                    <input type="text" name="nisn" class="form-input" required value="{{ siswa.nisn if siswa else '' }}">
+                </div>
+            </div>
+
+            <!-- Baris 2: Nama Lengkap -->
+            <div class="form-group full">
+                <label>Nama Lengkap <span class="text-danger">*</span></label>
+                <input type="text" name="nama" class="form-input" required value="{{ siswa.nama if siswa else '' }}">
+            </div>
+
+            <!-- Baris 3: NIK -->
+            <div class="form-group full">
+                <label>NIK <span class="text-danger">*</span></label>
+                <input type="text" name="nik" class="form-input" required value="{{ siswa.nik if siswa else '' }}">
+            </div>
+
+            <!-- Baris 4: Jenis Kelamin & Agama -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Jenis Kelamin <span class="text-danger">*</span></label>
+                    <div class="custom-select">
+                        <select name="jenis_kelamin" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="Laki-laki" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
+                            <option value="Perempuan" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group half">
+                    <label>Agama <span class="text-danger">*</span></label>
+                    <div class="custom-select">
+                        <select name="agama" required>
+                            <option value="">-- Pilih Agama --</option>
+                            <option value="Islam" {{ 'selected' if siswa and siswa.agama == 'Islam' else '' }}>Islam</option>
+                            <option value="Kristen Protestan" {{ 'selected' if siswa and siswa.agama == 'Kristen Protestan' else '' }}>Kristen Protestan</option>
+                            <option value="Kristen Katolik" {{ 'selected' if siswa and siswa.agama == 'Kristen Katolik' else '' }}>Kristen Katolik</option>
+                            <option value="Hindu" {{ 'selected' if siswa and siswa.agama == 'Hindu' else '' }}>Hindu</option>
+                            <option value="Buddha" {{ 'selected' if siswa and siswa.agama == 'Buddha' else '' }}>Buddha</option>
+                            <option value="Khonghucu" {{ 'selected' if siswa and siswa.agama == 'Khonghucu' else '' }}>Khonghucu</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baris 5: Tempat Lahir & Tanggal Lahir -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Tempat Lahir <span class="text-danger">*</span></label>
+                    <input type="text" name="tempat_lahir" class="form-input" required value="{{ siswa.tempat_lahir if siswa else '' }}">
+                </div>
+                <div class="form-group half">
+                    <label>Tanggal Lahir <span class="text-danger">*</span></label>
+                    <div class="custom-date">
+                        <input type="date" name="tanggal_lahir" required
+                            value="{{ siswa.tanggal_lahir.strftime('%Y-%m-%d') if siswa and siswa.tanggal_lahir else '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATA SEKOLAH SD -->
+            <div class="form-section saat-ini">
+                <h5 class="section-title title-1">Sekolah Asal (SD/MI)</h5>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Sekolah Dasar (SD) Asal</label>
+                        <input type="text" name="sekolah_sd" class="form-input" placeholder="Nama SD sebelumnya" 
+                            value="{{ siswa.sekolah_sd if siswa else '' }}">
+                    </div>
+                    <div class="form-group half">
+                        <label>Tahun Lulus SD</label>
+                        <input type="number" name="tahun_lulus_sd" class="form-input" min="2000" max="2099" 
+                            value="{{ siswa.tahun_lulus_sd if siswa else '' }}">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>Alamat Sekolah Dasar</label>
+                    <textarea name="alamat_sekolah_sd" class="form-input" rows="2" placeholder="Alamat lengkap SD asal">{{ siswa.alamat_sekolah_sd if siswa else '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- DATA SEKOLAH ASAL PINDAHAN -->
+            <div id="dataPindahan" class="form-section saat-ini">
+                <h5 class="section-title title-1">Data Sekolah Asal Pindahan</h5>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Sekolah Asal Pindahan</label>
+                        <input type="text" name="sekolah_asal_pindah" class="form-input" placeholder="Nama sekolah sebelumnya" 
+                            value="{{ siswa.sekolah_asal_pindah if siswa else '' }}">
+                    </div>
+                    <div class="form-group half">
+                        <label>Tahun Pindah Masuk</label>
+                        <input type="number" name="tahun_pindah" class="form-input" min="2000" max="2099" 
+                            value="{{ siswa.tahun_pindah if siswa else '' }}">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>Alamat Sekolah Asal Pindahan</label>
+                    <textarea name="alamat_sekolah_pindah" class="form-input" rows="2" placeholder="Alamat lengkap sekolah asal">{{ siswa.alamat_sekolah_pindah if siswa else '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- DATA PENERIMAAN -->
+            <div class="form-section saat-ini">
+                <h5 class="section-title title-1">Data Penerimaan di Sekolah Ini</h5>
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label>Tanggal Diterima <span class="text-danger">*</span></label>
+                        <div class="custom-date">
+                            <input type="date" name="tanggal_diterima" id="tanggalDiterima" class="form-input" required
+                                value="{{ siswa.tanggal_diterima.strftime('%Y-%m-%d') if siswa and siswa.tanggal_diterima else '' }}">
+                        </div>
+                    </div>
+                
+                    <div class="form-group half" id="kolomKelasTerima" style="display: none;">
+                        <label>Kelas Diterima <span class="text-danger">*</span></label>
+                        <div class="custom-select">
+                            <select name="diterima_di_kelas" id="diterimaDiKelas">
+                                <option value="">-- Pilih Kelas --</option>
+                                {% for kelas in daftar_kelas %}
+                                <option value="{{ kelas.id }}" 
+                                    data-kode="{{ kelas.nama_kelas }}"
+                                    data-tingkat="{{ kelas.jenjang }}"
+                                    data-tahun="{{ kelas.tahun_pelajaran }}"
+                                    {{ 'selected' if siswa and siswa.diterima_di_kelas == kelas.id else '' }}>
+                                    {{ kelas.nama_kelas }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="infoKelasOtomatis" style="display: none;">
+                        <input type="hidden" name="diterima_di_kelas" id="nilaiKelasOtomatis" value="{{ siswa.diterima_di_kelas if siswa else '' }}">
+                    </div>
+                </div>
+                <input type="hidden" name="tahun_diterima" id="tahunDiterima" value="{{ siswa.tahun_diterima if siswa else '' }}">
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Tingkat / Jenjang <span class="text-danger">*</span></label>
+                        
+                        <!-- ✅ DISINI SATU-SATUNYA TEMPAT PILIH TINGKAT -->
+                        <div id="tampilanTingkatBaru">
+                            <input type="text" class="form-input" readonly
+                                   style="background-color: #f8f9fa; cursor: not-allowed;"
+                                   value="Tingkat 7">
+                        </div>
+
+                        <div id="pilihTingkatPindahan" style="display: none;">
+                            <div class="custom-select">
+                                <select name="tingkat" id="nilaiTingkat" required>
+                                    <option value="">-- Pilih Tingkat --</option>
+                                    <option value="7" {{ 'selected' if siswa and siswa.tingkat == '7' else '' }}>Tingkat 7</option>
+                                    <option value="8" {{ 'selected' if siswa and siswa.tingkat == '8' else '' }}>Tingkat 8</option>
+                                    <option value="9" {{ 'selected' if siswa and siswa.tingkat == '9' else '' }}>Tingkat 9</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="nilaiTingkatSembunyi" value="{{ '7' if (siswa and siswa.jenis_pendaftaran == 'baru') else (siswa.tingkat if siswa else '') }}">
+                        <small class="form-note">
+                            * Siswa Baru otomatis Tingkat 7. Pindahan silakan pilih di atas.
+                        </small>
+                    </div>
+
+                    <div class="form-group half">
+                        <label>Kelas / Rombongan Belajar Saat Ini</label>
+                        <div class="custom-select">
+                            <select name="kelas_id" id="kelasSaatIni">
+                                <option value="">-- Belum Masuk Rombongan --</option>
+                                {% for kelas in daftar_kelas %}
+                                <option value="{{ kelas.id }}" 
+                                        data-tingkat="{{ kelas.jenjang }}"
+                                        data-tahun="{{ kelas.tahun_pelajaran }}"
+                                        {{ 'selected' if siswa and siswa.kelas_id == kelas.id else '' }}>
+                                    {{ kelas.nama_kelas }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small id="infoKelasKosong" class="form-note text-danger d-none">⚠️ Belum ada rombongan belajar untuk tingkat ini</small>
+                        <small class="form-note">* Daftar kelas menyesuaikan tingkat yang dipilih</small>
+                    </div>
+                </div>
+                
+                <div class="form-group full">
+                    <label>Status Siswa</label>
+                    <div class="custom-select">
+                        <select name="status">
+                            <option value="Aktif" {{ 'selected' if not siswa or siswa.status == 'Aktif' else '' }}>Aktif</option>
+                            <option value="Lulus" {{ 'selected' if siswa and siswa.status == 'Lulus' else '' }}>Lulus</option>
+                            <option value="Pindah" {{ 'selected' if siswa and siswa.status == 'Pindah' else '' }}>Pindah</option>
+                            <option value="Keluar" {{ 'selected' if siswa and siswa.status == 'Keluar' else '' }}>Keluar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KONTAK & ORANG TUA -->
+            <div class="form-section saat-ini">
+                <h5 class="section-title title-1">Kontak & Alamat</h5>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>No. HP Siswa</label>
+                        <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxx" 
+                               value="{{ siswa.no_hp if siswa else '' }}"
+                               pattern="[0-9]{8,13}"
+                               title="Hanya angka, 8–13 digit"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="form-group half">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-input" placeholder="contoh@email.com" 
+                               value="{{ siswa.email if siswa else '' }}">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>Alamat Lengkap</label>
+                    <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap tempat tinggal">{{ siswa.alamat if siswa else '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-section saat-ini">
+                <h5 class="section-title title-1">Data Orang Tua / Wali</h5>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Nama Ayah</label>
+                        <input type="text" name="nama_ayah" class="form-input" value="{{ siswa.nama_ayah if siswa else '' }}">
+                    </div>
+                    <div class="form-group half">
+                        <label>Nama Ibu</label>
+                        <input type="text" name="nama_ibu" class="form-input" value="{{ siswa.nama_ibu if siswa else '' }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Pekerjaan Ayah</label>
+                        <input type="text" name="pekerjaan_ayah" class="form-input" value="{{ siswa.pekerjaan_ayah if siswa else '' }}">
+                    </div>
+                    <div class="form-group half">
+                        <label>Pekerjaan Ibu</label>
+                        <input type="text" name="pekerjaan_ibu" class="form-input" value="{{ siswa.pekerjaan_ibu if siswa else '' }}">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>No. HP Orang Tua / Wali</label>
+                    <input type="text" name="no_hp_ortu" class="form-input" placeholder="08xxxxxxxxx" 
+                           value="{{ siswa.no_hp_ortu if siswa else '' }}"
+                           pattern="[0-9]{8,13}"
+                           title="Hanya angka, 8–13 digit"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="btn btn-cancel">Kembali</a>
+                <button type="submit" class="btn btn-save">Simpan Data</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ✅ JAVASCRIPT YANG SUDAH DIPERBAIKI -->
+<!-- ========================================== -->
+<script>
+const jenisPendaftaran = document.getElementById('jenisPendaftaran');
+const tampilanTingkatBaru = document.getElementById('tampilanTingkatBaru');
+const pilihTingkatPindahan = document.getElementById('pilihTingkatPindahan');
+const nilaiTingkat = document.getElementById('nilaiTingkat');
+const kolomKelasTerima = document.getElementById('kolomKelasTerima');
+const infoKelasOtomatis = document.getElementById('infoKelasOtomatis');
+const dataPindahan = document.getElementById('dataPindahan');
+const kelasSaatIni = document.getElementById('kelasSaatIni');
+const infoKelasKosong = document.getElementById('infoKelasKosong');
+const diterimaDiKelas = document.getElementById('diterimaDiKelas');
+const formSiswa = document.getElementById('formSiswa');
+
+function ambilDasarTahun(kode_tp) {
+    if (!kode_tp) return "";
+    let hasil = kode_tp.trim();
+    if (hasil.includes('-')) hasil = hasil.split('-')[0];
+    if (hasil.includes(' ')) hasil = hasil.split(' ')[0];
+    return hasil.trim();
+}
+
+let tahunDipilih = "";
+let semuaDataKelas = [];
+
+// ==============================================
+// FUNGSI CUSTOM DROPDOWN ASLI
+// ==============================================
+window.initCustomSelect = function(wrappers) {
+  if (!Array.isArray(wrappers) && !(wrappers instanceof NodeList)) {
+    wrappers = [wrappers];
+  }
+  wrappers.forEach(selectWrapper => {
+    delete selectWrapper.dataset.diproses;
+    selectWrapper.querySelectorAll('.custom-select__trigger, .custom-select__options').forEach(el => el.remove());
+    
+    if (selectWrapper.dataset.diproses === 'true') return;
+    selectWrapper.dataset.diproses = 'true';
+    const originalSelect = selectWrapper.querySelector('select');
+    if (!originalSelect) return;
+    originalSelect.style.cssText = `opacity:0;position:absolute;pointer-events:none;width:1px;height:1px;border:none;margin:0;padding:0;`;
+    originalSelect.tabIndex = -1;
+
+    const trigger = document.createElement('div');
+    const selectedText = document.createElement('span');
+    const arrow = document.createElement('span');
+    const optionsList = document.createElement('div');
+    trigger.className = 'custom-select__trigger';
+    trigger.tabIndex = 0;
+    selectedText.className = 'custom-select__selected';
+    arrow.className = 'custom-select__arrow';
+    optionsList.className = 'custom-select__options';
+    trigger.appendChild(selectedText);
+    trigger.appendChild(arrow);
+    selectWrapper.appendChild(trigger);
+    selectWrapper.appendChild(optionsList);
+
+    const populateOptions = () => {
+      optionsList.innerHTML = '';
+      Array.from(originalSelect.options).forEach((option) => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'custom-select__option';
+        optionEl.dataset.value = option.value;
+        optionEl.textContent = option.textContent.trim();
+        if (option.selected) {
+          optionEl.classList.add('selected');
+          selectedText.textContent = option.textContent.trim();
+        }
+        optionEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          originalSelect.value = option.value;
+          originalSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          window.closeAllSelects();
+          trigger.focus();
+        });
+        optionsList.appendChild(optionEl);
+      });
+    };
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.closeAllSelects(selectWrapper);
+      selectWrapper.classList.toggle('open');
+      selectWrapper.classList.add('focused');
+    });
+    trigger.addEventListener('focus', () => selectWrapper.classList.add('focused'));
+    trigger.addEventListener('blur', () => setTimeout(() => {
+      if (!selectWrapper.classList.contains('open')) selectWrapper.classList.remove('focused');
+    }, 150));
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectWrapper.classList.toggle('open'); }
+      if (e.key === 'Escape') { window.closeAllSelects(); trigger.focus(); }
+    });
+    originalSelect.addEventListener('change', () => {
+      const currentValue = originalSelect.value;
+      let ditemukan = false;
+      optionsList.querySelectorAll('.custom-select__option').forEach(opt => {
+        const cocok = opt.dataset.value === currentValue;
+        opt.classList.toggle('selected', cocok);
+        if (cocok) { selectedText.textContent = opt.textContent.trim(); ditemukan = true; }
+      });
+      if (!ditemukan) selectedText.textContent = '';
+    });
+    populateOptions();
+  });
+};
+
+window.closeAllSelects = (except = null) => {
+  document.querySelectorAll('.custom-select').forEach(sel => {
+    if (sel !== except) sel.classList.remove('open', 'focused');
+  });
+};
+
+// ==============================================
+// SIMPAN DATA LENGKAP DENGAN ATRIBUTNYA
+// ==============================================
+function simpanSemuaKelasAsli() {
+  semuaDataKelas = [];
+  const diproses = new Set();
+  [diterimaDiKelas, kelasSaatIni].forEach(select => {
+    if (!select) return;
+    Array.from(select.options).forEach(opt => {
+      if (opt.value && !diproses.has(opt.value)) {
+        diproses.add(opt.value);
+        semuaDataKelas.push({
+          id: opt.value.trim(),
+          nama: opt.textContent.trim(),
+          tingkat: String(opt.dataset.tingkat || '').trim(),
+          tahun: String(opt.dataset.tahun || '').trim()
+        });
+      }
+    });
+  });
+  console.log("✅ Data kelas tersimpan:", semuaDataKelas);
+}
+
+// ==============================================
+// FILTER DIPERBAIKI: ATRIBUT TERBAWA & PASTI BERJALAN
+// ==============================================
+function terapkanFilterKelas(selectElement, tingkatDipilih) {
+    if (!selectElement) return;
+    tingkatDipilih = String(tingkatDipilih || '').trim();
+    const tahunValid = tahunDipilih.trim();
+    let adaKelasCocok = false;
+
+    selectElement.innerHTML = '<option value="">-- Belum Masuk Rombongan --</option>';
+    semuaDataKelas.forEach(kelas => {
+        const cocokTingkat = (tingkatDipilih === '') || (kelas.tingkat === tingkatDipilih);
+        const cocokTahun = (String(kelas.tahun || '').trim() === tahunValid);
+
+        console.log(`Cek filter: ${kelas.nama} | Tingkat ${kelas.tingkat} vs ${tingkatDipilih} = ${cocokTingkat} | Tahun = ${cocokTahun}`);
+
+        if (cocokTingkat && cocokTahun) {
+            const opsi = document.createElement('option');
+            opsi.value = kelas.id;
+            opsi.textContent = kelas.nama;
+            opsi.dataset.tingkat = kelas.tingkat;
+            opsi.dataset.tahun = kelas.tahun;
+            selectElement.appendChild(opsi);
+            adaKelasCocok = true;
+        }
+    });
+
+    infoKelasKosong.classList.toggle('d-none', adaKelasCocok);
+    const wrapper = selectElement.closest('.custom-select');
+    if (wrapper) {
+        wrapper.dataset.diproses = '';
+        window.initCustomSelect(wrapper);
+    }
+}
+
+// ==============================================
+// ATUR JENIS: SISWA BARU LANGSUNG KE TINGKAT 7
+// ==============================================
+function aturBerdasarkanJenis() {
+    const jenis = jenisPendaftaran.value;
+    kolomKelasTerima.style.display = 'none';
+    infoKelasOtomatis.style.display = 'none';
+    dataPindahan.style.display = 'none';
+    infoKelasKosong.classList.add('d-none');
+
+    if (jenis === 'baru') {
+        tampilanTingkatBaru.style.display = 'block';
+        pilihTingkatPindahan.style.display = 'none';
+        infoKelasOtomatis.style.display = 'none';
+        setTimeout(() => {
+            terapkanFilterKelas(kelasSaatIni, '7');
+        }, 30);
+    } else if (jenis === 'pindahan') {
+        tampilanTingkatBaru.style.display = 'none';
+        pilihTingkatPindahan.style.display = 'block';
+        dataPindahan.style.display = 'flex';
+        terapkanFilterKelas(diterimaDiKelas, '');
+        terapkanFilterKelas(kelasSaatIni, '');
+    }
+}
+
+nilaiTingkat?.addEventListener('change', function(){
+    terapkanFilterKelas(diterimaDiKelas, this.value);
+    terapkanFilterKelas(kelasSaatIni, this.value);
+});
+
+formSiswa.addEventListener('submit', e => {
+    if (jenisPendaftaran.value === 'pindahan' && !nilaiTingkat.value) {
+        alert('Pilih tingkat dulu!');
+        e.preventDefault();
+    }
+});
+
+// ==============================================
+// URUTAN JALAN DIPASTIKAN BENAR
+// ==============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const inputTahun = document.getElementById('tahunPelajaranAktif');
+    const tahunMentah = inputTahun ? inputTahun.value : "";
+
+    tahunDipilih = ambilDasarTahun(tahunMentah);
+    console.log("📅 Tahun mentah:", tahunMentah);
+    console.log("✅ Tahun yang dipakai filter:", tahunDipilih);
+
+    window.initCustomSelect(document.querySelectorAll('.custom-select'));
+    document.addEventListener('click', window.closeAllSelects);
+
+    simpanSemuaKelasAsli();
+    setTimeout(() => {
+        aturBerdasarkanJenis();
+
+        const tingkatSembunyi = document.getElementById('nilaiTingkatSembunyi');
+        if (jenisPendaftaran.value === 'pindahan' && tingkatSembunyi?.value) {
+            setTimeout(() => {
+            nilaiTingkat.value = tingkatSembunyi.value;
+            terapkanFilterKelas(diterimaDiKelas, tingkatSembunyi.value);
+            terapkanFilterKelas(kelasSaatIni, tingkatSembunyi.value);
+            }, 80);
+        }
+    }, 50);
+});
+
+jenisPendaftaran.addEventListener('change', aturBerdasarkanJenis);
+</script>

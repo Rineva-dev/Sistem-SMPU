@@ -1,0 +1,41 @@
+<div class="dashboard-container">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5><i class="fas fa-building"></i> {{ 'Ubah Data Kelas' if mode == 'ubah' else 'Tambah Kelas Baru' }}</h5>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nama Kelas</label>
+                    <input type="text" name="nama_kelas" class="form-control" required placeholder="Contoh: 7 A" value="{{ kelas.nama_kelas if kelas else '' }}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Jenjang / Tingkat</label>
+                    <select name="jenjang" class="form-select" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="7" {{ 'selected' if kelas and kelas.jenjang == '7' else '' }}>Kelas 7</option>
+                        <option value="8" {{ 'selected' if kelas and kelas.jenjang == '8' else '' }}>Kelas 8</option>
+                        <option value="9" {{ 'selected' if kelas and kelas.jenjang == '9' else '' }}>Kelas 9</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Wali Kelas</label>
+                    <select name="wali_kelas_id" class="form-select">
+                        <option value="">-- Belum ada wali kelas --</option>
+                        {% for guru in daftar_guru %}
+                        <option value="{{ guru.id }}" {{ 'selected' if kelas and kelas.wali_kelas_id == guru.id else '' }}>{{ guru.nama }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <hr>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

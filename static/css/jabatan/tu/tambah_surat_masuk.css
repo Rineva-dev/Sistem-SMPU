@@ -1,0 +1,270 @@
+/* ==========================================
+   CSS LENGKAP - FORM TAMBAH SURAT MASUK
+========================================== */
+
+/* -- Header Halaman -- */
+.page-header {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    max-width: 800px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-header h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+}
+
+.page-header .text-muted {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* -- Kartu Utama -- */
+.card {
+    background: #ffffff;
+    border: none;
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.card-body {
+    padding: 1.75rem;
+}
+
+/* -- Tata Letak Baris & Kolom -- */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
+}
+
+.g-4 > * {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.col-md-6 {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.col-md-12 {
+    width: 100%;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+}
+
+/* -- Label Form -- */
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* -- Input, Textarea & Select -- */
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0.6rem;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    outline: none;
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #cbd5e1;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.6;
+}
+
+/* -- Area Upload File -- */
+.upload-area {
+  position: relative;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  background-color: #f8fafc;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.upload-area:hover {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.upload-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.upload-info {
+  pointer-events: none;
+  color: #475569;
+}
+
+.upload-info i {
+  color: #2563eb;
+  margin-bottom: 0.75rem;
+}
+
+.upload-info p {
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+.upload-info small {
+  color: #64748b;
+}
+
+/* -- Tombol -- */
+.btn {
+  padding: 0.65rem 1.3rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 0.6rem;
+  border: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  border: 1.5px solid #94a3b8;
+  color: #475569;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f1f5f9;
+  border-color: #64748b;
+  color: #1e293b;
+}
+
+/* -- Utilitas Tambahan -- */
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
+}
+
+.gap-2 {
+  gap: 0.75rem;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.me-1 {
+  margin-right: 0.25rem;
+}
+
+/* -- Khusus untuk custom-date & custom-select agar serasi -- */
+.custom-date .form-control,
+.custom-select .form-select {
+  height: 2.9rem;
+}
+
+/* -- Responsif untuk Layar Kecil -- */
+@media (max-width: 768px) {
+  .col-md-6 {
+    width: 100%;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .d-flex.justify-content-end {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .upload-area {
+    padding: 2rem 1rem;
+  }
+}

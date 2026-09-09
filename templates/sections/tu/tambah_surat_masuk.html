@@ -1,0 +1,380 @@
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/tu/tambah_surat_masuk.css') }}">
+{% endblock %}
+
+<div class="page-header">
+    <h2>Tambah Surat Keluar</h2>
+    <p class="text-muted mt-1">Buat dan simpan surat resmi yang akan dikirim</p>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+      <div class="row g-4">
+
+        <!-- Nomor Surat -->
+        <div class="col-md-6">
+          <label for="nomor_surat" class="form-label">Nomor Surat</label>
+          <input type="text" name="nomor_surat" id="nomor_surat" class="form-control" placeholder="Contoh: 026/SMP.U/Hamzanwadi/VI/2026" required>
+        </div>
+
+        <!-- Tanggal Surat -->
+        <div class="col-md-6 custom-date">
+          <label for="tanggal_surat" class="form-label">Tanggal Surat</label>
+          <input type="date" name="tanggal_surat" id="tanggal_surat" class="form-control" required>
+        </div>
+
+        <!-- Lampiran -->
+        <div class="col-md-6">
+          <label for="lampiran" class="form-label">Lampiran</label>
+          <input type="text" name="lampiran" id="lampiran" class="form-control" placeholder="Contoh: 1 rangkap / -">
+        </div>
+
+        <!-- Perihal -->
+        <div class="col-md-6">
+          <label for="perihal" class="form-label">Perihal</label>
+          <input type="text" name="perihal" id="perihal" class="form-control" placeholder="Contoh: Permakluman Kegiatan" required>
+        </div>
+
+        <!-- Tujuan Surat -->
+        <div class="col-md-12">
+          <label for="tujuan" class="form-label">Kepada / Tujuan Surat</label>
+          <textarea name="tujuan" id="tujuan" class="form-control" rows="2" placeholder="Yth. Nama Jabatan / Instansi&#10;di Tempat" required></textarea>
+        </div>
+
+        <!-- Isi Surat -->
+        <div class="col-md-12">
+          <label for="isi_surat" class="form-label">Isi Surat</label>
+          <textarea name="isi_surat" id="isi_surat" class="form-control" rows="8" placeholder="Tuliskan isi surat lengkap disini..." required></textarea>
+        </div>
+
+        <!-- ==========================================
+        DAFTAR PENANDATANGAN - SUDAH DIPERBAIKI
+        ========================================== -->
+        <div class="col-md-12">
+          <label class="form-label fw-bold">Daftar Penandatangan</label>
+          <div id="daftar-penandatangan">
+            <!-- Baris Pertama -->
+            <div class="baris-penandatangan d-flex flex-wrap align-items-center gap-2 mb-3">
+              <div class="flex-grow-1">
+                <select name="jenis_ttd[]" class="form-select jenis-ttd" required>
+                  <option value="">-- Pilih Jabatan / Tugas --</option>
+                  
+                  <!-- Kelompok Jabatan Utama -->
+                  <optgroup label="📋 Jabatan Utama">
+                      {% for jab, daftar in daftar_jabatan_tugas.items() %}
+                      {% if jab in ["Kepala Sekolah", "Guru", "Tata Usaha"] %}
+                          {% if daftar|length == 1 %}
+                              <!-- Jika hanya 1 orang: nilai = ID guru -->
+                              <option value="{{ daftar[0].id }}" 
+                                      data-jumlah="1" 
+                                      data-nama="{{ daftar[0].nama }}"
+                                      data-jabatan="{{ jab }}">
+                              {{ jab }}
+                              </option>
+                          {% else %}
+                              <!-- Jika lebih dari 1 orang: nilai = kode khusus -->
+                              <option value="pilih-{{ jab|replace(' ', '_') }}" 
+                                      data-jumlah="{{ daftar|length }}" 
+                                      data-nama=""
+                                      data-jabatan="{{ jab }}">
+                              {{ jab }}
+                              </option>
+                          {% endif %}
+                      {% endif %}
+                      {% endfor %}
+                  </optgroup>
+
+                  <!-- Kelompok Khusus / Panitia -->
+                  <optgroup label="📝 Khusus / Panitia">
+                    <option value="khusus-ketua" data-jabatan="Ketua Panitia">Ketua Panitia</option>
+                    <option value="khusus-sekretaris" data-jabatan="Sekretaris Panitia">Sekretaris Panitia</option>
+                    <option value="khusus-bendahara" data-jabatan="Bendahara Panitia">Bendahara Panitia</option>
+                    <option value="khusus-supervisor" data-jabatan="Supervisor">Supervisor</option>
+                    <option value="khusus-lain">Lainnya (Isi Sendiri)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- ✅ INPUT TERSEMBUNYI UNTUK ID GURU -->
+              <input type="hidden" name="id_guru_ttd[]" class="id-guru-ttd" value="">
+
+              <!-- Dropdown Nama jika lebih dari 1 orang -->
+              <div class="flex-grow-1 div-pilih-nama" style="display: none;">
+                <select name="id_guru_ttd[]" class="form-select select-nama">
+                  <option value="">-- Pilih Nama --</option>
+                  {% for jab, daftar in daftar_jabatan_tugas.items() %}
+                    {% for g in daftar %}
+                      <option value="{{ g.id }}" data-jabatan="{{ jab }}" data-nama="{{ g.nama }}" class="opsi-{{ jab|replace(' ', '_') }}">
+                        {{ g.nama }}
+                      </option>
+                    {% endfor %}
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Input Nama -->
+              <div class="flex-grow-1 div-input-nama">
+                <input type="text" name="nama_ttd[]" class="form-control nama-ttd" placeholder="Nama Lengkap" required>
+              </div>
+
+              <!-- Input Jabatan -->
+              <div class="flex-grow-1 div-input-jabatan">
+                <input type="text" name="jabatan_ttd[]" class="form-control jabatan-ttd" placeholder="Jabatan" required>
+              </div>
+
+              <button type="button" class="btn btn-sm btn-outline-danger hapus-ttd" style="display:none;">×</button>
+            </div>
+          </div>
+          <button type="button" id="tambah-ttd" class="btn btn-sm btn-outline-primary mt-1">
+            <i class="fas fa-plus me-1"></i> Tambah Penandatangan
+          </button>
+          <small class="text-muted d-block mt-1">* Jika dipilih "Ajukan", surat akan masuk ke kotak masuk penandatangan</small>
+        </div>
+
+        <!-- PILIHAN STATUS -->
+        <div class="col-md-6 custom-select">
+          <label for="status" class="form-label">Status Surat</label>
+          <select name="status" id="status" class="form-select">
+            <option value="Diajukan" selected>Ajukan ke Penandatangan</option>
+            <option value="Tersimpan">Simpan Saja (Belum Diajukan)</option>
+          </select>
+          <small class="text-muted">Pilih "Ajukan" jika ingin surat masuk ke kotak masuk penandatangan</small>
+        </div>
+
+        <!-- Upload File -->
+        <div class="col-md-12">
+          <label class="form-label">File Surat / Pendukung</label>
+          <div class="upload-area">
+            <input type="file" name="file_surat" id="file_surat" class="form-control upload-input" accept=".pdf,.jpg,.jpeg,.png">
+            <div class="upload-info">
+              <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-primary"></i>
+              <p class="mb-1">Klik atau seret file ke sini</p>
+              <small class="text-muted">Format: PDF, JPG, PNG | Maksimal 2MB</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="col-md-12 d-flex justify-content-end gap-2 pt-2">
+          <a href="/surat-menyurat" class="btn btn-outline-secondary">Batal</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Simpan
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================
+     JAVASCRIPT DINAMIS - SUDAH DIPERBAIKI
+     ========================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const daftarTTD = document.getElementById('daftar-penandatangan');
+  const tombolTambah = document.getElementById('tambah-ttd');
+  let nomorBaris = 1;
+
+  // --- LOGIKA UTAMA ---
+  function aturTampilanTTD(selectEl) {
+    const baris = selectEl.closest('.baris-penandatangan');
+    const divPilih = baris.querySelector('.div-pilih-nama');
+    const divInputNama = baris.querySelector('.div-input-nama');
+    const divInputJabatan = baris.querySelector('.div-input-jabatan');
+    const inputNama = baris.querySelector('.nama-ttd');
+    const inputJabatan = baris.querySelector('.jabatan-ttd');
+    const inputIdGuru = baris.querySelector('.id-guru-ttd');
+    const selectNama = baris.querySelector('.select-nama');
+    const opsiTerpilih = selectEl.options[selectEl.selectedIndex];
+
+    // Reset ke kondisi awal
+    divPilih.style.display = 'none';
+    divInputNama.style.display = 'block';
+    divInputJabatan.style.display = 'block';
+    inputNama.value = '';
+    inputJabatan.value = '';
+    inputIdGuru.value = '';
+    inputNama.readOnly = false;
+    inputJabatan.readOnly = false;
+    inputNama.classList.remove('bg-light');
+    inputJabatan.classList.remove('bg-light');
+    selectNama.value = '';
+
+    if (!selectEl.value) return;
+
+    // Baca data dari opsi
+    const jumlah = parseInt(opsiTerpilih.dataset.jumlah || '0');
+    const namaOtomatis = opsiTerpilih.dataset.nama || '';
+    const idOtomatis = opsiTerpilih.dataset.id || '';
+    const nilai = selectEl.value;
+
+    // === Jika ini Jabatan Tetap / Tugas Tambahan ===
+    if (nilai.startsWith('tetap-') || nilai.startsWith('tugas-')) {
+      // Ambil nama jabatan dengan benar
+      let namaJabatan = nilai
+        .replace(/^tetap-|^tugas-/, '')  // Hapus awalan
+        .replace(/-[0-9]+$/, '')        // Hapus ID di akhir
+        .replace(/_/g, ' ');            // Ganti underscore jadi spasi
+
+      // Isi jabatan & kunci
+      inputJabatan.value = namaJabatan;
+      inputJabatan.readOnly = true;
+      inputJabatan.classList.add('bg-light');
+
+      // ✅ JIKA HANYA ADA 1 ORANG → ISI OTOMATIS & KUNCI
+      if (jumlah === 1 && namaOtomatis) {
+        inputNama.value = namaOtomatis;
+        inputIdGuru.value = idOtomatis;
+        inputNama.readOnly = true;
+        inputNama.classList.add('bg-light');
+      }
+      // ✅ JIKA LEBIH DARI 1 ORANG → TAMPILKAN DROPDOWN
+      else {
+        divInputNama.style.display = 'none';
+        divPilih.style.display = 'block';
+        inputIdGuru.value = '';
+
+        // Filter opsi nama yang sesuai jabatan
+        const kelasFilter = `opsi-${namaJabatan.replace(/\s/g, '_')}`;
+        baris.querySelectorAll('.select-nama option').forEach(opt => {
+          if (opt.value === '') {
+            opt.style.display = 'block'; // Tetap tampilkan "Pilih Nama"
+          } else {
+            opt.style.display = opt.classList.contains(kelasFilter) ? 'block' : 'none';
+          }
+        });
+      }
+    }
+
+    // === Jika ini Jabatan Khusus / Panitia ===
+    else if (nilai.startsWith('khusus-')) {
+      inputIdGuru.value = '';
+      inputNama.readOnly = false;
+      inputNama.classList.remove('bg-light');
+
+      if (nilai !== 'khusus-lain') {
+        inputJabatan.value = opsiTerpilih.dataset.jabatan || '';
+        inputJabatan.readOnly = true;
+        inputJabatan.classList.add('bg-light');
+      } else {
+        inputJabatan.value = '';
+        inputJabatan.readOnly = false;
+        inputJabatan.classList.remove('bg-light');
+      }
+    }
+  }
+
+  // --- Saat pilih nama dari dropdown ---
+  daftarTTD.addEventListener('change', function(e) {
+    if (e.target.classList.contains('select-nama')) {
+      const baris = e.target.closest('.baris-penandatangan');
+      const inputNama = baris.querySelector('.nama-ttd');
+      const inputJabatan = baris.querySelector('.jabatan-ttd');
+      const inputIdGuru = baris.querySelector('.id-guru-ttd');
+      const opsi = e.target.options[e.target.selectedIndex];
+      
+      if (opsi.value) {
+        inputIdGuru.value = opsi.value;
+        inputNama.value = opsi.dataset.nama || '';
+        inputJabatan.value = opsi.dataset.jabatan || '';
+        inputNama.readOnly = true;
+        inputNama.classList.add('bg-light');
+      } else {
+        inputIdGuru.value = '';
+        inputNama.value = '';
+      }
+    }
+  });
+
+  // --- Jalankan untuk baris pertama saat halaman dimuat ---
+  document.querySelectorAll('.jenis-ttd').forEach(select => {
+    select.addEventListener('change', function() {
+      aturTampilanTTD(this);
+    });
+  });
+
+  // --- Tambah Baris Baru ---
+  tombolTambah.addEventListener('click', function() {
+    if (nomorBaris >= 4) {
+      alert('Maksimal 4 penandatangan per surat');
+      return;
+    }
+    nomorBaris++;
+
+    const barisBaru = document.createElement('div');
+    barisBaru.className = 'baris-penandatangan d-flex flex-wrap align-items-center gap-2 mb-3';
+    barisBaru.innerHTML = `
+      <div class="flex-grow-1">
+        <select name="jenis_ttd[]" class="form-select jenis-ttd" required>
+          <option value="">-- Pilih Jabatan / Tugas --</option>
+          <optgroup label="📋 Jabatan Utama">
+            {% for jab, daftar in daftar_jabatan_tugas.items() %}
+              {% if jab in ["Kepala Sekolah", "Guru", "Tata Usaha"] %}
+                <option value="tetap-{{ jab|replace(' ', '_') }}-{{ daftar[0].id if daftar|length == 1 else '' }}" 
+                        data-jumlah="{{ daftar|length }}" 
+                        data-nama="{{ daftar[0].nama if daftar|length == 1 else '' }}"
+                        data-id="{{ daftar[0].id if daftar|length == 1 else '' }}">
+                  {{ jab }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </optgroup>
+          <optgroup label="📌 Tugas Tambahan">
+            {% for jab, daftar in daftar_jabatan_tugas.items() %}
+              {% if jab not in ["Kepala Sekolah", "Guru", "Tata Usaha"] %}
+                <option value="tugas-{{ jab|replace(' ', '_') }}-{{ daftar[0].id if daftar|length == 1 else '' }}" 
+                        data-jumlah="{{ daftar|length }}" 
+                        data-nama="{{ daftar[0].nama if daftar|length == 1 else '' }}"
+                        data-id="{{ daftar[0].id if daftar|length == 1 else '' }}">
+                  {{ jab }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </optgroup>
+          <optgroup label="📝 Khusus / Panitia">
+            <option value="khusus-ketua" data-jabatan="Ketua Panitia">Ketua Panitia</option>
+            <option value="khusus-sekretaris" data-jabatan="Sekretaris Panitia">Sekretaris Panitia</option>
+            <option value="khusus-bendahara" data-jabatan="Bendahara Panitia">Bendahara Panitia</option>
+            <option value="khusus-supervisor" data-jabatan="Supervisor">Supervisor</option>
+            <option value="khusus-lain">Lainnya (Isi Sendiri)</option>
+          </optgroup>
+        </select>
+      </div>
+      <input type="hidden" name="id_guru_ttd[]" class="id-guru-ttd" value="">
+      <div class="flex-grow-1 div-pilih-nama" style="display: none;">
+        <select name="id_guru_ttd[]" class="form-select select-nama">
+          <option value="">-- Pilih Nama --</option>
+          {% for jab, daftar in daftar_jabatan_tugas.items() %}
+            {% for g in daftar %}
+              <option value="{{ g.id }}" data-jabatan="{{ jab }}" data-nama="{{ g.nama }}" class="opsi-{{ jab|replace(' ', '_') }}">
+                {{ g.nama }}
+              </option>
+            {% endfor %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="flex-grow-1 div-input-nama">
+        <input type="text" name="nama_ttd[]" class="form-control nama-ttd" placeholder="Nama Lengkap" required>
+      </div>
+      <div class="flex-grow-1 div-input-jabatan">
+        <input type="text" name="jabatan_ttd[]" class="form-control jabatan-ttd" placeholder="Jabatan" required>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-danger hapus-ttd">×</button>
+    `;
+
+    daftarTTD.appendChild(barisBaru);
+
+    // Pasang event ke baris baru
+    barisBaru.querySelector('.jenis-ttd').addEventListener('change', function() {
+      aturTampilanTTD(this);
+    });
+
+    barisBaru.querySelector('.hapus-ttd').addEventListener('click', function() {
+      barisBaru.remove();
+      nomorBaris--;
+    });
+  });
+});
+</script>

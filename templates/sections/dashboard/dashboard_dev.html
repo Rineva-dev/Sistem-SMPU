@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+
+    <!-- Header Selamat Datang -->
+    <div class="welcome-box">
+        <div class="garis-1"></div>
+        <div class="garis-2"></div>
+        <div class="titik titik-1"></div>
+        <div class="titik titik-2"></div>
+        <div class="titik titik-3"></div>
+
+        <div>
+            <h2>Selamat Datang, {{ user_name | default('Admin Dev') }}!</h2>
+            <p class="text-muted">Peran Dasar: <strong>Admin Developer</strong> | Hari ini: <strong>{{ today_date_long }}</strong></p>
+        </div>
+
+        <div class="date-box">
+            <i class="far fa-calendar-alt"></i>
+            <span>{{ today_date | default('Tanggal tidak tersedia') }}</span>
+        </div>
+    </div>
+
+    <!-- Kartu Informasi Sistem -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon bg-purple">
+                <i class="fas fa-users-cog"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_pengguna | default('0') }}</h3>
+                <p>Total Pengguna Terdaftar</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-dark">
+                <i class="fas fa-code"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ versi_sistem | default('1.0.0') }}</h3>
+                <p>Versi Sistem</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-gray">
+                <i class="fas fa-hdd"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ ruang_penyimpanan | default('0') }} GB</h3>
+                <p>Penyimpanan</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-red">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ error_sistem | default('0') }}</h3>
+                <p>Peringatan / Log Error</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Cepat & Log Aktivitas -->
+    <div class="content-grid">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-tools"></i> Pengelolaan Sistem</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="menu-grid p-3">
+                    <a href="{{ url_for('dev.pengaturan_umum') }}" class="menu-item-dev">
+                        <i class="fas fa-cog"></i> Pengaturan Umum
+                    </a>
+                    <a href="{{ url_for('dev.atur_hak_akses') }}" class="menu-item-dev">
+                        <i class="fas fa-user-lock"></i> Atur Hak Akses
+                    </a>
+                    <a href="{{ url_for('dev.log_aktivitas') }}" class="menu-item-dev">
+                        <i class="fas fa-history"></i> Log Aktivitas
+                    </a>
+                    <a href="{{ url_for('dev.backup_data') }}" class="menu-item-dev">
+                        <i class="fas fa-database"></i> Backup & Pulihkan Data
+                    </a>
+                    <a href="{{ url_for('dev.pengaturan_keamanan') }}" class="menu-item-dev">
+                        <i class="fas fa-shield-alt"></i> Pengaturan Keamanan
+                    </a>
+                    <a href="{{ url_for('dev.info_sistem') }}" class="menu-item-dev">
+                        <i class="fas fa-info-circle"></i> Informasi Sistem
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-clipboard-list"></i> Aktivitas Terkini</h4>
+            </div>
+            <div class="card-body p-0">
+                <ul class="activity-list">
+                    {% if log_aktivitas %}
+                        {% for log in log_aktivitas %}
+                        <li class="activity-item">
+                            <span class="activity-time">{{ log.waktu }}</span>
+                            <span class="activity-text">{{ log.aksi }}</span>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="text-center text-muted py-4">Belum ada aktivitas tercatat</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,422 @@
+{% extends "layout.html" %}
+
+{% block title %}Jurnal Kegiatan - {{ peminatan.nama }}{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <h3><i class="fas fa-book"></i> Jurnal Kegiatan</h3>
+            <p class="text-muted mb-0">{{ peminatan.nama }} | Pembina: {{ peminatan.pembina.nama if peminatan.pembina else 'Belum diatur' }}</p>
+        </div>
+
+        <a href="{{ url_for('data_peminatan.halaman') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4 card-info-ekskul">
+    <div class="card-body">
+        <div class="row g-4 align-items-center">
+            <!-- Periode -->
+            <div class="col-md-3">
+                <div class="item-info">
+                    <div class="icon-box primary">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="label">Periode Kegiatan</div>
+                        <div class="nilai">
+                            {{ peminatan.tgl_mulai.strftime('%d/%m/%Y') if peminatan.tgl_mulai else '-' }}
+                            <span class="text-muted mx-1">s/d</span>
+                            {{ peminatan.tgl_selesai.strftime('%d/%m/%Y') if peminatan.tgl_selesai else '-' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-3">
+                <div class="item-info">
+                    <div class="icon-box success">
+                        <i class="fas fa-signal"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="label">Status</div>
+                        <div class="nilai">
+                            {% if peminatan.status_otomatis == 'belum' %}
+                                <span class="badge bg-secondary">Belum Dimulai</span>
+                            {% elif peminatan.status_otomatis == 'aktif' %}
+                                <span class="badge bg-success">Sedang Berjalan</span>
+                            {% elif peminatan.status_otomatis == 'selesai' %}
+                                <span class="badge bg-dark">Sudah Selesai</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">Belum Diatur</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jumlah Anggota -->
+            <div class="col-md-3">
+                <div class="item-info">
+                    <div class="icon-box info">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info-text">
+                        <div class="label">Jumlah Anggota</div>
+                        <div class="nilai">{{ peminatan.anggota|length }} siswa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="col-md-3 text-end">
+                {% if jabatan in ["Admin", "Tata Usaha", "TU", "Waka Kurikulum", "Waka Kesiswaan", "Pembina Peminatan"] or "Admin Sistem" in daftar_tugas %}
+                <div class="d-flex gap-2 justify-content-end">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalLibur">
+                        <i class="fas fa-moon me-1"></i> Atur Bulan Libur
+                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahJurnal">
+                        <i class="fas fa-plus me-1"></i> Tambah Kegiatan
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if daftar_bulan_libur %}
+<div class="card mb-4 border-warning">
+    <div class="card-header bg-warning bg-opacity-10 text-warning fw-semibold">
+        <i class="fas fa-moon me-2"></i>Daftar Bulan Libur
+    </div>
+    <div class="card-body p-3">
+        <div class="row g-2">
+            {% for bln in daftar_bulan_libur %}
+            <div class="col-auto">
+                <div class="d-flex align-items-center gap-2 px-3 py-2 bg-warning bg-opacity-10 rounded-pill">
+                    <div>
+                        <strong>{{ bln.nama_bulan }} {{ bln.tahun }}</strong>
+                        {% if bln.keterangan %}
+                        <br><small class="text-dark-emphasis fst-italic">{{ bln.keterangan }}</small>
+                        {% endif %}
+                    </div>
+                    {% if jabatan in ["Admin", "Tata Usaha", "TU", "Admin Sistem"] %}
+                    <a href="{{ url_for('data_peminatan.hapus_bulan_libur', id=bln.id) }}" 
+                       class="text-danger small" 
+                       onclick="return confirm('Batalkan libur bulan {{ bln.nama_bulan }} {{ bln.tahun }}?');"
+                       title="Batalkan">
+                        <i class="fas fa-times-circle"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-body">
+        {% if daftar_jurnal %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="50px">No</th>
+                        <th width="110">Tanggal</th>
+                        <th width="140">Waktu</th>
+                        <th>Uraian Kegiatan</th>
+                        <th width="130">Kehadiran</th>
+                        <th width="280">Dicatat Oleh</th>
+                        <th width="220">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for j in daftar_jurnal %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="fw-medium">{{ j.tanggal_kegiatan.strftime('%d/%m/%Y') }}</td>
+                        <td class="small">{{ j.waktu_mulai or '-' }} - {{ j.waktu_selesai or '-' }}</td>
+                        <td>
+                            <div class="text-truncate" style="max-width:350px;">{{ j.uraian_kegiatan }}</div>
+                            {% if j.hasil_kegiatan %}
+                            <small class="text-muted">Hasil: {{ j.hasil_kegiatan }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="small">
+                            Hadir: {{ j.jumlah_hadir or 0 }}<br>
+                            {% if j.sakit %}Sakit: {{ j.sakit }}{% endif %}
+                            {% if j.izin %} | Izin: {{ j.izin }}{% endif %}
+                            {% if j.alpha %} | Alpha: {{ j.alpha }}{% endif %}
+                        </td>
+                        <td class="small">
+                            {% if j.pencatat and j.pencatat.guru %}
+                                {{ j.pencatat.guru.nama }}
+                            {% elif j.pencatat %}
+                                {{ j.pencatat.username }}
+                            {% else %}
+                                -
+                            {% endif %}
+                            <br>
+                            <span class="text-muted-pencatat">{{ j.dibuat_pada.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info btn-lihat" data-bs-toggle="modal" data-bs-target="#modalLihat{{ j.id }}" title="Detile">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% if jabatan in ["Admin", "Tata Usaha", "TU", "Waka Kurikulum", "Waka Kesiswaan", "Pembina Peminatan", "Admin Sistem"] %}
+                            <a href="{{ url_for('data_peminatan.halaman_absensi', jurnal_id=j.id) }}" class="btn btn-sm btn-success ms-1" title="Absensi">
+                                <i class="fas fa-check-square"></i>
+                            </a>
+                            
+                            <button class="btn btn-sm btn-warning btn-edit-jurnal ms-1" data-id="{{ j.id }}" title="Edit">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            {% endif %}
+                            {% if jabatan in ["Admin", "Tata Usaha", "TU", "Admin Sistem"] %}
+                            <button class="btn btn-sm btn-danger btn-hapus-jurnal ms-1" data-id="{{ j.id }}" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-book-open fa-3x mb-3"></i>
+            <p>Belum ada catatan jurnal kegiatan untuk peminatan ini.</p>
+            {% if jabatan in ["Admin", "Tata Usaha", "TU", "Waka Kurikulum", "Waka Kesiswaan", "Pembina Peminatan"] or "Admin Sistem" in daftar_tugas %}
+            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalTambahJurnal">
+                <i class="fas fa-plus"></i> Buat Catatan Pertama
+            </button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- MODAL TAMBAH JURNAL -->
+<div class="modal fade" id="modalTambahJurnal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ url_for('data_peminatan.tambah_jurnal', peminatan_id=peminatan.id) }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Catat Kegiatan Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Tanggal Kegiatan <span class="text-danger">*</span></label>
+                            <input type="date" name="tanggal_kegiatan" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Waktu Mulai</label>
+                            <input type="time" name="waktu_mulai" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Waktu Selesai</label>
+                            <input type="time" name="waktu_selesai" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Uraian Kegiatan <span class="text-danger">*</span></label>
+                        <textarea name="uraian_kegiatan" class="form-control" rows="3" required placeholder="Jelaskan kegiatan apa yang dilakukan hari ini..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hasil yang Dicapai</label>
+                        <textarea name="hasil_kegiatan" class="form-control" rows="2" placeholder="Apa hasil atau kemajuan yang dicapai..."></textarea>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Kendala</label>
+                            <textarea name="kendala" class="form-control" rows="2" placeholder="Jika ada kendala..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Catatan Pembina</label>
+                            <textarea name="catatan_pembina" class="form-control" rows="2" placeholder="Pesan untuk siswa atau catatan khusus..."></textarea>
+                        </div>
+                    </div>
+                    <h6 class="fw-semibold border-top pt-3 mb-2">Data Kehadiran</h6>
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">Hadir</label>
+                            <input type="number" name="jumlah_hadir" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Terlambat</label>
+                            <input type="number" name="terlambat" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sakit</label>
+                            <input type="number" name="sakit" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Izin</label>
+                            <input type="number" name="izin" class="form-control" min="0" value="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tanpa Keterangan</label>
+                            <input type="number" name="alpha" class="form-control" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Catatan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL LIHAT DETAIL -->
+{% for j in daftar_jurnal %}
+<div class="modal fade" id="modalLihat{{ j.id }}" tabindex="-1" aria-labelledby="modalLabel{{ j.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-semibold" id="modalLabel{{ j.id }}">
+                    <i class="fas fa-clipboard-list me-2"></i>Detail Jurnal Kegiatan
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <!-- Baris 1: Waktu & Kehadiran -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="fas fa-clock me-1"></i>Waktu Pelaksanaan
+                            </h6>
+                            <p class="mb-1">{{ j.waktu_mulai or '-' }} s/d {{ j.waktu_selesai or '-' }}</p>
+                            <small class="text-muted">Tanggal: {{ j.tanggal_kegiatan.strftime('%d/%m/%Y') }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded h-100">
+                            <h6 class="fw-bold text-primary mb-2">
+                                <i class="fas fa-users me-1"></i>Data Kehadiran
+                            </h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-success">Hadir: {{ j.jumlah_hadir or 0 }}</span>
+                                <span class="badge bg-info text-dark">Sakit: {{ j.sakit or 0 }}</span>
+                                <span class="badge bg-secondary">Izin: {{ j.izin or 0 }}</span>
+                                <span class="badge bg-danger">Alpa: {{ j.alpha or 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Baris 2: Uraian & Hasil -->
+                    <div class="col-12">
+                        <h6 class="fw-bold text-dark border-bottom pb-1 mb-2">
+                            <i class="fas fa-list-check me-1"></i>Uraian Kegiatan
+                        </h6>
+                        <p class="mb-3">{{ j.uraian_kegiatan }}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="fw-bold text-dark border-bottom pb-1 mb-2">
+                            <i class="fas fa-check-circle me-1"></i>Hasil yang Dicapai
+                        </h6>
+                        <p class="mb-3">{{ j.hasil_kegiatan or '<em class="text-muted">Belum dicantumkan</em>'|safe }}</p>
+                    </div>
+
+                    <!-- Baris 3: Kendala & Catatan -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark border-bottom pb-1 mb-2">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Kendala yang Dihadapi
+                        </h6>
+                        <p class="mb-0">{{ j.kendala or '<em class="text-muted">Tidak ada kendala</em>'|safe }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark border-bottom pb-1 mb-2">
+                            <i class="fas fa-comment-dots me-1"></i>Catatan Pembina
+                        </h6>
+                        <p class="mb-0">{{ j.catatan_pembina or '<em class="text-muted">Tidak ada catatan</em>'|safe }}</p>
+                    </div>
+
+                    <!-- Baris 4: Dicatat Oleh -->
+                    <div class="col-12 mt-3">
+                        <hr class="my-3">
+                        <p class="text-muted small mb-0 text-end">
+                            <i class="fas fa-user-pen me-1"></i>Dicatat oleh: 
+                            <strong>
+                                {% if j.pencatat and j.pencatat.guru %}
+                                    {{ j.pencatat.guru.nama }}
+                                {% elif j.pencatat %}
+                                    {{ j.pencatat.username }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </strong>
+                            <br>
+                            <span class="fst-italic">pada {{ j.dibuat_pada.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-xmark me-1"></i> Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<!-- MODAL ATUR BULAN LIBUR -->
+<div class="modal fade" id="modalLibur" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formLibur" method="POST" action="{{ url_for('data_peminatan.simpan_bulan_libur') }}">
+                <input type="hidden" name="peminatan_id" value="{{ peminatan.id }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Atur Bulan Libur</h5>
+                    <p class="mb-0 text-muted small">{{ peminatan.nama }}</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle"></i> Pilih bulan yang libur. Bulan yang sudah diatur tidak akan tampil di daftar ini.
+                        <br>
+                        <span id="periode-peminatan"
+                            data-mulai="{{ peminatan.tgl_mulai.strftime('%d/%m/%Y') if peminatan.tgl_mulai else '' }}"
+                            data-selesai="{{ peminatan.tgl_selesai.strftime('%d/%m/%Y') if peminatan.tgl_selesai else '' }}"
+                            data-peminatan-id="{{ peminatan.id }}">
+                            Periode kegiatan: {{ peminatan.tgl_mulai.strftime('%d/%m/%Y') if peminatan.tgl_mulai else '-' }} s.d. {{ peminatan.tgl_selesai.strftime('%d/%m/%Y') if peminatan.tgl_selesai else '-' }}
+                        </span>
+                    </div>
+
+                    <!-- TEMPAT PILIH BULAN -->
+                    <div id="daftarBulanPeriode" class="mt-3 border-top pt-3">
+                        <div class="text-center text-muted py-2">Memuat daftar bulan...</div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Keterangan (opsional)</label>
+                        <textarea name="keterangan" class="form-control" rows="2" placeholder="Contoh: Libur Ujian / Libur Akhir Tahun"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ekstrakurikuler/jurnal_peminatan.css') }}">
+<script src="{{ url_for('static', filename='js/ekstrakurikuler/jurnal_peminatan.js') }}"></script>
+{% endblock %}

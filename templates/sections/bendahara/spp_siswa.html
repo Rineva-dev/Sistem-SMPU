@@ -1,0 +1,278 @@
+<div class="page-header mb-4">
+    <h3><i class="fas fa-credit-card"></i> Pembayaran SPP Siswa</h3>
+    <p class="text-muted">Kelola tagihan dan status pembayaran SPP siswa per tahun pelajaran</p>
+</div>
+
+<!-- Ringkasan Cepat -->
+<div class="stats-grid mb-4">
+    <div class="stat-card">
+        <div class="stat-icon bg-primary">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ total_siswa | default('0') }}</h3>
+            <p>Total Siswa Aktif</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-success">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ siswa_lunas | default('0') }}</h3>
+            <p>Sudah Melunasi</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-warning">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ siswa_belum | default('0') }}</h3>
+            <p>Belum Lunas</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon bg-info">
+            <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ persen_lunas | default('0') }}%</h3>
+            <p>Tingkat Pelunasan</p>
+        </div>
+    </div>
+</div>
+
+<!-- Filter & Tombol Aksi -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <button class="btn btn-success" id="btnBukaPembayaran">
+                    <i class="fas fa-money-bill-wave me-2"></i> Pembayaran
+                </button>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="filterBulan">
+                    <option value="">Pilih Bulan</option>
+                    <option value="Januari">Januari</option>
+                    <option value="Februari">Februari</option>
+                    <option value="Maret">Maret</option>
+                    <option value="April">April</option>
+                    <option value="Mei">Mei</option>
+                    <option value="Juni">Juni</option>
+                    <option value="Juli">Juli</option>
+                    <option value="Agustus">Agustus</option>
+                    <option value="September">September</option>
+                    <option value="Oktober">Oktober</option>
+                    <option value="November">November</option>
+                    <option value="Desember">Desember</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filterKelas">
+                    <option value="">Semua Kelas</option>
+                    {% for kls in daftar_kelas %}
+                    <option value="{{ kls.id }}">{{ kls.nama_kelas }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="filterStatus">
+                    <option value="">Semua Status</option>
+                    <option value="Lunas">Lunas</option>
+                    <option value="Belum Lunas">Belum Lunas</option>
+                </select>
+            </div>
+            <div class="col-md-2 text-end">
+                <button class="btn btn-primary w-100"><i class="fas fa-filter"></i> Tampilkan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabel Daftar Pembayaran -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Status Pembayaran SPP</h5>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-success"><i class="fas fa-file-excel"></i> Export Excel</button>
+            <button class="btn btn-sm btn-danger"><i class="fas fa-print"></i> Cetak</button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5">No</th>
+                        <th width="120">NISN</th>
+                        <th>Nama Lengkap</th>
+                        <th>Kelas</th>
+                        <th>Total Tagihan</th>
+                        <th>Total Dibayarkan</th>
+                        <th>Sisa Tagihan</th>
+                        <th>Status</th>
+                        <th width="120">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in daftar_siswa %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ s.nisn }}</td>
+                        <td><strong>{{ s.nama }}</strong></td>
+                        <td>{{ s.kelas }}</td>
+                        <td class="fw-bold text-primary">{{ s.total_tagihan }}</td>
+                        <td class="fw-bold text-success">{{ s.total_dibayar }}</td>
+                        <td class="fw-bold {% set sisa_teks = s.sisa_tagihan | string | trim %} {% if sisa_teks == 'Rp 0' or sisa_teks == '0' or sisa_teks == '' or sisa_teks == 'Rp 0,00' or sisa_teks is none %}text-success{% else %}text-danger{% endif %}">
+                            {{ s.sisa_tagihan }}
+                        </td>
+                        <td>
+                            {% if s.sisa_tagihan == 0 or s.total_dibayar >= s.total_tagihan %}
+                                <span class="badge bg-success">Lunas</span>
+                            {% else %}
+                                <span class="badge bg-danger">Belum Lunas</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('bendahara.rincian_tagihan', kode=s.nisn) }}" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-eye"></i> Detail
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            Belum ada data siswa untuk tahun pelajaran ini.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PEMBAYARAN DARI DAFTAR UTAMA: PILIH SISWA DULU -->
+<div class="modal fade" id="modalPembayaranDaftar" tabindex="-1" aria-labelledby="judulModalBayarDaftar" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Ubah dari modal-xl → modal-lg sama rincian -->
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="judulModalBayarDaftar">
+                    <i class="fas fa-money-bill-wave me-2"></i>Pembayaran SPP Siswa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+
+            <div class="modal-body pembayaran">
+                <!-- ✅ PILIH SISWA -->
+                <div class="pilih-siswa">
+                    <label class="form-label fw-semibold mb-2"><i class="fas fa-user-check text-primary me-2"></i>Pilih Siswa Akan Dibayar</label>
+                    <select id="pilihSiswaBayar" class="form-select form-select-lg">
+                        <option value="">-- Pilih dari daftar di bawah ini --</option>
+                        {% for s in daftar_siswa %}
+                        <option value="{{ s.id }}" data-nisn="{{ s.nisn }}" data-nama="{{ s.nama }}" data-kelas="{{ s.kelas }}">{{ s.nisn }} — {{ s.nama }} | {{ s.kelas }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- INFO SISWA TERPILIH (MUNCUL SETELAH PILIH) -->
+                <div id="infoSiswaTerpilih" class="alert alert-light border mb-3 px-3 py-2 rounded-3 shadow-sm d-none">
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-user-graduate text-primary"></i>
+                            <div>
+                                <small class="text-muted d-block">Nama Lengkap</small>
+                                <strong class="text-dark" id="infoNama"></strong>
+                            </div>
+                        </div>
+                        <span class="vr"></span>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-id-card text-success"></i>
+                            <div>
+                                <small class="text-muted d-block">NISN</small>
+                                <strong class="text-dark" id="infoNisn"></strong>
+                            </div>
+                        </div>
+                        <span class="vr"></span>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-school text-info"></i>
+                            <div>
+                                <small class="text-muted d-block">Kelas</small>
+                                <strong class="text-dark" id="infoKelas"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grup-tagihan">
+                    <!-- PILIH SEMUA KESELURUHAN -->
+                    <div class="d-flex align-items-center justify-content-between mb-2 px-2 d-none" id="blokPilihSemua">
+                        <h6 class="mb-0 fw-semibold">Pilih Tagihan Akan Dibayar</h6>
+                        <label class="form-check fw-normal">
+                            <input class="form-check-input" type="checkbox" id="pilihSemuaBelumLunasUtama">
+                            Pilih Semua Belum Lunas
+                        </label>
+                    </div>
+
+                    <!-- ✅ DAFTAR KELOMPOK + BISA GULIR SAMA PERSIS -->
+                    <div id="wadahDaftarTagihanUtama" class="daftar-modal-wrapper border rounded mb-3">
+                        <i class="fas fa-hand-pointer me-2"></i>Silakan pilih siswa terlebih dahulu...
+                    </div>
+                </div>
+
+                                <div class="row mt-4 g-3 d-none" id="blokPembayaranLengkap">
+                    <!-- BARIS 1: Total Dibayar ← → Nominal Uang Diterima -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Total Jumlah Dibayar</label>
+                        <input type="text" class="form-control form-control-sm bg-light fw-bold text-end text-success" id="totalDipilihUtama" readonly value="Rp 0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Nominal Uang Diterima / Bayar Sekarang</label>
+                        <input type="text" class="form-control form-control-sm fw-bold text-end text-success" id="uangDiterimaUtama" placeholder="Contoh: 1000000">
+                    </div>
+
+                    <!-- BARIS 2: Metode Pembayaran ← → Tanggal & Jam -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Metode Pembayaran</label>
+                        <div class="custom-select modal-bayar-select">
+                            <select id="metodeBayarUtama" required>
+                                <option value="">-- Pilih Metode --</option>
+                                <option value="Tunai">💵 Tunai</option>
+                                <option value="Transfer Bank">🏦 Transfer Bank</option>
+                                <option value="Dompet Digital">📱 Dompet Digital</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">
+                            <i class="fas fa-calendar-check text-primary me-1"></i> Tanggal & Jam Pembayaran
+                        </label>
+                        <div class="custom-date">
+                            <input type="datetime-local" id="tanggalJamBayarUtama" required>
+                        </div>
+                    </div>
+
+                    <!-- BARIS 3: Catatan → Penuh Lebar -->
+                    <div class="col-12">
+                        <label class="form-label fw-medium">Catatan Tambahan (Opsional)</label>
+                        <textarea class="form-control form-control-sm" id="catatanBayarUtama" rows="2" placeholder="Contoh: Pembayaran kemarin, bayar bertahap, dll"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="btnSimpanPembayaranUtama" disabled>
+                    <i class="fas fa-save me-1"></i> Simpan Pembayaran Terpilih
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/sections/bendahara/spp_siswa.js') }}"></script>

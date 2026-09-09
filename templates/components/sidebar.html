@@ -1,0 +1,563 @@
+<!-- Sidebar - Gaya SaaS Modern -->
+<aside class="sidebar" id="mainSidebar">
+
+  <!-- ✅ HEADER: TETAP DI ATAS, TIDAK IKUT SCROLL -->
+  <div class="sidebar-header">
+    <a href="/dashboard" class="sidebar-logo">
+      <img src="/static/img/logo.png" alt="Logo Sekolah" width="36" height="36">
+      <span>Sistem Sekolah</span>
+    </a>
+  </div>
+
+  <!-- ✅ PEMILIH HALAMAN → HANYA DI SISTEM UTAMA -->
+  {% if g.sistem_mode == 'sekolah'
+        and user.jabatan != "Admin"
+        and halaman_aktif not in ['absensi', 'absensi_harian', 'absensi_wali']
+        and active_page not in ['absensi', 'absensi_harian', 'absensi_wali', 'absensi_rekap', 'absensi_laporan'] %}
+
+    {% set daftar_tugas = [] %}
+    {% if user.tugas_tambahan %}
+      {% if user.tugas_tambahan is string %}
+        {% set daftar_tugas = user.tugas_tambahan.split(',') %}
+        {% set daftar_tugas = daftar_tugas | map('trim') | list %}
+      {% else %}
+        {% set daftar_tugas = user.tugas_tambahan %}
+      {% endif %}
+    {% endif %}
+
+    {% if daftar_tugas | length > 0 %}
+    <div class="halaman-pemilih-wrapper">
+      <div class="halaman-pemilih">
+        <button class="btn-pemilih-halaman" id="tombolPilihHalaman">
+          <span>
+            {% if halaman_aktif == 'utama' %}
+              {{ user.jabatan }}
+            {% elif halaman_aktif == 'admin_sistem' %}
+              Admin Sistem
+            {% elif halaman_aktif == 'bendahara' %}
+              Bendahara
+            {% elif halaman_aktif == 'wali_kelas' %}
+              Wali Kelas
+            {% elif halaman_aktif == 'waka_kurikulum' %}
+              Waka Kurikulum
+            {% elif halaman_aktif == 'waka_kesiswaan' %}
+              Waka Kesiswaan
+            {% elif halaman_aktif == 'pembina_ekskul' %}
+              Pembina Ekskul
+            {% else %}
+              Beralih Halaman
+            {% endif %}
+          </span>
+          <i class="fas fa-exchange-alt me-2"></i>
+        </button>
+        <ul class="daftar-halaman" id="daftarHalaman">
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='utama') }}" 
+               class="{% if halaman_aktif == 'utama' %}aktif{% endif %}">
+              <i class="fas fa-home me-2"></i>
+              Halaman Utama ({{ user.jabatan }})
+            </a>
+          </li>
+          {% if "Admin Sistem" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='admin_sistem') }}" 
+               class="{% if halaman_aktif == 'admin_sistem' %}aktif{% endif %}">
+              <i class="fas fa-user-cog me-2"></i>
+              Halaman Admin Sistem
+            </a>
+          </li>
+          {% endif %}
+          {% if "Bendahara" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='bendahara') }}" 
+               class="{% if halaman_aktif == 'bendahara' %}aktif{% endif %}">
+              <i class="fas fa-wallet me-2"></i>
+              Halaman Bendahara
+            </a>
+          </li>
+          {% endif %}
+          {% if "Wali Kelas" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='wali_kelas') }}" 
+               class="{% if halaman_aktif == 'wali_kelas' %}aktif{% endif %}">
+              <i class="fas fa-chalkboard-user me-2"></i>
+              Halaman Wali Kelas
+            </a>
+          </li>
+          {% endif %}
+          {% if "Waka Kurikulum" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='waka_kurikulum') }}" 
+               class="{% if halaman_aktif == 'waka_kurikulum' %}aktif{% endif %}">
+              <i class="fas fa-book-open me-2"></i>
+              Halaman Waka Kurikulum
+            </a>
+          </li>
+          {% endif %}
+          {% if "Waka Kesiswaan" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='waka_kesiswaan') }}" 
+               class="{% if halaman_aktif == 'waka_kesiswaan' %}aktif{% endif %}">
+              <i class="fas fa-users me-2"></i>
+              Halaman Waka Kesiswaan
+            </a>
+          </li>
+          {% endif %}
+          {% if "Pembina Ekstrakurikuler" in daftar_tugas %}
+          <li>
+            <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='pembina_ekskul') }}" 
+               class="{% if halaman_aktif == 'pembina_ekskul' %}aktif{% endif %}">
+              <i class="fas fa-futbol me-2"></i>
+              Halaman Pembina Ekskul
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <!-- ✅ BAGIAN MENU: SATU-SATUNYA YANG BISA DI-SCROLL -->
+  <div class="sidebar-menu-wrapper">
+    <nav class="sidebar-menu">
+
+      {# =============================================
+          MENU ABSENSI → HANYA MUNCUL DI SISTEM ABSENSI
+          ============================================= #}
+      {% if g.sistem_mode == 'absensi' and halaman_aktif == 'absensi' %}
+      <div class="menu-section">
+        <h5 class="menu-title">MENU ABSENSI</h5>
+        <ul>
+          <li class="menu-item">
+            <a href="/absensi-guru/dashboard" class="menu-link {% if active_page == 'dashboard' %}active{% endif %}">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="/absensi-guru/absensi-harian" class="menu-link {% if active_page == 'absensi_harian' %}active{% endif %}">
+              <i class="fas fa-clipboard-list"></i>
+              <span>Absensi Harian</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="/absensi-guru/rekap-absensi" class="menu-link {% if active_page == 'rekap_absensi' %}active{% endif %}">
+              <i class="fas fa-chart-bar"></i>
+              <span>Rekapitulasi Absensi</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="/absensi-guru/rincian-gaji" class="menu-link {% if active_page == 'rincian_gaji' %}active{% endif %}">
+              <i class="fas fa-file-alt"></i>
+              <span>Rincian Gaji</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+
+      {# =============================================
+          MONITORING ABSENSI → HANYA DI SISTEM UTAMA
+          MUNCUL BERDASARKAN JABATAN
+          ============================================= #}
+      {% if g.sistem_mode == 'sekolah' 
+        and (user.jabatan in ["Kepala Sekolah", "Admin", "Tata Usaha", "TU", "Bendahara"] 
+             or halaman_aktif == 'admin_sistem'
+             or "Admin Sistem" in daftar_tugas) %}
+      <div class="menu-section">
+        <h5 class="menu-title">MONITORING ABSENSI</h5>
+        <ul>
+          <li class="menu-item">
+            <a href="/monitoring-absensi" class="menu-link {% if active_page == 'monitoring_absensi' %}active{% endif %}">
+              <i class="fas fa-users"></i>
+              <span>Rekap Absensi</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+
+      {# =============================================
+          SEMUA MENU SISTEM UTAMA → HANYA DI SISTEM SEKOLAH
+          ============================================= #}
+      {% if g.sistem_mode == 'sekolah' %}
+
+        {# KHUSUS ADMIN (Jabatan = Admin) #}
+        {% if user.jabatan == "Admin" %}
+        <div class="menu-section">
+          <h5 class="menu-title">KONTROL SISTEM</h5>
+          <ul>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.index') }}" class="menu-link {% if active_page == 'dashboard_dev' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard Sistem</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="/guru" class="menu-link {% if active_page == 'data_guru' %}active{% endif %}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Data Guru</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.pengaturan_umum') }}" class="menu-link {% if active_page == 'pengaturan_umum' %}active{% endif %}">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan Umum</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Tahun Pelajaran</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-link {% if active_page == 'kalender' %}active{% endif %}">
+                <i class="fas fa-calendar-week"></i>
+                <span>Kalender Pendidikan</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="/data-ekskul" class="menu-link {% if active_page == 'data_ekskul' %}active{% endif %}">
+                <i class="fas fa-futbol"></i>
+                <span>Ekstrakurikuler</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="/data-peminatan" class="menu-link {% if active_page == 'data_peminatan' %}active{% endif %}">
+                <i class="fas fa-layer-group"></i>
+                <span>Kelas Peminatan</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.atur_hak_akses') }}" class="menu-link {% if active_page == 'atur_hak' %}active{% endif %}">
+                <i class="fas fa-user-lock"></i>
+                <span>Pengaturan Hak Akses</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.log_aktivitas') }}" class="menu-link {% if active_page == 'log_aktivitas' %}active{% endif %}">
+                <i class="fas fa-history"></i>
+                <span>Log Aktivitas</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.backup_data') }}" class="menu-link {% if active_page == 'backup_data' %}active{% endif %}">
+                <i class="fas fa-database"></i>
+                <span>Backup & Pulihkan</span>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="{{ url_for('dev.info_sistem') }}" class="menu-link {% if active_page == 'info_sistem' %}active{% endif %}">
+                <i class="fas fa-info-circle"></i>
+                <span>Info Sistem</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        {% endif %}
+
+        {# UNTUK SEMUA JABATAN SELAIN ADMIN #}
+        {% if user.jabatan != "Admin" %}
+          {% if halaman_aktif == 'utama' %}
+
+            {% if user.jabatan == "Guru" %}
+            <div class="menu-section">
+              <h5 class="menu-title">Menu Guru</h5>
+              <ul>
+                <li class="menu-item">
+                  <a href="/dashboard-guru" class="menu-link {% if active_page == 'dashboard_guru' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/jadwal" class="menu-link {% if active_page == 'jadwal' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Jadwal Mengajar</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/nilai/guru" class="menu-link {% if active_page == 'nilai_guru' %}active{% endif %}">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Input Nilai</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/absensi/guru" class="menu-link {% if active_page == 'absensi_guru' %}active{% endif %}">
+                    <i class="fas fa-check-square"></i>
+                    <span>Absensi</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% elif user.jabatan == "Kepala Sekolah" %}
+            <div class="menu-section">
+              <h5 class="menu-title">Menu Kepala Sekolah</h5>
+              <ul>
+                <li class="menu-item">
+                  <a href="/dashboard" class="menu-link {% if active_page == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard Utama</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/agenda" class="menu-link {% if active_page == 'agenda' %}active{% endif %}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Agenda & Kegiatan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-link {% if active_page == 'kalender' %}active{% endif %}">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Kalender Pendidikan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/persetujuan" class="menu-link {% if active_page == 'persetujuan' %}active{% endif %}">
+                    <i class="fas fa-check-double"></i>
+                    <span>Persetujuan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/laporan/sekolah" class="menu-link {% if active_page == 'laporan' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Laporan Sekolah</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/profil-sekolah" class="menu-link {% if active_page == 'profil_sekolah' %}active{% endif %}">
+                    <i class="fas fa-school"></i>
+                    <span>Profil & Pengaturan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Tahun Pelajaran</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/guru" class="menu-link {% if active_page == 'data_guru' %}active{% endif %}">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Data Guru</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% elif user.jabatan == "Tata Usaha" or user.jabatan == "TU" %}
+            <div class="menu-section">
+              <h5 class="menu-title">Menu Tata Usaha</h5>
+              <ul>
+                <li class="menu-item">
+                  <a href="/dashboard" class="menu-link {% if active_page == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Tahun Pelajaran</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-link {% if active_page == 'kalender' %}active{% endif %}">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Kalender Pendidikan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/surat-menyurat" class="menu-link {% if active_page == 'surat_menyurat' %}active{% endif %}">
+                    <i class="fas fa-envelope"></i>
+                    <span>Surat Menyurat</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/guru" class="menu-link {% if active_page == 'data_guru' %}active{% endif %}">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Data Guru</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/siswa" class="menu-link {% if active_page == 'data_siswa' %}active{% endif %}">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Data Siswa</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/kelas" class="menu-link {% if active_page == 'data_kelas' %}active{% endif %}">
+                    <i class="fas fa-building"></i>
+                    <span>Data Kelas</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="menu-link {% if active_page == 'data_mapel' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Mata Pelajaran</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/data-ekskul" class="menu-link {% if active_page == 'data_ekskul' %}active{% endif %}">
+                    <i class="fas fa-futbol"></i>
+                    <span>Ekstrakurikuler</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/data-peminatan" class="menu-link {% if active_page == 'data_peminatan' %}active{% endif %}">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Kelas Peminatan</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/laporan-administrasi" class="menu-link {% if active_page == 'laporan_sekolah' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Laporan Administrasi</span>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/arsip-dokumen" class="menu-link {% if active_page == 'arsip' %}active{% endif %}">
+                    <i class="fas fa-archive"></i>
+                    <span>Arsip Dokumen</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          {% endif %}
+
+          {% if halaman_aktif == 'admin_sistem' %}
+          <div class="menu-section">
+            <h5 class="menu-title">Pengelolaan Data</h5>
+            <ul>
+              <li class="menu-item">
+                <a href="{{ url_for('dashboard_admin.index') }}" class="menu-link {% if active_page == 'dashboard' %}active{% endif %}">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Dashboard Admin</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
+                  <i class="fas fa-calendar-check"></i>
+                  <span>Tahun Pelajaran</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-link {% if active_page == 'kalender' %}active{% endif %}">
+                  <i class="fas fa-calendar-week"></i>
+                  <span>Kalender Pendidikan</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/siswa" class="menu-link {% if active_page == 'data_siswa' %}active{% endif %}">
+                  <i class="fas fa-user-graduate"></i>
+                  <span>Data Siswa</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/guru" class="menu-link {% if active_page == 'data_guru' %}active{% endif %}">
+                  <i class="fas fa-chalkboard-teacher"></i>
+                  <span>Data Guru</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/kelas" class="menu-link {% if active_page == 'data_kelas' %}active{% endif %}">
+                  <i class="fas fa-building"></i>
+                  <span>Data Kelas</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="menu-link {% if active_page == 'data_mapel' %}active{% endif %}">
+                  <i class="fas fa-book"></i>
+                  <span>Mata Pelajaran</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/data-ekskul" class="menu-link {% if active_page == 'data_ekskul' %}active{% endif %}">
+                  <i class="fas fa-futbol"></i>
+                  <span>Ekstrakurikuler</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/data-peminatan" class="menu-link {% if active_page == 'data_peminatan' %}active{% endif %}">
+                  <i class="fas fa-layer-group"></i>
+                  <span>Kelas Peminatan</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
+
+          {% if halaman_aktif == 'bendahara' %}
+          <div class="menu-section">
+            <h5 class="menu-title">Pengelolaan Keuangan</h5>
+            <ul>
+              <li class="menu-item">
+                <a href="{{ url_for('bendahara.index') }}" class="menu-link {% if active_page == 'dashboard' and halaman_aktif == 'bendahara' %}active{% endif %}">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('bendahara.spp_siswa') }}" class="menu-link {% if active_page in ['spp_siswa', 'rincian_tagihan'] %}active{% endif %}">
+                  <i class="fas fa-credit-card"></i>
+                  <span>Pembayaran SPP</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/keuangan/pemasukan" class="menu-link {% if active_page == 'pemasukan' %}active{% endif %}">
+                  <i class="fas fa-arrow-down"></i>
+                  <span>Pemasukan</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/keuangan/pengeluaran" class="menu-link {% if active_page == 'pengeluaran' %}active{% endif %}">
+                  <i class="fas fa-arrow-up"></i>
+                  <span>Pengeluaran</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/keuangan/laporan" class="menu-link {% if active_page == 'lap_keuangan' %}active{% endif %}">
+                  <i class="fas fa-file-invoice-dollar"></i>
+                  <span>Laporan Keuangan</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('bendahara.pengaturan_pembayaran') }}" class="menu-link {% if active_page == 'pengaturan_pembayaran' %}active{% endif %}">
+                  <i class="fas fa-sliders-h"></i>
+                  <span>Pengaturan Biaya</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </nav>
+  </div>
+
+  <!-- ✅ FOOTER -->
+  <div class="sidebar-footer">
+    <div class="logout">
+      <a href="{% if g.sistem_mode == 'absensi' %}/logout-absensi{% else %}/logout{% endif %}" class="btn-logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Keluar</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<script>
+const tombol = document.getElementById('tombolPilihHalaman');
+const pemilih = document.querySelector('.halaman-pemilih');
+if (tombol && pemilih) {
+  tombol.addEventListener('click', function(e) {
+    e.stopPropagation();
+    pemilih.classList.toggle('open');
+  });
+  document.addEventListener('click', function() {
+    pemilih.classList.remove('open');
+  });
+}
+</script>

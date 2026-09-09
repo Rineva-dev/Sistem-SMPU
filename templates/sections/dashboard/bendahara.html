@@ -1,0 +1,136 @@
+<div class="page-header mb-4">
+    <h3><i class="fas fa-wallet"></i> Dashboard Keuangan Sekolah</h3>
+    <p class="text-muted">Ringkasan kondisi keuangan dan transaksi sekolah</p>
+</div>
+
+<div class="dashboard-container">
+    <!-- Kumpulan Kartu Ringkasan -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ pemasukan_bulan_ini | default('0') }}</h3>
+                <p>Masuk Bulan Ini</p>
+                <small class="text-success"><i class="fas fa-arrow-up"></i> Dibanding bulan lalu</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-danger">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ pengeluaran_bulan_ini | default('0') }}</h3>
+                <p>Keluar Bulan Ini</p>
+                <small class="text-danger"><i class="fas fa-arrow-down"></i> Terkendali</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ saldo_tersedia | default('0') }}</h3>
+                <p>Saldo Kas Sekolah</p>
+                <small class="text-muted">Per Hari Ini</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ persen_lunas_spp | default('0') }} %</h3>
+                <p>SPP Lunas</p>
+                <small class="text-muted">Dari Total Siswa</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bagian Grafik & Daftar Transaksi -->
+    <div class="content-grid mt-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Perkembangan Keuangan 6 Bulan Terakhir</h5>
+                <span class="badge bg-primary">Tahun Pelajaran Aktif</span>
+            </div>
+            <div class="card-body">
+                <canvas id="keuanganChart" height="140"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list-alt"></i> Transaksi Terbaru</h5>
+                <a href="/keuangan/laporan" class="btn btn-sm btn-primary">Lihat Semua</a>
+            </div>
+            <div class="card-body p-0">
+                                <ul class="transaction-list">
+                    {% if daftar_transaksi %}
+                        {% for trx in daftar_transaksi %}
+                        <li class="transaction-item">
+                            <div class="trx-kiri">
+                                <span class="trx-jenis">{{ trx.jenis_pembayaran }}</span>
+                                <small class="trx-nama-siswa">{{ trx.nama_siswa }}</small>
+                                <span class="trx-tanggal">{{ trx.tanggal_lengkap }}</span>
+                            </div>
+                            <span class="trx-nominal {% if trx.jenis_trx == 'masuk' %}text-success{% else %}text-danger{% endif %}">
+                                {% if trx.jenis_trx == 'masuk' %}+{% else %}-{% endif %} Rp {{ "{:,.0f}".format(trx.nominal).replace(",", ".") }}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="transaction-item text-center text-muted py-3">
+                            Belum ada data transaksi.
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bagian Tambahan: Status Pembayaran & Pengingat -->
+    <div class="content-grid mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-exclamation-circle"></i> Pembayaran Belum Lunas</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i> Masih ada <strong>{{ jumlah_belum_lunas | default('0') }}</strong> siswa yang belum melunasi pembayaran bulan ini.
+                </div>
+                <a href="/bendahara/spp-siswa" class="btn btn-warning w-100 mt-2">Lihat Daftar Tagihan</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-check"></i> Laporan Keuangan</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Cetak atau unduh laporan keuangan untuk pertanggungjawaban.</p>
+                <div class="d-flex gap-2">
+                    <a href="/keuangan/laporan/bulan" class="btn btn-primary flex-fill">Laporan Bulanan</a>
+                    <a href="/keuangan/laporan/tahun" class="btn btn-success flex-fill">Laporan Tahunan</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/dashboard_bendahara.css') }}">
+
+<script src="/static/js/sections/bendahara/dashboard_bendahara.js"></script>
+<script>
+  // Data dari Backend — otomatis terisi dari Python
+  const labelBulan = {{ dlabel_bulan | tojson }};
+  const dataMasuk = {{ data_pemasukan | tojson }};
+  const dataKeluar = {{ data_pengeluaran | tojson }};
+</script>
+
+<!-- Taruh file JS Anda di bawah ini -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>

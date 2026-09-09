@@ -1,0 +1,447 @@
+/* ==========================================
+   DASHBOARD & KOMPONEN UTAMA
+========================================== */
+
+.page-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.page-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.page-header p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* ==========================================
+   WELCOME BOX - SAMA SEPERTI HALAMAN GURU
+========================================== */
+.welcome-box {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
+    color: #ffffff;
+    border-radius: 1.25rem;
+    padding: 2rem 2.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22), 0 3px 8px rgba(37, 99, 235, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lingkaran dekorasi besar */
+.welcome-box::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    top: -70px;
+    right: -70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    filter: blur(4px);
+}
+
+/* Lingkaran dekorasi kecil */
+.welcome-box::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    bottom: -40px;
+    left: 18%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    filter: blur(2px);
+}
+
+/* Garis lengkung samar */
+.welcome-box .garis-1 {
+    position: absolute;
+    top: 30%;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
+.welcome-box .garis-2 {
+    position: absolute;
+    bottom: 20%;
+    right: 25%;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+/* Titik-titik dekorasi halus */
+.welcome-box .titik {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+.welcome-box .titik-1 { width: 12px; height: 12px; top: 25%; left: 20%; }
+.welcome-box .titik-2 { width: 8px; height: 8px; top: 65%; right: 30%; }
+.welcome-box .titik-3 { width: 15px; height: 15px; bottom: 20%; left: 40%; }
+
+.welcome-box h2 {
+    font-size: 1.9rem;
+    margin: 0 0 0.6rem 0;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-box p {
+    margin: 0;
+    opacity: 0.92;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+    color: #fffbeb !important;
+}
+
+.welcome-box .text-primary {
+    color: #dbeafe !important;
+    font-weight: 500;
+}
+
+.date-box {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 1.25rem 1.75rem;
+    border-radius: 1rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 125px;
+    position: relative;
+    z-index: 2;
+    color: #ffffff !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.date-box i {
+    font-size: 1.7rem;
+    margin-bottom: 0.4rem;
+    display: block;
+    opacity: 0.95;
+}
+
+.date-box span {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Responsif untuk HP */
+@media (max-width: 768px) {
+    .welcome-box {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+        padding: 1.75rem 1.5rem;
+    }
+
+    .welcome-box h2 {
+        font-size: 1.5rem;
+    }
+
+    .date-box {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    /* Sembunyikan elemen dekorasi di HP agar rapi */
+    .welcome-box .garis-1,
+    .welcome-box .garis-2,
+    .welcome-box .titik {
+        display: none;
+    }
+}
+
+/* ==========================================
+   KARTU RINGKASAN DATA - SESUAI GAYA REFERENSI
+========================================== */
+/* Tambahkan ini di bagian paling atas atau bawah CSS halaman TU */
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)) !important;
+    gap: 1.5rem !important;
+    margin-bottom: 1.75rem !important;
+}
+
+.stat-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    flex-direction: row;
+}
+
+/* Efek lingkaran samar di pojok kanan atas */
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.05);
+    z-index: 0;
+}
+
+/* Efek mengangkat saat disentuh */
+.stat-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(191, 219, 254, 0.6) !important;
+}
+
+/* Kotak ikon persegi bulat */
+.stat-icon {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.6rem !important;
+    color: #ffffff !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12) !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Warna gradien untuk setiap ikon */
+.stat-icon.bg-primary {
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+}
+.stat-icon.bg-success {
+    background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+}
+.stat-icon.bg-info {
+    background: linear-gradient(135deg, #0284c7, #38bdf8) !important;
+}
+.stat-icon.bg-warning {
+    background: linear-gradient(135deg, #d97706, #fbbf24) !important;
+}
+
+/* Bagian teks di sebelah kanan ikon */
+.stat-info {
+    flex: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.stat-info p {
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    margin: 0 0 0.4rem 0 !important;
+    color: #64748b !important;
+    line-height: 1 !important;
+}
+
+.stat-info h3 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    color: #0f172a !important;
+    line-height: 1 !important;
+}
+
+/* Responsif di HP */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 1.5rem 1.25rem !important;
+    }
+    .stat-icon {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 1.4rem !important;
+    }
+    .stat-info h3 {
+        font-size: 1.8rem !important;
+    }
+}
+
+/* ==========================================
+   KARTU KONTEN UMUM
+========================================== */
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1rem 1.25rem;
+}
+
+.card-header h5 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* ==========================================
+   DAFTAR ITEM DALAM KARTU
+========================================== */
+.list-group-item {
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 1rem 1.25rem;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-group-item h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2d3748;
+  margin: 0 0 0.25rem 0;
+}
+
+/* ==========================================
+   TATA LETAK & JARAK
+========================================== */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+.g-4 > * {
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.col-md-3 {
+  width: 25%;
+}
+
+.col-md-6 {
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  .col-md-3 {
+    width: 50%;
+  }
+  .col-md-6 {
+    width: 100%;
+  }
+  .stat-card h3 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .col-md-3 {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   TOMBOL & TEKS
+========================================== */
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.btn-outline-primary {
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.text-danger {
+  color: #dc2626 !important;
+  font-weight: 500;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important;
+}
+
+.h-100 {
+  height: 100% !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.align-items-start {
+  align-items: flex-start !important;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+

@@ -1,0 +1,390 @@
+/* ==========================================
+   STYLE UTAMA DASHBOARD - ADMIN DEV
+========================================== */
+
+/* Kontainer Utama */
+.dashboard-container {
+    width: 100%;
+    max-width: 100%;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* ==========================================
+   HEADER SELAMAT DATANG
+========================================== */
+.welcome-box {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
+    color: #ffffff;
+    border-radius: 1.25rem;
+    padding: 2rem 2.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22), 0 3px 8px rgba(37, 99, 235, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lingkaran dekorasi besar */
+.welcome-box::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    top: -70px;
+    right: -70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    filter: blur(4px);
+}
+
+/* Lingkaran dekorasi kecil */
+.welcome-box::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    bottom: -40px;
+    left: 18%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    filter: blur(2px);
+}
+
+/* Garis lengkung samar */
+.welcome-box .garis-1 {
+    position: absolute;
+    top: 30%;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
+.welcome-box .garis-2 {
+    position: absolute;
+    bottom: 20%;
+    right: 25%;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+/* Titik-titik dekorasi halus */
+.welcome-box .titik {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+.welcome-box .titik-1 { width: 12px; height: 12px; top: 25%; left: 20%; }
+.welcome-box .titik-2 { width: 8px; height: 8px; top: 65%; right: 30%; }
+.welcome-box .titik-3 { width: 15px; height: 15px; bottom: 20%; left: 40%; }
+
+.welcome-box h2 {
+    font-size: 1.9rem;
+    margin: 0 0 0.6rem 0;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-box p {
+    margin: 0;
+    opacity: 0.92;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+    color: #fffbeb !important;
+}
+
+.welcome-box .text-primary {
+    color: #dbeafe !important;
+    font-weight: 500;
+}
+
+.date-box {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 1.25rem 1.75rem;
+    border-radius: 1rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 125px;
+    position: relative;
+    z-index: 2;
+}
+
+.date-box i {
+    font-size: 1.7rem;
+    margin-bottom: 0.4rem;
+    display: block;
+    opacity: 0.95;
+}
+
+.date-box span {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    .welcome-box {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+        padding: 1.75rem 1.5rem;
+    }
+
+    .welcome-box h2 {
+        font-size: 1.5rem;
+    }
+
+    .date-box {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .welcome-box .garis-1,
+    .welcome-box .garis-2,
+    .welcome-box .titik {
+        display: none;
+    }
+}
+
+/* ==========================================
+   GRID & KARTU STATISTIK
+========================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+.stat-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1.25rem;
+    padding: 1.75rem 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.05);
+    z-index: 0;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-color: rgba(191, 219, 254, 0.6);
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 1;
+}
+
+/* Warna khusus untuk halaman Admin Dev */
+.stat-icon.bg-purple { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+.stat-icon.bg-dark   { background: linear-gradient(135deg, #1e293b, #334155); }
+.stat-icon.bg-gray   { background: linear-gradient(135deg, #64748b, #94a3b8); }
+.stat-icon.bg-red    { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+.stat-info {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem 0;
+    color: #0f172a;
+    line-height: 1;
+}
+
+.stat-info p {
+    margin: 0 0 0.6rem 0;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* ==========================================
+   GRID KONTEN & KARTU
+========================================== */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+@media (max-width: 992px) {
+    .content-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafbfc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* ==========================================
+   MENU CEPAT
+========================================== */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.menu-item-dev {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: #fafbfc;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    color: #334155;
+    font-weight: 500;
+    border: 1px solid #f1f5f9;
+    transition: all 0.25s ease;
+}
+
+.menu-item-dev:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.menu-item-dev i {
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
+    color: #2563eb;
+}
+
+/* ==========================================
+   DAFTAR AKTIVITAS
+========================================== */
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-time {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.activity-text {
+    font-size: 0.9rem;
+    color: #334155;
+    text-align: right;
+}
+
+@media (max-width: 576px) {
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .activity-text {
+        text-align: left;
+    }
+}
+
+/* ==========================================
+   RESPONSIF
+========================================== */
+@media (max-width: 992px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 576px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-info h3 { font-size: 1.8rem; }
+    .stat-icon { width: 56px; height: 56px; font-size: 1.4rem; }
+}
+
+.text-center.text-muted {
+    color: #94a3b8 !important;
+    padding: 3rem 0;
+}

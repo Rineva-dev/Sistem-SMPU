@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block title %}Absensi Siswa - {{ jurnal.ekskul.nama }}{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <h3><i class="fas fa-check-square text-primary"></i> Absensi Siswa</h3>
+            <p class="text-muted mb-0">{{ jurnal.ekskul.nama }} | {{ jurnal.tanggal_kegiatan.strftime('%d/%m/%Y') }}
+            {% if jurnal.waktu_mulai %}&nbsp;&middot;&nbsp;{{ jurnal.waktu_mulai }} - {{ jurnal.waktu_selesai }}{% endif %}</p>
+        </div>
+        <a href="{{ url_for('data_ekskul.halaman_jurnal', ekskul_id=jurnal.ekskul.id) }}" class="btn btn-outline-secondary btn-sm ms-auto">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+</div>
+
+<!-- 📋 KARTU INFORMASI KEGIATAN -->
+<div class="card mb-4 border-primary border-opacity-25">
+    <div class="card-body p-4">
+        <div class="uraian">
+            <div class="item-info">
+                <div class="icon-box primary">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="info-text">
+                    <div class="fw-semibold text-primary">Uraian Kegiatan</div>
+                    <div class="text-dark">{{ jurnal.uraian_kegiatan }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hasil">
+            {% if jurnal.hasil_kegiatan %}
+            <div class="item-info">
+                <div class="icon-box success">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div class="info-text">
+                    <div class="fw-semibold text-success">Hasil Kegiatan</div>
+                    <div class="text-dark">{{ jurnal.hasil_kegiatan }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 📝 DAFTAR ABSENSI -->
+<div class="card">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold"><i class="fas fa-users me-2"></i>Daftar Kehadiran Anggota</h6>
+        <div class="d-flex gap-2">
+            <button type="button" id="btnHadirSemua" class="btn btn-sm btn-outline-success">Hadir Semua</button>
+            <button type="button" id="btnResetSemua" class="btn btn-sm btn-outline-secondary">Reset</button>
+        </div>
+    </div>
+    <form action="{{ url_for('data_ekskul.simpan_absensi', jurnal_id=jurnal.id) }}" method="POST">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50" class="text-center">No</th>
+                            <th width="100">NISN</th>
+                            <th>Nama Lengkap</th>
+                            <th width="120" class="text-center">Kelas</th>
+                            <th width="240" class="text-center">Status Kehadiran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in daftar_anggota %}
+                        <tr class="border-bottom border-light">
+                            <td class="text-center text-muted small">{{ loop.index }}</td>
+                            <td class="font-monospace text-muted">{{ a.nisn or '-' }}</td>
+                            <td class="fw-medium">{{ a.nama_lengkap }}</td>
+                            <td class="text-center">{{ a.kelas or '-' }}</td>
+                            <td>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <input type="radio" class="btn-check" name="status_{{ a.id }}" id="h_{{ a.id }}" value="hadir" {% if a.status == 'hadir' %}checked{% endif %} required>
+                                    <label class="btn btn-outline-success fw-bold px-3" for="h_{{ a.id }}">H</label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ a.id }}" id="s_{{ a.id }}" value="sakit" {% if a.status == 'sakit' %}checked{% endif %}>
+                                    <label class="btn btn-outline-info fw-bold px-3" for="s_{{ a.id }}">S</label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ a.id }}" id="i_{{ a.id }}" value="izin" {% if a.status == 'izin' %}checked{% endif %}>
+                                    <label class="btn btn-outline-secondary fw-bold px-3" for="i_{{ a.id }}">I</label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ a.id }}" id="a_{{ a.id }}" value="alpha" {% if a.status == 'alpha' %}checked{% endif %}>
+                                    <label class="btn btn-outline-danger fw-bold px-3" for="a_{{ a.id }}">A</label>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 📌 KETERANGAN & TOMBOL -->
+        <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="small text-muted">
+                <span class="badge bg-success me-1">H</span>Hadir
+                <span class="badge bg-info ms-3 me-1">S</span>Sakit
+                <span class="badge bg-secondary ms-3 me-1">I</span>Izin
+                <span class="badge bg-danger ms-3 me-1">A</span>Alpha
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">Batal</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Simpan Absensi
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('btnHadirSemua').addEventListener('click', () => {
+    document.querySelectorAll('[value="hadir"]').forEach(el => el.checked = true);
+});
+document.getElementById('btnResetSemua').addEventListener('click', () => {
+    document.querySelectorAll('[type="radio"]').forEach(el => el.checked = false);
+});
+</script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ekstrakurikuler/jurnal_ekskul.css') }}">
+{% endblock %}

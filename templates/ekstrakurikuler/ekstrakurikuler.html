@@ -1,0 +1,345 @@
+<div class="page-header mb-4">
+    <h3><i class="fas fa-futbol"></i> Ekstrakurikuler</h3>
+    <p class="text-muted">Kelola data, jadwal, jurnal kegiatan, dan status pembayaran</p>
+</div>
+
+<div class="mb-3 d-flex gap-2">
+    {% if jabatan in ["Admin", "Tata Usaha", "TU", "Waka Kesiswaan"] or "Admin Sistem" in daftar_tugas %}
+    <button class="btn btn-primary" 
+            data-bs-toggle="modal" 
+            data-bs-target="#modalTambah"
+            data-bs-backdrop="static" 
+            data-bs-keyboard="false">
+        <i class="fas fa-plus"></i> Tambah Ekskul
+    </button>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th width="50">No</th>
+                        <th>Nama Ekstrakurikuler</th>
+                        <th>Pembina</th>
+                        <th>Periode Kegiatan</th>
+                        <th>Jumlah Anggota</th>
+                        <th>Status Kegiatan</th>
+                        <th width="240">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if daftar_ekskul %}
+                        {% for ekskul in daftar_ekskul %}
+                        <!-- Filter: Pembina hanya lihat ekskul yang dipegangnya -->
+                        {% set tampilkan = true %}
+                        {% if jabatan == "Pembina Ekstrakurikuler" and ekskul.pembina_id != session.user_id %}
+                            {% set tampilkan = false %}
+                        {% endif %}
+                        {% if tampilkan %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><strong>{{ ekskul.nama }}</strong></td>
+                            <td>{{ ekskul.pembina.nama if ekskul.pembina else '<span class="text-muted">Belum ada</span>'|safe }}</td>
+                            <td class="small">
+                                Mulai: {{ ekskul.tgl_mulai.strftime('%d/%m/%Y') if ekskul.tgl_mulai else '-' }}<br>
+                                Selesai: {{ ekskul.tgl_selesai.strftime('%d/%m/%Y') if ekskul.tgl_selesai else '-' }}
+                            </td>
+                            <td><span class="badge bg-info">{{ ekskul.anggota|length }} siswa</span></td>
+                            <td>
+                                {% if ekskul.status_kegiatan == 'aktif' %}
+                                    <span class="badge bg-success">Aktif</span>
+                                {% elif ekskul.status_kegiatan == 'libur' %}
+                                    <span class="badge bg-warning text-dark">Libur</span>
+                                {% elif ekskul.status_kegiatan == 'berhenti' %}
+                                    <span class="badge bg-secondary">Berhenti</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">Belum Mulai</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1 btn-anggota" 
+                                        data-id="{{ ekskul.id }}"
+                                        data-nama="{{ ekskul.nama }}"
+                                        title="Anggota">
+                                    <i class="fas fa-users"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info me-1 btn-jurnal" 
+                                        data-id="{{ ekskul.id }}"
+                                        data-nama="{{ ekskul.nama }}"
+                                        title="Kegiatan">
+                                    <i class="fas fa-book"></i>
+                                </button>
+                                {% if jabatan in ["Admin", "Tata Usaha", "TU", "Waka Kesiswaan", "Pembina Ekstrakurikuler"] or "Admin Sistem" in daftar_tugas %}
+                                <button class="btn btn-sm btn-warning me-1 btn-edit" 
+                                        data-id="{{ ekskul.id }}"
+                                        data-nama="{{ ekskul.nama }}"
+                                        data-pembina="{{ ekskul.pembina_id or '' }}"
+                                        data-keterangan="{{ ekskul.keterangan or '' }}"
+                                        data-tgl_mulai="{{ ekskul.tgl_mulai.strftime('%Y-%m-%d') if ekskul.tgl_mulai is not none else '' }}"
+                                        data-tgl_selesai="{{ ekskul.tgl_selesai.strftime('%Y-%m-%d') if ekskul.tgl_selesai is not none else '' }}"
+                                        title="Edit">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                {% endif %}
+                                {% if jabatan in ["Admin", "Tata Usaha", "TU", "Admin Sistem"] %}
+                                <button class="btn btn-sm btn-danger btn-hapus"
+                                        data-id="{{ ekskul.id }}"
+                                        title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                Belum ada data ekstrakurikuler. Silakan tambahkan data baru.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TAMBAH (DITAMBAH TANGGAL & STATUS) -->
+<div class="modal fade" id="modalTambah" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('data_ekskul.tambah') }}" method="POST">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Ekstrakurikuler</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Ekstrakurikuler <span class="text-danger">*</span></label>
+                        <input type="text" name="nama" class="form-control" required placeholder="Contoh: Pramuka, PMR, Futsal">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pembina</label>
+                        <select name="pembina_id" class="form-select">
+                            <option value="">-- Pilih Guru Pembina --</option>
+                            {% for guru in daftar_guru %}
+                            <option value="{{ guru.id }}">{{ guru.nama }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Mulai Kegiatan</label>
+                            <div class="custom-date">
+                                <input type="date" name="tgl_mulai" class="form-control"
+                                    {% if tgl_min %}min="{{ tgl_min }}"{% endif %}
+                                    {% if tgl_max %}max="{{ tgl_max }}"{% endif %}>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rencana Selesai</label>
+                            <div class="custom-date">
+                                <input type="date" name="tgl_selesai" class="form-control"
+                                    {% if tgl_min %}min="{{ tgl_min }}"{% endif %}
+                                    {% if tgl_max %}max="{{ tgl_max }}"{% endif %}>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="2" placeholder="Keterangan singkat (opsional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDIT (SAMA DENGAN TAMBAH) -->
+<div class="modal fade" id="modalEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEdit" method="POST">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ubah Ekstrakurikuler</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Ekstrakurikuler <span class="text-danger">*</span></label>
+                        <input type="text" name="nama" id="editNama" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pembina</label>
+                        <select name="pembina_id" id="editPembina" class="form-select">
+                            <option value="">-- Pilih Guru Pembina --</option>
+                            {% for guru in daftar_guru %}
+                            <option value="{{ guru.id }}">{{ guru.nama }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tanggal Mulai</label>
+                            <div class="custom-date">
+                                <input type="date" name="tgl_mulai" id="editTglMulai" class="form-control"
+                                    {% if tgl_min %}min="{{ tgl_min }}"{% endif %}
+                                    {% if tgl_max %}max="{{ tgl_max }}"{% endif %}>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Rencana Selesai</label>
+                            <div class="custom-date">
+                                <input type="date" name="tgl_selesai" id="editTglSelesai" class="form-control"
+                                    {% if tgl_min %}min="{{ tgl_min }}"{% endif %}
+                                    {% if tgl_max %}max="{{ tgl_max }}"{% endif %}>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan</label>
+                        <textarea name="keterangan" id="editKeterangan" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Perbarui</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL KELOLA ANGGOTA -->
+<div class="modal fade" id="modalAnggota" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form id="formAnggota" method="POST">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <div>
+                        <h5 class="modal-title">Kelola Anggota Ekstrakurikuler</h5>
+                        <p class="text-muted mb-1" id="namaEkskul"></p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <div class="row g-4">
+                        <!-- KOLOM KIRI: BELUM ANGGOTA -->
+                        <div class="col-md-5">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-semibold text-secondary mb-0">Daftar Siswa</h6>
+                                <span class="badge bg-light text-dark" id="jmlBelum">0 siswa</span>
+                            </div>
+                            <div class="card border shadow-sm">
+                                <div class="card-body-anggota p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light small">
+                                                <tr>
+                                                    <th width="90">NISN</th>
+                                                    <th>Nama Lengkap</th>
+                                                    <th width="70">Kelas</th>
+                                                    <th width="90">Rombel</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="daftarBelum">
+                                                {% for siswa in semua_siswa %}
+                                                <tr role="button" class="pilih-siswa" data-id="{{ siswa.id }}">
+                                                    <td class="font-monospace text-muted">{{ siswa.nisn or '-' }}</td>
+                                                    <td class="fw-medium">{{ siswa.nama }}</td>
+                                                    <td>{{ siswa.kelas or '-' }}</td>
+                                                    <td>{{ siswa.rombel or '-' }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TOMBOL PINDAH -->
+                        <div class="col-md-2 d-flex flex-column align-items-center justify-content-center gap-3">
+                            <button type="button" id="btnTambahSiswa" class="btn btn-primary shadow-sm">
+                                Masukkan <i class="fas fa-angle-double-right"></i>
+                            </button>
+                            <button type="button" id="btnKeluarkanSiswa" class="btn btn-danger shadow-sm">
+                                <i class="fas fa-angle-double-left"></i> Keluarkan
+                            </button>
+                        </div>
+
+                        <!-- KOLOM KANAN: SUDAH ANGGOTA -->
+                        <div class="col-md-5">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-semibold text-secondary mb-0">Anggota Terdaftar</h6>
+                                <span class="badge bg-primary" id="jmlSudah">0 siswa</span>
+                            </div>
+                            <div class="card border shadow-sm">
+                                <div class="card-body-anggota p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light small">
+                                                <tr>
+                                                    <th width="90">NISN</th>
+                                                    <th>Nama Lengkap</th>
+                                                    <th width="70">Kelas</th>
+                                                    <th width="90">Rombel</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="daftarSudah">
+                                                <!-- Diisi otomatis saat klik tombol Anggota -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL HAPUS -->
+<div class="modal fade" id="modalHapus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formHapus" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ekstrakurikuler/ekstrakurikuler.css') }}">
+<script src="{{ url_for('static', filename='js/ekstrakurikuler/ekstrakurikuler.js') }}"></script>

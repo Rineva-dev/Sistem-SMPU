@@ -1,0 +1,146 @@
+<div class="dashboard-container">
+    <div class="welcome-box">
+        <div>
+            <h2>Detail Data Siswa</h2>
+            <p class="text-muted">Informasi lengkap siswa</p>
+        </div>
+        <div>
+            <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-1"></i> Kembali ke Daftar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Biodata: {{ siswa.nama }}</h5>
+            {% if bisa_kelola %}
+            <a href="{{ url_for('data_siswa.ubah_siswa', id=siswa.id) }}" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit me-1"></i> Ubah Data
+            </a>
+            {% endif %}
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 class="text-muted border-bottom pb-2">Data Utama</h6>
+                    <p><strong>NIS:</strong> {{ siswa.nis }}</p>
+                    <p><strong>NISN:</strong> {{ siswa.nisn or '-' }}</p>
+                    <p><strong>Nama Lengkap:</strong> {{ siswa.nama }}</p>
+                    <p><strong>NIK:</strong> {{ siswa.nik or '-' }}</p>
+                    <p><strong>Jenis Kelamin:</strong> {{ siswa.jenis_kelamin }}</p>
+                    <p><strong>Agama:</strong> {{ siswa.agama or '-' }}</p>
+                    <p><strong>Tempat, Tanggal Lahir:</strong> 
+                        {{ siswa.tempat_lahir or '-' }}, 
+                        {{ siswa.tanggal_lahir.strftime('%d %B %Y') if siswa.tanggal_lahir else '-' }}
+                    </p>
+                    
+                    <p><strong>Tingkat / Jenjang:</strong> 
+                        {% if siswa.tingkat %}
+                            Tingkat {{ siswa.tingkat }}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Kelas Saat Ini:</strong> 
+                        {% if siswa.kelas_sekarang %}
+                            {{ siswa.kelas_sekarang.nama_kelas }}
+                            <small class="text-muted">(Tahun Ajaran: {{ siswa.kelas_sekarang.tahun_pelajaran }})</small>
+                        {% else %}
+                            <span class="text-muted">Belum masuk ke rombel kelas</span>
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Jenis Pendaftaran:</strong> 
+                        {% if siswa.jenis_pendaftaran == 'baru' %}
+                            Siswa Baru
+                        {% elif siswa.jenis_pendaftaran == 'pindahan' %}
+                            Siswa Pindahan
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <!-- ✅ DIPERBAIKI: Tahun & Kelas Diterima -->
+                    <p><strong>Tanggal Diterima:</strong> 
+                        {{ siswa.tanggal_diterima.strftime('%d %B %Y') if siswa.tanggal_diterima else '-' }}
+                    </p>
+
+                    <p><strong>Tahun Diterima:</strong> 
+                        {% if siswa.tahun_diterima %}
+                            {{ siswa.tahun_diterima }}
+                        {% elif siswa.tanggal_diterima %}
+                            {{ siswa.tanggal_diterima.year }}
+                            <small class="text-muted">(otomatis dari tanggal)</small>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Kelas / Tingkat Diterima:</strong> 
+                        {% if siswa.diterima_di_kelas_rel %}
+                            {{ siswa.diterima_di_kelas_rel.nama_kelas }}
+                        {% elif siswa.jenis_pendaftaran == 'baru' %}
+                            Tingkat 7
+                            <small class="text-muted">(otomatis untuk siswa baru)</small>
+                        {% elif siswa.tingkat %}
+                            Tingkat {{ siswa.tingkat }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Status Siswa:</strong> 
+                        <span class="badge {% if siswa.status == 'Aktif' %}bg-success{% elif siswa.status == 'Lulus' %}bg-info{% elif siswa.status == 'Non Aktif' %}bg-secondary{% else %}bg-secondary{% endif %}">
+                            {% if siswa.status == 'Non Aktif' and siswa.jenis_non_aktif == 'Pindah' %}
+                                Pindah Sekolah
+                            {% elif siswa.status == 'Non Aktif' and siswa.jenis_non_aktif == 'Berhenti' %}
+                                Berhenti Sekolah
+                            {% else %}
+                                {{ siswa.status }}
+                            {% endif %}
+                        </span>
+                    </p>
+
+                    {% if siswa.status == 'Non Aktif' or siswa.status == 'Lulus' %}
+                    <p><strong>Tanggal Keluar / Tamat:</strong> 
+                        {{ siswa.tanggal_non_aktif.strftime('%d %B %Y') if siswa.tanggal_non_aktif else '-' }}
+                    </p>
+                    <p><strong>Keterangan:</strong> {{ siswa.alasan_non_aktif or '-' }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <h6 class="text-muted border-bottom pb-2">Kontak & Alamat</h6>
+                    <p><strong>No. HP Siswa:</strong> {{ siswa.no_hp or '-' }}</p>
+                    <p><strong>Email:</strong> {{ siswa.email or '-' }}</p>
+                    <p><strong>Alamat Lengkap:</strong> {{ siswa.alamat or '-' }}</p>
+                    
+                    <br>
+                    <h6 class="text-muted border-bottom pb-2">Data Sekolah Asal</h6>
+                    <p><strong>Sekolah Dasar Asal:</strong> {{ siswa.sekolah_sd or '-' }}</p>
+                    <p><strong>Tahun Lulus SD:</strong> {{ siswa.tahun_lulus_sd or '-' }}</p>
+                    
+                    {% if siswa.jenis_pendaftaran == 'pindahan' %}
+                    <p><strong>Sekolah Asal Pindahan:</strong> {{ siswa.sekolah_asal_pindah or '-' }}</p>
+                    <p><strong>Tahun Pindah Masuk:</strong> {{ siswa.tahun_pindah or '-' }}</p>
+                    <p><strong>Alamat Sekolah Asal Pindahan:</strong> {{ siswa.alamat_sekolah_pindah or '-' }}</p>
+                    {% endif %}
+
+                    {% if siswa.jenis_non_aktif == 'Pindah' and siswa.sekolah_tujuan %}
+                    <p><strong>Sekolah Tujuan Pindah:</strong> {{ siswa.sekolah_tujuan }}</p>
+                    {% endif %}
+
+                    <br>
+                    <h6 class="text-muted border-bottom pb-2">Data Orang Tua / Wali</h6>
+                    <p><strong>Nama Ayah:</strong> {{ siswa.nama_ayah or '-' }}</p>
+                    <p><strong>Pekerjaan Ayah:</strong> {{ siswa.pekerjaan_ayah or '-' }}</p>
+                    <p><strong>Nama Ibu:</strong> {{ siswa.nama_ibu or '-' }}</p>
+                    <p><strong>Pekerjaan Ibu:</strong> {{ siswa.pekerjaan_ibu or '-' }}</p>
+                    <p><strong>No. HP Orang Tua:</strong> {{ siswa.no_hp_ortu or '-' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

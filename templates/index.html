@@ -1,0 +1,274 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{# ==============================================
+   ✅ URUTAN: KHUSUS DULU, BARU UMUM
+   Agar tidak tumpang tindih / double tampilan
+   ============================================== #}
+
+{# KHUSUS BENDAHARA #}
+{% if active_page == "dashboard" and halaman_aktif == "bendahara" %}
+    {% include "sections/dashboard/bendahara.html" %}
+
+{# KHUSUS ADMIN SISTEM #}
+{% elif active_page == "dashboard" and halaman_aktif == "admin_sistem" %}
+    {% include "sections/dashboard/dashboard_dev.html" %}
+
+{# DASHBOARD LAINNYA (UMUM) #}
+{% elif active_page == "dashboard" %}
+    {% include "sections/dashboard.html" %}
+{% endif %}
+
+{# ==============================================
+   SISA HALAMAN LAINNYA TETAP SEPERTI SEMULA
+   ============================================== #}
+{% if active_page == "dashboard_guru" %}
+    {% include "sections/dashboard/base.html" %}
+{% endif %}
+
+{% if active_page == "dashboard_wakakur" %}
+    {% include "sections/dashboard/waka_kurikulum.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "daftar" %}
+    {% include "sections/tu/surat_menyurat.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "tambah_masuk" %}
+    {% include "sections/tu/tambah_surat_masuk.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "tambah_keluar" %}
+    {% include "sections/tu/tambah_surat_keluar.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "ubah_masuk" %}
+    {% include "sections/tu/ubah_surat_masuk.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "ubah_keluar" %}
+    {% include "sections/tu/ubah_surat_keluar.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "detail_masuk" %}
+    {% include "sections/tu/detail_surat_masuk.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "detail_keluar" %}
+    {% include "sections/tu/detail_keluar.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "cetak_masuk" %}
+    {% include "sections/tu/cetak_surat_masuk.html" %}
+{% endif %}
+
+{% if active_page == "surat_menyurat" and sub_page == "cetak_keluar" %}
+    {% include "sections/tu/cetak_surat_keluar.html" %}
+{% endif %}
+
+{% if active_page == "laporan_sekolah" %}
+    {% include "sections/tu/laporan_administrasi.html" %}
+{% endif %}
+
+{% if active_page == "data_guru" and sub_page == "daftar" %}
+    {% include "sections/data_guru.html" %}
+{% endif %}
+
+{% if active_page == "data_guru" and sub_page == "form_tambah" %}
+    {% include "sections/form_guru.html" %}
+{% endif %}
+
+{% if active_page == "data_guru" and sub_page == "form_ubah" %}
+    {% include "sections/form_guru.html" %}
+{% endif %}
+
+{% if active_page == "data_guru" and sub_page == "detail" %}
+    {% include "sections/detail_guru.html" %}
+{% endif %}
+
+{% if active_page == "tahun_pelajaran" %}
+    {% include "umum/kelola_tahun_pelajaran.html" %}
+{% endif %}
+
+{% if active_page == "data_siswa" and sub_page == "daftar" %}
+    {% include "siswa/data_siswa.html" %}
+{% endif %}
+
+{% if active_page == "data_siswa" and sub_page == "form_tambah" %}
+    {% include "siswa/form_siswa.html" %}
+{% endif %}
+
+{% if active_page == "data_siswa" and sub_page == "form_ubah" %}
+    {% include "siswa/form_ubah_password_siswa.html" %}
+{% endif %}
+
+{% if active_page == "data_siswa" and sub_page == "detail" %}
+    {% include "siswa/detail_siswa.html" %}
+{% endif %}
+
+{% if active_page == "data_kelas" and sub_page == "daftar" %}
+    {% include "kelas/daftar_kelas.html" %}
+{% endif %}
+
+{% if active_page == "data_kelas" and sub_page == "form_tambah" %}
+    {% include "kelas/form_kelas.html" %}
+{% endif %}
+
+{% if active_page == "data_kelas" and sub_page == "form_ubah" %}
+    {% include "kelas/form_kelas.html" %}
+{% endif %}
+
+{% if active_page == "data_kelas" and sub_page == "detail" %}
+    {% include "kelas/detail_kelas.html" %}
+{% endif %}
+
+{% if active_page == "data_kelas" and sub_page == "jadwal" %}
+    {% include "kelas/jadwal_kelas.html" %}
+{% endif %}
+
+{% if active_page == "data_mapel" and sub_page == "daftar" %}
+    {% include "mapel/mapel.html" %}
+{% endif %}
+
+{% if active_page == "data_mapel" and sub_page in ["tambah", "ubah"] %}
+    {% include "mapel/tambah-mapel.html" %}
+{% endif %}
+
+{% if active_page == "spp_siswa" and halaman_aktif == "bendahara" %}
+    {% include "sections/bendahara/spp_siswa.html" %}
+{% endif %}
+
+{% if active_page == "rincian_tagihan" and halaman_aktif == "bendahara" %}
+    {% include "sections/bendahara/rincian_tagihan.html" %}
+{% endif %}
+
+{% if active_page == "pengaturan_pembayaran" and halaman_aktif == "bendahara" %}
+    {% include "sections/bendahara/pengaturan_pembayaran.html" %}
+{% endif %}
+
+{% if active_page == "data_ekskul" %}
+    {% include "ekstrakurikuler/ekstrakurikuler.html" %}
+{% endif %}
+
+{% if active_page == "data_peminatan" %}
+    {% include "ekstrakurikuler/peminatan.html" %}
+{% endif %}
+
+
+{% include 'components/surat.html' %}
+
+{% endblock %}
+
+{% block extra_css %}
+    {# ✅ TETAP SAMA, SUDAH BENAR #}
+    {% if active_page == "dashboard" and halaman_aktif not in ["admin_sistem", "bendahara"] %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sections/dashboard.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "admin_sistem" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard_admin.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "bendahara" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/dashboard_bendahara.css') }}">
+    {% endif %}
+
+    {% if active_page == "spp_siswa" and halaman_aktif == "bendahara" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/pembayaran_spp.css') }}">
+    {% endif %}
+
+    {% if active_page == "rincian_tagihan" and halaman_aktif == "bendahara" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/rincian_tagihan.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard_guru" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/guru/dashboard_guru.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard_dev" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sections/dashboard_dev.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "utama" and (role == "Tata Usaha" or role == "TU") %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/tu/dashboard.css') }}">
+    {% endif %}
+
+    {% if active_page == "laporan_sekolah" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/tu/laporan_administrasi.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "utama" and role == "Kepala Sekolah" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/kepsek/dashboard_kepsek.css') }}">
+    {% endif %}
+
+    {% if active_page == "tahun_pelajaran" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/umum/kelola_tahun_pelajaran.css') }}">
+    {% endif %}
+
+    {% if active_page == "dashboard_wakakur" %}
+    <link rel="stylesheet" href="/static/css/jabatan/waka_kurikulum/dashboard_wakakur.css">
+    {% endif %}
+
+    {% if active_page == "data_guru" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sections/data_guru.css') }}">
+        {% if sub_page in ['form_tambah', 'form_ubah'] %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sections/form_guru.css') }}">
+        {% endif %}
+        {% if sub_page == "detail" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sections/detail_guru.css') }}">
+        {% endif %}
+    {% endif %}
+
+    {% if active_page == "data_siswa" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/data_siswa.css') }}">
+        {% if sub_page in ['form_tambah', 'form_ubah'] %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/form_siswa.css') }}">
+        {% endif %}
+        {% if sub_page == "detail" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/detail_siswa.css') }}">
+        {% endif %}
+    {% endif %}
+
+    {% if active_page == "data_kelas" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/kelas/data_kelas.css') }}">
+    {% endif %}
+
+    {% if active_page == "data_mapel" %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/mapel/mapel.css') }}">
+    {% endif %}
+
+    {% if active_page == "data_kelas" and sub_page == "jadwal" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kelas/jadwal.css') }}">
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    {# ✅ TETAP SAMA, SUDAH BENAR #}
+    {% if active_page == "dashboard" %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif not in ["admin_sistem", "bendahara"] %}
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "bendahara" %}
+    <script src="{{ url_for('static', filename='js/jabatan/bendahara/dashboard_bendahara.js') }}"></script>
+    {% endif %}
+
+    {% if active_page == "dashboard" and halaman_aktif == "utama" and role == "Kepala Sekolah" %}
+    <script src="{{ url_for('static', filename='js/sections/kepsek/dashboard.js') }}"></script>
+    {% endif %}
+
+    {% if active_page == "data_guru" %}
+        <script src="{{ url_for('static', filename='js/data_guru.js') }}"></script>
+    {% endif %}
+
+    {% if active_page == "data_siswa" %}
+        <script src="{{ url_for('static', filename='js/siswa/data_siswa.js') }}"></script>
+    {% endif %}
+
+    {% if active_page == "data_kelas" and sub_page == "jadwal" %}
+        <script src="{{ url_for('static', filename='js/kelas/jadwal.js') }}"></script>
+    {% endif %}
+{% endblock %}

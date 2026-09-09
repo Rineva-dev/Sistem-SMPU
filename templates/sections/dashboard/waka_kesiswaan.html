@@ -1,0 +1,87 @@
+<!-- Bagian Tambahan: Waka Kesiswaan -->
+<div class="dashboard-container mt-5">
+    <div class="card border-success">
+        <div class="card-header bg-success bg-opacity-10 border-bottom border-success">
+            <h4 class="mb-0">
+                <i class="fas fa-users text-success"></i>
+                Tugas Tambahan: Waka Kesiswaan
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ total_siswa_sekolah | default('0') }}</h3>
+                        <p>Total Siswa Aktif</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ rata_kehadiran_sekolah | default('0') }}%</h3>
+                        <p>Rata-rata Kehadiran</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_pelanggaran | default('0') }}</h3>
+                        <p>Pelanggaran Bulan Ini</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_prestasi | default('0') }}</h3>
+                        <p>Prestasi Siswa</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line"></i> Tren Kehadiran Bulanan</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="kehadiranSekolahChart" height="220"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bullhorn"></i> Program Kesiswaan</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="activity-list">
+                            <li class="activity-item">
+                                <span>Masa Orientasi Siswa Baru</span>
+                                <span class="badge bg-success">Akan Datang</span>
+                            </li>
+                            <li class="activity-item">
+                                <span>Lomba Kebersihan Kelas</span>
+                                <span class="badge bg-primary">Berlangsung</span>
+                            </li>
+                            <li class="activity-item">
+                                <span>Pemilihan Ketua OSIS</span>
+                                <span class="badge bg-warning">Persiapan</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

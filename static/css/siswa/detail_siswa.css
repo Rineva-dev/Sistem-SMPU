@@ -1,0 +1,56 @@
+/* ==========================================
+   HALAMAN DETAIL SISWA
+   ========================================== */
+
+.card-header {
+    background-color: #f8fafc !important;
+}
+
+.card-header h5 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.row.g-4 {
+    gap: 1.5rem;
+}
+
+/* Pemisah Data */
+.col-md-6 h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1rem;
+}
+
+/* Informasi Data */
+.col-md-6 p {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #2d3748;
+    margin-bottom: 0.8rem;
+}
+
+.col-md-6 p strong {
+    color: #1a202c;
+    width: 160px;
+    display: inline-block;
+}
+
+/* Badge Status */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.45rem 0.8rem;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .col-md-6 p strong {
+        width: auto;
+        display: block;
+        margin-bottom: 0.2rem;
+    }
+}

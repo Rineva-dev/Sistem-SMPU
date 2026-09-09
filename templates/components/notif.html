@@ -1,0 +1,29 @@
+<script>
+    {% set semua_pesan = get_flashed_messages(with_categories=true) %}
+
+    {# Gunakan g.sistem_mode, BUKAN session['sistem_mode'] #}
+    {% set sistem_saat_ini = g.sistem_mode | default('sekolah') %}
+
+    {% set pesan_ditampilkan = [] %}
+
+    {% for kategori, isi in semua_pesan %}
+
+        {% if sistem_saat_ini == 'sekolah' %}
+
+            {% if not kategori.startswith('absensi_') %}
+                {% set _ = pesan_ditampilkan.append([kategori, isi]) %}
+            {% endif %}
+
+        {% elif sistem_saat_ini == 'absensi' %}
+
+            {% if kategori.startswith('absensi_') %}
+                {% set jenis_asli = kategori.replace('absensi_', '') %}
+                {% set _ = pesan_ditampilkan.append([jenis_asli, isi]) %}
+            {% endif %}
+
+        {% endif %}
+
+    {% endfor %}
+
+    window.pesanFlash = {{ pesan_ditampilkan | tojson | safe }};
+</script>

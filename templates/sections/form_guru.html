@@ -1,0 +1,147 @@
+<div class="card form-wrapper">
+    <div class="card-header">
+        <h4>{{ 'Ubah Data Guru' if mode == 'ubah' else 'Tambah Data Guru' }}</h4>
+    </div>
+    <div class="card-body">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for kategori, pesan in messages %}
+                    <div class="alert alert-{{ kategori }}">{{ pesan }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="form-layout">
+
+            <!-- Baris 1: NIP - 1 Kolom Penuh -->
+
+            <!-- Baris 2: Nama Lengkap - 1 Kolom Penuh -->
+            <div class="form-group full">
+                <label>Nama Lengkap <span class="text-danger">*</span></label>
+                <input type="text" name="nama" class="form-input" required value="{{ guru.nama if guru else '' }}">
+            </div>
+
+            <!-- Baris 3: Jenis Kelamin - 1 Kolom Penuh -->
+           <div class="form-group full">
+                <label>Jenis Kelamin <span class="text-danger">*</span></label>
+                <div class="custom-select">
+                    <select name="jenis_kelamin" required>
+                        <option value="Laki-laki" {{ 'selected' if guru and guru.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ 'selected' if guru and guru.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Baris 4: Tempat Lahir & Tanggal Lahir - 2 Kolom Berdampingan -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Tempat Lahir</label>
+                    <input type="text" name="tempat_lahir" class="form-input" value="{{ guru.tempat_lahir if guru else '' }}">
+                </div>
+                <div class="form-group half">
+                    <label>Tanggal Lahir</label>
+                    <div class="custom-date">
+                        <input  type="date" name="tanggal_lahir" 
+                                value="{{ guru.tanggal_lahir.strftime('%Y-%m-%d') if guru and guru.tanggal_lahir else '' }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baris 5: Jabatan - 1 Kolom Penuh -->
+            <div class="form-group full">
+                <label>Jabatan <span class="text-danger">*</span></label>
+                <div class="custom-select">
+                    <select name="jabatan" required>
+                        <option value="">Pilih Jabatan</option>
+                        <option value="Guru" {{ 'selected' if guru and guru.jabatan == 'Guru' else '' }}>Guru</option>
+                        <option value="Kepala Sekolah" {{ 'selected' if guru and guru.jabatan == 'Kepala Sekolah' else '' }}>Kepala Sekolah</option>
+                        <option value="Tata Usaha" {{ 'selected' if guru and guru.jabatan == 'Tata Usaha' else '' }}>Tata Usaha</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!-- Baris 6: Tugas Tambahan - Dropdown Pencarian & Pilihan Banyak -->
+            <div class="form-group full">
+                <label>Tugas Tambahan</label>
+                <div class="custom-multiselect">
+                    <!-- ✅ Tampilan tugas yang sudah dipilih DALAM kotak -->
+                    <div id="tugasTerpilih" class="tampilan-terpilih">
+                        <input type="text" id="cariTugas" class="cari-tugas" placeholder="Pilih atau ketik nama tugas..." autocomplete="off">
+                    </div>
+                    
+                    <!-- Kotak daftar pilihan -->
+                    <div id="daftarTugasDropdown" class="dropdown-tugas">
+                        <em class="text-muted" id="pesanTugas">Pilih jabatan terlebih dahulu untuk melihat daftar tugas</em>
+                    </div>
+                </div>
+
+                <!-- Input tersembunyi tetap ada untuk kirim data -->
+                <input type="hidden" name="tugas_tambahan" id="inputTugasGabung" value="{{ guru.tugas_tambahan if guru else '' }}">
+                <small class="text-muted">Bisa pilih lebih dari satu, ketik untuk mencari tugas</small>
+            </div>
+
+            <!-- Baris 7: Sertifikasi, Status, Nomor HP -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Bersertifikasi?</label>
+                    <div class="custom-select">
+                        <select name="sertifikasi">
+                            <option value="ya" {{ 'selected' if guru and guru.sertifikasi else '' }}>Ya</option>
+                            <option value="tidak" {{ 'selected' if guru and not guru.sertifikasi else '' }}>Tidak</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group half">
+                    <label>Status</label>
+                    <div class="custom-select">
+                        <select name="status">
+                            <option value="Aktif" {{ 'selected' if guru and guru.status == 'Aktif' else '' }}>Aktif</option>
+                            <option value="Tidak Aktif" {{ 'selected' if guru and guru.status == 'Tidak Aktif' else '' }}>Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full">
+                <label>Nomor HP</label>
+                <input type="text" 
+                    name="no_hp" 
+                    class="form-input" 
+                    placeholder="08xxxxxxxxx" 
+                    value="{{ guru.no_hp if guru else '' }}"
+                    pattern="[0-9]{8,13}"
+                    title="Hanya angka, minimal 8 digit, maksimal 13 digit"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div class="form-group full">
+                <label>Email</label>
+                <input type="email" 
+                    name="email" 
+                    class="form-input" 
+                    placeholder="guru@sekolah.sch.id" 
+                    value="{{ guru.email if guru else '' }}"
+                    title="Contoh: nama@domain.com">
+            </div>
+
+            <!-- Baris 8: Alamat Lengkap -->
+            <div class="form-group full">
+                <label>Alamat Lengkap</label>
+                <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ guru.alamat if guru else '' }}</textarea>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="form-actions">
+                <a href="{{ url_for('data_guru.halaman_data_guru') }}" class="btn btn-cancel">Kembali</a>
+                <button type="submit" class="btn btn-save">Simpan Data</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Skrip: urutan HARUS seperti ini -->
+<input type="hidden" id="dataTugasKonfig" value='{{ daftar_tugas_konfig | tojson | safe }}'>
+
+<script src="{{ url_for('static', filename='js/form-guru.js') }}"></script>

@@ -1,0 +1,91 @@
+/* ==========================================
+   SISTEM NOTIFIKASI GLOBAL
+========================================== */
+
+.notif-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: calc(100% - 40px);
+    pointer-events: none;
+}
+
+.notif {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+    pointer-events: auto;
+}
+
+.notif.muncul {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notif.hilang {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Tipe Notifikasi */
+.notif.sukses {
+    background-color: #16a34a;
+    border-left: 5px solid #15803d;
+}
+
+.notif.info {
+    background-color: #2563eb;
+    border-left: 5px solid #1d4ed8;
+}
+
+.notif.peringatan {
+    background-color: #f59e0b;
+    border-left: 5px solid #d97706;
+    color: #1e293b;
+}
+
+.notif.error {
+    background-color: #dc2626;
+    border-left: 5px solid #b91c1c;
+}
+
+/* Tombol Tutup */
+.notif-tutup {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 12px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.notif-tutup:hover {
+    opacity: 1;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 576px) {
+    .notif-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+    }
+}

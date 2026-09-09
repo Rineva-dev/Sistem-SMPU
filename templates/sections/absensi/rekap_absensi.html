@@ -1,0 +1,434 @@
+{% extends "layout.html" %}
+{% set active_page = "rekap_absensi" %}
+{% set halaman_aktif = "absensi" %}
+{% block title %}Rekapitulasi Absensi{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rekap_absensi.css') }}">
+
+<div class="rekapitulasi-absensi-wrapper">
+    <!-- === JUDUL HALAMAN === -->
+    <div class="page-header mb-4">
+        <h3 class="page-title"><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Absensi Guru</h3>
+        <p class="page-subtitle">Periode: {{nama_bulan_terpilih}} {{filter_tahun}} &nbsp;|&nbsp; Tahun Pelajaran: {{label_tp}}</p>
+    </div>
+
+    <!-- === FILTER BULAN & TAHUN === -->
+    <div class="filter-card mb-4">
+        <div class="filter-body">
+            <form method="get" class="row g-3 align-items-center justify-content-center">
+                <div class="col-auto">
+                    <label class="filter-label"><i class="fas fa-calendar-alt me-1"></i> Bulan:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="bulan" class="filter-select" onchange="this.form.submit()">
+                        {% set bulan_list = [
+                            ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
+                            ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
+                            ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
+                        ] %}
+                        {% for val, nama in bulan_list %}
+                        <option value="{{val}}" {% if val|int == filter_bulan %}selected{% endif %}>
+                            {{nama}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="filter-label"><i class="fas fa-calendar-check me-1"></i> Tahun:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="tahun" class="filter-select" onchange="this.form.submit()">
+                        {% set thn_sekarang = filter_tahun %}
+                        {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
+                        <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- === KARTU RINGKASAN STATISTIK — BERWARNA PENUH === -->
+    <div class="row g-4 mb-5">
+        <!-- HADIR -->
+        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card stat-hadir">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Hadir</p>
+                    <h3 class="stat-value">{{jml_hadir}}</h3>
+                    <p class="stat-unit">hari</p>
+                </div>
+            </div>
+        </div>
+        <!-- TERLAMBAT -->
+        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card stat-terlambat">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Terlambat</p>
+                    <h3 class="stat-value">{{jml_terlambat}}</h3>
+                    <p class="stat-unit">hari</p>
+                </div>
+            </div>
+        </div>
+        <!-- IZIN/SAKIT -->
+        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card stat-izin">
+                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Izin / Sakit</p>
+                    <h3 class="stat-value">{{jml_izin}}</h3>
+                    <p class="stat-unit">hari</p>
+                </div>
+            </div>
+        </div>
+        <!-- ALFA -->
+        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card stat-alfa">
+                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Alfa</p>
+                    <h3 class="stat-value">{{jml_alfa}}</h3>
+                    <p class="stat-unit">hari</p>
+                </div>
+            </div>
+        </div>
+        <!-- PERSENTASE KEHADIRAN -->
+        <div class="col-xl-4 col-md-12 col-sm-12">
+            <div class="stat-card stat-persen">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Persentase Kehadiran</p>
+                    <h2 class="stat-value-big">{{persen_hadir}}%</h2>
+                    <p class="stat-unit">Dari {{total_hari}} hari tercatat</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === TABEL RIWAYAT ABSENSI === -->
+    <div class="table-card">
+        <div class="table-header">
+            <h6 class="table-title"><i class="fas fa-list-alt me-2"></i>Riwayat Absensi — {{nama_bulan_terpilih}} {{filter_tahun}}</h6>
+            <span class="table-badge"><i class="fas fa-database me-1"></i> {{riwayat_bulan_ini|length}} Data</span>
+        </div>
+        <div class="table-body">
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-calendar-day me-1"></i> Tanggal</th>
+                            <th><i class="fas fa-sign-in-alt me-1"></i> Jam Masuk</th>
+                            <th><i class="fas fa-sign-out-alt me-1"></i> Jam Pulang</th>
+                            <th><i class="fas fa-tag me-1"></i> Status</th>
+                            <th><i class="fas fa-sticky-note me-1"></i> Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if riwayat_bulan_ini %}
+                            {% for item in riwayat_bulan_ini %}
+                            <tr>
+                                <td class="td-tanggal">{{ item.tanggal.strftime('%d/%m/%Y') }}</td>
+                                <td class="td-jam">{{ item.jam_masuk or '-' }}</td>
+                                <td class="td-jam">{{ item.jam_pulang or '-' }}</td>
+                                <td>
+                                    {% set status_class = {
+                                        'hadir': 'badge-hadir',
+                                        'terlambat': 'badge-terlambat',
+                                        'izin': 'badge-izin',
+                                        'sakit': 'badge-sakit',
+                                        'alfa': 'badge-alfa'
+                                    } %}
+                                    {% set badge_class = status_class.get(item.status, 'badge-default') %}
+                                    <span class="status-badge {{ badge_class }}">
+                                        {{ item.status|upper }}
+                                    </span>
+                                </td>
+                                <td class="td-keterangan">{{ item.keterangan or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="td-empty">
+                                    <i class="fas fa-inbox me-2"></i> Belum ada data absensi untuk bulan ini
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- === 📤 CARD EXPORT REKAPITULASI === -->
+    <div class="export-card mb-5">
+        <div class="export-card-decoration"></div>
+        <div class="export-card-body">
+            <div class="export-header">
+                <div class="export-icon-wrap">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <div class="export-heading">
+                    <h5 class="export-title">Export Rekapitulasi Absensi</h5>
+                    <p class="export-subtitle">Unduh data dalam format Excel (.xlsx)</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('absensi_guru.export_rekap_absensi') }}" method="post" id="exportForm">
+                <input type="hidden" name="jenis_export" id="jenis_export" value="perbulan">
+
+                <div class="export-form-grid">
+                    <!-- PILIHAN JENIS EXPORT — KUSTOM SELECT -->
+                    <div class="form-group-wrap">
+                        <label class="form-label-export">
+                            <i class="fas fa-cog me-2"></i>Jenis Export
+                        </label>
+                        <!-- TAMPILAN PILIHAN AKTIF -->
+                        <div class="custom-select-trigger" id="exportSelectTrigger" onclick="toggleCustomSelect()">
+                            <span class="trigger-icon"><i class="fas fa-calendar"></i></span>
+                            <span class="trigger-text">Per Bulan</span>
+                            <i class="fas fa-chevron-down trigger-arrow"></i>
+                        </div>
+                        <!-- DAFTAR PILIHAN -->
+                        <div class="custom-select-dropdown" id="exportSelectDropdown">
+                            <div class="custom-option active" data-value="perbulan" data-icon="fa-calendar" data-text="Per Bulan" onclick="selectExportOption(this)">
+                                <i class="fas fa-calendar option-icon"></i>
+                                <span>Per Bulan</span>
+                            </div>
+                            <div class="custom-option" data-value="semua" data-icon="fa-calendar-check" data-text="Semua Bulan" onclick="selectExportOption(this)">
+                                <i class="fas fa-calendar-check option-icon"></i>
+                                <span>Semua Bulan</span>
+                            </div>
+                            <div class="custom-option" data-value="rentang" data-icon="fa-arrows-left-right-to-line" data-text="Rentang Bulan & Tahun" onclick="selectExportOption(this)">
+                                <i class="fas fa-arrows-left-right-to-line option-icon"></i>
+                                <span>Rentang Bulan & Tahun</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- === PER BULAN: PILIH BULAN + TAHUN === -->
+                    <div class="form-group-wrap perbulan-field" id="group_perbulan_bulan">
+                        <label class="form-label-export">
+                            <i class="fas fa-calendar-day me-2"></i>Pilih Bulan
+                        </label>
+                        <select name="bulan_pilih" class="form-select-export">
+                            {% set bulan_list = [
+                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
+                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
+                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
+                            ] %}
+                            {% for val, nama in bulan_list %}
+                            <option value="{{val}}" {% if val|int == filter_bulan %}selected{% endif %}>{{nama}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-wrap perbulan-field" id="group_perbulan_tahun">
+                        <label class="form-label-export">
+                            <i class="fas fa-calendar-alt me-2"></i>Tahun
+                        </label>
+                        <select name="tahun_pilih" class="form-select-export">
+                            {% set thn_sekarang = filter_tahun %}
+                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
+                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- === SEMUA BULAN: PILIH TAHUN === -->
+                    <div class="form-group-wrap semua-field" id="group_semua_tahun">
+                        <label class="form-label-export">
+                            <i class="fas fa-calendar-check me-2"></i>Tahun
+                        </label>
+                        <select name="tahun_semua" class="form-select-export">
+                            {% set thn_sekarang = filter_tahun %}
+                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
+                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- === RENTANG: DARI BULAN + TAHUN === -->
+                    <div class="form-group-wrap rentang-field" id="group_bulan_awal">
+                        <label class="form-label-export">
+                            <i class="fas fa-arrow-right-from-bracket me-2"></i>Dari Bulan
+                        </label>
+                        <select name="bulan_awal" class="form-select-export">
+                            {% set bulan_list = [
+                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
+                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
+                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
+                            ] %}
+                            {% for val, nama in bulan_list %}
+                            <option value="{{val}}">{{nama}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-wrap rentang-field" id="group_tahun_awal">
+                        <label class="form-label-export">
+                            <i class="fas fa-calendar me-2"></i>Tahun Awal
+                        </label>
+                        <select name="tahun_awal" class="form-select-export">
+                            {% set thn_sekarang = filter_tahun %}
+                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
+                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-wrap rentang-field" id="group_bulan_akhir">
+                        <label class="form-label-export">
+                            <i class="fas fa-arrow-right-to-bracket me-2"></i>Sampai Bulan
+                        </label>
+                        <select name="bulan_akhir" class="form-select-export">
+                            {% set bulan_list = [
+                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
+                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
+                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
+                            ] %}
+                            {% for val, nama in bulan_list %}
+                            <option value="{{val}}" {% if val == '12' %}selected{% endif %}>{{nama}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-wrap rentang-field" id="group_tahun_akhir">
+                        <label class="form-label-export">
+                            <i class="fas fa-calendar me-2"></i>Tahun Akhir
+                        </label>
+                        <select name="tahun_akhir" class="form-select-export">
+                            {% set thn_sekarang = filter_tahun %}
+                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
+                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- TOMBOL EXPORT -->
+                    <div class="form-group-wrap btn-wrap">
+                        <button type="submit" class="btn-export-xl">
+                            <span class="btn-icon"><i class="fas fa-download"></i></span>
+                            <span class="btn-text">Unduh Excel</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- === JAVASCRIPT TAMPILAN RENTANG === -->
+<script>
+// Buka/tutup daftar pilihan — Cek ruang & tutup SMOOTH tanpa lompat
+function toggleCustomSelect() {
+    const trigger = document.getElementById('exportSelectTrigger');
+    const dropdown = document.getElementById('exportSelectDropdown');
+    const wrap = document.querySelector('.form-group-wrap');
+
+    // Jika SEDANG TERBUKA → TUTUP
+    if (dropdown.classList.contains('open')) {
+        trigger.classList.remove('open');
+        dropdown.classList.remove('open');
+        setTimeout(() => {
+            dropdown.classList.remove('up', 'down');
+            dropdown.style.top = '';
+            dropdown.style.bottom = '';
+        }, 350);
+    }
+    // Jika SEDANG TERTUTUP → BUKA
+    else {
+        const rect = wrap.getBoundingClientRect();
+        const ruangBawah = window.innerHeight - rect.bottom;
+        const tinggiDaftar = 200;
+
+        trigger.classList.add('open');
+        dropdown.classList.add('open');
+
+        if (ruangBawah < tinggiDaftar) {
+            dropdown.classList.remove('down');
+            dropdown.classList.add('up');
+            dropdown.style.top = 'auto';
+            dropdown.style.bottom = 'calc(100% + 4px)';
+        } else {
+            dropdown.classList.remove('up');
+            dropdown.classList.add('down');
+            dropdown.style.top = 'calc(100% + 4px)';
+            dropdown.style.bottom = 'auto';
+        }
+    }
+}
+
+// Pilih salah satu opsi
+function selectExportOption(el) {
+    // Tutup daftar
+    document.getElementById('exportSelectTrigger').classList.remove('open');
+    document.getElementById('exportSelectDropdown').classList.remove('open');
+    setTimeout(() => {
+        document.getElementById('exportSelectDropdown').classList.remove('up', 'down');
+        document.getElementById('exportSelectDropdown').style.top = '';
+        document.getElementById('exportSelectDropdown').style.bottom = '';
+    }, 350);
+
+    // Hapus tanda aktif lama
+    document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+
+    // Ambil data
+    const value = el.dataset.value;
+    const icon = el.dataset.icon;
+    const text = el.dataset.text;
+
+    // Update tampilan terpilih
+    document.querySelector('.trigger-icon i').className = `fas ${icon}`;
+    document.querySelector('.trigger-text').textContent = text;
+
+    // Update input tersembunyi
+    document.getElementById('jenis_export').value = value;
+
+    // Tampilkan field sesuai PILIHAN
+    tampilkanFieldSesuaiJenis(value);
+}
+
+// === TAMPILKAN FIELD SESUAI JENIS EXPORT ===
+function tampilkanFieldSesuaiJenis(jenis) {
+    const perbulan = document.querySelectorAll('.perbulan-field');
+    const semua = document.querySelectorAll('.semua-field');
+    const rentang = document.querySelectorAll('.rentang-field');
+
+    // Sembunyikan SEMUA — hapus dari tata letak
+    [perbulan, semua, rentang].forEach(grup => {
+        grup.forEach(el => {
+            el.classList.remove('active');
+        });
+    });
+
+    // Tampilkan yang dipilih SAJA
+    if (jenis === 'perbulan') {
+        perbulan.forEach(el => el.classList.add('active'));
+    } else if (jenis === 'semua') {
+        semua.forEach(el => el.classList.add('active'));
+    } else if (jenis === 'rentang') {
+        rentang.forEach(el => el.classList.add('active'));
+    }
+}
+
+// Tutup daftar jika klik di luar
+document.addEventListener('click', function(e) {
+    const trigger = document.getElementById('exportSelectTrigger');
+    const dropdown = document.getElementById('exportSelectDropdown');
+    if (!e.target.closest('.form-group-wrap')) {
+        trigger.classList.remove('open');
+        dropdown.classList.remove('open');
+        setTimeout(() => {
+            dropdown.classList.remove('up', 'down');
+            dropdown.style.top = '';
+            dropdown.style.bottom = '';
+        }, 350);
+    }
+});
+
+// Jalankan saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    tampilkanFieldSesuaiJenis('perbulan');
+});
+</script>
+{% endblock %}

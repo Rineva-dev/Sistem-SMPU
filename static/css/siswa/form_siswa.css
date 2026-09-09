@@ -1,0 +1,563 @@
+/* ==========================================
+   FORM UTAMA - STRUKTUR DASAR
+========================================== */
+.form-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+    border: none;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem 2rem;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.card-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Pesan Notifikasi */
+.alert {
+    padding: 0.9rem 1.2rem;
+    border-radius: 0.6rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.alert-success {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.alert-danger {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+/* Tata Letak Form */
+.form-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem; /* Jarak antar baris sama rata */
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem; /* Jarak antar kolom dalam satu baris */
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Jarak label ke input */
+}
+
+/* Lebar Kolom */
+.form-group.full {
+    width: 100%;
+}
+
+.form-group.half {
+    width: calc(50% - 0.75rem);
+}
+
+.form-group.third {
+    width: calc(33.333% - 1rem);
+}
+
+/* Label */
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.text-danger {
+    color: #ef4444;
+}
+
+/* Input Standar */
+.form-input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.form-input::placeholder {
+    color: #94a3b8;
+}
+
+textarea.form-input {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* Tombol Aksi */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Responsif untuk HP & Tablet */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    .form-group.half,
+    .form-group.third {
+        width: 100%;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ==========================================
+   CUSTOM DROPDOWN / SELECT
+========================================== */
+.custom-select {
+    position: relative;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.custom-select__trigger {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    min-height: 48px;
+    outline: none;
+}
+
+.custom-select__trigger:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.custom-select.open .custom-select__trigger,
+.custom-select.focused .custom-select__trigger,
+.custom-select__trigger:focus {
+    background-color: #ffffff;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    outline: none;
+}
+
+.custom-select__selected {
+    color: #0f172a;
+}
+
+.custom-select__arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #64748b;
+    border-bottom: 2px solid #64748b;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    margin-top: -3px;
+}
+
+.custom-select.open .custom-select__arrow {
+    transform: rotate(-135deg);
+    margin-top: 3px;
+}
+
+.custom-select__options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e2e8f0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    z-index: 999;
+}
+
+.custom-select.open .custom-select__options {
+    max-height: 220px;
+    opacity: 1;
+    visibility: visible;
+    overflow-y: auto;
+}
+
+.custom-select__option {
+    padding: 0.85rem 1rem;
+    color: #1e293b;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.custom-select__option:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.custom-select__option.selected {
+    background-color: #dbeafe;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.custom-select > select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================
+   CUSTOM DATE PICKER
+========================================== */
+.custom-date {
+    position: relative;
+    width: 100%;
+    font-size: 0.9rem;
+    font-family: inherit;
+    display: block;
+}
+
+.custom-date__trigger {
+    width: 100%;
+    padding: 0;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    color: #0f172a;
+    user-select: none;
+    overflow: hidden;
+}
+
+.custom-date__input-manual {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.85rem 1rem;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+}
+
+.custom-date__input-manual::placeholder {
+    color: #94a3b8;
+}
+
+.custom-date__icon {
+    font-size: 18px;
+    color: #64748b;
+    flex-shrink: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem 0 0.5rem;
+    cursor: pointer;
+}
+
+.custom-date:hover .custom-date__trigger {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.custom-date:has(.custom-date__input-manual:focus) .custom-date__trigger,
+.custom-date.open .custom-date__trigger {
+    background-color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+    outline: none !important;
+}
+
+.custom-date > input[type="date"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+}
+
+.custom-date__calendar {
+    position: absolute;
+    width: 260px;
+    max-width: calc(100vw - 1.5rem);
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    border: 1px solid #e2e8f0;
+    padding: 0.7rem;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.custom-date__calendar.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.calendar-nav {
+    background: none;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #475569;
+    transition: background 0.15s ease;
+}
+
+.calendar-nav:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.calendar-title {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.calendar-title:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #94a3b8;
+    margin-bottom: 0.35rem;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.18rem;
+    text-align: center;
+}
+
+.calendar-day {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.4rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #1e293b;
+    margin: 0 auto;
+}
+
+.calendar-day:hover:not(.other-month):not(.today):not(.selected) {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.calendar-day.other-month {
+    color: #cbd5e1;
+    cursor: default;
+}
+
+.calendar-day.today {
+    background-color: #dbeafe;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.calendar-day.selected {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.calendar-months {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    padding: 0.25rem 0;
+}
+
+.month-item {
+    padding: 0.55rem 0.25rem;
+    text-align: center;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.15s ease;
+}
+
+.month-item:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.month-item.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.calendar-years {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.25rem 0;
+}
+
+.year-item {
+    padding: 0.5rem 0.2rem;
+    text-align: center;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.15s ease;
+}
+
+.year-item:hover {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+
+.year-item.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+/* ==========================================
+   PENAMBAHAN UNTUK KONSISTENSI TAMPILAN
+========================================== */
+
+/* Judul Bagian */
+.form-section {
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 1.4rem;
+    margin-top: 0.4rem;
+}
+
+.saat-ini,
+.form-section.saat-ini {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.section-title.title-1 {
+    margin: 0 !important;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 1.2rem 0;
+}
+
+/* Keterangan Kecil */
+.form-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0rem;
+    display: block;
+}
+
+/* Gaya Input Saat Dikunci / Otomatis */
+.input-disabled .custom-select__trigger {
+    background-color: #f1f5f9 !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+}
+
+.input-disabled .custom-select__arrow {
+    border-color: #94a3b8 !important;
+}

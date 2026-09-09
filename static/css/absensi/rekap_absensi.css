@@ -1,0 +1,640 @@
+/* =====================================================
+   REKAPITULASI ABSENSI — TEMA MODERN WARNA PENUH
+   SEMUA IKON: FONT AWESOME (fas fa-...)
+   ===================================================== */
+
+/* -- Animasi Muncul -- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+    50% { box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+    100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+/* -- Judul Halaman -- */
+.page-header {
+    animation: fadeInUp 0.6s ease-out;
+}
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+.page-title i {
+    -webkit-text-fill-color: #4f46e5;
+    color: #4f46e5;
+}
+.page-subtitle {
+    color: #718096;
+    margin: 0.3rem 0 0 0;
+    font-size: 0.95rem;
+}
+
+/* -- Kartu Filter -- */
+.filter-card {
+    background: linear-gradient(135deg, #f6f8fb 0%, #eef2f7 100%);
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    padding: 1.25rem 1.5rem;
+    animation: fadeInUp 0.7s ease-out;
+}
+.filter-body { padding: 0; }
+.filter-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+.filter-select {
+    padding: 0.5rem 2rem 0.5rem 1rem;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    background: #fff;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.filter-select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+/* -- KARTU STATISTIK BERWARNA -- */
+.stat-card {
+    border-radius: 20px;
+    padding: 1.5rem;
+    color: #fff;
+    border: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+}
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+}
+.stat-icon {
+    font-size: 2.2rem;
+    opacity: 0.92;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+}
+.stat-icon i {
+    line-height: 1;
+}
+.stat-content { flex: 1; }
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin: 0 0 0.25rem 0;
+    font-weight: 500;
+    color: #f1f5f9;
+}
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0;
+}
+.stat-value-big {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0;
+}
+.stat-unit {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0.25rem 0 0 0;
+    color: #f1f5f9;
+}
+
+/* WARNA PER KARTU */
+.stat-hadir     { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.stat-terlambat { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.stat-izin      { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+.stat-alfa      { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.stat-persen    { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+
+/* -- KARTU TABEL -- */
+.table-card {
+    background: #fff;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    animation: fadeInUp 0.9s ease-out;
+    margin-bottom: 1.5rem;
+}
+.table-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+.table-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+.table-badge {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+.table-body { padding: 0; }
+
+/* -- TABEL -- */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+.custom-table thead {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+.custom-table th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #334155;
+    border-bottom: 2px solid #cbd5e1;
+    display: table-cell;
+}
+.custom-table th i {
+    color: #6366f1;
+    font-size: 0.85rem;
+}
+.custom-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+.custom-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+}
+.custom-table td {
+    padding: 1rem 1.25rem;
+    font-size: 0.92rem;
+    color: #475569;
+}
+.td-tanggal  { font-weight: 600; color: #1e293b; }
+.td-jam      { font-family: 'Segoe UI', monospace; color: #4f46e5; font-weight: 500; }
+.td-keterangan { color: #64748b; font-size: 0.88rem; }
+.td-empty {
+    text-align: center;
+    padding: 2.5rem !important;
+    color: #94a3b8 !important;
+    font-style: italic;
+}
+.td-empty i {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+}
+
+/* -- BADGE STATUS -- */
+.status-badge {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+.badge-hadir     { background: #d1fae5; color: #065f46; }
+.badge-terlambat { background: #fef3c7; color: #92400e; }
+.badge-izin      { background: #dbeafe; color: #1e40af; }
+.badge-sakit     { background: #e0e7ff; color: #3730a3; }
+.badge-alfa      { background: #fee2e2; color: #b91c1c; }
+.badge-default   { background: #f3f4f6; color: #4b5563; }
+
+/* -- RESPONSIF -- */
+@media (max-width: 1200px) {
+    .stat-value { font-size: 1.9rem; }
+    .stat-value-big { font-size: 2.1rem; }
+}
+@media (max-width: 768px) {
+    .page-title { font-size: 1.4rem; }
+    .stat-card { padding: 1.2rem; flex-direction: column; text-align: center; }
+    .stat-value { font-size: 1.8rem; }
+    .stat-value-big { font-size: 2rem; }
+    .custom-table th, .custom-table td { padding: 0.75rem 0.55rem; font-size: 0.85rem; }
+}
+@media (max-width: 576px) {
+    .filter-card { padding: 1rem; }
+    .table-header { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+
+/* =====================================================
+   📤 EXPORT CARD — DESAIN PREMIUM MODERN
+   ===================================================== */
+
+.export-card {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.12),
+                0 2px 12px rgba(0, 0, 0, 0.04);
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Dekorasi lingkaran gradasi di belakang */
+.export-card-decoration {
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.export-card-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* === HEADER EXPORT === */
+.export-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.export-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+    flex-shrink: 0;
+}
+
+.export-icon-wrap i {
+    font-size: 1.85rem;
+    color: #fff;
+}
+
+.export-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #064e3b;
+    margin: 0 0 0.2rem 0;
+}
+
+.export-subtitle {
+    font-size: 0.88rem;
+    color: #047857;
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* === GRID FORM — FLEX RAPAT === */
+.export-form-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;        /* Jarak antar field seragam */
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.export-form-grid > .form-group-wrap {
+    flex: 0 0 auto;       /* Lebar pas sesuai isi, TIDAK dipaksa */
+    min-width: 160px;     /* Lebar minimal saja */
+}
+
+/* Tombol tetap di baris sendiri */
+.export-form-grid > .btn-wrap {
+    flex: 0 0 auto;
+    min-width: 180px;
+}
+
+/* === ATURAN TAMPIL/SEMBUNYI === */
+.perbulan-field,
+.semua-field,
+.rentang-field {
+    display: none;         /* Sembunyi dari tata letak */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* === SAAT AKTIF: MUNCUL === */
+.perbulan-field.active,
+.semua-field.active,
+.rentang-field.active {
+    display: block;        /* Muncul di tata letak */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* === LABEL & SELECT === */
+.form-label-export {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #065f46;
+    margin-bottom: 0.5rem;
+}
+
+.form-label-export i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.form-select-export {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid #a7f3d0;
+    background: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #064e3b;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23059669' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 6l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 1.15em;
+}
+
+.form-select-export:hover {
+    border-color: #6ee7b7;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+}
+
+.form-select-export:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.18);
+    background-color: #f0fdf4;
+}
+
+/* === TOMBOL EXPORT XL === */
+.btn-wrap {
+    display: flex;
+    align-items: flex-end;
+}
+
+.btn-export-xl {
+    width: 100%;
+    height: 50px;
+    padding: 0 1.5rem;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.35);
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-export-xl::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-export-xl:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 14px 30px rgba(16, 185, 129, 0.45);
+}
+
+.btn-export-xl:hover::before {
+    left: 100%;
+}
+
+.btn-export-xl:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.btn-export-xl .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.22);
+}
+
+.btn-export-xl .btn-icon i {
+    font-size: 0.95rem;
+}
+
+/* === RESPONSIF === */
+@media (max-width: 992px) {
+    .export-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .btn-wrap {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .export-card {
+        padding: 1.5rem 1.25rem;
+    }
+    .export-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.85rem;
+    }
+    .export-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .export-icon-wrap {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+    }
+}
+
+/* =====================================================
+   📋 CUSTOM SELECT — PAKAI ICON FAS FA SELAMANYA
+   ===================================================== */
+
+/* Kotak tampilan terpilih */
+.custom-select-trigger {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid #a7f3d0;
+    background: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #064e3b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    user-select: none;
+    gap: 10px;
+}
+.custom-select-trigger:hover {
+    border-color: #6ee7b7;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+}
+.custom-select-trigger.open {
+    border-color: #10b981;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.18);
+}
+.trigger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    flex-shrink: 0;
+}
+.trigger-text {
+    flex: 1;
+}
+.trigger-arrow {
+    font-size: 0.85rem;
+    color: #059669;
+    transition: transform 0.3s ease;
+}
+.custom-select-trigger.open .trigger-arrow {
+    transform: rotate(180deg);
+}
+
+/* Daftar pilihan */
+.custom-select-dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: 2px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+    z-index: 9999;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.2s ease, top 0.35s ease;
+}
+
+.custom-select-dropdown.open {
+    max-height: 300px;
+    padding: 0.5rem 0;
+    border-top: 2px solid #10b981;
+}
+
+.custom-select-dropdown.down {
+    top: 100%;
+    margin-top: 4px;
+}
+
+.custom-select-dropdown.up {
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 4px;
+    margin-top: 0;
+    border-top: none;
+    border-bottom: none;
+}
+
+/* Setiap baris pilihan */
+.custom-option {
+    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #064e3b;
+}
+.custom-option:hover {
+    background: #f0fdf4;
+    padding-left: 1.25rem;
+}
+.custom-option.active {
+    background: #d1fae5;
+    font-weight: 700;
+    color: #065f46;
+}
+.option-icon {
+    width: 20px;
+    text-align: center;
+    color: #059669;
+    font-size: 0.95rem;
+}
+
+/* Posisi relatif agar dropdown pas */
+.form-group-wrap {
+    position: relative;
+}

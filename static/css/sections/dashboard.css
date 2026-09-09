@@ -1,0 +1,222 @@
+/* ======================================
+   DASHBOARD UTAMA
+====================================== */
+:root {
+    --primary: #005B2B;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-500: #6B7280;
+    --gray-900: #111827;
+    --white: #FFFFFF;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+/* Header Selamat Datang */
+.welcome-box {
+    background: var(--white);
+    padding: 1.25rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.date-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gray-100);
+    padding: 0.5rem 0.9rem;
+    border-radius: 6px;
+    color: var(--gray-900) !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* ======================================
+   KARTU STATISTIK - SAMA PERSIS GAMBAR
+====================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+}
+
+.stat-card {
+    border-radius: 8px;
+    padding: 1rem;
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Warna sesuai contoh */
+.stat-blue { background: #2563EB; }
+.stat-green { background: #10B981; }
+.stat-orange { background: #F97316; }
+.stat-red { background: #EF4444; }
+
+/* Bagian atas: angka + ikon */
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+/* Label tengah */
+.stat-label {
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+    opacity: 0.9;
+    font-weight: 500;
+    color: #ffffffde;
+}
+
+/* Bagian bawah: keterangan + persen */
+.stat-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+
+.stat-percent {
+    font-weight: 600;
+}
+
+/* ======================================
+   BAGIAN GRAFIK & PENGUMUMAN
+====================================== */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.25rem;
+}
+
+.card {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--gray-100);
+}
+
+.card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.card-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Daftar Pengumuman */
+.announcement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement-item {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.announcement-item:last-child {
+    border-bottom: none;
+}
+
+.announcement-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 0.35rem;
+    flex-shrink: 0;
+}
+
+.announcement-item h5 {
+    font-size: 0.9rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.announcement-item p {
+    font-size: 0.82rem;
+    color: var(--gray-500);
+    margin: 0 0 0.25rem 0;
+    line-height: 1.4;
+}
+
+.announcement-date {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* ======================================
+   RESPONSIF
+====================================== */
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .stat-number {
+        font-size: 1.6rem;
+    }
+}

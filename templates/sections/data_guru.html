@@ -1,0 +1,164 @@
+<!-- Data Guru -->
+<div class="dashboard-container">
+
+    <!-- Header Halaman -->
+    <div class="welcome-box">
+        <div>
+            <h2>Data Guru & Tenaga Pendidik</h2>
+            <p class="text-muted">Daftar lengkap dan ringkasan data guru aktif di sekolah, per {{ today_date }}</p>
+        </div>
+        <div class="date-box">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span>Total: {{ total_guru | default('0') }} Orang</span>
+        </div>
+    </div>
+
+    <!-- Kartu Ringkasan Statistik Guru -->
+    <div class="stats-grid">
+        <!-- Kartu Total Guru -->
+        <div class="stat-card">
+            <div class="stat-icon bg-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_guru | default('0') }}</h3>
+                <p>Total Guru</p>
+                <span class="stat-change neutral">Seluruh Guru Aktif</span>
+            </div>
+        </div>
+
+        <!-- Kartu Guru Laki-laki -->
+        <div class="stat-card">
+            <div class="stat-icon bg-success">
+                <i class="fas fa-male"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ guru_laki | default('0') }}</h3>
+                <p>Guru Laki-laki</p>
+                <span class="stat-change neutral">{{ persen_guru_laki | default('0') }}%</span>
+            </div>
+        </div>
+
+        <!-- Kartu Guru Perempuan -->
+        <div class="stat-card">
+            <div class="stat-icon bg-info">
+                <i class="fas fa-female"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ guru_perempuan | default('0') }}</h3>
+                <p>Guru Perempuan</p>
+                <span class="stat-change neutral">{{ persen_guru_perempuan | default('0') }}%</span>
+            </div>
+        </div>
+
+        <!-- Kartu Guru Bersertifikat -->
+        <div class="stat-card">
+            <div class="stat-icon bg-warning">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ guru_sertifikasi | default('0') }}</h3>
+                <p>Guru Bersertifikat</p>
+                <span class="stat-change {{ 'positive' if persen_sertifikasi|default(0) >= 80 else 'warning' }}">{{ persen_sertifikasi | default('0') }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter & Tabel Daftar Guru -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4><i class="fas fa-list"></i> Daftar Guru</h4>
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Cari nama / NIP..." id="cariGuru">
+                {% if bisa_kelola %}
+                <a href="{{ url_for('data_guru.tambah_guru') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus"></i> Tambah Guru
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Lengkap</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Jabatan / Peran</th>
+                            <th>Tugas Tambahan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if daftar_guru %}
+                            {% for guru in daftar_guru %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ guru.nama }}</td>
+                                <td>{{ guru.jenis_kelamin }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ guru.jabatan | default('Guru') }}</span>
+                                </td>
+                                <td>
+                                    {% if guru.tugas_tambahan %}
+                                        {% for tugas in guru.tugas_tambahan %}
+                                            <span class="badge bg-secondary me-1">{{ tugas }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if guru.status == 'Aktif' %}
+                                        <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Tidak Aktif</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('data_guru.detail_guru', id=guru.id) }}" class="btn btn-sm btn-outline-primary" title="Lihat Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    {% if bisa_kelola %}
+                                    <a href="{{ url_for('data_guru.ubah_guru', id=guru.id) }}" class="btn btn-sm btn-outline-warning" title="Ubah Data">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if bisa_hapus %}
+                                    <form action="{{ url_for('data_guru.hapus_guru', id=guru.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini? Tindakan tidak dapat dibatalkan.')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Data">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    {% if bisa_atur_akun %}
+                                        {% if guru.akun %}
+                                            <a href="{{ url_for('data_guru.atur_ulang_password', id=guru.id) }}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-key"></i> Ubah Password
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('data_guru.buat_akun', id=guru.id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-user-plus"></i> Buat Akun
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Belum ada data guru yang terdaftar</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

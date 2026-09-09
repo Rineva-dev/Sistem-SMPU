@@ -1,0 +1,92 @@
+<!-- Bagian Tambahan: Pembina Ekstrakurikuler -->
+<div class="dashboard-container mt-5">
+    <div class="card border-teal">
+        <div class="card-header bg-teal bg-opacity-10 border-bottom border-teal">
+            <h4 class="mb-0">
+                <i class="fas fa-futbol text-teal"></i>
+                Tugas Tambahan: Pembina Ekskul {{ nama_ekskul | default('Belum ditentukan') }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_anggota | default('0') }}</h3>
+                        <p>Jumlah Anggota</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ frekuensi_pertemuan | default('0') }}</h3>
+                        <p>Pertemuan/Bulan</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ rata_kehadiran_anggota | default('0') }}%</h3>
+                        <p>Rata-rata Kehadiran</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-info">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>{{ jumlah_prestasi_ekskul | default('0') }}</h3>
+                        <p>Prestasi Diperoleh</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-calendar-alt"></i> Jadwal Kegiatan</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="schedule-list">
+                            <li class="schedule-item">
+                                <span>Senin & Kamis</span>
+                                <span class="fw-medium">Jam 15.00 - 16.30</span>
+                            </li>
+                            <li class="schedule-item">
+                                <span>Minggu</span>
+                                <span class="fw-medium">Jam 08.00 - 10.00</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list-alt"></i> Kegiatan Mendatang</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="upcoming-list">
+                            <li class="upcoming-item">
+                                <span>Latihan Persiapan Lomba</span>
+                                <small class="text-muted">12 Juli 2026</small>
+                            </li>
+                            <li class="upcoming-item">
+                                <span>Pertandingan Antar Sekolah</span>
+                                <small class="text-muted">25 Juli 2026</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
