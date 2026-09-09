@@ -55,7 +55,7 @@ def hitung_status_absensi(jam_masuk_str):
 
 def sudah_lewat_batas_absensi():
     BATAS_JAM = "11:00"
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     def jam_ke_menit(jam_str):
         j, m = map(int, jam_str.split(':'))
         return j * 60 + m
@@ -63,7 +63,7 @@ def sudah_lewat_batas_absensi():
 
 def belum_jam_pulang():
     BATAS_PULANG = "15:00"
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     def jam_ke_menit(jam_str):
         j, m = map(int, jam_str.split(':'))
         return j * 60 + m
@@ -497,7 +497,7 @@ def scan_qr_proses():
             guru_id = "SEMUA"  # Penanda: ambil dari sesi yang men-scan
 
             # ✅ TENTUKAN TIPE OTOMATIS DARI JAM SAAT SCAN
-            jam_sekarang = datetime.now()
+            jam_sekarang = waktu_wita()
             if jam_sekarang.hour < 15:
                 tipe = "masuk"
             else:
@@ -589,7 +589,7 @@ def scan_qr_proses():
     if not guru:
         return jsonify({"status": "error", "pesan": "Data guru tidak ditemukan"}), 404
 
-    jam_sekarang = datetime.now().strftime("%H:%M")
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini_date).first()
 
     # ==============================================================
