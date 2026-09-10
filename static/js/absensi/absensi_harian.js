@@ -37,7 +37,8 @@ function ambilJamSaatIni() {
     return `${h}:${m}`;
 }
 // --- CEK: SUDAH LEWAT JAM 11? ---
-const BATAS_ABSENSI = '11:00';
+const BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
+
 function sudahLewatBatasWaktu() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
@@ -47,7 +48,7 @@ function tampilkanPeringatanAlfa() {
 }
 
 // ✅ === BARU: CEK BELUM JAM 15:00 (TIDAK BOLEH PULANG) ===
-const BATAS_PULANG = '15:00';
+const BATAS_PULANG = ABSENSI.BATAS_PULANG;
 function belumJamPulang() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);

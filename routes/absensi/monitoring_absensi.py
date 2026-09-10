@@ -4,7 +4,7 @@
 # TIDAK BOLEH diakses dari Sesi Absensi Guru
 # ==================================================
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, make_response, g, jsonify
-from models import Guru, AbsensiGuru, TahunPelajaran, db, User
+from models import Guru, AbsensiGuru, TahunPelajaran, db, User, PengaturanJamKerja
 from datetime import date, datetime, timedelta
 from sqlalchemy import extract
 import pandas as pd
@@ -196,6 +196,19 @@ def monitoring_absensi():
         'persen': persen_total
     }
 
+    pengaturan = PengaturanJamKerja.ambil_atau_buat()
+
+    # === NILAI DEFAULT JIKA BELUM ADA PENGATURAN TERSIMPAN ===
+    DEFAULT_JAM_MASUK = "07:00"
+    DEFAULT_BATAS_TERLAMBAT = "07:15"
+    DEFAULT_JAM_TUTUP_ABSENSI = "11:00"
+    DEFAULT_JAM_PULANG = "15:00"
+    DEFAULT_JAM_MASUK_JUMAT = "07:00"
+    DEFAULT_JAM_PULANG_JUMAT = "11:30"
+
+    def ke_str(t, default):
+        return t.strftime('%H:%M') if t else default
+
     return render_template(
         'sections/absensi/monitoring_absensi.html',
         user=user,
@@ -211,7 +224,15 @@ def monitoring_absensi():
         daftar_guru=daftar_monitoring,
         ringkasan=ringkasan_seluruh,
         halaman_aktif=halaman_aktif,
-        active_page='monitoring_absensi'
+        active_page='monitoring_absensi',
+        # === NILAI DARI DATABASE ===
+        jam_masuk=ke_str(pengaturan.jam_masuk, DEFAULT_JAM_MASUK),
+        batas_terlambat=ke_str(pengaturan.batas_terlambat, DEFAULT_BATAS_TERLAMBAT),
+        jam_tutup_absensi=ke_str(pengaturan.jam_tutup_absensi, DEFAULT_JAM_TUTUP_ABSENSI),
+        jam_pulang=ke_str(pengaturan.jam_pulang, DEFAULT_JAM_PULANG),
+        jam_masuk_jumat=ke_str(pengaturan.jam_masuk_jumat, DEFAULT_JAM_MASUK_JUMAT),
+        jam_pulang_jumat=ke_str(pengaturan.jam_pulang_jumat, DEFAULT_JAM_PULANG_JUMAT),
+
     )
 
 # ==================================================
@@ -298,9 +319,6 @@ def export_monitoring():
 # ==================================================
 # ✅ BUAT QR ABSENSI — BERLAKU UNTUK SEMUA GURU
 # ==================================================
-# ==================================================
-# ✅ BUAT QR ABSENSI — BERLAKU UNTUK SEMUA GURU
-# ==================================================
 @monitoring_bp.route('/buat-qr-semua-guru', methods=['POST'])
 def buat_qr_semua_guru():
     boleh, alasan = cek_akses_monitoring()
@@ -322,4 +340,73 @@ def buat_qr_semua_guru():
         "jam_sekarang": jam_sekarang,
         "tipe_qr": info_tipe,
         "keterangan": f"QR berlaku otomatis: Sebelum 15:00=Masuk / Setelah 15:00=Pulang"
+    })
+
+# ==================================================
+# ✅ SIMPAN PENGATURAN KE DATABASE
+# ==================================================
+@monitoring_bp.route('/simpan-pengaturan-jam', methods=['POST'])
+def simpan_pengaturan_jam():
+    boleh, alasan = cek_akses_monitoring()
+    if not boleh:
+        return jsonify({"status": "error", "pesan": "⚠️ Tidak memiliki izin"}), 403
+
+    data = request.get_json()
+    pengaturan = PengaturanJamKerja.ambil_atau_buat()
+
+    # Ubah string "HH:MM" ke format time untuk disimpan
+    from datetime import datetime
+    def ke_waktu(s):
+        try:
+            return datetime.strptime(s, "%H:%M").time()
+        except:
+            return None
+
+    pengaturan.jam_masuk = ke_waktu(data.get('jam_masuk')) or pengaturan.jam_masuk
+    pengaturan.batas_terlambat = ke_waktu(data.get('batas_terlambat')) or pengaturan.batas_terlambat
+    pengaturan.jam_tutup_absensi = ke_waktu(data.get('jam_tutup_absensi')) or pengaturan.jam_tutup_absensi  # ✅ BARU
+    pengaturan.jam_pulang = ke_waktu(data.get('jam_pulang')) or pengaturan.jam_pulang
+    pengaturan.jam_masuk_jumat = ke_waktu(data.get('jam_masuk_jumat')) or pengaturan.jam_masuk_jumat
+    pengaturan.jam_pulang_jumat = ke_waktu(data.get('jam_pulang_jumat')) or pengaturan.jam_pulang_jumat
+
+    # Catat siapa yang mengubah
+    user_id = session.get('user_id')
+    if user_id:
+        pengaturan.diperbarui_oleh = user_id
+
+    db.session.commit()
+
+    return jsonify({"status": "sukses", "pesan": "✅ Pengaturan berhasil disimpan ke database!"})
+
+
+# ==================================================
+# ✅ AMBIL PENGATURAN DARI DATABASE
+# ==================================================
+@monitoring_bp.route('/ambil-pengaturan-jam', methods=['GET'])
+def ambil_pengaturan_jam():
+    boleh, alasan = cek_akses_monitoring()
+    if not boleh:
+        return jsonify({"status": "error", "pesan": "⚠️ Tidak memiliki izin"}), 403
+    pengaturan = PengaturanJamKerja.ambil_atau_buat()
+    
+    # === NILAI DEFAULT JIKA BELUM ADA PENGATURAN TERSIMPAN ===
+    DEFAULT_JAM_MASUK = "07:00"
+    DEFAULT_BATAS_TERLAMBAT = "07:15"
+    DEFAULT_JAM_TUTUP_ABSENSI = "11:00"
+    DEFAULT_JAM_PULANG = "15:00"
+    DEFAULT_JAM_MASUK_JUMAT = "07:00"
+    DEFAULT_JAM_PULANG_JUMAT = "11:30"
+    
+    # Ubah format time ke string "HH:MM" untuk tampilan HTML
+    def ke_str(t, default):
+        return t.strftime('%H:%M') if t else default
+    
+    return jsonify({
+        "status": "sukses",
+        "jam_masuk": ke_str(pengaturan.jam_masuk, DEFAULT_JAM_MASUK),
+        "batas_terlambat": ke_str(pengaturan.batas_terlambat, DEFAULT_BATAS_TERLAMBAT),
+        "jam_tutup_absensi": ke_str(pengaturan.jam_tutup_absensi, DEFAULT_JAM_TUTUP_ABSENSI),
+        "jam_pulang": ke_str(pengaturan.jam_pulang, DEFAULT_JAM_PULANG),
+        "jam_masuk_jumat": ke_str(pengaturan.jam_masuk_jumat, DEFAULT_JAM_MASUK_JUMAT),
+        "jam_pulang_jumat": ke_str(pengaturan.jam_pulang_jumat, DEFAULT_JAM_PULANG_JUMAT),
     })

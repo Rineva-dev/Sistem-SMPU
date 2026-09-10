@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, g, request, jsonify, make_response
-from models import Guru, AbsensiGuru, TahunPelajaran, GajiGuru, db, User
+from models import Guru, AbsensiGuru, TahunPelajaran, GajiGuru, db, User, PengaturanJamKerja
 from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import extract
 import qrcode
@@ -25,7 +25,7 @@ def cek_dari_wifi_sekolah():
     ip = dapatkan_ip_klien()
     
     IP_DIPERBOLEHKAN = [
-        "10.10.12."
+        "10.10.11."
     ]
     
     for rentang in IP_DIPERBOLEHKAN:
@@ -35,39 +35,82 @@ def cek_dari_wifi_sekolah():
 # ✅ === SELESAI FUNGSI CEK IP ===
 
 def hitung_status_absensi(jam_masuk_str):
-    JAM_BATAS_TEPAT = datetime.strptime("07:15", "%H:%M").time()
-    JAM_TUTUP_ABSEN = datetime.strptime("11:00", "%H:%M").time()
-    JAM_PULANG_RESMI = datetime.strptime("15:00", "%H:%M").time()
+    jam = ambil_jam_pengaturan()
+    JAM_MASUK_TEPAT = datetime.strptime(jam['jam_masuk_tepat'], "%H:%M").time()
+    BATAS_TERLAMBAT = datetime.strptime(jam['batas_terlambat'], "%H:%M").time()  # ✅ BARU
+    JAM_TUTUP_ABSEN = datetime.strptime(jam['jam_tutup_absensi'], "%H:%M").time()
+    JAM_PULANG_RESMI = datetime.strptime(jam['jam_pulang_resmi'], "%H:%M").time()
     
     jam_masuk = datetime.strptime(jam_masuk_str, "%H:%M").time() if jam_masuk_str else None
     status = "hadir"
     keterangan = ""
-    if jam_masuk and jam_masuk > JAM_TUTUP_ABSEN:
-        status = "alfa"
-        keterangan = "Lewat batas waktu absensi (11:00)"
-        return status, keterangan
-    if jam_masuk and jam_masuk > JAM_BATAS_TEPAT:
-        status = "terlambat"
-        terlambat_menit = (datetime.combine(date.today(), jam_masuk) - datetime.combine(date.today(), JAM_BATAS_TEPAT)).seconds // 60
-        keterangan = f"Terlambat {terlambat_menit} menit"
-    
+
+    if jam_masuk:
+        if jam_masuk > JAM_TUTUP_ABSEN:
+            status = "alfa"
+            keterangan = f"Lewat batas waktu absensi ({jam['jam_tutup_absensi']})"
+        elif jam_masuk > BATAS_TERLAMBAT:
+            # ⏰ TERLAMBAT: Setelah 07:15
+            status = "terlambat"
+            terlambat_menit = (
+                datetime.combine(date.today(), jam_masuk) -
+                datetime.combine(date.today(), BATAS_TERLAMBAT)
+            ).seconds // 60
+            keterangan = f"Terlambat {terlambat_menit} menit"
+        elif jam_masuk > JAM_MASUK_TEPAT:
+            status = "batas_waktu"
+            keterangan = "Masuk pada batas waktu toleransi"
+        else:
+            status = "hadir"
+            keterangan = "Masuk tepat waktu"
+
     return status, keterangan
 
 def sudah_lewat_batas_absensi():
-    BATAS_JAM = "11:00"
+    jam = ambil_jam_pengaturan()  # ✅ Baca dari pengaturan
+    BATAS_JAM = jam['jam_tutup_absensi']
+
     jam_sekarang = waktu_wita().strftime("%H:%M")
+
     def jam_ke_menit(jam_str):
         j, m = map(int, jam_str.split(':'))
         return j * 60 + m
+
     return jam_ke_menit(jam_sekarang) >= jam_ke_menit(BATAS_JAM)
 
 def belum_jam_pulang():
-    BATAS_PULANG = "15:00"
+    jam = ambil_jam_pengaturan()  # ✅ Baca dari pengaturan
+    BATAS_PULANG = jam['jam_pulang_resmi']
+
     jam_sekarang = waktu_wita().strftime("%H:%M")
+
     def jam_ke_menit(jam_str):
         j, m = map(int, jam_str.split(':'))
         return j * 60 + m
+
     return jam_ke_menit(jam_sekarang) < jam_ke_menit(BATAS_PULANG)
+
+# === ✅ FUNGSI AMBIL JAM DARI PENGATURAN DATABASE ===
+def ambil_jam_pengaturan():
+    defaults = {
+        'jam_masuk_tepat': '07:00',
+        'batas_terlambat': '07:15',   # ✅ BARU
+        'jam_tutup_absensi': '11:00',
+        'jam_pulang_resmi': '15:00'
+    }
+    hasil = defaults.copy()
+    try:
+        pengaturan = PengaturanJamKerja.ambil_atau_buat()
+        def ke_str(t, default_str):
+            return t.strftime('%H:%M') if t else default_str
+        
+        hasil['jam_masuk_tepat'] = ke_str(pengaturan.jam_masuk, defaults['jam_masuk_tepat'])
+        hasil['batas_terlambat'] = ke_str(pengaturan.batas_terlambat, defaults['batas_terlambat'])  # ✅ BARU
+        hasil['jam_tutup_absensi'] = ke_str(pengaturan.jam_tutup_absensi, defaults['jam_tutup_absensi'])
+        hasil['jam_pulang_resmi'] = ke_str(pengaturan.jam_pulang, defaults['jam_pulang_resmi'])
+    except Exception:
+        pass
+    return hasil
 
 # ==============================================
 # ✅ FUNGSI BANTU: TERBILANG (Angka ke Kalimat Bahasa Indonesia)
@@ -212,6 +255,14 @@ def dashboard():
     riwayat_terbaru = semua_absensi.order_by(
         AbsensiGuru.tanggal.desc()
     ).limit(5).all()
+
+    # ✅ AMBIL JAM DARI PENGATURAN
+    jam = ambil_jam_pengaturan()
+    jam_masuk_tepat = jam['jam_masuk_tepat']
+    batas_terlambat = jam['batas_terlambat']
+    jam_tutup_absensi = jam['jam_tutup_absensi']
+    jam_pulang_resmi = jam['jam_pulang_resmi']
+
     return render_template(
         'sections/absensi/dashboard.html',
         user=guru,
@@ -229,7 +280,11 @@ def dashboard():
         data_izin=data_izin,
         data_alfa=data_alfa,
         halaman_aktif='absensi',
-        active_page='dashboard'
+        active_page='dashboard',
+        jam_masuk_tepat=jam_masuk_tepat,
+        batas_terlambat=batas_terlambat,
+        jam_tutup_absensi=jam_tutup_absensi,
+        jam_pulang_resmi=jam_pulang_resmi,
     )
 
 @absensi_guru_bp.route('/absensi-harian')
@@ -277,6 +332,12 @@ def absensi_harian():
     total_terlambat = absensi_query.filter(AbsensiGuru.status == 'terlambat').count()
     total_izin = absensi_query.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count()
     total_alfa = absensi_query.filter(AbsensiGuru.status == 'alfa').count()
+    jam = ambil_jam_pengaturan()
+    jam_masuk_tepat = jam['jam_masuk_tepat']
+    batas_terlambat = jam['batas_terlambat']
+    jam_tutup_absensi = jam['jam_tutup_absensi']
+    jam_pulang_resmi = jam['jam_pulang_resmi']
+    
     return render_template(
         'sections/absensi/absensi.html',
         user=guru,
@@ -291,7 +352,11 @@ def absensi_harian():
         filter_bulan=filter_bulan,
         filter_tahun=filter_tahun,
         halaman_aktif='absensi',
-        active_page='absensi_harian'
+        active_page='absensi_harian',
+        jam_masuk_tepat=jam_masuk_tepat,
+        batas_terlambat=batas_terlambat,
+        jam_tutup_absensi=jam_tutup_absensi,
+        jam_pulang_resmi=jam_pulang_resmi,
     )
 
 # === 1. Tombol Absen Masuk ===

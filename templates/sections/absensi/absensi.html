@@ -24,19 +24,19 @@
         <div class="absen-rules-row">
             <div class="rule-col">
                 <span class="rule-label">Masuk</span>
-                <span class="rule-value">07:00</span>
+                <span class="rule-value">{{ jam_masuk_tepat }}</span>
             </div>
             <div class="rule-col">
                 <span class="rule-label">Terlambat</span>
-                <span class="rule-value">&gt; 07:15</span>
+                <span class="rule-value">&gt; {{ batas_terlambat }}</span>
             </div>
             <div class="rule-col">
                 <span class="rule-label">Batas Absen</span>
-                <span class="rule-value">11:00</span>
+                <span class="rule-value">{{ jam_tutup_absensi }}</span>
             </div>
             <div class="rule-col">
                 <span class="rule-label">Pulang</span>
-                <span class="rule-value">15:00</span>
+                <span class="rule-value">{{ jam_pulang_resmi }}</span>
             </div>
         </div>
     </div>
@@ -403,7 +403,9 @@
 <!-- ✅ VARIABEL DARI SERVER → DIPAKAI OLEH FILE JS -->
 <script>
 const ABSENSI = {
-    BATAS_TEPAT_WAKTU: "07:15",
+    BATAS_TEPAT_WAKTU: "{{ jam_masuk_tepat }}",
+    BATAS_TUTUP_ABSENSI: "{{ jam_tutup_absensi }}",
+    BATAS_PULANG: "{{ jam_pulang_resmi }}",
     SUDAH_ABSEN_MASUK: {{ 'true' if (absensi and absensi.jam_masuk) else 'false' }},
     URL_ABSENSI_HARIAN: "{{ url_for('absensi_guru.absensi_harian') }}",
     URL_ABSEN_MASUK: "{{ url_for('absensi_guru.absen_masuk') }}",

@@ -26,6 +26,100 @@
     </div>
 </div>
 
+{# ===== KARTU PENGATURAN JAM KERJA — DIPERBARUI JADI 4 INPUT ===== #}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5><i class="fas fa-clock me-2"></i>Pengaturan Jam Kerja Absensi</h5>
+        <button id="btn-edit-pengaturan" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-pen-to-square me-1"></i>Edit Pengaturan
+        </button>
+        <button id="btn-simpan-pengaturan" class="btn btn-sm btn-success d-none">
+            <i class="fas fa-save me-1"></i>Simpan Pengaturan
+        </button>
+    </div>
+    <div class="card-body">
+        {# === TAB NAVIGASI === #}
+        <ul class="nav nav-tabs mb-3" id="tabPengaturan" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-standar" data-bs-toggle="tab" data-bs-target="#panel-standar" type="button" role="tab">Jam Standar</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-jumat" data-bs-toggle="tab" data-bs-target="#panel-jumat" type="button" role="tab">Khusus Hari Jumat</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-pengecualian" data-bs-toggle="tab" data-bs-target="#panel-pengecualian" type="button" role="tab">Tanggal Khusus</button>
+            </li>
+        </ul>
+        
+        {# === TAB 1: JAM STANDAR — 4 INPUT === #}
+        <div class="tab-content" id="tabContentPengaturan">
+            <div class="tab-pane fade show active" id="panel-standar" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">🕖 Jam Masuk Tepat</label>
+                        <input type="time" id="jam_masuk" class="form-control" value="{{ jam_masuk }}" disabled>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">⚠️ Batas Terlambat</label>
+                        <input type="time" id="batas_terlambat" class="form-control" value="{{ batas_terlambat }}" disabled>
+                        <small class="text-muted">Maksimal terlambat 15 menit</small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">🔒 Batas Akhir Absen</label>
+                        <input type="time" id="jam_tutup_absensi" class="form-control" value="{{ jam_tutup_absensi }}" disabled>
+                        <small class="text-muted">Tidak bisa absen setelah jam ini</small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">🏠 Jam Pulang Resmi</label>
+                        <input type="time" id="jam_pulang" class="form-control" value="{{ jam_pulang }}" disabled>
+                    </div>
+                </div>
+            </div>
+            
+            {# === TAB 2: KHUSUS HARI JUMAT === #}
+            <div class="tab-pane fade" id="panel-jumat" role="tabpanel">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">🕖 Jam Masuk Jumat</label>
+                        <input type="time" id="jam_masuk_jumat" class="form-control" value="{{ jam_masuk_jumat }}" disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">🏠 Jam Pulang Hari Jumat</label>
+                        <input type="time" id="jam_pulang_jumat" class="form-control" value="{{ jam_pulang_jumat }}" disabled>
+                    </div>
+                </div>
+            </div>
+            
+            {# === TAB 3: TANGGAL PENGECUALIAN === #}
+            <div class="tab-pane fade" id="panel-pengecualian" role="tabpanel">
+                <div class="mb-3">
+                    <button id="btn-tambah-pengecualian" class="btn btn-sm btn-success" disabled>
+                        <i class="fas fa-plus me-1"></i>Tambah Tanggal Khusus
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                                <th>Keterangan</th>
+                                <th width="80">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daftar-pengecualian">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-2">Belum ada tanggal khusus ditambahkan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {# ===== FILTER PERIODE — KARTU RAPI ===== #}
 <div class="card mb-4">
     <div class="card-header">
@@ -395,6 +489,72 @@ async function prosesHasilScan(qr_teks) {
         tutupModalKamera();
     }
 }
+
+// ==============================================
+// ✅ EDIT ↔ SIMPAN PENGATURAN JAM — DIPERBARUI
+// ==============================================
+let modeEdit = false;
+
+// Daftar SEMUA input — ditambah jam_tutup_absensi
+const elemenInputJam = [
+    document.getElementById('jam_masuk'),
+    document.getElementById('batas_terlambat'),
+    document.getElementById('jam_tutup_absensi'),  // ✅ BARU
+    document.getElementById('jam_pulang'),
+    document.getElementById('jam_masuk_jumat'),
+    document.getElementById('jam_pulang_jumat'),
+    document.getElementById('btn-tambah-pengecualian')
+];
+
+const btnEdit = document.getElementById('btn-edit-pengaturan');
+const btnSimpan = document.getElementById('btn-simpan-pengaturan');
+
+// Fungsi: Kunci / Buka Semua Input
+function setKunciInput(kunci) {
+    elemenInputJam.forEach(el => {
+        if (el) el.disabled = kunci;
+    });
+}
+
+// Klik: Edit Pengaturan → Buka input, ganti tombol
+btnEdit.addEventListener('click', () => {
+    modeEdit = true;
+    setKunciInput(false);
+    btnEdit.classList.add('d-none');
+    btnSimpan.classList.remove('d-none');
+});
+
+// Klik: Simpan Pengaturan → Kirim ke server
+btnSimpan.addEventListener('click', async () => {
+    const data = {
+        jam_masuk: document.getElementById('jam_masuk').value,
+        batas_terlambat: document.getElementById('batas_terlambat').value,
+        jam_tutup_absensi: document.getElementById('jam_tutup_absensi').value, // ✅ BARU
+        jam_pulang: document.getElementById('jam_pulang').value,
+        jam_masuk_jumat: document.getElementById('jam_masuk_jumat').value,
+        jam_pulang_jumat: document.getElementById('jam_pulang_jumat').value
+    };
+
+    try {
+        const res = await fetch("{{ url_for('monitoring_absensi.simpan_pengaturan_jam') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const hasil = await res.json();
+        if (hasil.status === 'sukses') {
+            alert('✅ Pengaturan berhasil disimpan!');
+            modeEdit = false;
+            setKunciInput(true);
+            btnSimpan.classList.add('d-none');
+            btnEdit.classList.remove('d-none');
+        } else {
+            alert('❌ Gagal: ' + hasil.pesan);
+        }
+    } catch (err) {
+        alert('❌ Kesalahan jaringan: ' + err.message);
+    }
+});
 </script>
 
 {% endblock %}
@@ -768,5 +928,6 @@ async function prosesHasilScan(qr_teks) {
     .qr-info-baris { flex-direction: column; gap: 0.25rem; text-align: center; }
     .qr-info-nilai { text-align: right; width: 100%; }
 }
+
 </style>
 {% endblock %}

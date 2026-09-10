@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import UniqueConstraint, CheckConstraint
-from datetime import datetime, date
+from datetime import datetime, date, time
 from sqlalchemy import String
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -805,3 +805,58 @@ class GajiGuru(db.Model):
 
     def __repr__(self):
         return f"<GajiGuru {self.guru.nama} - {self.bulan}/{self.tahun}: Rp {self.gaji_bersih:,}>"
+
+# ==========================================
+# ✅ TABEL 1: PENGATURAN JAM KERJA ABSENSI
+# Menyimpan jam masuk, terlambat, pulang standar & khusus Jumat
+# ==========================================
+class PengaturanJamKerja(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jam_masuk = db.Column(db.Time, nullable=True)
+    batas_terlambat = db.Column(db.Time, nullable=True)       # ✅ SERAGAM: batas_terlambat
+    jam_tutup_absensi = db.Column(db.Time, nullable=True)
+    jam_pulang = db.Column(db.Time, nullable=True)
+    jam_masuk_jumat = db.Column(db.Time, nullable=True)
+    jam_pulang_jumat = db.Column(db.Time, nullable=True)
+    diperbarui_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    diperbarui_oleh = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    
+    @staticmethod
+    def ambil_atau_buat():
+        obj = PengaturanJamKerja.query.order_by(PengaturanJamKerja.id.desc()).first()
+        if not obj:
+            from datetime import time
+            obj = PengaturanJamKerja(
+                jam_masuk=time(7, 15),
+                batas_terlambat=time(7, 30),       # ✅ SAMA: batas_terlambat
+                jam_tutup_absensi=time(9, 0),
+                jam_pulang=time(15, 0),
+                jam_masuk_jumat=time(7, 0),
+                jam_pulang_jumat=time(11, 30)
+            )
+            db.session.add(obj)
+            db.session.commit()
+        return obj
+    
+# ==========================================
+# ✅ TABEL 2: TANGGAL PENGECUALIAN
+# Untuk hari tertentu pulang lebih awal karena kegiatan
+# ==========================================
+class TanggalPengecualian(db.Model):
+    __tablename__ = 'tanggal_pengecualian'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    tanggal = db.Column(db.Date, nullable=False, unique=True)
+    
+    jam_masuk = db.Column(db.Time, nullable=False)
+    jam_pulang = db.Column(db.Time, nullable=False)
+    
+    keterangan = db.Column(db.String(200), nullable=True)  # misal: "Upacara", "Kegiatan Sekolah"
+    dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (
+        db.UniqueConstraint('tanggal', name='_tanggal_pengecualian_unik'),
+    )
+    
+    def __repr__(self):
+        return f"<Pengecualian {self.tanggal} Pulang={self.jam_pulang} — {self.keterangan}>"
