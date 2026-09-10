@@ -23,26 +23,21 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False  # ← UBAH KE True JIKA PAKAI HTTPS
 
 # =========================================================
-# ✅ KUNCI UTAMA: PILIH NAMA COOKIE SEBELUM FLASK BACA SESI
+# ✅ CARA AMAN: GANTI NAMA COOKIE SEBELUM SESI DIPAKAI
 # =========================================================
-class SesuaiSubdomainMiddleware:
-    def __init__(self, app):
-        self.app = app
+from flask.sessions import SecureCookieSessionInterface
 
-    def __call__(self, environ, start_response):
-        host = environ.get('HTTP_HOST', '').lower()
+class SesuaiSubdomainSessionInterface(SecureCookieSessionInterface):
+    def get_cookie_name(self, app):
+        host = request.host.lower()
         if host.startswith('absensi.'):
-            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_absensi'
+            return 'sesi_absensi'
         elif host.startswith('school.'):
-            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_sekolah'
-        else:
-            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_umum'
-        return self.app(environ, start_response)
+            return 'sesi_sekolah'
+        return 'sesi_umum'
 
-# Pasang middleware — ini yang memisahkan sesi
-app.wsgi_app = SesuaiSubdomainMiddleware(app)
-
-# ❌ HAPUS FUNGSI atur_nama_cookie_sesi() YANG LAMA — SUDAH DIGANTI DI ATAS
+# Pasang antarmuka sesi khusus — ini yang memisahkan sesi
+app.session_interface = SesuaiSubdomainSessionInterface()
 
 # ✅ Daftarkan filter ke Jinja
 app.jinja_env.filters['number_format'] = number_format
@@ -116,8 +111,7 @@ def sebelum_permintaan():
     # DEBUG
     # =========================================================
     print(f"[DEBUG] host={request.host}")
-    print(f"[DEBUG] cookie_nama={app.config['SESSION_COOKIE_NAME']}")
-    print(f"[DEBUG] g.sistem_mode={g.sistem_mode}")
+    print(f"[DEBUG] sistem_mode={g.sistem_mode}")
     print(f"[DEBUG] logged_in={session.get('logged_in')}")
     print(f"[DEBUG] absensi_logged_in={session.get('absensi_logged_in')}")
     print(f"[DEBUG] sudah_login={sudah_login}")
