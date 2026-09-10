@@ -1,13 +1,41 @@
 from flask import Flask, request, g, session, flash, url_for, redirect
+
 from config import Config
+
 from models import db, TahunPelajaran
+
 from flask_migrate import Migrate
+
 # ✅ Impor filter
 from routes import number_format
 
 app = Flask(__name__)
+
 app.config.from_object(Config)
-app.secret_key = 'ganti_dengan_kunci_rahasia_yang_kuat_dan_acak'
+
+# =========================================================
+# 🔑 KONFIGURASI SESI PISAH BERDASARKAN SUBDOMAIN
+# =========================================================
+app.secret_key = 'ganti_dengan_kunci_rahasia_yang_kuat_dan_acak'  # ⚠️ WAJIB GANTI!
+
+# Domain utama — berlaku untuk semua subdomain
+app.config['SESSION_COOKIE_DOMAIN'] = ".smpuhamzanwadi.sch.id"
+app.config['SESSION_COOKIE_PATH'] = "/"
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# Ubah ke True jika sudah pakai HTTPS di produksi
+app.config['SESSION_COOKIE_SECURE'] = False  # ← UBAH KE True JIKA PAKAI HTTPS
+
+# ✅ OTOMATIS PILIH NAMA COOKIE BERDASARKAN SUBDOMAIN
+@app.before_request
+def atur_nama_cookie_sesi():
+    host = request.host.lower()
+    if host.startswith('absensi.'):
+        app.config['SESSION_COOKIE_NAME'] = 'sesi_absensi'
+    elif host.startswith('school.'):
+        app.config['SESSION_COOKIE_NAME'] = 'sesi_sekolah'
+    else:
+        app.config['SESSION_COOKIE_NAME'] = 'sesi_umum'
 
 # ✅ Daftarkan filter ke Jinja
 app.jinja_env.filters['number_format'] = number_format
@@ -17,36 +45,34 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # ==========================================
-# 🔍 DETEKSI DOMAIN + LOGIKA TAHUN PELAJARAN + CEK LOGIN
+# 🔍 DETEKSI SISTEM — DARI SUBDOMAIN DULU
 # ==========================================
 @app.before_request
 def sebelum_permintaan():
-
     # =========================================================
     # LEWATI STATIC
     # =========================================================
     if request.path.startswith("/static"):
         return
 
+    # =========================================================
+    # ✅ TENTUKAN SISTEM DARI SUBDOMAIN (LEBIH UTAMA DARI PATH)
+    # =========================================================
+    host = request.host.lower()
 
-    # =========================================================
-    # TENTUKAN SISTEM YANG SEDANG DIAKSES
-    # =========================================================
-    if request.path.startswith('/monitoring-absensi'):
-        g.sistem_mode = 'sekolah'
-    elif (
-        request.path.startswith('/absensi-guru')
-        or request.path.startswith('/login-absensi')
-        or request.path.startswith('/logout-absensi')
-    ):
+    if host.startswith('absensi.'):
         g.sistem_mode = 'absensi'
-    else:
+    elif host.startswith('school.'):
         g.sistem_mode = 'sekolah'
-
+    else:
+        # Fallback: deteksi dari path jika bukan subdomain
+        if request.path.startswith('/absensi-guru') or request.path.startswith('/login-absensi') or request.path.startswith('/logout-absensi'):
+            g.sistem_mode = 'absensi'
+        else:
+            g.sistem_mode = 'sekolah'
 
     # =========================================================
-    # HALAMAN LOGIN / LOGOUT
-    # TIDAK PERLU CEK LOGIN
+    # HALAMAN LOGIN / LOGOUT — TIDAK PERLU CEK LOGIN
     # =========================================================
     if request.path in [
         '/login',
@@ -54,138 +80,65 @@ def sebelum_permintaan():
         '/proses-login',
         '/logout-absensi'
     ]:
-
         if g.sistem_mode == 'absensi':
-
-            aktif = TahunPelajaran.query.filter_by(
-                aktif=True
-            ).first()
-
-            g.tahun_pelajaran = (
-                aktif.kode
-                if aktif
-                else "2025/2026"
-            )
-
+            aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+            g.tahun_pelajaran = aktif.kode if aktif else "2025/2026"
         else:
-
             if "tahun_pelajaran" not in session:
-
-                aktif = TahunPelajaran.query.filter_by(
-                    aktif=True
-                ).first()
-
-                session["tahun_pelajaran"] = (
-                    aktif.kode
-                    if aktif
-                    else "2025/2026"
-                )
-
+                aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+                session["tahun_pelajaran"] = aktif.kode if aktif else "2025/2026"
             g.tahun_pelajaran = session["tahun_pelajaran"]
-
         return
-
 
     # =========================================================
     # CEK SESI SESUAI SISTEM
     # =========================================================
     if g.sistem_mode == 'absensi':
-
         sudah_login = (
             session.get('absensi_logged_in') is True
-            and
-            session.get('absensi_sistem_mode') == 'absensi'
-            and
-            session.get('absensi_user_id') is not None
+            and session.get('absensi_sistem_mode') == 'absensi'
+            and session.get('absensi_user_id') is not None
         )
-
     else:
-
         sudah_login = (
             session.get('logged_in') is True
-            and
-            session.get('sistem_mode') == 'sekolah'
-            and
-            session.get('user_id') is not None
+            and session.get('sistem_mode') == 'sekolah'
+            and session.get('user_id') is not None
         )
-
 
     # =========================================================
     # DEBUG
     # =========================================================
+    print(f"[DEBUG] host={request.host}")
     print(f"[DEBUG] path={request.path}")
     print(f"[DEBUG] g.sistem_mode={g.sistem_mode}")
-
     print(f"[DEBUG] logged_in={session.get('logged_in')}")
-    print(f"[DEBUG] sistem_mode={session.get('sistem_mode')}")
-    print(f"[DEBUG] user_id={session.get('user_id')}")
-
     print(f"[DEBUG] absensi_logged_in={session.get('absensi_logged_in')}")
-    print(f"[DEBUG] absensi_sistem_mode={session.get('absensi_sistem_mode')}")
-    print(f"[DEBUG] absensi_user_id={session.get('absensi_user_id')}")
-    print(f"[DEBUG] absensi_guru_id={session.get('absensi_guru_id')}")
-
     print(f"[DEBUG] sudah_login={sudah_login}")
 
-
     # =========================================================
-    # JIKA BELUM LOGIN
+    # JIKA BELUM LOGIN → ARAHKAN KE LOGIN SESUAI SUBDOMAIN
     # =========================================================
     if not sudah_login:
-
         if g.sistem_mode == 'absensi':
-
-            flash(
-                'Silakan login terlebih dahulu untuk sistem absensi.',
-                'absensi_warning'
-            )
-
-            return redirect(
-                url_for('absensi.login_absensi')
-            )
-
+            flash('Silakan login terlebih dahulu untuk sistem absensi.', 'absensi_warning')
+            return redirect(url_for('absensi.login_absensi'))
         else:
-
-            flash(
-                'Silakan login terlebih dahulu untuk sistem utama.',
-                'warning'
-            )
-
-            return redirect(
-                url_for('login.halaman_login')
-            )
-
+            flash('Silakan login terlebih dahulu untuk sistem utama.', 'warning')
+            return redirect(url_for('login.halaman_login'))
 
     # =========================================================
     # SET TAHUN PELAJARAN
     # =========================================================
     if g.sistem_mode == 'absensi':
-
-        aktif = TahunPelajaran.query.filter_by(
-            aktif=True
-        ).first()
-
-        g.tahun_pelajaran = (
-            aktif.kode
-            if aktif
-            else "2025/2026"
-        )
-
+        aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+        g.tahun_pelajaran = aktif.kode if aktif else "2025/2026"
     else:
-
         if "tahun_pelajaran" not in session:
-
-            aktif = TahunPelajaran.query.filter_by(
-                aktif=True
-            ).first()
-
-            session["tahun_pelajaran"] = (
-                aktif.kode
-                if aktif
-                else "2025/2026"
-            )
-
+            aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+            session["tahun_pelajaran"] = aktif.kode if aktif else "2025/2026"
         g.tahun_pelajaran = session["tahun_pelajaran"]
+
 
 # ==========================================
 # 📋 IMPOR & DAFTARKAN SEMUA BLUEPRINT
@@ -212,7 +165,7 @@ from routes.sections.tu.laporan_administrasi import laporan_admin_bp
 from routes.sections.admin.dashboard_admin import dashboard_admin_bp
 from routes.sections.bendahara.bendahara import bendahara_bp
 
-# --- ✅ BLUEPRINT BARU: SISTEM ABSENSI GURU ---
+# --- ✅ BLUEPRINT SISTEM ABSENSI GURU ---
 from routes.absensi.absensi import absensi_bp
 from routes.absensi.absensi_guru import absensi_guru_bp
 from routes.absensi.monitoring_absensi import monitoring_bp

@@ -4,7 +4,6 @@ from models import db, User
 
 login_bp = Blueprint('login', __name__)
 
-
 @login_bp.route('/')
 @login_bp.route('/login')
 def halaman_login():
@@ -14,22 +13,16 @@ def halaman_login():
         session.get('sistem_mode') == 'sekolah' and
         session.get('user_id')
     ):
-
         if session.get('role') == "Admin":
             return redirect(url_for('dev.index'))
-
         elif session.get('role') == "Guru":
             return redirect(url_for('dashboard_guru.halaman_dashboard_guru'))
-
         else:
             return redirect(url_for('dashboard.index'))
-
     return render_template('login.html')
-
 
 @login_bp.route('/proses-login', methods=['POST'])
 def proses_login():
-
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
 
@@ -37,11 +30,8 @@ def proses_login():
     # LOGIN ADMIN DEV
     # =========================================================
     if username == "adm1n" and password == "dev123":
-
-        # HAPUS HANYA SESI SISTEM SEKOLAH
-        for key in list(session.keys()):
-            if not key.startswith('absensi_'):
-                session.pop(key, None)
+        # ✅ SESI SUDAH TERPISAH → CUKUP CLEAR SAJA
+        session.clear()
 
         # SIMPAN SESI SEKOLAH
         session['logged_in'] = True
@@ -55,24 +45,19 @@ def proses_login():
         session['daftar_tugas'] = ["Admin Sistem"]
         session['user_initials'] = "AD"
         session['halaman_aktif'] = 'utama'
-
         flash('Login berhasil sebagai Admin Dev', 'success')
-
         return redirect(url_for('dev.index'))
 
     # =========================================================
     # LOGIN USER BIASA
     # =========================================================
     user = User.query.filter_by(username=username).first()
-
     if user and user.aktif and check_password_hash(
         user.password_hash,
         password
     ):
-
-        for key in list(session.keys()):
-            if not key.startswith('absensi_'):
-                session.pop(key, None)
+        # ✅ SESI SUDAH TERPISAH → CUKUP CLEAR SAJA
+        session.clear()
 
         # SIMPAN SESI SEKOLAH
         session['logged_in'] = True
@@ -91,48 +76,31 @@ def proses_login():
         )
         session['halaman_aktif'] = 'utama'
 
-        # INITIAL USER
+        # INISIAL NAMA
         if user.guru:
-
             nama_pisah = user.guru.nama.split()
-
             session['user_initials'] = (
                 (nama_pisah[0][0] + nama_pisah[-1][0]).upper()
                 if len(nama_pisah) >= 2
                 else nama_pisah[0][0].upper()
             )
-
         else:
             session['user_initials'] = "US"
 
         flash('Login berhasil! Selamat datang.', 'success')
-
         if user.jabatan == "Guru":
-            return redirect(
-                url_for('dashboard_guru.halaman_dashboard_guru')
-            )
-
+            return redirect(url_for('dashboard_guru.halaman_dashboard_guru'))
         else:
-            return redirect(
-                url_for('dashboard.index')
-            )
+            return redirect(url_for('dashboard.index'))
 
     flash('Username atau kata sandi salah!', 'danger')
-
-    return redirect(
-        url_for('login.halaman_login')
-    )
+    return redirect(url_for('login.halaman_login'))
 
 # =========================================================
 # LOGOUT SISTEM SEKOLAH
 # =========================================================
 @login_bp.route('/logout')
 def logout():
-
-    for key in list(session.keys()):
-        if not key.startswith('absensi_'):
-            session.pop(key, None)
-
-    return redirect(
-        url_for('login.halaman_login')
-    )
+    # ✅ HAPUS SESI SEKOLAH SAJA — TIDAK MENGGANGGU SESI ABSENSI
+    session.clear()
+    return redirect(url_for('login.halaman_login'))
