@@ -15,7 +15,14 @@ app.config.from_object(Config)
 app.secret_key = 'ganti_dengan_kunci_rahasia_yang_kuat_dan_acak'
 
 # Domain utama — berlaku untuk semua subdomain
-app.config['SESSION_COOKIE_DOMAIN'] = ".smpuhamzanwadi.sch.id"
+@app.before_request
+def atur_domain_sesi():
+    host = request.host.lower()
+    if host.endswith('.smpuhamzanwadi.sch.id'):
+        app.config['SESSION_COOKIE_DOMAIN'] = ".smpuhamzanwadi.sch.id"
+    else:
+        # Saat akses dari IP / localhost — TANPA domain khusus
+        app.config['SESSION_COOKIE_DOMAIN'] = None
 app.config['SESSION_COOKIE_PATH'] = "/"
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'

@@ -7,7 +7,6 @@ login_bp = Blueprint('login', __name__)
 @login_bp.route('/')
 @login_bp.route('/login')
 def halaman_login():
-    # CEK SESI SISTEM SEKOLAH SAJA
     if (
         session.get('logged_in') is True and
         session.get('sistem_mode') == 'sekolah' and
@@ -30,10 +29,9 @@ def proses_login():
     # LOGIN ADMIN DEV
     # =========================================================
     if username == "adm1n" and password == "dev123":
-        # ✅ SESI SUDAH TERPISAH → CUKUP CLEAR SAJA
+
         session.clear()
 
-        # SIMPAN SESI SEKOLAH
         session['logged_in'] = True
         session['sistem_mode'] = 'sekolah'
         session['user_id'] = 1
