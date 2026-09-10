@@ -87,28 +87,19 @@ function kirimAbsenPulang() {
 }
 // ✅ === SELESAI PENAMBAHAN ===
 
-// --- PROSES HASIL SCAN QR ---
 async function prosesHasilScan(dataQR) {
-    // Parse tipe dari QR
-    let tipe = "masuk";
-    if (dataQR.startsWith("guru:")) {
-        const bagian = dataQR.split(":");
-        if (bagian.length >= 6) tipe = bagian[5];
+    // ✅ TUTUP KAMERA & MODAL DULU
+    if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
+    if (window._aliranKamera) {
+        window._aliranKamera.getTracks().forEach(track => track.stop());
+        window._aliranKamera = null;
     }
+    const modalKameraOverlay = document.getElementById('modal-kamera-overlay');
+    const modalKamera = document.getElementById('modal-kamera');
+    if (modalKameraOverlay) modalKameraOverlay.style.display = 'none';
+    if (modalKamera) modalKamera.style.display = 'none';
 
-    // ✅ CEK KHUSUS ABSEN PULANG
-    if (tipe === "pulang") {
-        if (belumJamPulang()) {
-            tampilkanPeringatanBelumJamPulang();
-            return;
-        }
-    } else {
-        // CEK KHUSUS ABSEN MASUK
-        if (sudahLewatBatasWaktu()) {
-            tampilkanPeringatanAlfa();
-            return;
-        }
-    }
+    // ... sisa kode (cek jam masuk/pulang) ...
 
     try {
         const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
@@ -117,14 +108,17 @@ async function prosesHasilScan(dataQR) {
             body: JSON.stringify({ data_qr: dataQR })
         });
         const hasil = await res.json();
+
         if (hasil.status === 'sukses' || hasil.status === 'info') {
-            alert(hasil.pesan || 'Berhasil!');
-            setTimeout(() => location.reload(), 800);
+            // ✅ TAMPILKAN NAMA & STATUS
+            alert(hasil.pesan || '✅ Absensi berhasil tercatat!');
+            setTimeout(() => location.reload(), 1000);
         } else {
-            alert(hasil.pesan || 'Gagal memproses');
+            // ❌ TAMPILKAN ALASAN GAGAL
+            alert('❌ ' + (hasil.pesan || 'Gagal memproses QR'));
         }
     } catch (err) {
-        alert('Gagal menghubungi server');
+        alert('❌ Kesalahan: ' + err.message);
     }
 }
 

@@ -354,10 +354,17 @@ function pindaiBingkai() {
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     const gambar = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const kode = jsQR.decodeQRFromImage(gambar.data, gambar.width, gambar.height);
-    if (kode) {
+
+    // ✅ Pastikan library ada
+    if (!window.jsQR) {
+        requestAnimationFrame(pindaiBingkai);
+        return;
+    }
+
+    const hasilQR = window.jsQR(gambar);
+    if (hasilQR && hasilQR.data) {
         pemindaianAktif = false;
-        prosesHasilScan(kode);
+        prosesHasilScan(hasilQR.data);
     } else {
         requestAnimationFrame(pindaiBingkai);
     }
@@ -365,16 +372,27 @@ function pindaiBingkai() {
 
 async function prosesHasilScan(qr_teks) {
     document.getElementById('kamera-status').textContent = '✅ QR Terdeteksi! Memproses...';
-    const res = await fetch("{{ url_for('absensi_guru.scan_qr_proses') }}", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'qr_data=' + encodeURIComponent(qr_teks)
-    });
-    const hasil = await res.json();
-    alert(hasil.pesan || hasil.message);
-    tutupModalKamera();
-    if (hasil.sukses || hasil.success) {
-        window.location.reload();
+
+    try {
+        const res = await fetch("{{ url_for('absensi_guru.scan_qr_proses') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data_qr: qr_teks }) // ✅ Kirim JSON
+        });
+
+        const hasil = await res.json();
+
+        // ✅ TAMPILKAN PESAN JELAS
+        alert(hasil.pesan || hasil.message || 'Tidak ada pesan dari server');
+
+        tutupModalKamera(); // ✅ TUTUP OTOMATIS
+
+        if (hasil.status === 'sukses' || hasil.sukses || hasil.success) {
+            setTimeout(() => window.location.reload(), 800); // ✅ REFRESH
+        }
+    } catch (err) {
+        alert('❌ Kesalahan jaringan: ' + err.message);
+        tutupModalKamera();
     }
 }
 </script>

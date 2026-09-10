@@ -297,36 +297,29 @@ def export_monitoring():
 
 # ==================================================
 # ✅ BUAT QR ABSENSI — BERLAKU UNTUK SEMUA GURU
-# Format: semua_guru:tanggal:{TGL}:tipe:{jenis}:pembuat:admin
 # ==================================================
-# ==============================================
-# ✅ BUAT QR ABSENSI — 1 QR UNTUK MASUK & PULANG
-# Format: semua_guru:tanggal:{YYYY-MM-DD}:pembuat:admin
-# Tipe ditentukan OTOMATIS dari jam saat scan:
-#   < 15:00 → MASUK  /  ≥ 15:00 → PULANG
-# ==============================================
+# ==================================================
+# ✅ BUAT QR ABSENSI — BERLAKU UNTUK SEMUA GURU
+# ==================================================
 @monitoring_bp.route('/buat-qr-semua-guru', methods=['POST'])
 def buat_qr_semua_guru():
-    """Buat 1 QR berlaku untuk SEMUA guru — otomatis Masuk/Pulang berdasarkan jam scan"""
-    # ✅ CEK HAK AKSES
     boleh, alasan = cek_akses_monitoring()
     if not boleh:
         return jsonify({"status": "error", "pesan": "⚠️ Tidak memiliki izin"}), 403
-
     hari_ini = date.today()
     hari_ini_str = hari_ini.strftime("%Y-%m-%d")
-
-    # ✅ FORMAT QR — TANPA TIPE, SISTEM YANG MENENTUKAN
     data_qr = f"semua_guru:tanggal:{hari_ini_str}:pembuat:admin"
-
     qr_img = qrcode.make(data_qr)
     buffered = io.BytesIO()
     qr_img.save(buffered, format="PNG")
     qr_base64 = base64.b64encode(buffered.getvalue()).decode()
-
+    jam_sekarang = datetime.now().strftime("%H:%M")
+    info_tipe = "MASUK" if belum_jam_pulang() else "PULANG"
     return jsonify({
         "status": "sukses",
         "qr_code": qr_base64,
         "hari_ini": hari_ini_str,
-        "keterangan": "QR berlaku untuk Masuk & Pulang"
+        "jam_sekarang": jam_sekarang,
+        "tipe_qr": info_tipe,
+        "keterangan": f"QR berlaku otomatis: Sebelum 15:00=Masuk / Setelah 15:00=Pulang"
     })

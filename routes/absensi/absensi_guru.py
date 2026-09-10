@@ -474,7 +474,7 @@ def scan_qr_proses():
     hari_ini_date = waktu_wita().date()
     hari_ini_str = hari_ini_date.strftime("%Y-%m-%d")
 
-    # === CEK BATAS WAKTU ===
+    # === CEK BATAS WAKTU UNTUK ABSEN MASUK ===
     if sudah_lewat_batas_absensi():
         return jsonify({"status": "error", "pesan": "Sudah lewat jam 11:00. Absensi ditutup."}), 403
 
@@ -487,24 +487,24 @@ def scan_qr_proses():
     tanggal_qr = None
     pembuat_qr = None  # 'guru' atau 'admin'
 
-    # === PARSE DATA QR ===
+    # === ✅ PARSE QR DARI MONITORING: semua_guru:tanggal:{YYYY-MM-DD}:pembuat:admin ===
     if data_scan.startswith("semua_guru:tanggal:"):
-        # Format BARU: semua_guru:tanggal:{YYYY-MM-DD}:pembuat:admin
         bagian = data_scan.split(":")
+        # Format yang dibuat: "semua_guru:tanggal:2026-09-10:pembuat:admin"
         if len(bagian) >= 4:
-            tanggal_qr = bagian[2].strip()  # bagian[2] = tanggal
-            pembuat_qr = bagian[3].strip()   # bagian[3] = admin
-            guru_id = "SEMUA"  # Penanda: ambil dari sesi yang men-scan
+            tanggal_qr = bagian[2].strip()
+            pembuat_qr = bagian[3].strip()  # "admin"
+            guru_id = "SEMUA"  # Ambil dari sesi pengguna yang men-scan
 
-            # ✅ TENTUKAN TIPE OTOMATIS DARI JAM SAAT SCAN
+            # ✅ TENTUKAN TIPE OTOMATIS SESUAI JAM SAAT SCAN (WITA)
             jam_sekarang = waktu_wita()
             if jam_sekarang.hour < 15:
                 tipe = "masuk"
             else:
                 tipe = "pulang"
 
+    # === PARSE QR DARI HALAMAN ABSENSI GURU ===
     elif data_scan.startswith("guru:"):
-        # Format lama (per guru) tetap dipakai
         bagian = data_scan.split(":")
         if len(bagian) >= 8:
             guru_id = bagian[1]
@@ -516,8 +516,9 @@ def scan_qr_proses():
             tanggal_qr = bagian[3]
             tipe = bagian[5]
             pembuat_qr = 'guru'
+
+    # === FALLBACK: NIP GURU LANGSUNG ===
     else:
-        # Fallback NIP → dianggap QR dari Monitoring/Admin
         guru = Guru.query.filter_by(nip=data_scan).first()
         if guru:
             guru_id = guru.id
@@ -539,42 +540,38 @@ def scan_qr_proses():
         }), 403
 
     # ==============================================================
-    # 🔒 DETEKSI: DARI MODE APA SAAT INI SCAN DILAKUKAN
+    # 🔒 DETEKSI MODE SCAN
     # ==============================================================
-    # mode_saat_ini: 'mode_absensi' = halaman guru | 'mode_sekolah' = Admin/TU/Kepsek/Mesin
-    mode_saat_ini = 'mode_sekolah'  # Default: izinkan (untuk mesin pemindai)
-
+    mode_saat_ini = 'mode_sekolah'  # Default: izinkan mesin pemindai
     if session.get('absensi_logged_in') and session.get('absensi_sistem_mode') == 'absensi':
-        mode_saat_ini = 'mode_absensi'  # ✅ Dari halaman absensi guru
+        mode_saat_ini = 'mode_absensi'  # Dari halaman absensi guru
     elif session.get('logged_in') and session.get('sistem_mode') in ['sekolah', 'admin', 'kepala_sekolah', 'tu', 'monitoring']:
-        mode_saat_ini = 'mode_sekolah'  # ✅ Dari sistem utama sekolah
+        mode_saat_ini = 'mode_sekolah'  # Dari sistem utama sekolah
 
     # ==============================================================
     # 🔒 ATURAN 2: SIAPA BOLEH MEN-SCAN
     # ==============================================================
-
-    # === 🟦 QR DARI MONITORING/ADMIN ===
+    # === QR DARI MONITORING/ADMIN ===
     if pembuat_qr == 'admin':
-        # ❌ DITOLAK: discan dari mode sekolah itu sendiri
+        # ❌ DITOLAK: discan dari sistem sekolah itu sendiri
         if mode_saat_ini == 'mode_sekolah':
             return jsonify({
                 "status": "error",
                 "pesan": "❌ QR dari Monitoring hanya boleh discan dari Mode Absensi Guru."
             }), 403
-        # ✅ DIPERBOLEHKAN: dari mode absensi (semua guru siapa pun)
+        # ✅ DIPERBOLEHKAN: dari mode absensi guru
 
-    # === 🟩 QR DARI HALAMAN ABSENSI GURU ===
+    # === QR DARI HALAMAN ABSENSI GURU ===
     elif pembuat_qr == 'guru':
-        # ❌ DITOLAK: discan dari mode absensi (siapa pun)
+        # ❌ DITOLAK: discan dari mode absensi
         if mode_saat_ini == 'mode_absensi':
             return jsonify({
                 "status": "error",
                 "pesan": "❌ QR buatan halaman absensi hanya boleh discan dari Monitoring atau Mesin Pemindai."
             }), 403
-        # ✅ DIPERBOLEHKAN: dari mode sekolah/monitoring atau mesin
 
     # ==============================================================
-    # ✅ LULUS SEMUA CEK → LANJUT PROSES ABSENSI
+    # ✅ AMBIL GURU ID DARI SESI JIKA QR SEMUA_GURU
     # ==============================================================
     if guru_id == "SEMUA":
         if mode_saat_ini == 'mode_absensi' and session.get('absensi_guru_id'):
@@ -593,7 +590,7 @@ def scan_qr_proses():
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini_date).first()
 
     # ==============================================================
-    # 🔒 ATURAN 3: PULANG WAJIB SUDAH MASUK DULU
+    # 🔒 ATURAN 3: ABSEN PULANG WAJIB SUDAH ABSEN MASUK DULU
     # ==============================================================
     if tipe == "pulang":
         if belum_jam_pulang():
