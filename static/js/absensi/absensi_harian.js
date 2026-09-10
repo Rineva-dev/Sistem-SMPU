@@ -122,23 +122,27 @@ async function prosesHasilScan(dataQR) {
     }
 }
 
-// --- BACA QR DARI KAMERA (DENGAN INDIKASI VISUAL) ---
+// --- BACA QR DARI KAMERA ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
 
-    // ⛔ TUNGGU VIDEO SIAP & UKURAN VALID
+    // ⛔ TUNGGU VIDEO SIAP
     if (!videoKamera || videoKamera.readyState < 2 ||
         videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
         requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
         return;
     }
 
-    const konteks = kanvasPemindai.getContext('2d');
+    // ✅ SET UKURAN CANVAS SESUAI VIDEO
     kanvasPemindai.width = videoKamera.videoWidth;
     kanvasPemindai.height = videoKamera.videoHeight;
-    konteks.drawImage(videoKamera, 0, 0);
 
-    // Indikasi status pemindaian
+    // ✅ TAMBAH willReadFrequently: true ← HILANGKAN PERINGATAN CONSOLE
+    const konteks = kanvasPemindai.getContext('2d', { willReadFrequently: true });
+    
+    konteks.drawImage(videoKamera, 0, 0, kanvasPemindai.width, kanvasPemindai.height);
+
+    // Indikasi status
     const kameraStatus = document.getElementById('kamera-status');
     if (kameraStatus) {
         kameraStatus.textContent = '🔍 Sedang memindai... arahkan kode QR ke bingkai';
@@ -146,15 +150,41 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     }
 
     try {
-        const gambarData = konteks.getImageData(0, 0, kanvasPemindai.width, kanvasPemindai.height);
-
-        // ⛔ VALIDASI: pastikan data gambar cukup & ukuran wajar
-        if (gambarData.data.length < 100 || kanvasPemindai.width < 50 || kanvasPemindai.height < 50) {
+        // ✅ Pastikan jsQR sudah dimuat
+        if (!window.jsQR) {
+            if (kameraStatus) {
+                kameraStatus.textContent = '⏳ Menunggu pustaka pemindai...';
+                kameraStatus.style.color = '#f59e0b';
+            }
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
 
-        const kodeQR = window.jsQR ? window.jsQR(gambarData) : null;
+        // ✅ Baca area TENGAH saja agar lebih cepat & akurat
+        const lebar = kanvasPemindai.width;
+        const tinggi = kanvasPemindai.height;
+        const skala = 0.6; // baca 60% area tengah
+        const potongX = lebar * (1 - skala) / 2;
+        const potongY = tinggi * (1 - skala) / 2;
+        const potongLebar = lebar * skala;
+        const potongTinggi = tinggi * skala;
+
+        const gambarData = konteks.getImageData(
+            Math.floor(potongX), Math.floor(potongY),
+            Math.floor(potongLebar), Math.floor(potongTinggi)
+        );
+
+        // Validasi ukuran data
+        if (gambarData.data.length < 100 || gambarData.width < 50 || gambarData.height < 50) {
+            requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
+            return;
+        }
+
+        // ✅ Scan QR
+        const kodeQR = window.jsQR(gambarData.data, gambarData.width, gambarData.height, {
+            inversionAttempts: 'dontInvert' // opsi tambahan: 'attemptBoth' jika perlu
+        });
+
         if (kodeQR && kodeQR.data) {
             pemindaianAktifRef.value = false;
             if (kameraStatus) {
@@ -162,12 +192,13 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
                 kameraStatus.style.color = '#16a34a';
             }
             prosesHasilScan(kodeQR.data);
+            return;
         }
     } catch (e) {
-        // ⚠️ JANGAN tampilkan error berulang di konsol
-        // console.error('Kesalahan baca kanvas:', e);
+        // Diam saja, jangan spam console
     }
 
+    // Lanjut frame berikutnya
     requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
 }
 
