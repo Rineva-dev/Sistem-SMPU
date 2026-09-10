@@ -813,10 +813,12 @@ class GajiGuru(db.Model):
 class PengaturanJamKerja(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     jam_masuk = db.Column(db.Time, nullable=True)
-    batas_terlambat = db.Column(db.Time, nullable=True)       # ✅ SERAGAM: batas_terlambat
+    batas_terlambat = db.Column(db.Time, nullable=True)
     jam_tutup_absensi = db.Column(db.Time, nullable=True)
     jam_pulang = db.Column(db.Time, nullable=True)
     jam_masuk_jumat = db.Column(db.Time, nullable=True)
+    batas_terlambat_jumat = db.Column(db.Time, nullable=True)
+    jam_tutup_absensi_jumat = db.Column(db.Time, nullable=True)
     jam_pulang_jumat = db.Column(db.Time, nullable=True)
     diperbarui_pada = db.Column(db.DateTime, default=datetime.utcnow)
     diperbarui_oleh = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
@@ -827,11 +829,13 @@ class PengaturanJamKerja(db.Model):
         if not obj:
             from datetime import time
             obj = PengaturanJamKerja(
-                jam_masuk=time(7, 15),
-                batas_terlambat=time(7, 30),       # ✅ SAMA: batas_terlambat
+                jam_masuk=time(7, 0),
+                batas_terlambat=time(7, 15),
                 jam_tutup_absensi=time(9, 0),
                 jam_pulang=time(15, 0),
                 jam_masuk_jumat=time(7, 0),
+                batas_terlambat_jumat = time(7, 15),
+                jam_tutup_absensi_jumat = time(9, 0),
                 jam_pulang_jumat=time(11, 30)
             )
             db.session.add(obj)

@@ -91,25 +91,61 @@ def belum_jam_pulang():
     return jam_ke_menit(jam_sekarang) < jam_ke_menit(BATAS_PULANG)
 
 # === ✅ FUNGSI AMBIL JAM DARI PENGATURAN DATABASE ===
+# === ✅ FUNGSI AMBIL JAM — OTOMATIS BIASA / JUMAT ===
+
 def ambil_jam_pengaturan():
-    defaults = {
+    """
+    Mengembalikan jam kerja sesuai HARI INI:
+    - Senin–Kamis & Sabtu → jam biasa
+    - Jumat → jam khusus Jumat
+    - Kalau ada Hari Libur → bisa ditambahkan nanti
+    """
+    defaults_biasa = {
         'jam_masuk_tepat': '07:00',
-        'batas_terlambat': '07:15',   # ✅ BARU
+        'batas_terlambat': '07:15',
         'jam_tutup_absensi': '11:00',
         'jam_pulang_resmi': '15:00'
     }
+    defaults_jumat = {
+        'jam_masuk_tepat': '07:00',   # Sesuaikan jam Jumat sebenarnya
+        'batas_terlambat': '07:15',
+        'jam_tutup_absensi': '10:30',
+        'jam_pulang_resmi': '11:30'   # Jam pulang Jumat lebih awal
+    }
+
+    # 🔍 CEK HARI INI — WITA (jam sekolah)
+    hari_ini = waktu_wita().date()
+    hari_angka = hari_ini.weekday()  # 0=Senin, 1=Selasa, 2=Rabu, 3=Kamis, 4=Jumat, 5=Sabtu, 6=Minggu
+
+    # Pilih default sesuai hari
+    if hari_angka == 4:  # === HARI JUMAT ===
+        defaults = defaults_jumat
+    else:  # === HARI BIASA ===
+        defaults = defaults_biasa
+
     hasil = defaults.copy()
+
     try:
         pengaturan = PengaturanJamKerja.ambil_atau_buat()
+
         def ke_str(t, default_str):
             return t.strftime('%H:%M') if t else default_str
-        
-        hasil['jam_masuk_tepat'] = ke_str(pengaturan.jam_masuk, defaults['jam_masuk_tepat'])
-        hasil['batas_terlambat'] = ke_str(pengaturan.batas_terlambat, defaults['batas_terlambat'])  # ✅ BARU
-        hasil['jam_tutup_absensi'] = ke_str(pengaturan.jam_tutup_absensi, defaults['jam_tutup_absensi'])
-        hasil['jam_pulang_resmi'] = ke_str(pengaturan.jam_pulang, defaults['jam_pulang_resmi'])
+
+        # Baca dari database — bedakan jam biasa & jam Jumat
+        if hari_angka == 4:
+            hasil['jam_masuk_tepat'] = ke_str(getattr(pengaturan, 'jam_masuk_jumat', None), defaults['jam_masuk_tepat'])
+            hasil['batas_terlambat'] = ke_str(getattr(pengaturan, 'batas_terlambat_jumat', None), defaults['batas_terlambat'])
+            hasil['jam_tutup_absensi'] = ke_str(getattr(pengaturan, 'jam_tutup_absensi_jumat', None), defaults['jam_tutup_absensi'])
+            hasil['jam_pulang_resmi'] = ke_str(getattr(pengaturan, 'jam_pulang_jumat', None), defaults['jam_pulang_resmi'])
+        else:
+            hasil['jam_masuk_tepat'] = ke_str(pengaturan.jam_masuk, defaults['jam_masuk_tepat'])
+            hasil['batas_terlambat'] = ke_str(pengaturan.batas_terlambat, defaults['batas_terlambat'])
+            hasil['jam_tutup_absensi'] = ke_str(pengaturan.jam_tutup_absensi, defaults['jam_tutup_absensi'])
+            hasil['jam_pulang_resmi'] = ke_str(pengaturan.jam_pulang, defaults['jam_pulang_resmi'])
+
     except Exception:
         pass
+
     return hasil
 
 # ==============================================

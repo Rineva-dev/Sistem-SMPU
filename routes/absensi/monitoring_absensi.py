@@ -204,6 +204,8 @@ def monitoring_absensi():
     DEFAULT_JAM_TUTUP_ABSENSI = "11:00"
     DEFAULT_JAM_PULANG = "15:00"
     DEFAULT_JAM_MASUK_JUMAT = "07:00"
+    DEFAULT_BATAS_TERLAMBAT_JUMAT = "07:15"
+    DEFAULT_JAM_TUTUP_ABSENSI_JUMAT = "09:00"
     DEFAULT_JAM_PULANG_JUMAT = "11:30"
 
     def ke_str(t, default):
@@ -231,6 +233,8 @@ def monitoring_absensi():
         jam_tutup_absensi=ke_str(pengaturan.jam_tutup_absensi, DEFAULT_JAM_TUTUP_ABSENSI),
         jam_pulang=ke_str(pengaturan.jam_pulang, DEFAULT_JAM_PULANG),
         jam_masuk_jumat=ke_str(pengaturan.jam_masuk_jumat, DEFAULT_JAM_MASUK_JUMAT),
+        batas_terlambat_jumat=ke_str(pengaturan.batas_terlambat_jumat, DEFAULT_BATAS_TERLAMBAT_JUMAT),
+        jam_tutup_absensi_jumat=ke_str(pengaturan.jam_tutup_absensi_jumat, DEFAULT_JAM_TUTUP_ABSENSI_JUMAT),
         jam_pulang_jumat=ke_str(pengaturan.jam_pulang_jumat, DEFAULT_JAM_PULANG_JUMAT),
 
     )
@@ -367,6 +371,8 @@ def simpan_pengaturan_jam():
     pengaturan.jam_tutup_absensi = ke_waktu(data.get('jam_tutup_absensi')) or pengaturan.jam_tutup_absensi  # ✅ BARU
     pengaturan.jam_pulang = ke_waktu(data.get('jam_pulang')) or pengaturan.jam_pulang
     pengaturan.jam_masuk_jumat = ke_waktu(data.get('jam_masuk_jumat')) or pengaturan.jam_masuk_jumat
+    pengaturan.batas_terlambat_jumat = ke_waktu(data.get('batas_terlambat_jumat')) or pengaturan.batas_terlambat_jumat  # ✅ BARU
+    pengaturan.jam_tutup_absensi_jumat = ke_waktu(data.get('jam_tutup_absensi_jumat')) or pengaturan.jam_tutup_absensi_jumat  # ✅ BARU
     pengaturan.jam_pulang_jumat = ke_waktu(data.get('jam_pulang_jumat')) or pengaturan.jam_pulang_jumat
 
     # Catat siapa yang mengubah
@@ -395,6 +401,8 @@ def ambil_pengaturan_jam():
     DEFAULT_JAM_TUTUP_ABSENSI = "11:00"
     DEFAULT_JAM_PULANG = "15:00"
     DEFAULT_JAM_MASUK_JUMAT = "07:00"
+    DEFAULT_BATAS_TERLAMBAT_JUMAT = "07:15"
+    DEFAULT_JAM_TUTUP_ABSENSI_JUMAT = "09:00"
     DEFAULT_JAM_PULANG_JUMAT = "11:30"
     
     # Ubah format time ke string "HH:MM" untuk tampilan HTML
@@ -408,5 +416,7 @@ def ambil_pengaturan_jam():
         "jam_tutup_absensi": ke_str(pengaturan.jam_tutup_absensi, DEFAULT_JAM_TUTUP_ABSENSI),
         "jam_pulang": ke_str(pengaturan.jam_pulang, DEFAULT_JAM_PULANG),
         "jam_masuk_jumat": ke_str(pengaturan.jam_masuk_jumat, DEFAULT_JAM_MASUK_JUMAT),
+        "batas_terlambat_jumat": ke_str(pengaturan.batas_terlambat_jumat, DEFAULT_BATAS_TERLAMBAT_JUMAT),
+        "jam_tutup_absensi_jumat": ke_str(pengaturan.jam_tutup_absensi_jumat, DEFAULT_JAM_TUTUP_ABSENSI_JUMAT),
         "jam_pulang_jumat": ke_str(pengaturan.jam_pulang_jumat, DEFAULT_JAM_PULANG_JUMAT),
     })

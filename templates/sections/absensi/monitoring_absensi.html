@@ -79,11 +79,21 @@
             {# === TAB 2: KHUSUS HARI JUMAT === #}
             <div class="tab-pane fade" id="panel-jumat" role="tabpanel">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label class="form-label">🕖 Jam Masuk Jumat</label>
                         <input type="time" id="jam_masuk_jumat" class="form-control" value="{{ jam_masuk_jumat }}" disabled>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <label class="form-label">⚠️ Batas Terlambat</label>
+                        <input type="time" id="batas_terlambat_jumat" class="form-control" value="{{ batas_terlambat_jumat }}" disabled>
+                        <small class="text-muted">Maksimal terlambat 15 menit</small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">🔒 Batas Akhir Absen</label>
+                        <input type="time" id="jam_tutup_absensi_jumat" class="form-control" value="{{ jam_tutup_absensi_jumat }}" disabled>
+                        <small class="text-muted">Tidak bisa absen setelah jam ini</small>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label">🏠 Jam Pulang Hari Jumat</label>
                         <input type="time" id="jam_pulang_jumat" class="form-control" value="{{ jam_pulang_jumat }}" disabled>
                     </div>
@@ -502,6 +512,8 @@ const elemenInputJam = [
     document.getElementById('jam_tutup_absensi'),  // ✅ BARU
     document.getElementById('jam_pulang'),
     document.getElementById('jam_masuk_jumat'),
+    document.getElementById('batas_terlambat_jumat'),
+    document.getElementById('jam_tutup_absensi_jumat'),
     document.getElementById('jam_pulang_jumat'),
     document.getElementById('btn-tambah-pengecualian')
 ];
@@ -532,6 +544,8 @@ btnSimpan.addEventListener('click', async () => {
         jam_tutup_absensi: document.getElementById('jam_tutup_absensi').value, // ✅ BARU
         jam_pulang: document.getElementById('jam_pulang').value,
         jam_masuk_jumat: document.getElementById('jam_masuk_jumat').value,
+        batas_terlambat_jumat: document.getElementById('batas_terlambat_jumat').value,
+        jam_tutup_absensi_jumat: document.getElementById('jam_tutup_absensi_jumat').value,
         jam_pulang_jumat: document.getElementById('jam_pulang_jumat').value
     };
 
