@@ -125,36 +125,49 @@ async function prosesHasilScan(dataQR) {
 // --- BACA QR DARI KAMERA (DENGAN INDIKASI VISUAL) ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
+
+    // ⛔ TUNGGU VIDEO SIAP & UKURAN VALID
+    if (!videoKamera || videoKamera.readyState < 2 ||
+        videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
+        requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
+        return;
+    }
+
     const konteks = kanvasPemindai.getContext('2d');
     kanvasPemindai.width = videoKamera.videoWidth;
     kanvasPemindai.height = videoKamera.videoHeight;
     konteks.drawImage(videoKamera, 0, 0);
 
-    // === TAMBAHAN: INDIKASI SEDANG MEMINDAI ===
+    // Indikasi status pemindaian
     const kameraStatus = document.getElementById('kamera-status');
     if (kameraStatus) {
         kameraStatus.textContent = '🔍 Sedang memindai... arahkan kode QR ke bingkai';
         kameraStatus.style.color = '#2563eb';
     }
-    // =========================================
 
     try {
         const gambarData = konteks.getImageData(0, 0, kanvasPemindai.width, kanvasPemindai.height);
-        const kodeQR = window.jsQR ? window.jsQR(gambarData) : null;
 
+        // ⛔ VALIDASI: pastikan data gambar cukup & ukuran wajar
+        if (gambarData.data.length < 100 || kanvasPemindai.width < 50 || kanvasPemindai.height < 50) {
+            requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
+            return;
+        }
+
+        const kodeQR = window.jsQR ? window.jsQR(gambarData) : null;
         if (kodeQR && kodeQR.data) {
-            // === QR TERDETEKSI: UBAH INDIKASI DULU ===
             pemindaianAktifRef.value = false;
             if (kameraStatus) {
                 kameraStatus.textContent = '✅ QR Terdeteksi! Memproses...';
                 kameraStatus.style.color = '#16a34a';
             }
-            // =======================================
             prosesHasilScan(kodeQR.data);
         }
     } catch (e) {
-        console.error('Kesalahan baca kanvas:', e);
+        // ⚠️ JANGAN tampilkan error berulang di konsol
+        // console.error('Kesalahan baca kanvas:', e);
     }
+
     requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
 }
 

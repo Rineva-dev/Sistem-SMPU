@@ -379,24 +379,25 @@
 <!-- ✅ MODAL KAMERA SCAN QR -->
 <div id="modal-kamera-overlay" class="modal-overlay"></div>
 <div id="modal-kamera" class="modal-card">
-    <div class="modal-header">
-        <div class="modal-icon green">
-            <i class="fas fa-camera"></i>
-        </div>
-        <div class="modal-header-content">
-            <h4>Scan QR Absen</h4>
-            <p><span id="kamera-status">Memindai...</span></p>
-        </div>
+  <div class="modal-header">
+    <div class="modal-icon green">
+      <i class="fas fa-camera"></i>
     </div>
-    <div class="modal-body">
-        <div class="kamera-frame">
-            <video id="video-kamera" autoplay playsinline></video>
-            <canvas id="kanvas-pemindai"></canvas>
-        </div>
+    <div class="modal-header-content">
+      <h4>Scan QR Absen</h4>
+      <p id="kamera-status">Memuat kamera...</p>
     </div>
-    <div class="modal-footer">
-        <button id="btn-tutup-kamera" class="btn-modal btn-cancel">Tutup</button>
+  </div>
+  <div class="modal-body">
+    <div class="kamera-frame">
+      <!-- ✅ PERBAIKAN: tambahkan id & atribut -->
+      <video id="video-kamera" autoplay playsinline muted></video>
+      <canvas id="kanvas-pemindai"></canvas>
     </div>
+  </div>
+  <div class="modal-footer">
+    <button id="btn-tutup-kamera" class="btn-modal btn-cancel">Tutup</button>
+  </div>
 </div>
 
 <!-- ✅ VARIABEL DARI SERVER → DIPAKAI OLEH FILE JS -->
