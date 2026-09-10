@@ -12,7 +12,7 @@ app.config.from_object(Config)
 # =========================================================
 # 🔑 KONFIGURASI SESI PISAH BERDASARKAN SUBDOMAIN
 # =========================================================
-app.secret_key = 'ganti_dengan_kunci_rahasia_yang_kuat_dan_acak'  # ⚠️ WAJIB GANTI!
+app.secret_key = 'ganti_dengan_kunci_rahasia_yang_kuat_dan_acak'
 
 # Domain utama — berlaku untuk semua subdomain
 app.config['SESSION_COOKIE_DOMAIN'] = ".smpuhamzanwadi.sch.id"
