@@ -1,16 +1,12 @@
 from flask import Flask, request, g, session, flash, url_for, redirect
-
 from config import Config
-
 from models import db, TahunPelajaran
-
 from flask_migrate import Migrate
 
 # ✅ Impor filter
 from routes import number_format
 
 app = Flask(__name__)
-
 app.config.from_object(Config)
 
 # =========================================================
@@ -26,16 +22,27 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 # Ubah ke True jika sudah pakai HTTPS di produksi
 app.config['SESSION_COOKIE_SECURE'] = False  # ← UBAH KE True JIKA PAKAI HTTPS
 
-# ✅ OTOMATIS PILIH NAMA COOKIE BERDASARKAN SUBDOMAIN
-@app.before_request
-def atur_nama_cookie_sesi():
-    host = request.host.lower()
-    if host.startswith('absensi.'):
-        app.config['SESSION_COOKIE_NAME'] = 'sesi_absensi'
-    elif host.startswith('school.'):
-        app.config['SESSION_COOKIE_NAME'] = 'sesi_sekolah'
-    else:
-        app.config['SESSION_COOKIE_NAME'] = 'sesi_umum'
+# =========================================================
+# ✅ KUNCI UTAMA: PILIH NAMA COOKIE SEBELUM FLASK BACA SESI
+# =========================================================
+class SesuaiSubdomainMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        host = environ.get('HTTP_HOST', '').lower()
+        if host.startswith('absensi.'):
+            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_absensi'
+        elif host.startswith('school.'):
+            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_sekolah'
+        else:
+            self.app.config['SESSION_COOKIE_NAME'] = 'sesi_umum'
+        return self.app(environ, start_response)
+
+# Pasang middleware — ini yang memisahkan sesi
+app.wsgi_app = SesuaiSubdomainMiddleware(app)
+
+# ❌ HAPUS FUNGSI atur_nama_cookie_sesi() YANG LAMA — SUDAH DIGANTI DI ATAS
 
 # ✅ Daftarkan filter ke Jinja
 app.jinja_env.filters['number_format'] = number_format
@@ -45,7 +52,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 # ==========================================
-# 🔍 DETEKSI SISTEM — DARI SUBDOMAIN DULU
+# 🔍 DETEKSI SISTEM — DARI SUBDOMAIN
 # ==========================================
 @app.before_request
 def sebelum_permintaan():
@@ -56,10 +63,9 @@ def sebelum_permintaan():
         return
 
     # =========================================================
-    # ✅ TENTUKAN SISTEM DARI SUBDOMAIN (LEBIH UTAMA DARI PATH)
+    # ✅ TENTUKAN SISTEM DARI SUBDOMAIN
     # =========================================================
     host = request.host.lower()
-
     if host.startswith('absensi.'):
         g.sistem_mode = 'absensi'
     elif host.startswith('school.'):
@@ -110,7 +116,7 @@ def sebelum_permintaan():
     # DEBUG
     # =========================================================
     print(f"[DEBUG] host={request.host}")
-    print(f"[DEBUG] path={request.path}")
+    print(f"[DEBUG] cookie_nama={app.config['SESSION_COOKIE_NAME']}")
     print(f"[DEBUG] g.sistem_mode={g.sistem_mode}")
     print(f"[DEBUG] logged_in={session.get('logged_in')}")
     print(f"[DEBUG] absensi_logged_in={session.get('absensi_logged_in')}")
@@ -138,7 +144,6 @@ def sebelum_permintaan():
             aktif = TahunPelajaran.query.filter_by(aktif=True).first()
             session["tahun_pelajaran"] = aktif.kode if aktif else "2025/2026"
         g.tahun_pelajaran = session["tahun_pelajaran"]
-
 
 # ==========================================
 # 📋 IMPOR & DAFTARKAN SEMUA BLUEPRINT
