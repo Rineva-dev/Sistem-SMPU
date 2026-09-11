@@ -214,6 +214,16 @@ body {
   background: white;
 }
 
+.input-wrapper.salah input {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+    background: #fef2f2 !important;
+}
+
+.input-wrapper.salah i {
+    color: #dc2626 !important;
+}
+
 .toggle-password {
   position: absolute;
   right: 0.75rem;

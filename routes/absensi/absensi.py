@@ -36,14 +36,25 @@ def login_absensi():
         password = request.form.get('password', '').strip()
         user = User.query.filter_by(username=username).first()
 
+        # Simpan isi form agar TIDAK HILANG
+        session['last_username'] = username
+
         if not user:
             flash('Username tidak terdaftar.', 'absensi_danger')
+            session['error_username'] = True       # ✅ Tandai username salah
+            session['error_password'] = False
         elif not user.aktif:
             flash('Akun ini sudah dinonaktifkan.', 'absensi_danger')
+            session['error_username'] = True       # ✅ Tandai username salah
+            session['error_password'] = False
         elif not check_password_hash(user.password_hash, password):
             flash('Kata sandi salah.', 'absensi_danger')
+            session['error_username'] = False      # ✅ Username benar
+            session['error_password'] = True       # ✅ Tandai sandi salah
         elif not user.guru:
             flash('Akun ini belum terhubung ke data Guru.', 'absensi_danger')
+            session['error_username'] = True
+            session['error_password'] = False
         else:
             # ✅ HAPUS SESI ABSENSI LAMA → CUKUP CLEAR SAJA
             session.clear()
@@ -59,6 +70,11 @@ def login_absensi():
                 'absensi_success'
             )
             return redirect(url_for('absensi_guru.dashboard'))
+    else:
+        # ✅ Saat BUKA HALAMAN / RELOAD → HAPUS ISI & TANDA SALAH
+        session.pop('last_username', None)
+        session.pop('error_username', None)
+        session.pop('error_password', None)
 
     # ==========================================================
     # TAMPILKAN HALAMAN LOGIN

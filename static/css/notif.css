@@ -87,9 +87,10 @@
 
     /* Bentuk & arah meluncur dari ATAS */
     .notif {
-        border-radius: 16px !important; /* Sudut bulat gaya iPhone */
-        border-left: none !important;    /* Hilangkan garis pinggir kiri */
-        transform: translateY(-100px) !important; /* Dari atas luar layar */
+        border-radius: 16px !important;
+        border-left: none !important;
+        transform: translateY(-100px) !important;
+        padding-left: 18px !important;
     }
 
     /* Saat muncul — turun ke bawah */

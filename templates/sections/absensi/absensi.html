@@ -5,6 +5,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/absensi_harian.css') }}">
 
 <div class="absensi-harian-wrapper">
+
+    <a href="{{ url_for('absensi_guru.dashboard') }}" class="tombol-kembali-hp">
+        <i class="fas fa-chevron-left"></i>
+    </a>
+    
     <div class="page-header">
         <h3>Absensi Harian</h3>
         <p>Catat kehadiran Anda hari ini dan lihat rekapitulasi kehadiran.</p>

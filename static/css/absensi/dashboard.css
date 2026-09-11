@@ -422,7 +422,7 @@
 
     .welcome-text p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: 0.7rem;
         opacity: 0.85;
     }
 
@@ -667,5 +667,84 @@
 
     .header {
         display: none !important;
+    }
+}
+
+/* =============================================
+   ✅ KARTU JAM & ATURAN ABSENSI — KHUSUS HP
+   ============================================= */
+.mobile-datetime-section {
+    display: none; /* Sembunyikan di komputer */
+}
+
+@media (max-width: 767px) {
+    .mobile-datetime-section {
+        display: block;
+        margin: 2rem 0 0;
+        padding: 0 0.25rem;
+        position: relative;
+        z-index: 5;
+    }
+
+    .datetime-mini-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed rgba(59, 130, 246, 0.15);
+    }
+
+    .jam-mini {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+    }
+
+    .tanggal-mini {
+        text-align: right;
+        line-height: 1.4;
+    }
+
+    .tgl-masehi {
+        font-size: 14px;
+        font-weight: 400;
+        color: #fdfdfd;
+    }
+
+    .tgl-hijriah {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .aturan-mini-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .aturan-mini-col {
+        text-align: center;
+    }
+
+    .aturan-label {
+        font-size: 10px;
+        color: #73849b;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+    }
+
+    .aturan-nilai {
+        font-size: 13px;
+        font-weight: 500;
+        color: #ffe1af;
     }
 }

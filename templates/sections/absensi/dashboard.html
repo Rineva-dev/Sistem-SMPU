@@ -14,8 +14,39 @@
                 <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name={{ user.nama|urlencode }}&background=fff&color=2563eb&size=128'">
             </div>
             <div class="welcome-text">
-                <h4>Hi, {{ user.nama.split(' ')[0] if user.nama else 'Guru' }} 👋</h4>
+                <h4>Hi, {{ user.nama if user.nama else 'Guru' }} 👋</h4>
                 <p>Pastikan kehadiran anda selalu tercatat</p>
+            </div>
+        </div>
+
+        <!-- ✅ KARTU JAM & ATURAN ABSENSI — KHUSUS HP SAJA -->
+        <div class="mobile-datetime-section">
+            <div class="saas-datetime-card-mini">
+            <div class="datetime-mini-row">
+                <div class="jam-mini" id="jam-digital">00.00.00</div>
+                <div class="tanggal-mini">
+                <div class="tgl-masehi">{{ hari_ini }}</div>
+                <div class="tgl-hijriah" id="tanggal-hijriah">-- ------- -- H</div>
+                </div>
+            </div>
+            <div class="aturan-mini-row">
+                <div class="aturan-mini-col">
+                <span class="aturan-label">Masuk</span>
+                <span class="aturan-nilai">{{ jam_masuk_tepat }}</span>
+                </div>
+                <div class="aturan-mini-col">
+                <span class="aturan-label">Terlambat</span>
+                <span class="aturan-nilai">&gt; {{ batas_terlambat }}</span>
+                </div>
+                <div class="aturan-mini-col">
+                <span class="aturan-label">Batas</span>
+                <span class="aturan-nilai">{{ jam_tutup_absensi }}</span>
+                </div>
+                <div class="aturan-mini-col">
+                <span class="aturan-label">Pulang</span>
+                <span class="aturan-nilai">{{ jam_pulang_resmi }}</span>
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -188,6 +219,28 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.dispatchEvent(new Event('scroll'));
     }, 100);
 });
+
+function updateJam() {
+  const el = document.getElementById('jam-digital');
+  if (!el) return;
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2,'0');
+  const menit = String(now.getMinutes()).padStart(2,'0');
+  const detik = String(now.getSeconds()).padStart(2,'0');
+  el.textContent = `${jam}.${menit}.${detik}`;
+}
+updateJam();
+setInterval(updateJam, 1000);
+
+// Tanggal Hijriah sederhana (bisa diganti sesuai kebutuhan)
+function tampilkanTanggalHijriah() {
+  const el = document.getElementById('tanggal-hijriah');
+  if (!el) return;
+  const d = new Date();
+  // Sementara tampilkan teks statis — nanti bisa diganti hitungan asli
+  el.textContent = '-- ------- -- H';
+}
+tampilkanTanggalHijriah();
 </script>
 
 {% endblock %}

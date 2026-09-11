@@ -643,31 +643,7 @@
         grid-template-columns: 1fr;
     }
 }
-@media (max-width: 768px) {
-    .datetime-left-col {
-        font-size: 48px;
-    }
-    .datetime-right-col {
-        text-align: left;
-    }
-    .absen-rules-row {
-        flex-wrap: wrap;
-    }
-    .btn-absensi-group {
-        flex-direction: column;
-        width: 100%;
-    }
-    .btn-absensi {
-        width: 100%;
-        justify-content: center;
-    }
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-    .absensi-harian-wrapper {
-        padding: 16px;
-    }
-}
+
 @media (max-width: 480px) {
     .modal-header, .modal-body {
         padding-left: 20px;
@@ -715,4 +691,230 @@
 
 .status-text i {
     margin-right: 8px;
+}
+
+.tombol-kembali-hp {
+    display: none;
+}
+
+/* ==========================================
+   ✅ TAMPILAN HP — GAYA MODERN MEWAH
+   ========================================== */
+@media (max-width: 768px) {
+    /* ✅ Latar belakang HP jadi gradasi mewah */
+    body {
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
+    /* ✅ Hilangkan header halaman di HP */
+    .header {
+        display: none !important;
+    }
+
+    /* ✅ Beri jarak atas agar tidak tertutup tombol kembali */
+    .absensi-harian-wrapper {
+        padding: 70px 16px 30px !important;
+        background: transparent;
+    }
+
+    /* ✅ KARTU JAM — LEBIH MEWAH & BESAR DI HP */
+    .saas-datetime-card {
+        padding: 28px 20px !important;
+        margin: 0 0 20px !important;
+        border-radius: 24px !important;
+        box-shadow: 
+            0 20px 50px rgba(0,0,0,0.35),
+            inset 0 1px 0 rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .datetime-main-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .datetime-left-col {
+        font-size: 52px !important;
+        letter-spacing: 2px;
+    }
+
+    .datetime-right-col {
+        text-align: center !important;
+    }
+
+    .tanggal-masehi {
+        font-size: 18px !important;
+    }
+
+    .tanggal-hijriah {
+        font-size: 13px !important;
+    }
+
+    .wita-label {
+        font-size: 11px !important;
+        opacity: 0.7;
+    }
+
+    /* ✅ Aturan masuk/pulang — rapi 2 baris di HP */
+    .absen-rules-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    .rule-col {
+        padding: 12px 10px !important;
+        border-radius: 14px !important;
+        background: rgba(255,255,255,0.06) !important;
+    }
+
+    .rule-label {
+        font-size: 11px !important;
+    }
+
+    .rule-value {
+        font-size: 16px !important;
+    }
+
+    /* ✅ KARTU STATUS — MEWAH, PUTIH TEMBUS */
+    .status-today-card {
+        background: rgba(255,255,255,0.92) !important;
+        backdrop-filter: blur(20px);
+        border-radius: 20px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        border: 1px solid rgba(255,255,255,0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .status-text {
+        font-size: 15px !important;
+        text-align: center;
+        display: block;
+    }
+
+    /* ✅ TOMBOL ABSEN — TUMPUK BAWAH, PENUH LEBAR */
+    .btn-absensi-wrapper {
+        margin-bottom: 20px !important;
+    }
+
+    .btn-absensi-group {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px !important;
+        padding: 16px !important;
+        border-radius: 20px !important;
+        background: rgba(255,255,255,0.95) !important;
+        backdrop-filter: blur(20px);
+    }
+
+    .btn-absensi {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 14px !important;
+        border-radius: 14px !important;
+        font-size: 15px !important;
+    }
+
+    .absensi-selesai {
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    /* ✅ KARTU INFO KEHADIRAN — PUTIH TEMBUS, BULAT BESAR */
+    .info-kehadiran-card {
+        background: rgba(255,255,255,0.92) !important;
+        backdrop-filter: blur(20px);
+        border-radius: 24px !important;
+        padding: 22px !important;
+        margin-bottom: 20px !important;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .card-title-info {
+        justify-content: center;
+        margin-bottom: 18px !important;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .info-item {
+        border-radius: 16px !important;
+        padding: 16px !important;
+    }
+
+    /* ✅ FILTER — RAPI DI BAWAH */
+    .filter-bar {
+        justify-content: center;
+        margin-bottom: 16px !important;
+    }
+
+    .filter-dropdown {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* ✅ RIWAYAT — KARTU BULAT & MEWAH */
+    .riwayat-section {
+        margin-bottom: 20px !important;
+    }
+
+    .riwayat-title {
+        text-align: center;
+        margin-bottom: 14px !important;
+    }
+
+    .riwayat-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .riwayat-card {
+        border-radius: 18px !important;
+        padding: 16px !important;
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* ✅ PAGINASI — RAPI TENGAH */
+    .pagination-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px !important;
+    }
+}
+
+/* ✅ Tombol kembali — tampilkan di HP */
+.tombol-kembali-hp {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .tombol-kembali-hp {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+        color: #0f172a;
+        font-size: 18px;
+        z-index: 900;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .tombol-kembali-hp:active {
+        transform: scale(0.92);
+    }
 }
