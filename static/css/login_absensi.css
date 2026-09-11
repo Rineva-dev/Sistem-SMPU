@@ -302,8 +302,7 @@ body {
         height: auto;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* ✅ Logo di atas, card di bawah, jarak otomatis seimbang */
-        padding: 1.5rem 0;     /* ✅ Jarak aman dari tepi atas & bawah HP */
+        justify-content: space-between;
         background: transparent;
     }
 
@@ -316,7 +315,7 @@ body {
     .mobile-logo-top {
         display: flex;
         justify-content: center;
-        padding-top: 2vh;       /* ✅ Jarak atas dikurangi, tidak terlalu jauh */
+        padding-top: 8vh;       /* ✅ Jarak atas dikurangi, tidak terlalu jauh */
         padding-bottom: 0;
     }
 
