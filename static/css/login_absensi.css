@@ -286,8 +286,8 @@ body {
         background: linear-gradient(180deg, #0b2b80 0%, #0b1b3f 100%);
         padding: 0;
         align-items: stretch;
-        min-height: 90vh;
-        height: 90vh;
+        min-height: 70vh;
+        height: 70vh;
         overflow: hidden;
     }
 
