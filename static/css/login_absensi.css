@@ -287,8 +287,9 @@ body {
         padding: 0;
         align-items: stretch;
         min-height: 100vh;
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100dvh; /* ✅ Sesuaikan area aman di atas tombol HP */
+        height: auto;         /* ✅ Tinggi menyesuaikan isi, TIDAK dipaksa 100vh */
+        overflow: visible;    /* ✅ TIDAK memotong bagian bawah */
     }
 
     .login-container {
@@ -297,9 +298,12 @@ body {
         box-shadow: none;
         max-width: 100%;
         width: 100%;
-        height: 100vh;
+        min-height: 100dvh;   /* ✅ Pas di area layar yang terlihat */
+        height: auto;
         display: flex;
         flex-direction: column;
+        justify-content: space-between; /* ✅ Logo di atas, card di bawah, jarak otomatis seimbang */
+        padding: 1.5rem 0;     /* ✅ Jarak aman dari tepi atas & bawah HP */
         background: transparent;
     }
 
@@ -308,12 +312,12 @@ body {
         display: none;
     }
 
-    /* ✅ LOGO DI ATAS — HANYA LOGO, TANPA TULISAN */
+    /* ✅ LOGO DI ATAS — Jarak atas wajar */
     .mobile-logo-top {
         display: flex;
         justify-content: center;
-        padding-top: 4vh;
-        padding-bottom: 1vh;
+        padding-top: 2vh;       /* ✅ Jarak atas dikurangi, tidak terlalu jauh */
+        padding-bottom: 0;
     }
 
     .logo-hp {
@@ -322,11 +326,10 @@ body {
         filter: brightness(0) invert(1);
     }
 
-    /* ✅ FORM PUTIH MELENGKUNG DI BAWAH */
+    /* ✅ CARD PUTIH — Naik mendekat, jarak seimbang */
     .login-form-section {
         background: #FFFFFF;
-        margin: 0;
-        margin-top: auto;
+        margin: 0;              /* ✅ HAPUS margin-top: auto → pakai justify-content saja */
         border-radius: 32px 32px 0 0;
         padding: 1.5rem 1.5rem 2rem;
         box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.06);
@@ -338,7 +341,7 @@ body {
         margin-bottom: 1.5rem;
     }
 
-    /* ✅ Pembatas "Butuh Bantuan?" menggantikan Google/Facebook */
+    /* ✅ Pembatas "Butuh Bantuan?" */
     .divider-or {
         display: flex;
         align-items: center;
@@ -369,13 +372,14 @@ body {
         line-height: 1.7;
     }
 
+    /* ❌ Sembunyikan info kontak asli di HP */
     .komp,
     .contact-info-desktop {
         display: none;
     }
 
     .hp {
-      display: block;
-      margin: 0 !important;
+        display: block;
+        margin: 0 !important;
     }
 }
