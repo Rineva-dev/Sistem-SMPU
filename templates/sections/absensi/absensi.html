@@ -50,7 +50,7 @@
                     </div>
                 {% elif absensi.jam_masuk %}
                     <div class="status-text pending">
-                        <i class="fas fa-clock"></i> Sudah Check In, silakan Check Out sebelum jam 15:00
+                        <i class="fas fa-clock"></i> Sudah Check In, silakan Check Out setelah jam {{ jam_pulang_resmi }}
                     </div>
                 {% else %}
                     <div class="status-text pending">
