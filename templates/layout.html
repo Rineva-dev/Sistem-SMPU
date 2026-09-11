@@ -27,7 +27,7 @@
 
     <!-- ✅ CSS Notifikasi Global -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notif.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notif_custom.css') }}">
     <!-- Tempat tambahan CSS khusus per halaman -->
     {% block extra_css %}
     {% endblock %}
@@ -66,7 +66,7 @@
 
     <!-- ✅ JS Notifikasi Global -->
     <script src="{{ url_for('static', filename='js/notif.js') }}"></script>
-
+    <script src="{{ url_for('static', filename='js/notif_custom.js') }}"></script>
     <!-- Tempat tambahan JS khusus per halaman -->
     {% block extra_js %}{% endblock %}
     

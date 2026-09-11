@@ -43,7 +43,7 @@ function sudahLewatBatasWaktu() {
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
 }
 function tampilkanPeringatanAlfa() {
-    alert(`[fas fa-exclamation-triangle] PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP. Kehadiran Anda terhitung ALFA.`);
+    notifPeringatan(`[fas fa-exclamation-triangle] PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP..`);
 }
 // ✅ === BARU: CEK BELUM JAM PULANG ===
 const BATAS_PULANG = ABSENSI.BATAS_PULANG;
@@ -52,7 +52,7 @@ function belumJamPulang() {
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
 }
 function tampilkanPeringatanBelumJamPulang() {
-    alert(`[fas fa-clock] BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
+    notifInfo(`[fas fa-clock] BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
 }
 // ✅ === SELESAI PENAMBAHAN ===
 // --- KIRIM ABSEN MASUK ---
@@ -104,14 +104,14 @@ async function prosesHasilScan(dataQR) {
         const hasil = await res.json();
         if (hasil.status === 'sukses' || hasil.status === 'info') {
             // ✅ TAMPILKAN NAMA & STATUS
-            alert(`[fas fa-check-circle] ${hasil.pesan || 'Absensi berhasil tercatat!'}`);
+            notifSukses(`[fas fa-check-circle] ${hasil.pesan || 'Absensi berhasil tercatat!'}`);
             setTimeout(() => location.reload(), 1000);
         } else {
             // ❌ TAMPILKAN ALASAN GAGAL
-            alert(`[fas fa-times-circle] ${hasil.pesan || 'Gagal memproses QR'}`);
+            notifError(`[fas fa-times-circle] ${hasil.pesan || 'Gagal memproses QR'}`);
         }
     } catch (err) {
-        alert(`[fas fa-exclamation-circle] Kesalahan: ${err.message}`);
+        notifError(`[fas fa-exclamation-circle] Kesalahan: ${err.message}`);
     }
 }
 // --- BACA QR DARI KAMERA ---
