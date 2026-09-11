@@ -9,7 +9,13 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- Bagian Kiri: Informasi Absensi -->
+        <!-- Logo di Latar Biru (Muncul di HP) -->
+        <div class="mobile-logo-area">
+            <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo" class="logo-hp">
+            <h2 class="mobile-title">Sistem Absensi Guru</h2>
+        </div>
+
+        <!-- Bagian Kiri: Informasi (Komputer) -->
         <div class="school-info">
             <div class="logo-wrapper">
                 <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo SMP Unggulan Hamzanwadi" class="logo-sekolah">
@@ -22,14 +28,14 @@
             <div class="copyright">&copy; 2026 SMP Unggulan Hamzanwadi</div>
         </div>
 
-        <!-- Bagian Kanan: Form Login -->
+        <!-- Bagian Form Login -->
         <div class="login-form-section">
             <div class="form-header">
                 <h3>Masuk ke Absensi</h3>
                 <p>Silakan masukkan Username dan kata sandi Anda</p>
             </div>
-
             <form id="formLogin" action="{{ url_for('absensi.login_absensi') }}" method="POST">
+                <!-- ... sisa form TETAP SAMA ... -->
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
@@ -49,7 +55,6 @@
                 </div>
                 <button type="submit" class="btn-login">Masuk ke Absensi</button>
             </form>
-
             <div class="contact-info">
                 <p>Butuh bantuan? Hubungi bagian administrasi</p>
                 <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
