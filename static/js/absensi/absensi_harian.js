@@ -36,28 +36,25 @@ function ambilJamSaatIni() {
     const m = String(wita.getMinutes()).padStart(2, '0');
     return `${h}:${m}`;
 }
-// --- CEK: SUDAH LEWAT JAM 11? ---
+// --- CEK: SUDAH LEWAT BATAS WAKTU? ---
 const BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
-
 function sudahLewatBatasWaktu() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
 }
 function tampilkanPeringatanAlfa() {
-    alert(`⚠️ PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP. Kehadiran Anda terhitung ALFA.`);
+    alert(`[fas fa-exclamation-triangle] PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP. Kehadiran Anda terhitung ALFA.`);
 }
-
-// ✅ === BARU: CEK BELUM JAM 15:00 (TIDAK BOLEH PULANG) ===
+// ✅ === BARU: CEK BELUM JAM PULANG ===
 const BATAS_PULANG = ABSENSI.BATAS_PULANG;
 function belumJamPulang() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
 }
 function tampilkanPeringatanBelumJamPulang() {
-    alert(`⚠️ BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
+    alert(`[fas fa-clock] BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
 }
 // ✅ === SELESAI PENAMBAHAN ===
-
 // --- KIRIM ABSEN MASUK ---
 function kirimAbsenMasuk(alasan = '') {
     const form = document.createElement('form');
@@ -73,7 +70,6 @@ function kirimAbsenMasuk(alasan = '') {
     document.body.appendChild(form);
     form.submit();
 }
-
 // ✅ === BARU: KIRIM ABSEN PULANG ===
 function kirimAbsenPulang() {
     if (belumJamPulang()) {
@@ -87,7 +83,6 @@ function kirimAbsenPulang() {
     form.submit();
 }
 // ✅ === SELESAI PENAMBAHAN ===
-
 async function prosesHasilScan(dataQR) {
     // ✅ TUTUP KAMERA & MODAL DULU
     if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
@@ -99,9 +94,7 @@ async function prosesHasilScan(dataQR) {
     const modalKamera = document.getElementById('modal-kamera');
     if (modalKameraOverlay) modalKameraOverlay.style.display = 'none';
     if (modalKamera) modalKamera.style.display = 'none';
-
     // ... sisa kode (cek jam masuk/pulang) ...
-
     try {
         const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
             method: 'POST',
@@ -109,58 +102,50 @@ async function prosesHasilScan(dataQR) {
             body: JSON.stringify({ data_qr: dataQR })
         });
         const hasil = await res.json();
-
         if (hasil.status === 'sukses' || hasil.status === 'info') {
             // ✅ TAMPILKAN NAMA & STATUS
-            alert(hasil.pesan || '✅ Absensi berhasil tercatat!');
+            alert(`[fas fa-check-circle] ${hasil.pesan || 'Absensi berhasil tercatat!'}`);
             setTimeout(() => location.reload(), 1000);
         } else {
             // ❌ TAMPILKAN ALASAN GAGAL
-            alert('❌ ' + (hasil.pesan || 'Gagal memproses QR'));
+            alert(`[fas fa-times-circle] ${hasil.pesan || 'Gagal memproses QR'}`);
         }
     } catch (err) {
-        alert('❌ Kesalahan: ' + err.message);
+        alert(`[fas fa-exclamation-circle] Kesalahan: ${err.message}`);
     }
 }
-
 // --- BACA QR DARI KAMERA ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
-
     // ⛔ TUNGGU VIDEO SIAP
     if (!videoKamera || videoKamera.readyState < 2 ||
         videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
         requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
         return;
     }
-
     // ✅ SET UKURAN CANVAS SESUAI VIDEO
     kanvasPemindai.width = videoKamera.videoWidth;
     kanvasPemindai.height = videoKamera.videoHeight;
-
     // ✅ TAMBAH willReadFrequently: true ← HILANGKAN PERINGATAN CONSOLE
     const konteks = kanvasPemindai.getContext('2d', { willReadFrequently: true });
     
     konteks.drawImage(videoKamera, 0, 0, kanvasPemindai.width, kanvasPemindai.height);
-
     // Indikasi status
     const kameraStatus = document.getElementById('kamera-status');
     if (kameraStatus) {
-        kameraStatus.textContent = '🔍 Sedang memindai... arahkan kode QR ke bingkai';
+        kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan kode QR ke bingkai';
         kameraStatus.style.color = '#2563eb';
     }
-
     try {
         // ✅ Pastikan jsQR sudah dimuat
         if (!window.jsQR) {
             if (kameraStatus) {
-                kameraStatus.textContent = '⏳ Menunggu pustaka pemindai...';
+                kameraStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menunggu pustaka pemindai...';
                 kameraStatus.style.color = '#f59e0b';
             }
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
-
         // ✅ Baca area TENGAH saja agar lebih cepat & akurat
         const lebar = kanvasPemindai.width;
         const tinggi = kanvasPemindai.height;
@@ -169,27 +154,23 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
         const potongY = tinggi * (1 - skala) / 2;
         const potongLebar = lebar * skala;
         const potongTinggi = tinggi * skala;
-
         const gambarData = konteks.getImageData(
             Math.floor(potongX), Math.floor(potongY),
             Math.floor(potongLebar), Math.floor(potongTinggi)
         );
-
         // Validasi ukuran data
         if (gambarData.data.length < 100 || gambarData.width < 50 || gambarData.height < 50) {
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
-
         // ✅ Scan QR
         const kodeQR = window.jsQR(gambarData.data, gambarData.width, gambarData.height, {
             inversionAttempts: 'dontInvert' // opsi tambahan: 'attemptBoth' jika perlu
         });
-
         if (kodeQR && kodeQR.data) {
             pemindaianAktifRef.value = false;
             if (kameraStatus) {
-                kameraStatus.textContent = '✅ QR Terdeteksi! Memproses...';
+                kameraStatus.innerHTML = '<i class="fas fa-check-circle"></i> QR Terdeteksi! Memproses...';
                 kameraStatus.style.color = '#16a34a';
             }
             prosesHasilScan(kodeQR.data);
@@ -198,11 +179,9 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     } catch (e) {
         // Diam saja, jangan spam console
     }
-
     // Lanjut frame berikutnya
     requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
 }
-
 // ==========================================
 // INISIALISASI SEMUA EVENT SETELAH HALAMAN SIAP
 // ==========================================
@@ -210,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Mulai jam
     updateClock();
     setInterval(updateClock, 1000);
-
     // ==========================================
     // MODAL 1: IZIN / SAKIT
     // ==========================================
@@ -248,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function () {
             kirimAbsenMasuk(alasan);
         });
     }
-
     // ==========================================
     // MODAL 2: QR ABSENSI
     // ==========================================
@@ -276,21 +253,19 @@ document.addEventListener('DOMContentLoaded', function () {
         btnTampilkanQR.addEventListener('click', async () => {
             // === CEK JAM MASUK vs JAM PULANG ===
             const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
-
             if (!sudahMasuk) {
-            // BELUM ABSEN MASUK → cek batas jam 11:00
+            // BELUM ABSEN MASUK → cek batas jam
             if (sudahLewatBatasWaktu()) {
                 tampilkanPeringatanAlfa();
                 return;
             }
             } else {
-            // SUDAH MASUK → ini QR untuk PULANG, cek jam 15:00
+            // SUDAH MASUK → ini QR untuk PULANG, cek jam
             if (belumJamPulang()) {
                 tampilkanPeringatanBelumJamPulang();
                 return;
             }
             }
-
             bukaModalQR();
             try {
             const res = await fetch(ABSENSI.URL_QR_DATA);
@@ -303,16 +278,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('qr-tanggal-hariini').textContent = data.hari_ini;
             } else {
                 document.getElementById('qr-tempat-tampil').innerHTML =
-                `<em style="color:red;">${data.pesan || 'Gambar QR gagal dimuat'}</em>`;
+                `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> ${data.pesan || 'Gambar QR gagal dimuat'}</em>`;
             }
             } catch (err) {
             document.getElementById('qr-tempat-tampil').innerHTML =
-                `<em style="color:red;">Gagal memuat QR</em>`;
+                `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> Gagal memuat QR</em>`;
             }
         });
     }
     if (modalQrTutup) modalQrTutup.addEventListener('click', tutupModalQR);
-
     // ==========================================
     // MODAL 3: ALASAN TERLAMBAT
     // ==========================================
@@ -362,7 +336,6 @@ document.addEventListener('DOMContentLoaded', function () {
             kirimAbsenMasuk(alasan);
         });
     }
-
     // ✅ === BARU: TOMBOL ABSEN PULANG ===
     const btnCheckOut = document.getElementById('btn-checkout');
     if (btnCheckOut) {
@@ -375,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     // ✅ === SELESAI PENAMBAHAN ===
-
     // ==========================================
     // MODAL 4: KAMERA SCAN QR
     // ==========================================
@@ -397,13 +369,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
         }
-
         let aliranKamera = null;
         let pemindaianAktifRef = { value: false };
         try {
             const cekIzin = await navigator.permissions.query({ name: 'camera' });
             if (cekIzin.state === 'denied') {
-                alert('❌ Izin kamera DIBLOKIR.\n\nKlik ikon gembok 🔒 di bilah alamat → Pengaturan Situs → Ubah Kamera jadi Izinkan');
+                alert('[fas fa-exclamation-triangle] Izin kamera DIBLOKIR.\n\nKlik ikon gembok <i class="fas fa-lock"></i> di bilah alamat → Pengaturan Situs → Ubah Kamera jadi Izinkan');
                 return;
             }
             aliranKamera = await navigator.mediaDevices.getUserMedia({ 
@@ -412,9 +383,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const videoKamera = document.getElementById('video-kamera');
             videoKamera.srcObject = aliranKamera;
             const kameraStatus = document.getElementById('kamera-status');
-            kameraStatus.textContent = tipe === "pulang"
-                ? 'Scan QR untuk Absen Pulang'
-                : 'Scan QR untuk Absen Masuk';
+            kameraStatus.innerHTML = tipe === "pulang"
+                ? '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Pulang'
+                : '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Masuk';
             modalKameraOverlay.style.display = 'block';
             modalKamera.style.display = 'block';
             setTimeout(() => {
@@ -425,15 +396,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const kanvasPemindai = document.getElementById('kanvas-pemindai');
             setTimeout(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef), 500);
         } catch (err) {
-            let pesan = '❌ Tidak bisa membuka kamera.\n\n';
+            let pesan = '[fas fa-exclamation-circle] Tidak bisa membuka kamera.\n\n';
             if (err.name === 'NotAllowedError') {
-                pesan += '→ Akses kamera DITOLAK/BLOKIR.\n→ Klik ikon gembok 🔒 di alamat → Izinkan Kamera';
+                pesan += '→ <i class="fas fa-ban"></i> Akses kamera DITOLAK/BLOKIR.\n→ Klik ikon gembok <i class="fas fa-lock"></i> di alamat → Izinkan Kamera';
             } else if (err.name === 'NotFoundError') {
-                pesan += '→ Kamera tidak ditemukan di perangkat.';
+                pesan += '→ <i class="fas fa-video-slash"></i> Kamera tidak ditemukan di perangkat.';
             } else if (err.name === 'NotReadableError') {
-                pesan += '→ Kamera sedang dipakai aplikasi lain.';
+                pesan += '→ <i class="fas fa-video"></i> Kamera sedang dipakai aplikasi lain.';
             } else {
-                pesan += '→ Error: ' + err.message;
+                pesan += `→ <i class="fas fa-code"></i> Error: ${err.message}`;
             }
             alert(pesan);
         }
