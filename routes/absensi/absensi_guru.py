@@ -107,20 +107,19 @@ def ambil_jam_pengaturan():
         'jam_pulang_resmi': '15:00'
     }
     defaults_jumat = {
-        'jam_masuk_tepat': '07:00',   # Sesuaikan jam Jumat sebenarnya
+        'jam_masuk_tepat': '07:00',
         'batas_terlambat': '07:15',
         'jam_tutup_absensi': '10:30',
-        'jam_pulang_resmi': '11:30'   # Jam pulang Jumat lebih awal
+        'jam_pulang_resmi': '11:30'
     }
 
-    # 🔍 CEK HARI INI — WITA (jam sekolah)
     hari_ini = waktu_wita().date()
-    hari_angka = hari_ini.weekday()  # 0=Senin, 1=Selasa, 2=Rabu, 3=Kamis, 4=Jumat, 5=Sabtu, 6=Minggu
+    hari_angka = hari_ini.weekday()
 
     # Pilih default sesuai hari
-    if hari_angka == 4:  # === HARI JUMAT ===
+    if hari_angka == 4:
         defaults = defaults_jumat
-    else:  # === HARI BIASA ===
+    else:
         defaults = defaults_biasa
 
     hasil = defaults.copy()
@@ -131,7 +130,6 @@ def ambil_jam_pengaturan():
         def ke_str(t, default_str):
             return t.strftime('%H:%M') if t else default_str
 
-        # Baca dari database — bedakan jam biasa & jam Jumat
         if hari_angka == 4:
             hasil['jam_masuk_tepat'] = ke_str(getattr(pengaturan, 'jam_masuk_jumat', None), defaults['jam_masuk_tepat'])
             hasil['batas_terlambat'] = ke_str(getattr(pengaturan, 'batas_terlambat_jumat', None), defaults['batas_terlambat'])
@@ -412,11 +410,12 @@ def absen_masuk():
     # ✅ === CEK WIFI SEKOLAH — WAJIB ===
     dari_sekolah, ip_klien = cek_dari_wifi_sekolah()
     if not dari_sekolah:
-        flash(f'⚠️ Absen Masuk hanya bisa dari Wifi Sekolah.\nIP Anda: {ip_klien}', 'absensi_danger')
+        flash(f'<i class="fas fa-wifi"></i> Absen Masuk hanya bisa dari Wifi Sekolah.<br>IP Anda: {ip_klien}', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
 
     if sudah_lewat_batas_absensi():
-        flash('⚠️ Sudah lewat jam 11:00. Absensi ditutup. Terhitung ALFA.', 'absensi_danger')
+        jam = ambil_jam_pengaturan()
+        flash(f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
     guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
@@ -472,12 +471,13 @@ def absen_pulang():
     # ✅ === CEK WIFI SEKOLAH — WAJIB UNTUK ABSEN PULANG JUGA ===
     dari_sekolah, ip_klien = cek_dari_wifi_sekolah()
     if not dari_sekolah:
-        flash(f'⚠️ Absen Pulang hanya bisa dari Wifi Sekolah.\nIP Anda: {ip_klien}', 'absensi_danger')
+        flash(f'<i class="fas fa-wifi"></i> Absen Pulang hanya bisa dari Wifi Sekolah.<br>IP Anda: {ip_klien}', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     # ✅ === SELESAI CEK IP ===
 
     if belum_jam_pulang():
-        flash('⚠️ Belum jam 15:00. Absen pulang belum diperbolehkan.', 'absensi_danger')
+        jam = ambil_jam_pengaturan()
+        flash(f'<i class="fas fa-clock"></i> Belum jam {jam["jam_pulang_resmi"]}. Absen pulang belum diperbolehkan.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
     guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
@@ -490,7 +490,7 @@ def absen_pulang():
     
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
     if not absensi or not absensi.jam_masuk:
-        flash('⚠️ Anda belum absen masuk.', 'absensi_danger')
+        flash(f'<i class="fas fa-exclamation-triangle"></i> Anda belum absen masuk.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
     if absensi.jam_pulang:
@@ -520,16 +520,18 @@ def qr_absensi_data():
     ).first()
     if absensi_hari_ini and absensi_hari_ini.jam_masuk:
         if belum_jam_pulang():
+            jam = ambil_jam_pengaturan()
             return jsonify({
                 "status": "error",
-                "pesan": f"Belum jam 15:00. QR Pulang belum tersedia."
+                "pesan": f'<i class="fas fa-clock"></i> Belum jam {jam["jam_pulang_resmi"]}. QR Pulang belum tersedia.'
             }), 403
         data_qr = f"guru:{guru.id}:tanggal:{hari_ini_str}:tipe:pulang:pembuat:guru"
     else:
         if sudah_lewat_batas_absensi():
+            jam = ambil_jam_pengaturan()
             return jsonify({
                 "status": "error",
-                "pesan": "Sudah lewat jam 11:00. Absensi ditutup."
+                "pesan": f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.'
             }), 403
         data_qr = f"guru:{guru.id}:tanggal:{hari_ini_str}:tipe:masuk:pembuat:guru"
     qr_img = qrcode.make(data_qr)
@@ -577,7 +579,11 @@ def scan_qr_proses():
 
     # === CEK BATAS WAKTU UNTUK ABSEN MASUK ===
     if sudah_lewat_batas_absensi():
-        return jsonify({"status": "error", "pesan": "Sudah lewat jam 11:00. Absensi ditutup."}), 403
+        jam = ambil_jam_pengaturan()
+        return jsonify({
+            "status": "error",
+            "pesan": f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.'
+        }), 403
 
     data_scan = request.form.get('data_qr') or request.json.get('data_qr') or request.form.get('qr_data')
     if not data_scan:
@@ -586,18 +592,16 @@ def scan_qr_proses():
     guru_id = None
     tipe = "masuk"
     tanggal_qr = None
-    pembuat_qr = None  # 'guru' atau 'admin'
+    pembuat_qr = None
 
-    # === ✅ PARSE QR DARI MONITORING: semua_guru:tanggal:{YYYY-MM-DD}:pembuat:admin ===
     if data_scan.startswith("semua_guru:tanggal:"):
         bagian = data_scan.split(":")
-        # Format yang dibuat: "semua_guru:tanggal:2026-09-10:pembuat:admin"
+
         if len(bagian) >= 4:
             tanggal_qr = bagian[2].strip()
-            pembuat_qr = bagian[3].strip()  # "admin"
-            guru_id = "SEMUA"  # Ambil dari sesi pengguna yang men-scan
+            pembuat_qr = bagian[3].strip()
+            guru_id = "SEMUA"
 
-            # ✅ TENTUKAN TIPE OTOMATIS SESUAI JAM SAAT SCAN (WITA)
             jam_sekarang = waktu_wita()
             if jam_sekarang.hour < 15:
                 tipe = "masuk"
@@ -695,7 +699,11 @@ def scan_qr_proses():
     # ==============================================================
     if tipe == "pulang":
         if belum_jam_pulang():
-            return jsonify({"status": "error", "pesan": "Belum jam 15:00. Absen pulang belum diperbolehkan."}), 403
+            jam = ambil_jam_pengaturan()
+            return jsonify({
+                "status": "error",
+                "pesan": f'<i class="fas fa-clock"></i> Belum jam {jam["jam_pulang_resmi"]}. Absen pulang belum diperbolehkan.'
+            }), 403
         if not absensi or not absensi.jam_masuk:
             return jsonify({"status": "error", "pesan": "❌ Belum absen masuk. Silakan absen masuk terlebih dahulu."}), 403
         if absensi.jam_pulang:
@@ -737,7 +745,11 @@ def scan_qr_proses():
 @absensi_guru_bp.route('/api/mesin-absen', methods=['POST'])
 def api_mesin_absen():
     if sudah_lewat_batas_absensi():
-        return jsonify({"status": "error", "pesan": "Sudah lewat jam 11:00. Absensi ditutup."}), 403
+        jam = ambil_jam_pengaturan()
+        return jsonify({
+            "status": "error",
+            "pesan": f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.'
+        }), 403
     data = request.get_json() or request.form
     kode_kartu = data.get('kode_kartu')
     tipe = data.get('tipe', 'masuk')
@@ -772,7 +784,11 @@ def api_mesin_absen():
     
     elif tipe == "pulang":
         if belum_jam_pulang():
-            return jsonify({"status": "error", "pesan": "Belum jam 15:00. Absen pulang belum diperbolehkan."}), 403
+            jam = ambil_jam_pengaturan()
+            return jsonify({
+                "status": "error",
+                "pesan": f'<i class="fas fa-clock"></i> Belum jam {jam["jam_pulang_resmi"]}. Absen pulang belum diperbolehkan.'
+            }), 403
         if not absensi or not absensi.jam_masuk:
             return jsonify({"status": "belum_masuk"}), 400
         if absensi.jam_pulang:
