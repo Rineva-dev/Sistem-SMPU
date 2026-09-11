@@ -1,47 +1,91 @@
 {% extends "layout.html" %}
 {% set active_page = "dashboard" %}
 {% set halaman_aktif = "absensi" %}
-
 {% block content %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/dashboard.css') }}">
 
 <div class="absensi-dashboard-wrapper">
-    <!-- HEADER -->
-    <div class="page-header">
+
+    <!-- ✅ HEADER KHUSUS HP — Latar Biru + Avatar -->
+    <div class="mobile-header-section">
+        <div class="mobile-header-content">
+            <div class="avatar-box">
+                <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name={{ user.nama|urlencode }}&background=fff&color=2563eb&size=128'">
+            </div>
+            <div class="welcome-text">
+                <h4>Hi, {{ user.nama.split(' ')[0] if user.nama else 'Guru' }} 👋</h4>
+                <p>Pastikan kehadiran anda selalu tercatat</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ❌ Sembunyikan header lama di HP -->
+    <div class="page-header desktop-only">
         <h3>Dashboard Absensi</h3>
         <p>Ringkasan kehadiran Anda per tahun pelajaran saat ini.</p>
     </div>
 
-    <!-- KARTU STATISTIK -->
-    <div class="stats-row">
-        <div class="stat-card stat-hadir">
-            <div class="stat-icon"><i class="fas fa-check"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ statistik.hadir or 0 }}</div>
-                <div class="stat-label">Hadir</div>
+    <!-- ✅ KARTU STATISTIK BISA DI-SCROLL -->
+    <div class="stats-scroll-wrapper">
+        <div class="stats-row">
+            <div class="stat-card stat-hadir">
+                <div class="stat-icon"><i class="fas fa-check"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.hadir or 0 }}</div>
+                    <div class="stat-label">Hadir</div>
+                </div>
+            </div>
+            <div class="stat-card stat-terlambat">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.terlambat or 0 }}</div>
+                    <div class="stat-label">Terlambat</div>
+                </div>
+            </div>
+            <div class="stat-card stat-izin">
+                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.izin or 0 }}</div>
+                    <div class="stat-label">Izin / Sakit</div>
+                </div>
+            </div>
+            <div class="stat-card stat-alfa">
+                <div class="stat-icon"><i class="fas fa-times"></i></div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.alfa or 0 }}</div>
+                    <div class="stat-label">Alfa</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card stat-terlambat">
-            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ statistik.terlambat or 0 }}</div>
-                <div class="stat-label">Terlambat</div>
-            </div>
-        </div>
-        <div class="stat-card stat-izin">
-            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ statistik.izin or 0 }}</div>
-                <div class="stat-label">Izin / Sakit</div>
-            </div>
-        </div>
-        <div class="stat-card stat-alfa">
-            <div class="stat-icon"><i class="fas fa-times"></i></div>
-            <div class="stat-info">
-                <div class="stat-value">{{ statistik.alfa or 0 }}</div>
-                <div class="stat-label">Alfa</div>
-            </div>
+    </div>
+    <!-- ✅ Indikator titik-titik scroll -->
+    <div class="scroll-indicators">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+
+    <!-- ✅ MENU NAVIGASI KHUSUS HP -->
+    <div class="mobile-menu-section">
+        <div class="mobile-menu-grid">
+            <a href="/absensi-guru/dashboard" class="mobile-menu-item {% if active_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/absensi-guru/absensi-harian" class="mobile-menu-item {% if active_page == 'absensi_harian' %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Absensi Harian</span>
+            </a>
+            <a href="/absensi-guru/rekap-absensi" class="mobile-menu-item {% if active_page == 'rekap_absensi' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Rekapitulasi</span>
+            </a>
+            <a href="/absensi-guru/rincian-gaji" class="mobile-menu-item {% if active_page == 'rincian_gaji' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>
+                <span>Rincian Gaji</span>
+            </a>
         </div>
     </div>
 
@@ -57,7 +101,6 @@
                 <canvas id="grafikAbsensi"></canvas>
             </div>
         </div>
-
         <!-- AKTIVITAS TERBARU -->
         <div class="activity-card">
             <h5 class="card-title"><i class="fas fa-history"></i> Aktivitas Terbaru</h5>
@@ -101,9 +144,10 @@
             </div>
         </div>
     </div>
+
 </div>
 
-<!-- Data untuk Grafik (disembunyikan) -->
+<!-- Data untuk Grafik -->
 <script type="application/json" id="data-label-bulan">{{ label_bulan | tojson }}</script>
 <script type="application/json" id="data-hadir">{{ data_hadir | tojson }}</script>
 <script type="application/json" id="data-terlambat">{{ data_terlambat | tojson }}</script>
@@ -113,4 +157,20 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <script src="{{ url_for('static', filename='js/absensi/dashboard.js') }}"></script>
+
+<!-- ✅ Script untuk Update Indikator Scroll -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.querySelector('.stats-scroll-wrapper');
+    const dots = document.querySelectorAll('.scroll-indicators .dot');
+    if (!wrapper || dots.length === 0) return;
+
+    wrapper.addEventListener('scroll', function() {
+        const cardWidth = wrapper.offsetWidth;
+        const index = Math.round(wrapper.scrollLeft / cardWidth);
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    });
+});
+</script>
+
 {% endblock %}
