@@ -12,6 +12,8 @@
   --gray-300: #CBD5E1;
   --gray-500: #64748B;
   --gray-700: #1E293B;
+
+  --bg-lines: url("data:image/svg+xml,%3Csvg width='600' height='600' viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 300C100 250 200 350 300 300C400 250 500 350 600 300' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.08'/%3E%3Cpath d='M0 350C100 300 200 400 300 350C400 300 500 400 600 350' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.08'/%3E%3Cpath d='M0 250C100 200 200 300 300 250C400 200 500 300 600 250' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.08'/%3E%3Cpath d='M0 200C100 150 200 250 300 200C400 150 500 250 600 200' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.08'/%3E%3Cpath d='M0 400C100 350 200 450 300 400C400 350 500 450 600 400' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.08'/%3E%3C/svg%3E");
 }
 
 * {
@@ -22,7 +24,13 @@
 }
 
 body {
-  background: linear-gradient(135deg, #0b1b3f 0%, #000e28 100%);
+  background: 
+    linear-gradient(135deg, #0b1b3f 0%, #000e28 100%),
+    var(--bg-lines);
+  background-blend-mode: overlay;
+  background-size: cover, 600px 600px;
+  background-position: center, center;
+  background-attachment: fixed;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -283,7 +291,14 @@ body {
 
 @media (max-width: 767px) {
     body {
-        background: linear-gradient(180deg, #0b2b80 0%, #0b1b3f 100%);
+        background: 
+            linear-gradient(180deg, #001755 0%, #002c93 100%),
+            url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1200 -100C900 200 600 500 300 800' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.12'/%3E%3Cpath d='M1300 0C1000 300 700 600 400 900' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.12'/%3E%3Cpath d='M1400 100C1100 400 800 700 500 1000' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.12'/%3E%3Cpath d='M1500 200C1200 500 900 800 600 1100' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.12'/%3E%3Cpath d='M1100 -200C800 100 500 400 200 700' fill='none' stroke='%23ffffff' stroke-width='1.5' opacity='0.12'/%3E%3C/svg%3E");
+        background-blend-mode: overlay;
+        background-size: cover;
+        background-position: right top;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         padding: 0;
         align-items: stretch;
         min-height: 100vh;
@@ -325,14 +340,27 @@ body {
         filter: brightness(0) invert(1);
     }
 
-    /* ✅ CARD PUTIH — Naik mendekat, jarak seimbang */
+    .login-form-section::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 10%;
+        width: 80%;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.345);
+        border-radius: 32px 32px 0 0;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+    }
+
     .login-form-section {
+        position: relative;
         background: #FFFFFF;
-        margin: 0;              /* ✅ HAPUS margin-top: auto → pakai justify-content saja */
+        margin: 0;
         border-radius: 32px 32px 0 0;
         padding: 1.5rem 1.5rem 2rem;
         box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.06);
         flex-shrink: 0;
+        overflow: visible;
     }
 
     .form-header {
