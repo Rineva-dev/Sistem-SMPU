@@ -30,15 +30,17 @@
         <!-- Bagian Kanan: Form Login -->
         <div class="login-form-section">
             <div class="form-header">
-                <h3>Masuk ke Absensi</h3>
-                <p>Silakan masukkan Username dan kata sandi Anda</p>
+                <h3 class="komp">Masuk ke Absensi</h3>
+                <h3 class="hp">Welcome Back</h3>
+                <p class="komp">Silakan masukkan Username dan kata sandi Anda</p>
+                <p class="hp">Enter your details below</p>
             </div>
             <form id="formLogin" action="{{ url_for('absensi.login_absensi') }}" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-wrapper">
                         <i class="fa fa-user"></i>
-                        <input type="text" id="username" name="username" required placeholder="Masukkan NIP atau Username">
+                        <input type="text" id="username" name="username" required placeholder="Masukkan Username">
                     </div>
                 </div>
                 <div class="form-group">
@@ -59,8 +61,7 @@
                 <span>Butuh Bantuan?</span>
             </div>
             <div class="contact-info-mobile">
-                <p>📞 (62) 81929830033</p>
-                <p>📧 smpu@hamzanwadi.ac.id</p>
+                <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
                 <p class="mt-2">
                     <a href="https://school.smpuhamzanwadi.sch.id" class="link-sistem-utama">
                         ← Kembali ke Sistem Manajemen Sekolah
