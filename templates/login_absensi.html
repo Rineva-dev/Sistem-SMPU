@@ -90,6 +90,66 @@
             icon.classList.toggle('fa-eye');
             icon.classList.toggle('fa-eye-slash');
         }
+
+        // ==========================================
+        // SISTEM NOTIFIKASI GLOBAL
+        // ==========================================
+        class Notifikasi {
+            constructor() {
+                this.waktuTampil = 3500;
+                this.container = document.querySelector('.notif-container');
+                if (!this.container) this.buatContainer();
+            }
+            buatContainer() {
+                const wadah = document.createElement('div');
+                wadah.className = 'notif-container';
+                document.body.appendChild(wadah);
+                this.container = wadah;
+            }
+            tampil(teks, tipe = 'info', waktu = null) {
+                const elemen = document.createElement('div');
+                elemen.className = `notif ${tipe}`;
+                elemen.innerHTML = `
+                    <span>${teks}</span>
+                    <button class="notif-tutup" onclick="this.parentElement.classList.add('hilang'); setTimeout(() => this.parentElement.remove(), 400);">&times;</button>
+                `;
+                this.container.appendChild(elemen);
+                setTimeout(() => elemen.classList.add('muncul'), 10);
+                const durasi = waktu || this.waktuTampil;
+                setTimeout(() => {
+                    if (elemen.parentElement) {
+                        elemen.classList.add('hilang');
+                        setTimeout(() => elemen.remove(), 400);
+                    }
+                }, durasi);
+            }
+            bacaFlash() {
+                if (window.pesanFlash && Array.isArray(window.pesanFlash)) {
+                    window.pesanFlash.forEach(pesan => {
+                        let tipe = 'info';
+                        if (pesan[0].includes('success')) tipe = 'sukses';
+                        if (pesan[0].includes('danger')) tipe = 'error';
+                        if (pesan[0].includes('warning')) tipe = 'peringatan';
+                        this.tampil(pesan[1], tipe);
+                    });
+                }
+            }
+        }
+
+        // === ✅ KIRIM PESAN FLASH DARI FLASK KE JS ===
+        window.pesanFlash = [
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        ["{{ category }}", "{{ message|e }}"]{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        ];
+
+        // === ✅ JALANKAN OTOMATIS ===
+        const notif = new Notifikasi();
+        document.addEventListener('DOMContentLoaded', () => notif.bacaFlash());
     </script>
 </body>
 </html>

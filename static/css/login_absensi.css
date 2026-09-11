@@ -410,3 +410,151 @@ body {
         margin: 0 !important;
     }
 }
+
+/* ==========================================
+   SISTEM NOTIFIKASI GLOBAL
+========================================== */
+
+.notif-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    width: calc(100% - 40px);
+    pointer-events: none;
+}
+
+.notif {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+    pointer-events: auto;
+}
+
+.notif.muncul {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notif.hilang {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* Tipe Notifikasi */
+.notif.sukses {
+    background-color: #16a34a;
+    border-left: 5px solid #15803d;
+}
+
+.notif.info {
+    background-color: #2563eb;
+    border-left: 5px solid #1d4ed8;
+}
+
+.notif.peringatan {
+    background-color: #f59e0b;
+    border-left: 5px solid #d97706;
+    color: #1e293b;
+}
+
+.notif.error {
+    background-color: #dc2626;
+    border-left: 5px solid #b91c1c;
+}
+
+/* Tombol Tutup */
+.notif-tutup {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 12px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.notif-tutup:hover {
+    opacity: 1;
+}
+
+/* Responsif untuk layar kecil */
+@media (max-width: 576px) {
+    .notif-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: 100%;
+    }
+}
+
+/* ==========================================
+   ✅ NOTIFIKASI GAYA IPHONE — KHUSUS HP SAJA
+   Warna TETAP SAMA dengan komputer, hanya bentuk & posisi yang beda
+   ========================================== */
+@media (max-width: 767px) {
+    /* Ubah posisi jadi TENGAH ATAS */
+    .notif-container {
+        top: 12px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        max-width: 320px !important;
+        width: calc(100% - 32px) !important;
+        pointer-events: none;
+    }
+
+    /* Gaya tampilan: sudut bulat, posisi dari atas, TAPI WARNA TETAP SAMA */
+    .notif {
+        border: none !important;
+        border-radius: 16px !important;
+        padding: 10px 12px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        transform: translateY(-100px) !important;
+        opacity: 0 !important;
+        border-left: none !important;
+    }
+
+    /* Saat muncul — turun dari atas */
+    .notif.muncul {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+    }
+
+    /* Saat hilang — naik ke atas */
+    .notif.hilang {
+        transform: translateY(-100px) !important;
+        opacity: 0 !important;
+    }
+
+    /* ⬇️ WARNA LATAR TETAP SAMA PERSIS dengan komputer */
+    .notif.sukses     { background-color: #16a34a !important; }
+    .notif.info       { background-color: #2563eb !important; }
+    .notif.peringatan { background-color: #f59e0b !important; color: #1e293b !important; }
+    .notif.error      { background-color: #dc2626 !important; }
+
+    /* Tombol tutup di HP */
+    .notif-tutup {
+        color: inherit !important;
+        font-size: 18px !important;
+        margin-left: 10px !important;
+        opacity: 0.85 !important;
+    }
+}

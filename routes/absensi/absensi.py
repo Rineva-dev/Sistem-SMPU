@@ -6,6 +6,9 @@ absensi_bp = Blueprint('absensi', __name__)
 
 @absensi_bp.route('/login-absensi', methods=['GET', 'POST'])
 def login_absensi():
+    # ✅ BERSIHKAN SEMUA PESAN FLASH LAMA DULU
+    session.pop('_flashes', None)
+
     # ==========================================================
     # CEK APAKAH SUDAH LOGIN KE SISTEM ABSENSI
     # ==========================================================
@@ -44,7 +47,6 @@ def login_absensi():
         else:
             # ✅ HAPUS SESI ABSENSI LAMA → CUKUP CLEAR SAJA
             session.clear()
-
             # BUAT SESI ABSENSI BARU
             session['absensi_logged_in'] = True
             session['absensi_sistem_mode'] = 'absensi'
@@ -52,7 +54,6 @@ def login_absensi():
             session['absensi_guru_id'] = user.guru.id
             session['absensi_user_name'] = user.guru.nama
             session['absensi_halaman'] = 'absensi'
-
             flash(
                 f'Selamat datang, {user.guru.nama}',
                 'absensi_success'
