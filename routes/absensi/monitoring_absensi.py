@@ -5,7 +5,7 @@
 # ==================================================
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, make_response, g, jsonify
 from models import Guru, AbsensiGuru, TahunPelajaran, db, User, PengaturanJamKerja
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import extract
 import pandas as pd
 from io import BytesIO
@@ -16,6 +16,9 @@ import base64
 # ✅ Blueprint Terpisah
 monitoring_bp = Blueprint('monitoring_absensi', __name__)
 
+def waktu_wita():
+    return datetime.now(timezone.utc) + timedelta(hours=8)
+
 # ==============================================
 # ✅ FUNGSI BANTU: AMBIL TAHUN PELAJARAN AKTIF
 # ==============================================
@@ -24,7 +27,7 @@ def ambil_tahun_pelajaran():
     Mengembalikan (tgl_mulai_tp, tgl_selesai_tp, label_tp)
     berdasarkan g.tahun_pelajaran atau tahun pelajaran aktif
     """
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
     tp_terpilih = None
     if hasattr(g, 'tahun_pelajaran') and g.tahun_pelajaran:
         tp_terpilih = TahunPelajaran.query.filter_by(kode=g.tahun_pelajaran).first()
@@ -85,7 +88,7 @@ def belum_jam_pulang():
     Mengembalikan True jika BELUM jam 15:00 hari ini
     Digunakan agar QR Pulang baru bisa dibuat setelah jam 15:00
     """
-    jam_sekarang = datetime.now()
+    jam_sekarang = waktu_wita()
     batas_jam = jam_sekarang.replace(hour=15, minute=0, second=0, microsecond=0)
     return jam_sekarang < batas_jam
 
@@ -114,7 +117,7 @@ def monitoring_absensi():
     user_name = session.get('user_name', 'Pengguna')
     jabatan = session.get('jabatan', '')
     halaman_aktif = session.get('halaman_aktif', 'utama')
-    hari_ini = date.today()
+    hari_ini = waktu_wita().date()
 
     # === Ambil Tahun Pelajaran ===
     tgl_mulai_tp, tgl_selesai_tp, label_tp = ambil_tahun_pelajaran()
@@ -257,8 +260,9 @@ def export_monitoring():
             return redirect(url_for('dashboard'))
 
     # Ambil parameter filter
-    filter_bulan = request.form.get('bulan', type=int) or date.today().month
-    filter_tahun = request.form.get('tahun', type=int) or date.today().year
+    hari_ini = waktu_wita().date()
+    filter_bulan = request.form.get('bulan', type=int) or hari_ini.month
+    filter_tahun = request.form.get('tahun', type=int) or hari_ini.year
 
     # Rentang tanggal
     tgl_awal = date(filter_tahun, filter_bulan, 1)
@@ -328,8 +332,10 @@ def buat_qr_semua_guru():
     boleh, alasan = cek_akses_monitoring()
     if not boleh:
         return jsonify({"status": "error", "pesan": "⚠️ Tidak memiliki izin"}), 403
-    hari_ini = date.today()
+    
+    hari_ini = waktu_wita().date()
     hari_ini_str = hari_ini.strftime("%Y-%m-%d")
+    jam_sekarang = waktu_wita().strftime("%H:%M")
     data_qr = f"semua_guru:tanggal:{hari_ini_str}:pembuat:admin"
     qr_img = qrcode.make(data_qr)
     buffered = io.BytesIO()
