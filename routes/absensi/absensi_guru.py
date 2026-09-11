@@ -577,13 +577,8 @@ def scan_qr_proses():
     hari_ini_date = waktu_wita().date()
     hari_ini_str = hari_ini_date.strftime("%Y-%m-%d")
 
-    # === CEK BATAS WAKTU UNTUK ABSEN MASUK ===
-    if sudah_lewat_batas_absensi():
-        jam = ambil_jam_pengaturan()
-        return jsonify({
-            "status": "error",
-            "pesan": f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.'
-        }), 403
+    # === HAPUS CEK BATAS DI SINI ===
+    # if sudah_lewat_batas_absensi(): ... ❌ DIHAPUS
 
     data_scan = request.form.get('data_qr') or request.json.get('data_qr') or request.form.get('qr_data')
     if not data_scan:
@@ -596,19 +591,15 @@ def scan_qr_proses():
 
     if data_scan.startswith("semua_guru:tanggal:"):
         bagian = data_scan.split(":")
-
         if len(bagian) >= 4:
             tanggal_qr = bagian[2].strip()
             pembuat_qr = bagian[3].strip()
             guru_id = "SEMUA"
-
             jam_sekarang = waktu_wita()
             if jam_sekarang.hour < 15:
                 tipe = "masuk"
             else:
                 tipe = "pulang"
-
-    # === PARSE QR DARI HALAMAN ABSENSI GURU ===
     elif data_scan.startswith("guru:"):
         bagian = data_scan.split(":")
         if len(bagian) >= 8:
@@ -621,8 +612,6 @@ def scan_qr_proses():
             tanggal_qr = bagian[3]
             tipe = bagian[5]
             pembuat_qr = 'guru'
-
-    # === FALLBACK: NIP GURU LANGSUNG ===
     else:
         guru = Guru.query.filter_by(nip=data_scan).first()
         if guru:
@@ -635,49 +624,32 @@ def scan_qr_proses():
     if not guru_id:
         return jsonify({"status": "error", "pesan": "ID Guru tidak ditemukan"}), 404
 
-    # ==============================================================
-    # 🔒 ATURAN 1: QR HANYA BERLAKU HARI INI
-    # ==============================================================
+    # QR Kadaluarsa
     if tanggal_qr and tanggal_qr != hari_ini_str:
         return jsonify({
             "status": "error",
             "pesan": f"❌ QR sudah kadaluarsa! Berlaku untuk {tanggal_qr}, hari ini {hari_ini_str}"
         }), 403
 
-    # ==============================================================
-    # 🔒 DETEKSI MODE SCAN
-    # ==============================================================
-    mode_saat_ini = 'mode_sekolah'  # Default: izinkan mesin pemindai
+    mode_saat_ini = 'mode_sekolah'
     if session.get('absensi_logged_in') and session.get('absensi_sistem_mode') == 'absensi':
-        mode_saat_ini = 'mode_absensi'  # Dari halaman absensi guru
+        mode_saat_ini = 'mode_absensi'
     elif session.get('logged_in') and session.get('sistem_mode') in ['sekolah', 'admin', 'kepala_sekolah', 'tu', 'monitoring']:
-        mode_saat_ini = 'mode_sekolah'  # Dari sistem utama sekolah
+        mode_saat_ini = 'mode_sekolah'
 
-    # ==============================================================
-    # 🔒 ATURAN 2: SIAPA BOLEH MEN-SCAN
-    # ==============================================================
-    # === QR DARI MONITORING/ADMIN ===
     if pembuat_qr == 'admin':
-        # ❌ DITOLAK: discan dari sistem sekolah itu sendiri
         if mode_saat_ini == 'mode_sekolah':
             return jsonify({
                 "status": "error",
                 "pesan": "❌ QR dari Monitoring hanya boleh discan dari Mode Absensi Guru."
             }), 403
-        # ✅ DIPERBOLEHKAN: dari mode absensi guru
-
-    # === QR DARI HALAMAN ABSENSI GURU ===
     elif pembuat_qr == 'guru':
-        # ❌ DITOLAK: discan dari mode absensi
         if mode_saat_ini == 'mode_absensi':
             return jsonify({
                 "status": "error",
                 "pesan": "❌ QR buatan halaman absensi hanya boleh discan dari Monitoring atau Mesin Pemindai."
             }), 403
 
-    # ==============================================================
-    # ✅ AMBIL GURU ID DARI SESI JIKA QR SEMUA_GURU
-    # ==============================================================
     if guru_id == "SEMUA":
         if mode_saat_ini == 'mode_absensi' and session.get('absensi_guru_id'):
             guru_id = str(session.get('absensi_guru_id'))
@@ -694,9 +666,20 @@ def scan_qr_proses():
     jam_sekarang = waktu_wita().strftime("%H:%M")
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini_date).first()
 
-    # ==============================================================
-    # 🔒 ATURAN 3: ABSEN PULANG WAJIB SUDAH ABSEN MASUK DULU
-    # ==============================================================
+    # ==================================================
+    # ✅ CEK BATAS WAKTU HANYA UNTUK ABSEN MASUK
+    # ==================================================
+    if tipe == "masuk":
+        if sudah_lewat_batas_absensi():
+            jam = ambil_jam_pengaturan()
+            return jsonify({
+                "status": "error",
+                "pesan": f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.'
+            }), 403
+
+    # ==================================================
+    # ✅ PROSES ABSEN PULANG — TIDAK DIKUNCI JAM 11.00
+    # ==================================================
     if tipe == "pulang":
         if belum_jam_pulang():
             jam = ambil_jam_pengaturan()
@@ -708,7 +691,6 @@ def scan_qr_proses():
             return jsonify({"status": "error", "pesan": "❌ Belum absen masuk. Silakan absen masuk terlebih dahulu."}), 403
         if absensi.jam_pulang:
             return jsonify({"status": "info", "pesan": "✅ Sudah absen pulang", "jam": absensi.jam_pulang})
-
         absensi.jam_pulang = jam_sekarang
         db.session.commit()
         return jsonify({
@@ -717,11 +699,12 @@ def scan_qr_proses():
             "jam": jam_sekarang
         })
 
-    # === ✅ PROSES ABSEN MASUK ===
+    # ==================================================
+    # ✅ PROSES ABSEN MASUK
+    # ==================================================
     elif tipe == "masuk":
         if absensi and absensi.jam_masuk:
             return jsonify({"status": "info", "pesan": "✅ Sudah absen masuk", "jam": absensi.jam_masuk})
-
         status, keterangan = hitung_status_absensi(jam_sekarang)
         if not absensi:
             absensi = AbsensiGuru(
@@ -733,7 +716,6 @@ def scan_qr_proses():
             absensi.jam_masuk = jam_sekarang
             absensi.status = status
             absensi.keterangan = keterangan
-
         db.session.commit()
         return jsonify({
             "status": "sukses",
