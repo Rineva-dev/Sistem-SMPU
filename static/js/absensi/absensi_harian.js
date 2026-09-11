@@ -43,7 +43,7 @@ function sudahLewatBatasWaktu() {
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
 }
 function tampilkanPeringatanAlfa() {
-    notifPeringatan(`[fas fa-exclamation-triangle] PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP..`);
+    notifPeringatan(`PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP..`);
 }
 // ✅ === BARU: CEK BELUM JAM PULANG ===
 const BATAS_PULANG = ABSENSI.BATAS_PULANG;
@@ -52,7 +52,7 @@ function belumJamPulang() {
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
 }
 function tampilkanPeringatanBelumJamPulang() {
-    notifInfo(`[fas fa-clock] BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
+    notifInfo(`BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
 }
 // ✅ === SELESAI PENAMBAHAN ===
 // --- KIRIM ABSEN MASUK ---
@@ -104,14 +104,14 @@ async function prosesHasilScan(dataQR) {
         const hasil = await res.json();
         if (hasil.status === 'sukses' || hasil.status === 'info') {
             // ✅ TAMPILKAN NAMA & STATUS
-            notifSukses(`[fas fa-check-circle] ${hasil.pesan || 'Absensi berhasil tercatat!'}`);
+            notifSukses(`${hasil.pesan || 'Absensi berhasil tercatat!'}`);
             setTimeout(() => location.reload(), 1000);
         } else {
             // ❌ TAMPILKAN ALASAN GAGAL
-            notifError(`[fas fa-times-circle] ${hasil.pesan || 'Gagal memproses QR'}`);
+            notifError(`${hasil.pesan || 'Gagal memproses QR'}`);
         }
     } catch (err) {
-        notifError(`[fas fa-exclamation-circle] Kesalahan: ${err.message}`);
+        notifError(`Kesalahan: ${err.message}`);
     }
 }
 // --- BACA QR DARI KAMERA ---
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const cekIzin = await navigator.permissions.query({ name: 'camera' });
             if (cekIzin.state === 'denied') {
-                alert('[fas fa-exclamation-triangle] Izin kamera DIBLOKIR.\n\nKlik ikon gembok <i class="fas fa-lock"></i> di bilah alamat → Pengaturan Situs → Ubah Kamera jadi Izinkan');
+                notifError('Izin kamera DIBLOKIR.\n\nKlik ikon gembok <i class="fas fa-lock"></i> di bilah alamat → Pengaturan Situs → Ubah Kamera jadi Izinkan');
                 return;
             }
             aliranKamera = await navigator.mediaDevices.getUserMedia({ 
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 pesan += `→ <i class="fas fa-code"></i> Error: ${err.message}`;
             }
-            alert(pesan);
+            notifError(pesan);
         }
         window._aliranKamera = aliranKamera;
         window._pemindaianAktifRef = pemindaianAktifRef;
