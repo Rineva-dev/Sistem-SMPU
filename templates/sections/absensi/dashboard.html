@@ -163,13 +163,30 @@
 document.addEventListener('DOMContentLoaded', function() {
     const wrapper = document.querySelector('.stats-scroll-wrapper');
     const dots = document.querySelectorAll('.scroll-indicators .dot');
-    if (!wrapper || dots.length === 0) return;
+    const cards = document.querySelectorAll('.stat-card'); // ✅ Ambil semua kartu
+
+    if (!wrapper || dots.length === 0 || cards.length === 0) return;
 
     wrapper.addEventListener('scroll', function() {
-        const cardWidth = wrapper.offsetWidth;
-        const index = Math.round(wrapper.scrollLeft / cardWidth);
+        // ✅ Hitung posisi berdasarkan lebar kartu sebenarnya
+        const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(cards[0]).marginLeft || 0) + parseInt(getComputedStyle(cards[0]).marginRight || 0);
+        const gap = parseInt(getComputedStyle(wrapper).gap) || 0;
+        const cardFullWidth = cardWidth + gap;
+
+        // ✅ Hitung indeks kartu yang sedang terlihat
+        let index = Math.round(wrapper.scrollLeft / cardFullWidth);
+
+        // ✅ Batasi agar tidak melebihi jumlah titik yang ada
+        index = Math.max(0, Math.min(index, dots.length - 1));
+
+        // ✅ Update status titik
         dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     });
+
+    // ✅ Inisialisasi saat pertama kali dimuat → titik pertama aktif
+    setTimeout(() => {
+        wrapper.dispatchEvent(new Event('scroll'));
+    }, 100);
 });
 </script>
 
