@@ -1405,7 +1405,7 @@
 }
 
 /* ✅ Responsive — Pas di HP */
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .kamera-frame {
     max-width: 100%;
     border-radius: 16px;
