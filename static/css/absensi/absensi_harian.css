@@ -643,7 +643,6 @@
         grid-template-columns: 1fr;
     }
 }
-
 @media (max-width: 480px) {
     .modal-header, .modal-body {
         padding-left: 20px;
@@ -661,42 +660,33 @@
         gap: 4px;
     }
 }
-
 .modal-icon i {
     font-size: 22px;
     line-height: 1;
 }
-
 .absensi-selesai {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-
     width: 100%;
     padding: 14px 20px;
-
     border-radius: 12px;
     font-weight: 600;
     font-size: 15px;
-
     background: #ecfdf5;
     border: 1px solid #a7f3d0;
     color: #047857;
 }
-
 .absensi-selesai i {
     font-size: 20px;
 }
-
 .status-text i {
     margin-right: 8px;
 }
-
 .tombol-kembali-hp {
     display: none;
 }
-
 /* ==========================================
    ✅ TAMPILAN HP — GAYA MODERN MEWAH
    ========================================== */
@@ -707,18 +697,15 @@
         background-attachment: fixed;
         min-height: 100vh;
     }
-
     /* ✅ Hilangkan header halaman di HP */
     .header {
         display: none !important;
     }
-
     /* ✅ Beri jarak atas agar tidak tertutup tombol kembali */
     .absensi-harian-wrapper {
         padding: 70px 16px 30px !important;
         background: transparent;
     }
-
     /* ✅ KARTU JAM — LEBIH MEWAH & BESAR DI HP */
     .saas-datetime-card {
         padding: 28px 20px !important;
@@ -729,56 +716,45 @@
             inset 0 1px 0 rgba(255,255,255,0.08);
         border: 1px solid rgba(255,255,255,0.08);
     }
-
     .datetime-main-row {
         flex-direction: column;
         text-align: center;
         gap: 12px;
     }
-
     .datetime-left-col {
         font-size: 52px !important;
         letter-spacing: 2px;
     }
-
     .datetime-right-col {
         text-align: center !important;
     }
-
     .tanggal-masehi {
         font-size: 18px !important;
     }
-
     .tanggal-hijriah {
         font-size: 13px !important;
     }
-
     .wita-label {
         font-size: 11px !important;
         opacity: 0.7;
     }
-
     /* ✅ Aturan masuk/pulang — rapi 2 baris di HP */
     .absen-rules-row {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 10px !important;
     }
-
     .rule-col {
         padding: 12px 10px !important;
         border-radius: 14px !important;
         background: rgba(255,255,255,0.06) !important;
     }
-
     .rule-label {
         font-size: 11px !important;
     }
-
     .rule-value {
         font-size: 16px !important;
     }
-
     /* ✅ KARTU STATUS — MEWAH, PUTIH TEMBUS */
     .status-today-card {
         background: rgba(255,255,255,0.92) !important;
@@ -789,18 +765,15 @@
         border: 1px solid rgba(255,255,255,0.3);
         box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     }
-
     .status-text {
         font-size: 15px !important;
         text-align: center;
         display: block;
     }
-
     /* ✅ TOMBOL ABSEN — TUMPUK BAWAH, PENUH LEBAR */
     .btn-absensi-wrapper {
         margin-bottom: 20px !important;
     }
-
     .btn-absensi-group {
         flex-direction: column !important;
         width: 100% !important;
@@ -810,7 +783,6 @@
         background: rgba(255,255,255,0.95) !important;
         backdrop-filter: blur(20px);
     }
-
     .btn-absensi {
         width: 100% !important;
         justify-content: center !important;
@@ -818,12 +790,10 @@
         border-radius: 14px !important;
         font-size: 15px !important;
     }
-
     .absensi-selesai {
         padding: 16px !important;
         border-radius: 14px !important;
     }
-
     /* ✅ KARTU INFO KEHADIRAN — PUTIH TEMBUS, BULAT BESAR */
     .info-kehadiran-card {
         background: rgba(255,255,255,0.92) !important;
@@ -833,53 +803,43 @@
         margin-bottom: 20px !important;
         border: 1px solid rgba(255,255,255,0.3);
     }
-
     .card-title-info {
         justify-content: center;
         margin-bottom: 18px !important;
     }
-
     .info-grid {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
     }
-
     .info-item {
         border-radius: 16px !important;
         padding: 16px !important;
     }
-
     /* ✅ FILTER — RAPI DI BAWAH */
     .filter-bar {
         justify-content: center;
         margin-bottom: 16px !important;
     }
-
     .filter-dropdown {
         flex: 1;
         min-width: 120px;
     }
-
     /* ✅ RIWAYAT — KARTU BULAT & MEWAH */
     .riwayat-section {
         margin-bottom: 20px !important;
     }
-
     .riwayat-title {
         text-align: center;
         margin-bottom: 14px !important;
     }
-
     .riwayat-grid {
         grid-template-columns: 1fr !important;
     }
-
     .riwayat-card {
         border-radius: 18px !important;
         padding: 16px !important;
         border: 1px solid rgba(255,255,255,0.5);
     }
-
     /* ✅ PAGINASI — RAPI TENGAH */
     .pagination-bar {
         flex-direction: column;
@@ -887,12 +847,10 @@
         gap: 12px !important;
     }
 }
-
 /* ✅ Tombol kembali — tampilkan di HP */
 .tombol-kembali-hp {
     display: none;
 }
-
 @media (max-width: 767px) {
     .tombol-kembali-hp {
         display: flex !important;
@@ -913,8 +871,146 @@
         text-decoration: none;
         transition: all 0.2s ease;
     }
-
     .tombol-kembali-hp:active {
         transform: scale(0.92);
+    }
+}
+/* ==========================================
+   📱 FOOTER — LENGKUNG SETENGAH LINGKARAN HALUS ✅
+   ========================================== */
+.mobile-bottom-nav {
+    display: none;
+}
+@media (max-width: 768px) {
+    /* ✅ Jarak bawah konten */
+    .absensi-harian-wrapper {
+        padding-bottom: 110px !important;
+    }
+    .btn-absensi-wrapper {
+        display: none !important;
+    }
+
+    /* ✅ TOMBOL TENGAH — DI LUAR FOOTER, TIDAK TERPOTONG */
+    .nav-btn.main-btn {
+        position: fixed;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 16px rgb(5 150 105 / 56%);
+        z-index: 999;
+    }
+    .nav-btn.main-btn:active {
+        transform: translateX(-50%) scale(0.96);
+    }
+    .nav-btn.main-btn i {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    /* ✅ FOOTER — LATAR BELAKANG + LENGKUNGAN SETENGAH LINGKARAN ✅ */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 62px;
+        background: #ffffff;
+        padding: 12px 30px 0;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.08);
+        z-index: 995;
+        align-items: flex-end;
+        justify-content: space-between;
+        position: relative;
+        overflow: visible;
+    }
+
+    /* ✅ LENGKUNGAN SETENGAH LINGKARAN DI TENGAH — MULUS & HALUS ✅ */
+    .mobile-bottom-nav::before {
+        content: '';
+        position: absolute;
+        top: -32px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 94px;
+        height: 52px;
+        background: #ffffff;
+        border-radius: 52px 52px 0 0;
+        z-index: 1;
+    }
+
+    /* ✅ Isi footer tetap di atas lengkung */
+    .mobile-bottom-nav > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ✅ Tombol samping */
+    .nav-btn.side-btn {
+        width: 52px;
+        height: 52px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 12px;
+    }
+    .nav-btn.side-btn:active {
+        transform: scale(0.94);
+        background: #f1f5f9;
+    }
+    .nav-btn.side-btn i {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    /* ✅ Warna tombol */
+    .btn-checkin { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+    .btn-checkout {
+        background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.28);
+    }
+    .btn-excuse { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; }
+    .btn-scan { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+
+    /* ✅ Status selesai */
+    .absensi-selesai-footer {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: #ecfdf5;
+        border-radius: 14px;
+        color: #047857;
+        font-weight: 500;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    .absensi-selesai-footer i {
+        font-size: 18px;
     }
 }

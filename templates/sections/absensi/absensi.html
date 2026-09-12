@@ -9,7 +9,7 @@
     <a href="{{ url_for('absensi_guru.dashboard') }}" class="tombol-kembali-hp">
         <i class="fas fa-chevron-left"></i>
     </a>
-    
+
     <div class="page-header">
         <h3>Absensi Harian</h3>
         <p>Catat kehadiran Anda hari ini dan lihat rekapitulasi kehadiran.</p>
@@ -403,6 +403,38 @@
   <div class="modal-footer">
     <button id="btn-tutup-kamera" class="btn-modal btn-cancel">Tutup</button>
   </div>
+</div>
+
+<!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER agar tidak terpotong -->
+{% if not absensi or not absensi.jam_masuk %}
+    <button type="button" id="btn-checkin" class="nav-btn main-btn btn-checkin">
+        <i class="fas fa-sign-in-alt"></i>
+    </button>
+{% else %}
+    <button type="button" id="btn-checkout" class="nav-btn main-btn btn-checkout">
+        <i class="fas fa-sign-out-alt"></i>
+    </button>
+{% endif %}
+
+<!-- ✅ FOOTER — HANYA LATAR BELAKANG & TOMBOL SAMPING -->
+<div class="mobile-bottom-nav">
+    {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+        <div class="absensi-selesai-footer">
+            <i class="fas fa-check-circle"></i>
+            <span>Absensi Hari Ini Sudah Lengkap</span>
+        </div>
+    {% else %}
+        <!-- Tombol Kiri: Izin -->
+        <button type="button" id="btn-excuse" class="nav-btn side-btn btn-excuse">
+            <i class="fas fa-calendar-times"></i>
+            <span>Izin</span>
+        </button>
+        <!-- Tombol Kanan: Scan QR -->
+        <button type="button" id="btn-buka-kamera" class="nav-btn side-btn btn-scan">
+            <i class="fas fa-camera"></i>
+            <span>Scan</span>
+        </button>
+    {% endif %}
 </div>
 
 <!-- ✅ VARIABEL DARI SERVER → DIPAKAI OLEH FILE JS -->
