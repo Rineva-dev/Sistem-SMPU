@@ -472,6 +472,13 @@
 <!-- ✅ FOOTER — HANYA LATAR BELAKANG & TOMBOL SAMPING -->
 <div class="mobile-bottom-nav">
     {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+        <!-- ❌ HAPUS BAGIAN INI -->
+        <!-- <div class="absensi-selesai-footer">
+            <i class="fas fa-check-circle"></i>
+            <span>Absensi Hari Ini Sudah Lengkap</span>
+        </div> -->
+        
+        <!-- ✅ GANTI DENGAN: TOMBOL TETAP ADA TAPI DINONAKTIFKAN -->
         <button type="button" class="nav-btn side-btn btn-aksi-izin" disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;">
             <i class="fas fa-calendar-times"></i>
             <span>Izin</span>
@@ -482,8 +489,8 @@
         </button>
     {% else %}
         <!-- Tombol Kiri: Izin -->
-        <button type="button" class="nav-btn side-btn btn-excuse btn-aksi-izin">
-            {% if absensi and absensi.jam_masuk %}disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;"{% endif %}
+        <button type="button" class="nav-btn side-btn btn-excuse btn-aksi-izin" 
+            {% if absensi and absensi.jam_masuk %}disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;"{% endif %}>
             <i class="fas fa-calendar-times"></i>
             <span>Izin</span>
         </button>
@@ -494,6 +501,24 @@
         </button>
     {% endif %}
 </div>
+
+<!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER -->
+{% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+    <!-- ✅ SUDAH LENGKAP → TAMPIL IKON CENTANG, TIDAK BISA DIKLIK -->
+    <button type="button" class="nav-btn main-btn selesai" disabled style="opacity:1;cursor:not-allowed;pointer-events:none;background:#d4edda;color:#155724;">
+        <i class="fas fa-check-circle"></i>
+    </button>
+{% elif absensi and absensi.jam_masuk %}
+    <!-- ✅ SUDAH MASUK, BELUM PULANG → TOMBOL PULANG -->
+    <button type="button" class="nav-btn main-btn btn-checkout btn-aksi-pulang">
+        <i class="fas fa-sign-out-alt"></i>
+    </button>
+{% else %}
+    <!-- ❌ BELUM APA-APA → TOMBOL MASUK -->
+    <button type="button" class="nav-btn main-btn btn-checkin btn-aksi-masuk">
+        <i class="fas fa-sign-in-alt"></i>
+    </button>
+{% endif %}
 
 <!-- ✅ VARIABEL DARI SERVER → DIPAKAI OLEH FILE JS -->
 <script>
