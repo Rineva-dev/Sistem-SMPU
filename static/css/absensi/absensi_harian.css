@@ -703,7 +703,7 @@
     }
     /* ✅ Beri jarak atas agar tidak tertutup tombol kembali */
     .absensi-harian-wrapper {
-        padding: 70px 16px 30px !important;
+        padding: 40px 0 70px 0 !important;
         background: transparent;
     }
     /* ✅ KARTU JAM — LEBIH MEWAH & BESAR DI HP */
@@ -878,14 +878,11 @@
 /* ==========================================
    📱 FOOTER — LENGKUNG SETENGAH LINGKARAN HALUS ✅
    ========================================== */
+.hp-datetime-bar,
 .mobile-bottom-nav {
     display: none;
 }
 @media (max-width: 768px) {
-    /* ✅ Jarak bawah konten */
-    .absensi-harian-wrapper {
-        padding-bottom: 110px !important;
-    }
     .btn-absensi-wrapper {
         display: none !important;
     }
@@ -1090,15 +1087,142 @@
         transform: scale(0.94);
     }
 
-    /* ✅ Sesuaikan jarak konten agar tidak tertutup header */
-    .absensi-harian-wrapper {
-        padding-top: 66px !important;
-    }
-
     /* Sembunyikan tombol kembali lama yang ada di atas */
     .datetime-main-row,
     .divider-line,
     .page-header {
+        display: none !important;
+    }
+
+    /*NEW CODE*/
+    .hp-datetime-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .hp-time-display {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        background: #ffffffef;
+        line-height: 1;
+        padding: 6px;
+        border-radius: 4px;
+        border: 1px solid rgb(236, 236, 236);
+    }
+    .hp-date-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+    .hp-date-text {
+        font-size: 12px;
+        font-weight: 500;
+        color: #0f172a;
+    }
+    .hp-calendar-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        border: none;
+        color: #2563eb;
+        font-size: 12px;
+        cursor: pointer !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    .hp-calendar-btn:active {
+        transform: scale(0.92);
+        background: #bfdbfe;
+    }
+    #input-tanggal-pilih {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* ✅ KARTU STATUS HARI INI — SEPERTI GAMBAR */
+    .hp-status-today-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        margin: 0 0 20px;
+        border-radius: 6px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid #e2e8f0;
+        position: relative;
+
+    }
+
+    /* ✅ DEKORASI DI BELAKANG */
+    .hp-status-today-card::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 10%;
+        width: 80%;
+        height: 24px;
+        border-radius: 10px 10px 0 0;
+        background: rgb(0 106 255 / 60%);
+        opacity: 0.6;
+        z-index: 1;
+    }
+
+    /* ✅ LATAR BELAKANG KARTU DI TENGAH */
+    .hp-status-today-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+        z-index: 2;
+    }
+
+    /* ✅ PASTIKAN TEKS & IKON TAMPIL DI PALING DEPAN */
+    .hp-status-today-card > * {
+        position: relative;
+        z-index: 3;
+    }
+    
+    .hp-status-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #003589;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+    .hp-status-content {
+        flex: 1;
+    }
+    .hp-status-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .hp-status-desc {
+        font-size: 12px;
+        color: #a6b2c0;
+        line-height: 1.4;
+    }
+
+    .saas-datetime-card,
+    .status-today-card {
         display: none !important;
     }
 }

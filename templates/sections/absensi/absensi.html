@@ -22,6 +22,18 @@
         <p>Catat kehadiran Anda hari ini dan lihat rekapitulasi kehadiran.</p>
     </div>
 
+    <!-- ✅ BARIS JAM & TANGGAL PILIH — KHUSUS HP -->
+    <div class="hp-datetime-bar">
+        <div class="hp-time-display" id="hp-jam">00.00</div>
+        <div class="hp-date-selector">
+            <span class="hp-date-text" id="hp-tanggal-teks">{{ hari_ini }}</span>
+            <button class="hp-calendar-btn" id="btn-pilih-tanggal">
+                <i class="fas fa-calendar-alt"></i>
+            </button>
+            <input type="date" id="input-tanggal-pilih" value="{{ tanggal_terpilih }}" onchange="terapkanFilterTanggal(this.value)">
+        </div>
+    </div>
+
     <!-- ✅ KARTU JAM & TANGGAL MEGAH -->
     <div class="saas-datetime-card">
         <div class="datetime-main-row">
@@ -76,6 +88,34 @@
             {% endif %}
         </div>
     </div>
+
+    <div class="hp-status-today-card">
+        <div class="hp-status-icon">
+            {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+            <i class="fas fa-check-circle"></i>
+            {% elif absensi and absensi.jam_masuk %}
+            <i class="fas fa-clock"></i>
+            {% else %}
+            <i class="fas fa-exclamation-circle"></i>
+            {% endif %}
+        </div>
+        <div class="hp-status-content">
+            {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+            <div class="hp-status-title">Absensi Lengkap ✅</div>
+            <div class="hp-status-desc">Hadir: {{ absensi.jam_masuk }} — Pulang: {{ absensi.jam_pulang }}</div>
+            {% elif absensi and absensi.jam_masuk %}
+            <div class="hp-status-title">Sudah Check In ⏰</div>
+            <div class="hp-status-desc">Jam Masuk: {{ absensi.jam_masuk }} — Silakan Check Out nanti</div>
+            {% else %}
+            <div class="hp-status-title">Belum Absensi Hari Ini</div>
+            <div class="hp-status-desc">Silakan lakukan Absen Masuk terlebih dahulu</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <form id="form-filter-tanggal" method="get" style="display:none;">
+        <input type="hidden" name="tanggal" id="hidden-tanggal" value="{{ tanggal_terpilih }}">
+    </form>
 
     <!-- =========================================================
      TOMBOL ABSENSI
