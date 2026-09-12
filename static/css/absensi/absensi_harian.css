@@ -678,12 +678,23 @@
     border: 1px solid #a7f3d0;
     color: #047857;
 }
+
 .absensi-selesai i {
     font-size: 20px;
 }
+
 .status-text i {
     margin-right: 8px;
 }
+
+.input-pagenation {
+    width: 48px;
+    padding: 4px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+}
+
 .tombol-kembali-hp {
     display: none;
 }
@@ -880,7 +891,7 @@
     }
 
     .riwayat-status {
-        margin-bottom: 0;
+        margin-bottom: 4px;
     }
 }
 /* ✅ Tombol kembali — tampilkan di HP */
@@ -927,7 +938,7 @@
     /* ✅ TOMBOL TENGAH — DI LUAR FOOTER, TIDAK TERPOTONG */
     .nav-btn.main-btn {
         position: fixed;
-        bottom: 22px;
+        bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
         width: 64px;
@@ -951,7 +962,7 @@
         transform: translateX(-50%) scale(0.96);
     }
     .nav-btn.main-btn i {
-        font-size: 22px;
+        font-size: 26px;
         line-height: 1;
     }
 
@@ -962,9 +973,9 @@
         bottom: 0;
         left: 0;
         right: 0;
-        height: 62px;
+        min-height: 52px;
         background: #ffffff;
-        padding: 12px 30px 0;
+        padding: 4px 30px 0;
         border-radius: 24px 24px 0 0;
         box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.08);
         z-index: 995;
@@ -978,10 +989,10 @@
     .mobile-bottom-nav::before {
         content: '';
         position: absolute;
-        top: -32px;
+        top: -26px;
         left: 50%;
         transform: translateX(-50%);
-        width: 94px;
+        width: 90px;
         height: 52px;
         background: #ffffff;
         border-radius: 52px 52px 0 0;
@@ -1046,6 +1057,27 @@
     }
     .absensi-selesai-footer i {
         font-size: 18px;
+    }
+
+    .info-empty {
+        padding: 30px 20px 40px 20px;
+    }
+
+    .page-btn {
+        padding: 4px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    .input-pagenation {
+        width: 36px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .pagination-bar {
+        padding: 0;
     }
 }
 
