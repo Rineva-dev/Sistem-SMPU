@@ -1014,3 +1014,91 @@
         font-size: 18px;
     }
 }
+
+/* ==========================================
+   📱 HEADER TETAP DI ATAS — KHUSUS HP
+   Posisi tetap, tidak ikut geser
+   ========================================== */
+.hp-fixed-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .hp-fixed-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        padding: 0 16px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 950;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Tombol Kembali — Panah Kiri */
+    .header-kembali-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #00478f;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 10px;
+        background: rgb(0 12 63 / 8%);
+        transition: all 0.2s ease;
+    }
+
+    .header-kembali-btn:active {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(0.94);
+    }
+
+    /* Judul Halaman Tengah */
+    .header-judul-halaman {
+        font-size: 17px;
+        font-weight: 600;
+        color: #00152a;
+        margin: 0;
+        letter-spacing: 0.3px;
+    }
+
+    /* Tombol Keluar — Ikon Saja Kanan */
+    .header-keluar-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f87171;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .header-keluar-btn:active {
+        background: rgba(220, 38, 38, 0.25);
+        transform: scale(0.94);
+    }
+
+    /* ✅ Sesuaikan jarak konten agar tidak tertutup header */
+    .absensi-harian-wrapper {
+        padding-top: 66px !important;
+    }
+
+    /* Sembunyikan tombol kembali lama yang ada di atas */
+    .datetime-main-row,
+    .divider-line,
+    .page-header {
+        display: none !important;
+    }
+}

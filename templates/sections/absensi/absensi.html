@@ -6,9 +6,16 @@
 
 <div class="absensi-harian-wrapper">
 
-    <a href="{{ url_for('absensi_guru.dashboard') }}" class="tombol-kembali-hp">
-        <i class="fas fa-chevron-left"></i>
-    </a>
+    <!-- ✅ HEADER TETAP DI ATAS KHUSUS HP -->
+    <header class="hp-fixed-header">
+        <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h1 class="header-judul-halaman">Absensi</h1>
+        <a href="{{ url_for('login.logout') }}" class="header-keluar-btn" title="Keluar">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </header>
 
     <div class="page-header">
         <h3>Absensi Harian</h3>
