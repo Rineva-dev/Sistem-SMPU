@@ -871,12 +871,15 @@
         text-align: center;
         margin-bottom: 14px !important;
     }
+
     .riwayat-grid {
         grid-template-columns: 1fr !important;
+        gap: 6px;
     }
+
     .riwayat-card {
-        border-radius: 18px !important;
-        padding: 16px !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
         border: 1px solid rgba(255,255,255,0.5);
     }
 
@@ -887,7 +890,7 @@
     .pagination-bar {
         flex-direction: column;
         text-align: center;
-        gap: 12px !important;
+        gap: 6px !important;
     }
 
     .riwayat-status {
@@ -1295,4 +1298,147 @@
         background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
         box-shadow: 0 6px 16px rgba(217, 119, 6, 0.56%) !important;
     }
+}
+
+/* ==========================================
+   📸 MODAL KAMERA SCAN QR — DESAIN MODERN HP
+   ========================================== */
+/* Frame Kamera — Pas & Rapi di HP */
+.kamera-frame {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  box-shadow: 
+    0 0 0 4px rgba(22, 163, 74, 0.12),
+    0 0 40px rgba(15, 23, 42, 0.4),
+    inset 0 0 60px rgba(59, 130, 246, 0.08);
+}
+
+/* Video Kamera */
+.kamera-frame video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+  background: #0f172a;
+  transform: scale(1.02);
+}
+
+/* Kanvas Pemindai — Tersembunyi tapi tetap berfungsi */
+.kamera-frame canvas {
+  display: none;
+}
+
+/* ✅ Garis Pandu Pemindai — Kotak Penanda QR */
+.kamera-frame::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: 45%;
+  border: 2px solid rgba(74, 222, 128, 0.7);
+  border-radius: 12px;
+  box-shadow: 
+    0 0 0 9999px rgba(15, 23, 42, 0.55),
+    inset 0 0 0 1px rgba(74, 222, 128, 0.4);
+  pointer-events: none;
+}
+
+/* ✅ Sudut-Sudut Kotak Pemindai */
+.kamera-frame::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: 45%;
+  pointer-events: none;
+}
+
+.kamera-frame .corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #4ade80;
+  border-radius: 4px;
+}
+.kamera-frame .corner.tl { top: 27.5%; left: 17.5%; border-right: none; border-bottom: none; }
+.kamera-frame .corner.tr { top: 27.5%; right: 17.5%; border-left: none; border-bottom: none; }
+.kamera-frame .corner.bl { bottom: 27.5%; left: 17.5%; border-right: none; border-top: none; }
+.kamera-frame .corner.br { bottom: 27.5%; right: 17.5%; border-left: none; border-top: none; }
+
+/* ✅ Garis Bergerak Animasi Pemindaian */
+.scan-line {
+  position: absolute;
+  top: 27.5%;
+  left: 17.5%;
+  width: 65%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4ade80, transparent);
+  border-radius: 2px;
+  animation: scanMove 2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scanMove {
+  0% { top: 27.5%; opacity: 1; }
+  50% { top: 70%; opacity: 0.8; }
+  100% { top: 27.5%; opacity: 1; }
+}
+
+/* ✅ Status Teks di Bawah Video */
+#kamera-status {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
+  color: #64748b;
+}
+#kamera-status.scanning {
+  color: #059669;
+  font-weight: 500;
+}
+
+/* ✅ Responsive — Pas di HP */
+@media (max-width: 480px) {
+  .kamera-frame {
+    max-width: 100%;
+    border-radius: 16px;
+  }
+  .kamera-frame::before {
+    width: 72%;
+    height: 50%;
+  }
+  .scan-line {
+    width: 72%;
+    left: 14%;
+  }
+  .kamera-frame .corner {
+    width: 20px;
+    height: 20px;
+  }
+  .kamera-frame .corner.tl { top: 25%; left: 14%; }
+  .kamera-frame .corner.tr { top: 25%; right: 14%; }
+  .kamera-frame .corner.bl { bottom: 25%; left: 14%; }
+  .kamera-frame .corner.br { bottom: 25%; right: 14%; }
+}
+
+/* ✅ Penyesuaian Modal Kamera */
+#modal-kamera .modal-body {
+  padding: 10px 20px 20px;
+  text-align: center;
+}
+#modal-kamera .modal-card {
+  max-width: 400px;
+}
+
+#kamera-status.scanning {
+    background-color: #dbeafe;
+    border-left: 4px solid #2563eb;
+    font-weight: 500;
 }

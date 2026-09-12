@@ -438,6 +438,12 @@
       <!-- ✅ PERBAIKAN: tambahkan id & atribut -->
       <video id="video-kamera" autoplay playsinline muted></video>
       <canvas id="kanvas-pemindai"></canvas>
+      <!-- ✅ Elemen Penanda Kotak Scan -->
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="scan-line"></div>
     </div>
   </div>
   <div class="modal-footer">
@@ -445,27 +451,39 @@
   </div>
 </div>
 
-<!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER agar tidak terpotong -->
-{% if not absensi or not absensi.jam_masuk %}
-    <button type="button" class="nav-btn main-btn btn-checkin btn-aksi-masuk">
-        <i class="fas fa-sign-in-alt"></i>
+<!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER -->
+{% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
+    <!-- ✅ SUDAH LENGKAP → TAMPIL IKON CENTANG, TIDAK BISA DIKLIK -->
+    <button type="button" class="nav-btn main-btn selesai" disabled style="opacity:1;cursor:not-allowed;pointer-events:none;background:#d4edda;color:#155724;">
+        <i class="fas fa-check-circle"></i>
     </button>
-{% else %}
+{% elif absensi and absensi.jam_masuk %}
+    <!-- ✅ SUDAH MASUK, BELUM PULANG → TOMBOL PULANG -->
     <button type="button" class="nav-btn main-btn btn-checkout btn-aksi-pulang">
         <i class="fas fa-sign-out-alt"></i>
+    </button>
+{% else %}
+    <!-- ❌ BELUM APA-APA → TOMBOL MASUK -->
+    <button type="button" class="nav-btn main-btn btn-checkin btn-aksi-masuk">
+        <i class="fas fa-sign-in-alt"></i>
     </button>
 {% endif %}
 
 <!-- ✅ FOOTER — HANYA LATAR BELAKANG & TOMBOL SAMPING -->
 <div class="mobile-bottom-nav">
     {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
-        <div class="absensi-selesai-footer">
-            <i class="fas fa-check-circle"></i>
-            <span>Absensi Hari Ini Sudah Lengkap</span>
-        </div>
+        <button type="button" class="nav-btn side-btn btn-aksi-izin" disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;">
+            <i class="fas fa-calendar-times"></i>
+            <span>Izin</span>
+        </button>
+        <button type="button" class="nav-btn side-btn btn-aksi-scan" disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;">
+            <i class="fas fa-camera"></i>
+            <span>Scan</span>
+        </button>
     {% else %}
         <!-- Tombol Kiri: Izin -->
         <button type="button" class="nav-btn side-btn btn-excuse btn-aksi-izin">
+            {% if absensi and absensi.jam_masuk %}disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;"{% endif %}>
             <i class="fas fa-calendar-times"></i>
             <span>Izin</span>
         </button>
@@ -484,6 +502,7 @@ const ABSENSI = {
     BATAS_TUTUP_ABSENSI: "{{ jam_tutup_absensi }}",
     BATAS_PULANG: "{{ jam_pulang_resmi }}",
     SUDAH_ABSEN_MASUK: {{ 'true' if (absensi and absensi.jam_masuk) else 'false' }},
+    SUDAH_PULANG: {{ 'true' if (absensi and absensi.jam_pulang) else 'false' }},
     URL_ABSENSI_HARIAN: "{{ url_for('absensi_guru.absensi_harian') }}",
     URL_ABSEN_MASUK: "{{ url_for('absensi_guru.absen_masuk') }}",
     URL_ABSEN_PULANG: "{{ url_for('absensi_guru.absen_pulang') }}",

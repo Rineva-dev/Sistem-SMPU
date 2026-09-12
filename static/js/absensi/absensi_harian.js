@@ -130,20 +130,25 @@ async function prosesHasilScan(dataQR) {
 // --- BACA QR DARI KAMERA ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
+
     if (!videoKamera || videoKamera.readyState < 2 ||
         videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
         requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
         return;
     }
+
     kanvasPemindai.width = videoKamera.videoWidth;
     kanvasPemindai.height = videoKamera.videoHeight;
     const konteks = kanvasPemindai.getContext('2d', { willReadFrequently: true });
     konteks.drawImage(videoKamera, 0, 0, kanvasPemindai.width, kanvasPemindai.height);
 
     const kameraStatus = document.getElementById('kamera-status');
+
+    // ✅ SAAT SEDANG MEMINDAI
     if (kameraStatus) {
         kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan QR ke bingkai';
         kameraStatus.style.color = '#2563eb';
+        kameraStatus.classList.add('scanning'); // ← pastikan kelas scanning aktif
     }
 
     try {
@@ -155,6 +160,7 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
+
         const lebar = kanvasPemindai.width;
         const tinggi = kanvasPemindai.height;
         const skala = 0.6;
@@ -162,29 +168,39 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
         const potongY = tinggi * (1 - skala) / 2;
         const potongLebar = lebar * skala;
         const potongTinggi = tinggi * skala;
+
         const gambarData = konteks.getImageData(
             Math.floor(potongX), Math.floor(potongY),
             Math.floor(potongLebar), Math.floor(potongTinggi)
         );
+
         if (gambarData.data.length < 100 || gambarData.width < 50 || gambarData.height < 50) {
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
+
         const kodeQR = window.jsQR(gambarData.data, gambarData.width, gambarData.height, {
             inversionAttempts: 'dontInvert'
         });
+
         if (kodeQR && kodeQR.data) {
             pemindaianAktifRef.value = false;
+
+            // ✅ SAAT QR TERDETEKSI
             if (kameraStatus) {
-                kameraStatus.innerHTML = '<i class="fas fa-check-circle"></i> QR Terdeteksi! Memproses...';
+                kameraStatus.textContent = '✅ QR Terdeteksi! Memproses...';
+                kameraStatus.classList.remove('scanning'); // ← hapus kelas scanning
                 kameraStatus.style.color = '#16a34a';
             }
+
             prosesHasilScan(kodeQR.data);
             return;
         }
+
     } catch (e) {
         // Diam saja
     }
+
     requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
 }
 
@@ -390,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
             kameraStatus.innerHTML = sudahMasuk
                 ? '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Pulang'
                 : '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Masuk';
+            kameraStatus.classList.add('scanning');
             modalKameraOverlay.style.display = 'block';
             modalKamera.style.display = 'block';
             setTimeout(() => {
@@ -430,4 +447,30 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     semuaBtnScan.forEach(btn => btn.addEventListener('click', bukaKamera));
     if (btnTutupKameraEl) btnTutupKameraEl.addEventListener('click', tutupKamera);
+
+    // ==========================================
+    // ✅ ATURAN TOMBOL NAVIGASI HP (KHUSUS)
+    // ==========================================
+    const SUDAH_MASUK = !!(ABSENSI.SUDAH_ABSEN_MASUK);
+    const SUDAH_LENGKAP = !!(ABSENSI.SUDAH_ABSEN_MASUK && ABSENSI.SUDAH_SUDAH_PULANG); 
+    const SUDAH_PULANG = document.querySelector('.btn-aksi-pulang') ? false : false; // akan diatur ulang lewat kondisi dari server lewat HTML disabled
+
+    if (SUDAH_MASUK) {
+        document.querySelectorAll('.side-btn.btn-aksi-izin').forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.style.pointerEvents = 'none';
+        });
+    }
+
+    // Nonaktifkan SEMUA tombol jika sudah lengkap
+    if (SUDAH_MASUK && SUDAH_PULANG) {
+        document.querySelectorAll('.side-btn.btn-aksi-scan').forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.style.pointerEvents = 'none';
+        });
+    }
 });
