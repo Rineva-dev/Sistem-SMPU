@@ -101,11 +101,11 @@
         </div>
         <div class="hp-status-content">
             {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
-            <div class="hp-status-title">Absensi Lengkap ✅</div>
+            <div class="hp-status-title">Absensi Lengkap</div>
             <div class="hp-status-desc">Hadir: {{ absensi.jam_masuk }} — Pulang: {{ absensi.jam_pulang }}</div>
             {% elif absensi and absensi.jam_masuk %}
-            <div class="hp-status-title">Sudah Check In ⏰</div>
-            <div class="hp-status-desc">Jam Masuk: {{ absensi.jam_masuk }} — Silakan Check Out nanti</div>
+            <div class="hp-status-title">Sudah Check In</div>
+            <div class="hp-status-desc">Jam Masuk: {{ absensi.jam_masuk }} — Silakan Check Out setelah jam {{ jam_pulang_resmi }}</div>
             {% else %}
             <div class="hp-status-title">Belum Absensi Hari Ini</div>
             <div class="hp-status-desc">Silakan lakukan Absen Masuk terlebih dahulu</div>

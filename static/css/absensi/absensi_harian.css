@@ -752,9 +752,11 @@
     .rule-label {
         font-size: 11px !important;
     }
+
     .rule-value {
         font-size: 16px !important;
     }
+
     /* ✅ KARTU STATUS — MEWAH, PUTIH TEMBUS */
     .status-today-card {
         background: rgba(255,255,255,0.92) !important;
@@ -765,15 +767,18 @@
         border: 1px solid rgba(255,255,255,0.3);
         box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     }
+
     .status-text {
         font-size: 15px !important;
         text-align: center;
         display: block;
     }
+
     /* ✅ TOMBOL ABSEN — TUMPUK BAWAH, PENUH LEBAR */
     .btn-absensi-wrapper {
         margin-bottom: 20px !important;
     }
+
     .btn-absensi-group {
         flex-direction: column !important;
         width: 100% !important;
@@ -783,6 +788,7 @@
         background: rgba(255,255,255,0.95) !important;
         backdrop-filter: blur(20px);
     }
+
     .btn-absensi {
         width: 100% !important;
         justify-content: center !important;
@@ -790,15 +796,17 @@
         border-radius: 14px !important;
         font-size: 15px !important;
     }
+
     .absensi-selesai {
         padding: 16px !important;
         border-radius: 14px !important;
     }
+
     /* ✅ KARTU INFO KEHADIRAN — PUTIH TEMBUS, BULAT BESAR */
     .info-kehadiran-card {
         background: rgba(255,255,255,0.92) !important;
         backdrop-filter: blur(20px);
-        border-radius: 24px !important;
+        border-radius: 12px !important;
         padding: 22px !important;
         margin-bottom: 20px !important;
         border: 1px solid rgba(255,255,255,0.3);
@@ -812,9 +820,26 @@
         gap: 12px !important;
     }
     .info-item {
-        border-radius: 16px !important;
-        padding: 16px !important;
+        border-radius: 8px !important;
+        padding: 12px 12px 12px 20px !important;
     }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    .info-label {
+        margin-bottom: 0;
+        font-size: 10px
+    }
+
+    .info-value {
+        font-size: 13px;
+    }
+
     /* ✅ FILTER — RAPI DI BAWAH */
     .filter-bar {
         justify-content: center;
@@ -823,6 +848,9 @@
     .filter-dropdown {
         flex: 1;
         min-width: 120px;
+        padding: 6px 14px;
+        font-size: 12px;
+        border-radius: 8px;
     }
     /* ✅ RIWAYAT — KARTU BULAT & MEWAH */
     .riwayat-section {
@@ -878,6 +906,7 @@
 /* ==========================================
    📱 FOOTER — LENGKUNG SETENGAH LINGKARAN HALUS ✅
    ========================================== */
+.nav-btn,
 .hp-datetime-bar,
 .mobile-bottom-nav {
     display: none;
@@ -1016,6 +1045,7 @@
    📱 HEADER TETAP DI ATAS — KHUSUS HP
    Posisi tetap, tidak ikut geser
    ========================================== */
+.hp-status-today-card,
 .hp-fixed-header {
     display: none;
 }
@@ -1037,7 +1067,6 @@
         z-index: 950;
     }
 
-    /* Tombol Kembali — Panah Kiri */
     .header-kembali-btn {
         width: 32px;
         height: 32px;
@@ -1057,7 +1086,6 @@
         transform: scale(0.94);
     }
 
-    /* Judul Halaman Tengah */
     .header-judul-halaman {
         font-size: 17px;
         font-weight: 600;
@@ -1066,7 +1094,6 @@
         letter-spacing: 0.3px;
     }
 
-    /* Tombol Keluar — Ikon Saja Kanan */
     .header-keluar-btn {
         width: 32px;
         height: 32px;
@@ -1085,14 +1112,12 @@
         transform: scale(0.94);
     }
 
-    /* Sembunyikan tombol kembali lama yang ada di atas */
     .datetime-main-row,
     .divider-line,
     .page-header {
         display: none !important;
     }
 
-    /*NEW CODE*/
     .hp-datetime-bar {
         display: flex;
         justify-content: space-between;
@@ -1104,7 +1129,7 @@
         font-size: 12px;
         font-weight: 800;
         letter-spacing: 1px;
-        background: #ffffffef;
+        background: #ffffffa8;
         line-height: 1;
         padding: 6px;
         border-radius: 4px;
@@ -1134,10 +1159,12 @@
         justify-content: center;
         transition: all 0.2s ease;
     }
+
     .hp-calendar-btn:active {
         transform: scale(0.92);
         background: #bfdbfe;
     }
+
     #input-tanggal-pilih {
         position: absolute;
         top: 0;
@@ -1148,7 +1175,6 @@
         cursor: pointer;
     }
 
-    /* ✅ KARTU STATUS HARI INI — SEPERTI GAMBAR */
     .hp-status-today-card {
         display: flex;
         align-items: center;
@@ -1162,7 +1188,6 @@
 
     }
 
-    /* ✅ DEKORASI DI BELAKANG */
     .hp-status-today-card::before {
         content: "";
         position: absolute;
@@ -1176,7 +1201,6 @@
         z-index: 1;
     }
 
-    /* ✅ LATAR BELAKANG KARTU DI TENGAH */
     .hp-status-today-card::after {
         content: "";
         position: absolute;
@@ -1186,7 +1210,6 @@
         z-index: 2;
     }
 
-    /* ✅ PASTIKAN TEKS & IKON TAMPIL DI PALING DEPAN */
     .hp-status-today-card > * {
         position: relative;
         z-index: 3;
@@ -1222,5 +1245,14 @@
     .saas-datetime-card,
     .status-today-card {
         display: none !important;
+    }
+
+    .nav-btn.main-btn.btn-checkin {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.56%) !important;
+    }
+    .nav-btn.main-btn.btn-checkout {
+        background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
+        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.56%) !important;
     }
 }
