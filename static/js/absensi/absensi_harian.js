@@ -1,6 +1,7 @@
 // ==========================================
 // ABSENSI HARIAN — SCRIPT LENGKAP & BENAR
 // ==========================================
+
 // --- JAM DIGITAL ---
 function updateClock() {
     const now = new Date();
@@ -11,6 +12,13 @@ function updateClock() {
     const s = String(wita.getSeconds()).padStart(2, '0');
     document.getElementById('jam-digital').textContent = `${h}.${m}.${s}`;
 }
+
+// --- FUNGSI NOTIFIKASI (jika belum ada di layout) ---
+function notifSukses(pesan) { alert('✅ SUKSES: ' + pesan); }
+function notifError(pesan) { alert('❌ GAGAL: ' + pesan); }
+function notifInfo(pesan) { alert('ℹ️ INFO: ' + pesan); }
+function notifPeringatan(pesan) { alert('⚠️ PERINGATAN: ' + pesan); }
+
 // --- FILTER BULAN & TAHUN ---
 function terapkanFilter() {
     const bulan = document.getElementById('filter-bulan').value;
@@ -22,11 +30,13 @@ function terapkanFilter() {
     if (params.toString()) url += '?' + params.toString();
     window.location.href = url;
 }
+
 // --- UBAH JAM KE MENIT ---
 function jamKeMenit(jamStr) {
     const [j, m] = jamStr.split(':').map(Number);
     return j * 60 + m;
 }
+
 // --- AMBIL JAM SAAT INI (WITA) ---
 function ambilJamSaatIni() {
     const now = new Date();
@@ -36,6 +46,7 @@ function ambilJamSaatIni() {
     const m = String(wita.getMinutes()).padStart(2, '0');
     return `${h}:${m}`;
 }
+
 // --- CEK: SUDAH LEWAT BATAS WAKTU? ---
 const BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
 function sudahLewatBatasWaktu() {
@@ -43,18 +54,19 @@ function sudahLewatBatasWaktu() {
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
 }
 function tampilkanPeringatanAlfa() {
-    notifPeringatan(`PERINGATAN: Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP..`);
+    notifPeringatan(`Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP.`);
 }
-// ✅ === BARU: CEK BELUM JAM PULANG ===
+
+// --- CEK: BELUM JAM PULANG? ---
 const BATAS_PULANG = ABSENSI.BATAS_PULANG;
 function belumJamPulang() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
 }
 function tampilkanPeringatanBelumJamPulang() {
-    notifInfo(`BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru diperbolehkan mulai jam ${BATAS_PULANG}.`);
+    notifInfo(`BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru bisa mulai jam ${BATAS_PULANG}.`);
 }
-// ✅ === SELESAI PENAMBAHAN ===
+
 // --- KIRIM ABSEN MASUK ---
 function kirimAbsenMasuk(alasan = '') {
     const form = document.createElement('form');
@@ -70,7 +82,8 @@ function kirimAbsenMasuk(alasan = '') {
     document.body.appendChild(form);
     form.submit();
 }
-// ✅ === BARU: KIRIM ABSEN PULANG ===
+
+// --- KIRIM ABSEN PULANG ---
 function kirimAbsenPulang() {
     if (belumJamPulang()) {
         tampilkanPeringatanBelumJamPulang();
@@ -82,9 +95,10 @@ function kirimAbsenPulang() {
     document.body.appendChild(form);
     form.submit();
 }
-// ✅ === SELESAI PENAMBAHAN ===
+
+// --- PROSES HASIL SCAN QR ---
 async function prosesHasilScan(dataQR) {
-    // ✅ TUTUP KAMERA & MODAL DULU
+    // Tutup kamera & modal dulu
     if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
     if (window._aliranKamera) {
         window._aliranKamera.getTracks().forEach(track => track.stop());
@@ -94,7 +108,7 @@ async function prosesHasilScan(dataQR) {
     const modalKamera = document.getElementById('modal-kamera');
     if (modalKameraOverlay) modalKameraOverlay.style.display = 'none';
     if (modalKamera) modalKamera.style.display = 'none';
-    // ... sisa kode (cek jam masuk/pulang) ...
+
     try {
         const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
             method: 'POST',
@@ -103,53 +117,47 @@ async function prosesHasilScan(dataQR) {
         });
         const hasil = await res.json();
         if (hasil.status === 'sukses' || hasil.status === 'info') {
-            // ✅ TAMPILKAN NAMA & STATUS
-            notifSukses(`${hasil.pesan || 'Absensi berhasil tercatat!'}`);
+            notifSukses(hasil.pesan || 'Absensi berhasil tercatat!');
             setTimeout(() => location.reload(), 1000);
         } else {
-            // ❌ TAMPILKAN ALASAN GAGAL
-            notifError(`${hasil.pesan || 'Gagal memproses QR'}`);
+            notifError(hasil.pesan || 'Gagal memproses QR.');
         }
     } catch (err) {
         notifError(`Kesalahan: ${err.message}`);
     }
 }
+
 // --- BACA QR DARI KAMERA ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
-    // ⛔ TUNGGU VIDEO SIAP
     if (!videoKamera || videoKamera.readyState < 2 ||
         videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
         requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
         return;
     }
-    // ✅ SET UKURAN CANVAS SESUAI VIDEO
     kanvasPemindai.width = videoKamera.videoWidth;
     kanvasPemindai.height = videoKamera.videoHeight;
-    // ✅ TAMBAH willReadFrequently: true ← HILANGKAN PERINGATAN CONSOLE
     const konteks = kanvasPemindai.getContext('2d', { willReadFrequently: true });
-    
     konteks.drawImage(videoKamera, 0, 0, kanvasPemindai.width, kanvasPemindai.height);
-    // Indikasi status
+
     const kameraStatus = document.getElementById('kamera-status');
     if (kameraStatus) {
-        kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan kode QR ke bingkai';
+        kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan QR ke bingkai';
         kameraStatus.style.color = '#2563eb';
     }
+
     try {
-        // ✅ Pastikan jsQR sudah dimuat
         if (!window.jsQR) {
             if (kameraStatus) {
-                kameraStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menunggu pustaka pemindai...';
+                kameraStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menunggu pustaka...';
                 kameraStatus.style.color = '#f59e0b';
             }
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
-        // ✅ Baca area TENGAH saja agar lebih cepat & akurat
         const lebar = kanvasPemindai.width;
         const tinggi = kanvasPemindai.height;
-        const skala = 0.6; // baca 60% area tengah
+        const skala = 0.6;
         const potongX = lebar * (1 - skala) / 2;
         const potongY = tinggi * (1 - skala) / 2;
         const potongLebar = lebar * skala;
@@ -158,14 +166,12 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
             Math.floor(potongX), Math.floor(potongY),
             Math.floor(potongLebar), Math.floor(potongTinggi)
         );
-        // Validasi ukuran data
         if (gambarData.data.length < 100 || gambarData.width < 50 || gambarData.height < 50) {
             requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
-        // ✅ Scan QR
         const kodeQR = window.jsQR(gambarData.data, gambarData.width, gambarData.height, {
-            inversionAttempts: 'dontInvert' // opsi tambahan: 'attemptBoth' jika perlu
+            inversionAttempts: 'dontInvert'
         });
         if (kodeQR && kodeQR.data) {
             pemindaianAktifRef.value = false;
@@ -177,39 +183,38 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
             return;
         }
     } catch (e) {
-        // Diam saja, jangan spam console
+        // Diam saja
     }
-    // Lanjut frame berikutnya
     requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
 }
+
 // ==========================================
-// INISIALISASI SEMUA EVENT SETELAH HALAMAN SIAP
+// INISIALISASI SETELAH HALAMAN SIAP
 // ==========================================
 document.addEventListener('DOMContentLoaded', function () {
-    // Mulai jam
     updateClock();
     setInterval(updateClock, 1000);
+
     // ==========================================
-    // MODAL 1: IZIN / SAKIT
+    // MODAL IZIN / SAKIT
     // ==========================================
-    const btnExcuse = document.getElementById('btn-excuse');
+    const semuaBtnIzin = document.querySelectorAll('.btn-aksi-izin');
     const modalOverlay = document.getElementById('modal-overlay');
     const modalForm = document.getElementById('modal-form');
     const modalCancel = document.getElementById('modal-cancel');
     const modalSubmit = document.getElementById('modal-submit');
-    if (btnExcuse && modalOverlay && modalForm) {
-        btnExcuse.addEventListener('click', () => {
-            if (sudahLewatBatasWaktu()) {
-                tampilkanPeringatanAlfa();
-                return;
-            }
-            modalOverlay.style.display = 'block';
-            modalForm.style.display = 'block';
-            setTimeout(() => {
-                modalOverlay.classList.add('active');
-                modalForm.classList.add('active');
-            }, 10);
-        });
+
+    function bukaModalIzin() {
+        if (sudahLewatBatasWaktu()) {
+            tampilkanPeringatanAlfa();
+            return;
+        }
+        modalOverlay.style.display = 'block';
+        modalForm.style.display = 'block';
+        setTimeout(() => {
+            modalOverlay.classList.add('active');
+            modalForm.classList.add('active');
+        }, 10);
     }
     function tutupModalIzin() {
         modalOverlay.classList.remove('active');
@@ -219,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
             modalForm.style.display = 'none';
         }, 350);
     }
+    semuaBtnIzin.forEach(btn => btn.addEventListener('click', bukaModalIzin));
     if (modalCancel) modalCancel.addEventListener('click', tutupModalIzin);
     if (modalSubmit) {
         modalSubmit.addEventListener('click', () => {
@@ -226,14 +232,28 @@ document.addEventListener('DOMContentLoaded', function () {
             kirimAbsenMasuk(alasan);
         });
     }
+
     // ==========================================
-    // MODAL 2: QR ABSENSI
+    // MODAL TAMPILKAN QR
     // ==========================================
-    const btnTampilkanQR = document.getElementById('btn-tampilkan-qr');
+    const semuaBtnQR = document.querySelectorAll('.btn-aksi-qr');
     const modalQrOverlay = document.getElementById('modal-qr-overlay');
     const modalQr = document.getElementById('modal-qr');
     const modalQrTutup = document.getElementById('modal-qr-tutup');
+
     function bukaModalQR() {
+        const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
+        if (!sudahMasuk) {
+            if (sudahLewatBatasWaktu()) {
+                tampilkanPeringatanAlfa();
+                return;
+            }
+        } else {
+            if (belumJamPulang()) {
+                tampilkanPeringatanBelumJamPulang();
+                return;
+            }
+        }
         modalQrOverlay.style.display = 'block';
         modalQr.style.display = 'block';
         setTimeout(() => {
@@ -249,52 +269,37 @@ document.addEventListener('DOMContentLoaded', function () {
             modalQr.style.display = 'none';
         }, 350);
     }
-    if (btnTampilkanQR && modalQrOverlay && modalQr) {
-        btnTampilkanQR.addEventListener('click', async () => {
-            // === CEK JAM MASUK vs JAM PULANG ===
-            const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
-            if (!sudahMasuk) {
-            // BELUM ABSEN MASUK → cek batas jam
-            if (sudahLewatBatasWaktu()) {
-                tampilkanPeringatanAlfa();
-                return;
-            }
-            } else {
-            // SUDAH MASUK → ini QR untuk PULANG, cek jam
-            if (belumJamPulang()) {
-                tampilkanPeringatanBelumJamPulang();
-                return;
-            }
-            }
-            bukaModalQR();
-            try {
+    semuaBtnQR.forEach(btn => btn.addEventListener('click', async () => {
+        bukaModalQR();
+        try {
             const res = await fetch(ABSENSI.URL_QR_DATA);
             const data = await res.json();
             if (data.status === 'sukses') {
                 document.getElementById('qr-tempat-tampil').innerHTML =
-                `<img src="data:image/png;base64,${data.qr_code}" alt="QR Absensi">`;
+                    `<img src="data:image/png;base64,${data.qr_code}" alt="QR Absensi">`;
                 document.getElementById('qr-nama-guru').textContent = data.nama;
                 document.getElementById('qr-nip-guru').textContent = data.nip || '-';
                 document.getElementById('qr-tanggal-hariini').textContent = data.hari_ini;
             } else {
                 document.getElementById('qr-tempat-tampil').innerHTML =
-                `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> ${data.pesan || 'Gambar QR gagal dimuat'}</em>`;
+                    `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> ${data.pesan || 'QR gagal dimuat'}</em>`;
             }
-            } catch (err) {
+        } catch (err) {
             document.getElementById('qr-tempat-tampil').innerHTML =
                 `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> Gagal memuat QR</em>`;
-            }
-        });
-    }
+        }
+    }));
     if (modalQrTutup) modalQrTutup.addEventListener('click', tutupModalQR);
+
     // ==========================================
-    // MODAL 3: ALASAN TERLAMBAT
+    // MODAL ALASAN TERLAMBAT — ABSEN MASUK
     // ==========================================
-    const btnCheckIn = document.getElementById('btn-checkin');
+    const semuaBtnMasuk = document.querySelectorAll('.btn-aksi-masuk');
     const modalTelatOverlay = document.getElementById('modal-telat-overlay');
     const modalTelat = document.getElementById('modal-telat');
     const modalTelatBatal = document.getElementById('modal-telat-batal');
     const modalTelatSimpan = document.getElementById('modal-telat-simpan');
+
     function bukaModalAlasanTelat(jamSaatIni) {
         document.getElementById('jam-saat-ini').textContent = jamSaatIni;
         document.getElementById('alasan-keterlambatan').value = '';
@@ -313,22 +318,20 @@ document.addEventListener('DOMContentLoaded', function () {
             modalTelat.style.display = 'none';
         }, 350);
     }
-    if (btnCheckIn) {
-        btnCheckIn.addEventListener('click', () => {
-            if (sudahLewatBatasWaktu()) {
-                tampilkanPeringatanAlfa();
-                return;
-            }
-            const jamSaatIni = ambilJamSaatIni();
-            const batasMenit = jamKeMenit(ABSENSI.BATAS_TEPAT_WAKTU);
-            const saatIniMenit = jamKeMenit(jamSaatIni);
-            if (saatIniMenit > batasMenit) {
-                bukaModalAlasanTelat(jamSaatIni);
-            } else {
-                kirimAbsenMasuk();
-            }
-        });
-    }
+    semuaBtnMasuk.forEach(btn => btn.addEventListener('click', () => {
+        if (sudahLewatBatasWaktu()) {
+            tampilkanPeringatanAlfa();
+            return;
+        }
+        const jamSaatIni = ambilJamSaatIni();
+        const batasMenit = jamKeMenit(ABSENSI.BATAS_TEPAT_WAKTU);
+        const saatIniMenit = jamKeMenit(jamSaatIni);
+        if (saatIniMenit > batasMenit) {
+            bukaModalAlasanTelat(jamSaatIni);
+        } else {
+            kirimAbsenMasuk();
+        }
+    }));
     if (modalTelatBatal) modalTelatBatal.addEventListener('click', tutupModalTelat);
     if (modalTelatSimpan) {
         modalTelatSimpan.addEventListener('click', () => {
@@ -336,36 +339,37 @@ document.addEventListener('DOMContentLoaded', function () {
             kirimAbsenMasuk(alasan);
         });
     }
-    // ✅ === BARU: TOMBOL ABSEN PULANG ===
-    const btnCheckOut = document.getElementById('btn-checkout');
-    if (btnCheckOut) {
-        btnCheckOut.addEventListener('click', () => {
-            if (belumJamPulang()) {
-                tampilkanPeringatanBelumJamPulang();
-                return;
-            }
-            kirimAbsenPulang();
-        });
-    }
-    // ✅ === SELESAI PENAMBAHAN ===
+
     // ==========================================
-    // MODAL 4: KAMERA SCAN QR
+    // ABSEN PULANG
     // ==========================================
-    const btnBukaKameraEl = document.getElementById('btn-buka-kamera');
+    const semuaBtnPulang = document.querySelectorAll('.btn-aksi-pulang');
+    semuaBtnPulang.forEach(btn => btn.addEventListener('click', () => {
+        if (belumJamPulang()) {
+            tampilkanPeringatanBelumJamPulang();
+            return;
+        }
+        kirimAbsenPulang();
+    }));
+
+    // ==========================================
+    // MODAL KAMERA SCAN QR
+    // ==========================================
+    const semuaBtnScan = document.querySelectorAll('.btn-aksi-scan');
     const btnTutupKameraEl = document.getElementById('btn-tutup-kamera');
     const modalKameraOverlay = document.getElementById('modal-kamera-overlay');
     const modalKamera = document.getElementById('modal-kamera');
+
     async function bukaKamera() {
-        // Cek sesuai tipe
-        const tipe = ABSENSI.SUDAH_ABSEN_MASUK ? "pulang" : "masuk";
-        if (tipe === "pulang") {
-            if (belumJamPulang()) {
-                tampilkanPeringatanBelumJamPulang();
+        const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
+        if (!sudahMasuk) {
+            if (sudahLewatBatasWaktu()) {
+                tampilkanPeringatanAlfa();
                 return;
             }
         } else {
-            if (sudahLewatBatasWaktu()) {
-                tampilkanPeringatanAlfa();
+            if (belumJamPulang()) {
+                tampilkanPeringatanBelumJamPulang();
                 return;
             }
         }
@@ -374,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const cekIzin = await navigator.permissions.query({ name: 'camera' });
             if (cekIzin.state === 'denied') {
-                notifError('Izin kamera DIBLOKIR.\n\nKlik ikon gembok <i class="fas fa-lock"></i> di bilah alamat → Pengaturan Situs → Ubah Kamera jadi Izinkan');
+                notifError('Izin kamera DIBLOKIR.\n\nKlik ikon gembok 🔒 di bilah alamat → Pengaturan Situs → Izinkan Kamera');
                 return;
             }
             aliranKamera = await navigator.mediaDevices.getUserMedia({ 
@@ -383,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const videoKamera = document.getElementById('video-kamera');
             videoKamera.srcObject = aliranKamera;
             const kameraStatus = document.getElementById('kamera-status');
-            kameraStatus.innerHTML = tipe === "pulang"
+            kameraStatus.innerHTML = sudahMasuk
                 ? '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Pulang'
                 : '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Masuk';
             modalKameraOverlay.style.display = 'block';
@@ -396,15 +400,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const kanvasPemindai = document.getElementById('kanvas-pemindai');
             setTimeout(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef), 500);
         } catch (err) {
-            let pesan = '[fas fa-exclamation-circle] Tidak bisa membuka kamera.\n\n';
+            let pesan = '⚠️ Tidak bisa membuka kamera.\n\n';
             if (err.name === 'NotAllowedError') {
-                pesan += '→ <i class="fas fa-ban"></i> Akses kamera DITOLAK/BLOKIR.\n→ Klik ikon gembok <i class="fas fa-lock"></i> di alamat → Izinkan Kamera';
+                pesan += '→ Akses kamera DITOLAK/BLOKIR.\n→ Klik ikon gembok 🔒 di alamat → Izinkan Kamera';
             } else if (err.name === 'NotFoundError') {
-                pesan += '→ <i class="fas fa-video-slash"></i> Kamera tidak ditemukan di perangkat.';
+                pesan += '→ Kamera tidak ditemukan di perangkat.';
             } else if (err.name === 'NotReadableError') {
-                pesan += '→ <i class="fas fa-video"></i> Kamera sedang dipakai aplikasi lain.';
+                pesan += '→ Kamera sedang dipakai aplikasi lain.';
             } else {
-                pesan += `→ <i class="fas fa-code"></i> Error: ${err.message}`;
+                pesan += `→ Error: ${err.message}`;
             }
             notifError(pesan);
         }
@@ -424,6 +428,6 @@ document.addEventListener('DOMContentLoaded', function () {
             modalKamera.style.display = 'none';
         }, 350);
     }
-    if (btnBukaKameraEl) btnBukaKameraEl.addEventListener('click', bukaKamera);
+    semuaBtnScan.forEach(btn => btn.addEventListener('click', bukaKamera));
     if (btnTutupKameraEl) btnTutupKameraEl.addEventListener('click', tutupKamera);
 });

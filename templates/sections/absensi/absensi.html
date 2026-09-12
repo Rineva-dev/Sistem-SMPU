@@ -99,8 +99,7 @@
                     <!-- Absen Masuk -->
                     <button
                         type="button"
-                        id="btn-checkin"
-                        class="btn-absensi btn-checkin">
+                        class="btn-absensi btn-checkin btn-aksi-masuk">
                         <i class="fas fa-sign-in-alt"></i>
                         Absen Masuk
                     </button>
@@ -108,8 +107,7 @@
                     <!-- Tampilkan QR untuk masuk -->
                     <button
                         type="button"
-                        id="btn-tampilkan-qr"
-                        class="btn-absensi btn-checkin">
+                        class="btn-absensi btn-checkin btn-aksi-qr">
                         <i class="fas fa-qrcode"></i>
                         Tampilkan QR
                     </button>
@@ -117,8 +115,7 @@
                     <!-- Scan QR untuk masuk -->
                     <button
                         type="button"
-                        id="btn-buka-kamera"
-                        class="btn-absensi btn-checkin">
+                        class="btn-absensi btn-checkin btn-aksi-scan">
                         <i class="fas fa-camera"></i>
                         Scan QR
                     </button>
@@ -126,8 +123,7 @@
                     <!-- Izin / Sakit -->
                     <button
                         type="button"
-                        id="btn-excuse"
-                        class="btn-absensi btn-excuse">
+                        class="btn-absensi btn-excuse btn-aksi-izin">
                         <i class="fas fa-calendar-times"></i>
                         Izin / Sakit
                     </button>
@@ -141,8 +137,7 @@
                     <!-- Absen Pulang Manual -->
                     <button
                         type="button"
-                        id="btn-checkout"
-                        class="btn-absensi btn-checkout">
+                        class="btn-absensi btn-checkout btn-aksi-pulang">
                         <i class="fas fa-sign-out-alt"></i>
                         Absen Pulang
                     </button>
@@ -150,8 +145,7 @@
                     <!-- Tampilkan QR untuk pulang -->
                     <button
                         type="button"
-                        id="btn-tampilkan-qr"
-                        class="btn-absensi btn-checkout">
+                        class="btn-absensi btn-checkout btn-aksi-qr">
                         <i class="fas fa-qrcode"></i>
                         Tampilkan QR
                     </button>
@@ -159,8 +153,7 @@
                     <!-- Scan QR untuk pulang -->
                     <button
                         type="button"
-                        id="btn-buka-kamera"
-                        class="btn-absensi btn-checkout">
+                        class="btn-absensi btn-checkout btn-aksi-scan">
                         <i class="fas fa-camera"></i>
                         Scan QR
                     </button>
@@ -407,11 +400,11 @@
 
 <!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER agar tidak terpotong -->
 {% if not absensi or not absensi.jam_masuk %}
-    <button type="button" id="btn-checkin" class="nav-btn main-btn btn-checkin">
+    <button type="button" class="nav-btn main-btn btn-checkin btn-aksi-masuk">
         <i class="fas fa-sign-in-alt"></i>
     </button>
 {% else %}
-    <button type="button" id="btn-checkout" class="nav-btn main-btn btn-checkout">
+    <button type="button" class="nav-btn main-btn btn-checkout btn-aksi-pulang">
         <i class="fas fa-sign-out-alt"></i>
     </button>
 {% endif %}
@@ -425,12 +418,12 @@
         </div>
     {% else %}
         <!-- Tombol Kiri: Izin -->
-        <button type="button" id="btn-excuse" class="nav-btn side-btn btn-excuse">
+        <button type="button" class="nav-btn side-btn btn-excuse btn-aksi-izin">
             <i class="fas fa-calendar-times"></i>
             <span>Izin</span>
         </button>
         <!-- Tombol Kanan: Scan QR -->
-        <button type="button" id="btn-buka-kamera" class="nav-btn side-btn btn-scan">
+        <button type="button" class="nav-btn side-btn btn-scan btn-aksi-scan">
             <i class="fas fa-camera"></i>
             <span>Scan</span>
         </button>
