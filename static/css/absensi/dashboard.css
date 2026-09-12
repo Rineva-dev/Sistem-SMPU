@@ -373,7 +373,7 @@
         display: block;
         background: linear-gradient(180deg, #0b2b80 0%, #0b1b3f 100%);
         margin: -1.5rem -1.5rem -2.5rem;
-        padding: 1.5rem 1.5rem 4rem;
+        padding: 0.5rem 1.5rem 4rem;
         border-radius: 0 0 10% 10%;
         position: relative;
         overflow: hidden;
@@ -684,7 +684,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.6rem;
+        margin-bottom: 1rem;
     }
 
     .header-keluar-btn {
@@ -694,6 +694,10 @@
         color: #ffffff;
         font-size: 16px;
         transition: all 0.2s ease;
+        position: relative;
+        z-index: 9999;
+        pointer-events: auto;
+        cursor: pointer;
     }
 
     .mobile-logo-top {
