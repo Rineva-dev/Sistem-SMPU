@@ -355,6 +355,7 @@
 /* =============================================
    ✅ MENU KHUSUS HP
    ============================================= */
+.mobile-header-title,
 .mobile-menu-section {
     display: none;
 }
@@ -372,7 +373,7 @@
         display: block;
         background: linear-gradient(180deg, #0b2b80 0%, #0b1b3f 100%);
         margin: -1.5rem -1.5rem -2.5rem;
-        padding: 2rem 1.5rem 4rem;
+        padding: 1.5rem 1.5rem 4rem;
         border-radius: 0 0 10% 10%;
         position: relative;
         overflow: hidden;
@@ -673,11 +674,42 @@
 /* =============================================
    ✅ KARTU JAM & ATURAN ABSENSI — KHUSUS HP
    ============================================= */
+.header-dashboard,
 .mobile-datetime-section {
-    display: none; /* Sembunyikan di komputer */
+    display: none;
 }
 
 @media (max-width: 767px) {
+    .header-dashboard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.6rem;
+    }
+
+    .header-keluar-btn {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 8px;
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-logo-top {
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        height: 26px;
+    }
+
+    .logo-hp {
+        width: auto;
+        height: 26px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+    }
+
     .mobile-datetime-section {
         display: block;
         margin: 2rem 0 0;

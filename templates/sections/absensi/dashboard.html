@@ -9,6 +9,16 @@
 
     <!-- ✅ HEADER KHUSUS HP — Latar Biru + Avatar -->
     <div class="mobile-header-section">
+        <div class="header-dashboard">
+            <div class="mobile-logo-top">
+                <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo" class="logo-hp">
+            </div>
+
+            <a href="{{ url_for('login.logout') }}" class="header-keluar-btn" title="Keluar">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+        
         <div class="mobile-header-content">
             <div class="avatar-box">
                 <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name={{ user.nama|urlencode }}&background=fff&color=2563eb&size=128'">
