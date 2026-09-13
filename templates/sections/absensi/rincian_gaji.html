@@ -5,6 +5,17 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rincian_gaji.css') }}">
 
 <div class="rincian-gaji-wrapper">
+
+    <header class="hp-fixed-header">
+        <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h1 class="header-judul-halaman">Rincian Gaji</h1>
+        <a href="{{ url_for('absensi.logout_absensi') }}" class="header-keluar-btn" title="Keluar">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </header>
+
     <!-- Filter Periode -->
     <div class="filter-bar">
         <select class="filter-dropdown" id="filter-bulan" onchange="terapkanFilter()">

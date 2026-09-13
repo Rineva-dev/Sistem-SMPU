@@ -385,3 +385,60 @@
         padding: 20px 0;
     }
 }
+
+.hp-fixed-header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .page-header,
+    .header {
+        display: none !important;
+    }
+
+    .hp-fixed-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        padding: 0 16px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 950;
+    }
+
+    .header-judul-halaman {
+        font-size: 17px;
+        font-weight: 600;
+        color: #00152a;
+        margin: 0;
+        letter-spacing: 0.3px;
+    }
+
+    .header-keluar-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f87171;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .header-keluar-btn:active {
+        background: rgba(220, 38, 38, 0.25);
+        transform: scale(0.94);
+    }
+
+    .rincian-gaji-wrapper {
+        padding: 40px 0 70px 0 !important;
+    }
+}
