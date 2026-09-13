@@ -25,7 +25,7 @@ def cek_dari_wifi_sekolah():
     ip = dapatkan_ip_klien()
     
     IP_DIPERBOLEHKAN = [
-        "10.10.11."
+        "125.164.46."
     ]
     
     for rentang in IP_DIPERBOLEHKAN:
@@ -414,7 +414,7 @@ def absen_masuk():
     # ✅ === CEK WIFI SEKOLAH — WAJIB ===
     dari_sekolah, ip_klien = cek_dari_wifi_sekolah()
     if not dari_sekolah:
-        flash(f'<i class="fas fa-wifi"></i> Absen Masuk hanya bisa dari Wifi Sekolah.<br>IP Anda: {ip_klien}', 'absensi_danger')
+        flash(f'<i class="fas fa-wifi"></i> Absen Masuk hanya bisa dari Wifi Sekolah.', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
 
     if sudah_lewat_batas_absensi():
