@@ -330,17 +330,17 @@ def absensi_harian():
     ):
         flash('Silakan login terlebih dahulu.', 'absensi_warning')
         return redirect(url_for('absensi.login_absensi'))
-
     guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
-
     if not guru:
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')
         return redirect(url_for('absensi.login_absensi'))
     hari_ini = waktu_wita().date()
-    absensi_hari_ini = AbsensiGuru.query.filter_by(
-        guru_id=guru.id,
-        tanggal=hari_ini
-    ).first()
+
+    halaman = request.args.get("halaman", 1, type=int)
+    per_halaman = request.args.get("per_halaman", 10, type=int)
+    filter_bulan = request.args.get('bulan', type=int) or hari_ini.month
+    filter_tahun = request.args.get('tahun', type=int) or hari_ini.year
+
     tp_terpilih = None
     if g.tahun_pelajaran:
         tp_terpilih = TahunPelajaran.query.filter_by(kode=g.tahun_pelajaran).first()
@@ -352,20 +352,27 @@ def absensi_harian():
     else:
         tgl_mulai_tp = date(hari_ini.year, 7, 1)
         tgl_selesai_tp = date(hari_ini.year + 1, 6, 30)
-    filter_bulan = request.args.get('bulan', type=int) or hari_ini.month
-    filter_tahun = request.args.get('tahun', type=int) or hari_ini.year
+
     absensi_query = AbsensiGuru.query.filter(
         AbsensiGuru.guru_id == guru.id,
         extract('year', AbsensiGuru.tanggal) == filter_tahun,
         extract('month', AbsensiGuru.tanggal) == filter_bulan,
         AbsensiGuru.tanggal >= tgl_mulai_tp,
         AbsensiGuru.tanggal <= tgl_selesai_tp
-    ).order_by(AbsensiGuru.tanggal.desc())
-    absensi_list = absensi_query.all()
+    )
+
+    total_data = absensi_query.count()
+
+    absensi_list = absensi_query.order_by(AbsensiGuru.tanggal.desc())\
+        .offset((halaman - 1) * per_halaman)\
+        .limit(per_halaman)\
+        .all()
+
     total_hadir = absensi_query.filter(AbsensiGuru.status == 'hadir').count()
     total_terlambat = absensi_query.filter(AbsensiGuru.status == 'terlambat').count()
     total_izin = absensi_query.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count()
     total_alfa = absensi_query.filter(AbsensiGuru.status == 'alfa').count()
+
     jam = ambil_jam_pengaturan()
     jam_masuk_tepat = jam['jam_masuk_tepat']
     batas_terlambat = jam['batas_terlambat']
@@ -376,7 +383,7 @@ def absensi_harian():
         'sections/absensi/absensi.html',
         user=guru,
         guru=guru,
-        absensi=absensi_hari_ini,
+        absensi=AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first(),
         absensi_list=absensi_list,
         hari_ini=hari_ini.strftime('%d %B %Y'),
         total_hadir=total_hadir,
@@ -391,6 +398,9 @@ def absensi_harian():
         batas_terlambat=batas_terlambat,
         jam_tutup_absensi=jam_tutup_absensi,
         jam_pulang_resmi=jam_pulang_resmi,
+        total_data=total_data,
+        halaman_sekarang=halaman,
+        per_halaman=per_halaman
     )
 
 # === 1. Tombol Absen Masuk ===

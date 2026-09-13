@@ -410,14 +410,14 @@
 }
 .pagination-controls {
     display: flex;
-    gap: 8px;
+    gap: 2px;
     align-items: center;
 }
 .page-btn {
     padding: 8px 14px;
-    border: 1px solid #e2e8f0;
+    border: none;
     border-radius: 10px;
-    background: white;
+    background: none;
     cursor: pointer;
     font-size: 13px;
     color: #334155;
@@ -444,7 +444,7 @@
     bottom: 0;
     background: rgba(15, 23, 42, 0.60);
     backdrop-filter: blur(6px);
-    z-index: 990;
+    z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -1169,7 +1169,7 @@
 
     .hp-time-display {
         font-size: 12px;
-        font-weight: 800;
+        font-weight: 600;
         letter-spacing: 1px;
         background: #ffffffa8;
         line-height: 1;
@@ -1177,6 +1177,13 @@
         border-radius: 4px;
         border: 1px solid rgb(236, 236, 236);
     }
+
+    .hp-time-display i {
+        font-size: 12px;
+        opacity: 0.8;
+        color: #bc5500;
+    }
+
     .hp-date-selector {
         display: flex;
         align-items: center;
@@ -1292,6 +1299,7 @@
     .nav-btn.main-btn.btn-checkin {
         background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
         box-shadow: 0 6px 16px rgba(5, 150, 105, 0.56%) !important;
+        border: none;
     }
     .nav-btn.main-btn.btn-checkout {
         background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;

@@ -24,7 +24,7 @@
 
     <!-- ✅ BARIS JAM & TANGGAL PILIH — KHUSUS HP -->
     <div class="hp-datetime-bar">
-        <div class="hp-time-display" id="hp-jam">00.00</div>
+        <div class="hp-time-display" id="hp-jam"><i class="fas fa-clock"></i> 00.00</div>
         <div class="hp-date-selector">
             <span class="hp-date-text" id="hp-tanggal-teks">{{ hari_ini }}</span>
             <button class="hp-calendar-btn" id="btn-pilih-tanggal">
@@ -338,11 +338,13 @@
 
     <!-- ✅ PAGINASI -->
     <div class="pagination-bar">
-        <div>Tampilkan <input type="number" class="input-pagenation" value="10"> data dari 0 data</div>
-        <div class="pagination-controls">
-            <button class="page-btn">Prev</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">Next</button>
+        <div>
+            Tampilkan 
+            <input type="number" class="input-pagenation" id="jumlah-per-halaman" value="{{ per_halaman|default(10) }}" min="1" max="100"> 
+            data dari <span id="total-data">{{ total_data|default(0) }}</span> data
+        </div>
+        <div class="pagination-controls" id="tombol-paginasi">
+            <!-- Tombol akan digenerate otomatis lewat JS -->
         </div>
     </div>
 </div>
@@ -451,34 +453,9 @@
   </div>
 </div>
 
-<!-- ✅ TOMBOL TENGAH — DI LUAR FOOTER -->
-{% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
-    <!-- ✅ SUDAH LENGKAP → TAMPIL IKON CENTANG, TIDAK BISA DIKLIK -->
-    <button type="button" class="nav-btn main-btn selesai" disabled style="opacity:1;cursor:not-allowed;pointer-events:none;background:#d4edda;color:#155724;">
-        <i class="fas fa-check-circle"></i>
-    </button>
-{% elif absensi and absensi.jam_masuk %}
-    <!-- ✅ SUDAH MASUK, BELUM PULANG → TOMBOL PULANG -->
-    <button type="button" class="nav-btn main-btn btn-checkout btn-aksi-pulang">
-        <i class="fas fa-sign-out-alt"></i>
-    </button>
-{% else %}
-    <!-- ❌ BELUM APA-APA → TOMBOL MASUK -->
-    <button type="button" class="nav-btn main-btn btn-checkin btn-aksi-masuk">
-        <i class="fas fa-sign-in-alt"></i>
-    </button>
-{% endif %}
-
 <!-- ✅ FOOTER — HANYA LATAR BELAKANG & TOMBOL SAMPING -->
 <div class="mobile-bottom-nav">
     {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
-        <!-- ❌ HAPUS BAGIAN INI -->
-        <!-- <div class="absensi-selesai-footer">
-            <i class="fas fa-check-circle"></i>
-            <span>Absensi Hari Ini Sudah Lengkap</span>
-        </div> -->
-        
-        <!-- ✅ GANTI DENGAN: TOMBOL TETAP ADA TAPI DINONAKTIFKAN -->
         <button type="button" class="nav-btn side-btn btn-aksi-izin" disabled style="opacity:0.5;cursor:not-allowed;pointer-events:none;">
             <i class="fas fa-calendar-times"></i>
             <span>Izin</span>
@@ -534,6 +511,13 @@ const ABSENSI = {
     URL_QR_DATA: "{{ url_for('absensi_guru.qr_absensi_data') }}",
     URL_SCAN_QR_PROSES: "{{ url_for('absensi_guru.scan_qr_proses') }}"
 };
+
+const PAGINASI = {
+        halaman_sekarang: {{ halaman_sekarang|default(1) }},
+        per_halaman: {{ per_halaman|default(10) }},
+        total_data: {{ total_data|default(0) }},
+        batas_tampil_tombol: 5 // tampilkan maksimal 5 nomor halaman
+    };
 </script>
 
 <!-- ✅ LIBRARY QRCODE -->

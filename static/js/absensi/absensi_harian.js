@@ -10,7 +10,19 @@ function updateClock() {
     const h = String(wita.getHours()).padStart(2, '0');
     const m = String(wita.getMinutes()).padStart(2, '0');
     const s = String(wita.getSeconds()).padStart(2, '0');
-    document.getElementById('jam-digital').textContent = `${h}.${m}.${s}`;
+
+    const jamDigital = document.getElementById('jam-digital');
+    if (jamDigital) {
+        jamDigital.textContent = `${h}.${m}.${s}`;
+    }
+
+    const jamHP = document.getElementById('hp-jam');
+    if (jamHP) {
+        const ikon = jamHP.querySelector('i');
+        jamHP.innerHTML = '';
+        if (ikon) jamHP.appendChild(ikon);
+        jamHP.appendChild(document.createTextNode(` ${h}.${m}`));
+    }
 }
 
 // --- FUNGSI NOTIFIKASI (jika belum ada di layout) ---
@@ -473,4 +485,146 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.style.pointerEvents = 'none';
         });
     }
+
+        // ==========================================
+    // ✅ PAGINASI — LOGIKA LENGKAP
+    // ==========================================
+    // Update tampilan teks
+    function perbaruiTeksPaginasi() {
+        document.getElementById('total-data').textContent = PAGINASI.total_data;
+        document.getElementById('jumlah-per-halaman').value = PAGINASI.per_halaman;
+    }
+
+    // Hitung jumlah halaman
+    function hitungTotalHalaman() {
+        return Math.ceil(PAGINASI.total_data / PAGINASI.per_halaman);
+    }
+
+    // Generate tombol nomor halaman
+    function renderTombolPaginasi() {
+        const wadah = document.getElementById('tombol-paginasi');
+        const totalHalaman = hitungTotalHalaman();
+        wadah.innerHTML = '';
+
+        // Tombol Prev
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'page-btn' + (PAGINASI.halaman_sekarang <= 1 ? ' disabled' : '');
+        btnPrev.textContent = 'Prev';
+        btnPrev.addEventListener('click', () => {
+            if (PAGINASI.halaman_sekarang > 1) {
+                ubahHalaman(PAGINASI.halaman_sekarang - 1);
+            }
+        });
+        wadah.appendChild(btnPrev);
+
+        // Jika tidak ada data / 1 halaman saja
+        if (totalHalaman <= 1) {
+            const btnSatu = document.createElement('button');
+            btnSatu.className = 'page-btn active';
+            btnSatu.textContent = '1';
+            wadah.appendChild(btnSatu);
+            // Tombol Next tetap tampil tapi dinonaktifkan
+            const btnNext = document.createElement('button');
+            btnNext.className = 'page-btn disabled';
+            btnNext.textContent = 'Next';
+            wadah.appendChild(btnNext);
+            return;
+        }
+
+        // Hitung rentang nomor halaman yang ditampilkan
+        let mulai = Math.max(1, PAGINASI.halaman_sekarang - Math.floor(PAGINASI.batas_tampil_tombol / 2));
+        let akhir = Math.min(totalHalaman, mulai + PAGINASI.batas_tampil_tombol - 1);
+        if (akhir - mulai + 1 < PAGINASI.batas_tampil_tombol) {
+            mulai = Math.max(1, akhir - PAGINASI.batas_tampil_tombol + 1);
+        }
+
+        // Tambahkan tombol halaman pertama jika tidak dalam rentang
+        if (mulai > 1) {
+            const btnPertama = document.createElement('button');
+            btnPertama.className = 'page-btn';
+            btnPertama.textContent = '1';
+            btnPertama.addEventListener('click', () => ubahHalaman(1));
+            wadah.appendChild(btnPertama);
+            if (mulai > 2) {
+                const titik = document.createElement('span');
+                titik.style.padding = '0 8px';
+                titik.textContent = '...';
+                wadah.appendChild(titik);
+            }
+        }
+
+        // Tambahkan nomor halaman dalam rentang
+        for (let h = mulai; h <= akhir; h++) {
+            const btn = document.createElement('button');
+            btn.className = 'page-btn' + (h === PAGINASI.halaman_sekarang ? ' active' : '');
+            btn.textContent = h;
+            btn.addEventListener('click', () => ubahHalaman(h));
+            wadah.appendChild(btn);
+        }
+
+        // Tambahkan titik & halaman terakhir jika perlu
+        if (akhir < totalHalaman) {
+            if (akhir < totalHalaman - 1) {
+                const titik = document.createElement('span');
+                titik.style.padding = '0 8px';
+                titik.textContent = '...';
+                wadah.appendChild(titik);
+            }
+            const btnTerakhir = document.createElement('button');
+            btnTerakhir.className = 'page-btn';
+            btnTerakhir.textContent = totalHalaman;
+            btnTerakhir.addEventListener('click', () => ubahHalaman(totalHalaman));
+            wadah.appendChild(btnTerakhir);
+        }
+
+        // Tombol Next
+        const btnNext = document.createElement('button');
+        btnNext.className = 'page-btn' + (PAGINASI.halaman_sekarang >= totalHalaman ? ' disabled' : '');
+        btnNext.textContent = 'Next';
+        btnNext.addEventListener('click', () => {
+            if (PAGINASI.halaman_sekarang < totalHalaman) {
+                ubahHalaman(PAGINASI.halaman_sekarang + 1);
+            }
+        });
+        wadah.appendChild(btnNext);
+    }
+
+    // Ubah halaman → kirim ke server lewat URL
+    function ubahHalaman(halamanBaru) {
+        PAGINASI.halaman_sekarang = halamanBaru;
+        terapkanFilterDanPaginasi();
+    }
+
+    // Ubah jumlah per halaman
+    document.getElementById('jumlah-per-halaman').addEventListener('change', function () {
+        const nilai = parseInt(this.value) || 10;
+        PAGINASI.per_halaman = Math.max(1, Math.min(100, nilai));
+        PAGINASI.halaman_sekarang = 1; // reset ke halaman 1
+        terapkanFilterDanPaginasi();
+    });
+
+    // Gabungkan filter + paginasi
+    function terapkanFilterDanPaginasi() {
+        const bulan = document.getElementById('filter-bulan').value;
+        const tahun = document.getElementById('filter-tahun').value;
+        let url = ABSENSI.URL_ABSENSI_HARIAN;
+        const params = new URLSearchParams();
+        if (bulan) params.append('bulan', bulan);
+        if (tahun) params.append('tahun', tahun);
+        params.append('halaman', PAGINASI.halaman_sekarang);
+        params.append('per_halaman', PAGINASI.per_halaman);
+        url += '?' + params.toString();
+        window.location.href = url;
+    }
+
+    // Override fungsi filter lama agar ikut paginasi
+    window.terapkanFilter = function () {
+        PAGINASI.halaman_sekarang = 1;
+        terapkanFilterDanPaginasi();
+    };
+
+    // Inisialisasi saat halaman dimuat
+    perbaruiTeksPaginasi();
+    renderTombolPaginasi();
+
 });
