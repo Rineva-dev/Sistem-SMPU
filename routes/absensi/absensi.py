@@ -4,6 +4,15 @@ from models import db, User, Guru
 
 absensi_bp = Blueprint('absensi', __name__)
 
+
+@absensi_bp.route('/')
+def absensi_root():
+    return redirect(url_for('absensi.login_absensi'))
+
+@absensi_bp.route('/login')
+def absensi_login_alias():
+    return redirect(url_for('absensi.login_absensi'))
+
 @absensi_bp.route('/login-absensi', methods=['GET', 'POST'])
 def login_absensi():
     # ✅ BERSIHKAN SEMUA PESAN FLASH LAMA DULU

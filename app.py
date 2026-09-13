@@ -21,13 +21,13 @@ def atur_domain_sesi():
     if host.endswith('.smpuhamzanwadi.sch.id'):
         app.config['SESSION_COOKIE_DOMAIN'] = ".smpuhamzanwadi.sch.id"
     else:
-        # Saat akses dari IP / localhost — TANPA domain khusus
+
         app.config['SESSION_COOKIE_DOMAIN'] = None
-app.config['SESSION_COOKIE_PATH'] = "/"
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# Ubah ke True jika sudah pakai HTTPS di produksi
-app.config['SESSION_COOKIE_SECURE'] = False  # ← UBAH KE True JIKA PAKAI HTTPS
+        app.config['SESSION_COOKIE_PATH'] = "/"
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
+        app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+        # Ubah ke True jika sudah pakai HTTPS di produksi
+        app.config['SESSION_COOKIE_SECURE'] = False
 
 # =========================================================
 # ✅ CARA AMAN: GANTI NAMA COOKIE SEBELUM SESI DIPAKAI
@@ -113,15 +113,6 @@ def sebelum_permintaan():
             and session.get('sistem_mode') == 'sekolah'
             and session.get('user_id') is not None
         )
-
-    # =========================================================
-    # DEBUG
-    # =========================================================
-    print(f"[DEBUG] host={request.host}")
-    print(f"[DEBUG] sistem_mode={g.sistem_mode}")
-    print(f"[DEBUG] logged_in={session.get('logged_in')}")
-    print(f"[DEBUG] absensi_logged_in={session.get('absensi_logged_in')}")
-    print(f"[DEBUG] sudah_login={sudah_login}")
 
     # =========================================================
     # JIKA BELUM LOGIN → ARAHKAN KE LOGIN SESUAI SUBDOMAIN
