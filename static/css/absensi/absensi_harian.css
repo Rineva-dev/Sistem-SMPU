@@ -1404,28 +1404,49 @@
   font-weight: 500;
 }
 
-/* ✅ Responsive — Pas di HP */
-@media (max-width: 767px) {
-  .kamera-frame {
-    max-width: 100%;
-    border-radius: 16px;
-  }
-  .kamera-frame::before {
-    width: 72%;
-    height: 50%;
-  }
-  .scan-line {
-    width: 72%;
-    left: 14%;
-  }
-  .kamera-frame .corner {
-    width: 20px;
-    height: 20px;
-  }
-  .kamera-frame .corner.tl { top: 25%; left: 14%; }
-  .kamera-frame .corner.tr { top: 25%; right: 14%; }
-  .kamera-frame .corner.bl { bottom: 25%; left: 14%; }
-  .kamera-frame .corner.br { bottom: 25%; right: 14%; }
+/* ==========================================
+   📱 KHUSUS HP SAJA — Perbaikan Ukuran Kamera
+   ========================================== */
+@media (max-width: 768px) {
+  /* Frame kamera di HP — lebar & tinggi seimbang */
+    .kamera-frame {
+        width: 88% !important;        /* Lebar 88% layar, ada jarak pinggir */
+        max-width: 300px !important;  /* Batas maksimal tidak terlalu besar */
+        aspect-ratio: 4/3 !important;  /* Tinggi otomatis pas, tidak kebesaran */
+        border-radius: 16px !important;
+    }
+
+    /* Video di HP — proporsional, tidak terdistorsi */
+    .kamera-frame video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important; /* Isi penuh tanpa merenggang/rusak */
+        transform: scale(1.05) !important;
+    }
+
+    /* Modal kamera di HP — tidak terlalu lebar */
+    #modal-kamera .modal-card {
+        width: 94% !important;
+        max-width: 340px !important;
+    }
+
+    /* Sesuaikan kotak pemindai hijau agar selaras rasio */
+    .kamera-frame::before {
+        width: 70% !important;
+        height: 52% !important;
+    }
+
+    /* Posisi sudut pemindai agar tetap pas */
+    .kamera-frame .corner.tl { top: 24% !important; left: 15% !important; }
+    .kamera-frame .corner.tr { top: 24% !important; right: 15% !important; }
+    .kamera-frame .corner.bl { bottom: 24% !important; left: 15% !important; }
+    .kamera-frame .corner.br { bottom: 24% !important; right: 15% !important; }
+
+    /* Garis scan bergerak */
+    .scan-line {
+        width: 70% !important;
+        left: 15% !important;
+    }
 }
 
 /* ✅ Penyesuaian Modal Kamera */
