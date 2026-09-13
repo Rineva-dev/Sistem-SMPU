@@ -185,6 +185,11 @@ def tambah_guru():
 
     if request.method == 'POST':
         # Ambil data dari form
+        nik = request.form.get('nik', '').strip()
+        gelar_depan = request.form.get('gelar_depan', '').strip()
+        gelar_belakang = request.form.get('gelar_belakang', '').strip()
+        pendidikan_terakhir = request.form.get('pendidikan_terakhir', '').strip()
+        status_pernikahan = request.form.get('status_pernikahan', '').strip()
         nama = request.form.get('nama', '').strip()
         jenis_kelamin = request.form.get('jenis_kelamin', '').strip()
         jabatan = request.form.get('jabatan', '').strip()
@@ -228,6 +233,11 @@ def tambah_guru():
 
         # Buat data baru
         guru_baru = Guru(
+            nik=nik,
+            gelar_depan=gelar_depan,
+            gelar_belakang=gelar_belakang,
+            pendidikan_terakhir=pendidikan_terakhir,
+            status_pernikahan=status_pernikahan,
             nama=nama,
             jenis_kelamin=jenis_kelamin,
             jabatan=jabatan,
@@ -284,6 +294,11 @@ def ubah_guru(id):
 
     if request.method == 'POST':
         # Ambil data dari form
+        nik = request.form.get('nik', '').strip()
+        gelar_depan = request.form.get('gelar_depan', '').strip()
+        gelar_belakang = request.form.get('gelar_belakang', '').strip()
+        pendidikan_terakhir = request.form.get('pendidikan_terakhir', '').strip()
+        status_pernikahan = request.form.get('status_pernikahan', '').strip()
         nama = request.form.get('nama', '').strip()
         jenis_kelamin = request.form.get('jenis_kelamin', '').strip()
         jabatan_baru = request.form.get('jabatan', '').strip()
@@ -323,6 +338,11 @@ def ubah_guru(id):
 
         tugas_tambahan = bersihkan_tugas(jabatan_baru, tugas_tambahan, guru.tugas_tambahan)
 
+        guru.nik = nik
+        guru.gelar_depan = gelar_depan
+        guru.gelar_belakang = gelar_belakang
+        guru.pendidikan_terakhir = pendidikan_terakhir
+        guru.status_pernikahan = status_pernikahan
         guru.nama = nama
         guru.jenis_kelamin = jenis_kelamin
         guru.jabatan = jabatan_baru

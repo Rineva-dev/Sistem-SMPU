@@ -10,46 +10,101 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-
         <form method="POST" class="form-layout">
-
-            <!-- Baris 1: NIP - 1 Kolom Penuh -->
-
-            <!-- Baris 2: Nama Lengkap - 1 Kolom Penuh -->
+            <!-- Baris 1: NIK Guru -->
             <div class="form-group full">
-                <label>Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" name="nama" class="form-input" required value="{{ guru.nama if guru else '' }}">
+                <label><i class="fa fa-id-card" aria-hidden="true"></i> NIK Guru</label>
+                <input type="text" name="nik" class="form-input" placeholder="16 Digit NIK" 
+                        value="{{ guru.nik if guru else '' }}"
+                        pattern="[0-9]{16}"
+                        title="NIK harus 16 digit angka"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
 
-            <!-- Baris 3: Jenis Kelamin - 1 Kolom Penuh -->
-           <div class="form-group full">
-                <label>Jenis Kelamin <span class="text-danger">*</span></label>
-                <div class="custom-select">
-                    <select name="jenis_kelamin" required>
-                        <option value="Laki-laki" {{ 'selected' if guru and guru.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
-                        <option value="Perempuan" {{ 'selected' if guru and guru.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Baris 4: Tempat Lahir & Tanggal Lahir - 2 Kolom Berdampingan -->
+            <!-- Baris 2: Nama Lengkap + Gelar -->
             <div class="form-row">
                 <div class="form-group half">
-                    <label>Tempat Lahir</label>
-                    <input type="text" name="tempat_lahir" class="form-input" value="{{ guru.tempat_lahir if guru else '' }}">
+                    <label><i class="fas fa-user-graduate"></i> Gelar Depan</label>
+                    <input type="text" name="gelar_depan" class="form-input" placeholder="Contoh: Dr." 
+                           value="{{ guru.gelar_depan if guru else '' }}">
+                </div>
+
+                <div class="form-group half">
+                    <label><i class="fas fa-user-graduate"></i> Gelar Belakang</label>
+                    <input type="text" name="gelar_belakang" class="form-input" placeholder="Contoh: S.Pd., M.Pd." 
+                           value="{{ guru.gelar_belakang if guru else '' }}">
+                </div>
+            </div>
+
+            <div class="form-group full">
+                <label><i class="fas fa-user"></i> Nama Lengkap <span class="text-danger">*</span></label>
+                <input type="text" name="nama" class="form-input" placeholder="Nama Lengkap" required 
+                        value="{{ guru.nama if guru else '' }}">
+            </div>
+
+            <!-- Baris 3: Jenis Kelamin & Status Pernikahan - 2 Kolom -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label><i class="fas fa-venus-mars"></i> Jenis Kelamin <span class="text-danger">*</span></label>
+                    <div class="custom-select">
+                        <select name="jenis_kelamin" required>
+                            <option value="Laki-laki" {{ 'selected' if guru and guru.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
+                            <option value="Perempuan" {{ 'selected' if guru and guru.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group half">
-                    <label>Tanggal Lahir</label>
+                    <label><i class="fas fa-heart"></i> Status Pernikahan</label>
+                    <div class="custom-select">
+                        <select name="status_pernikahan">
+                            <option value="">Pilih Status</option>
+                            <option value="Belum Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Belum Menikah' else '' }}>Belum Menikah</option>
+                            <option value="Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Menikah' else '' }}>Menikah</option>
+                            <option value="Cerai Hidup" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Hidup' else '' }}>Cerai Hidup</option>
+                            <option value="Cerai Mati" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Mati' else '' }}>Cerai Mati</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Baris 4: Tempat Lahir & Tanggal Lahir - 2 Kolom -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label><i class="fas fa-map-marker-alt"></i> Tempat Lahir</label>
+                    <input type="text" name="tempat_lahir" class="form-input" 
+                            value="{{ guru.tempat_lahir if guru else '' }}">
+                </div>
+                <div class="form-group half">
+                    <label><i class="fas fa-birthday-cake"></i> Tanggal Lahir</label>
                     <div class="custom-date">
-                        <input  type="date" name="tanggal_lahir" 
+                        <input type="date" name="tanggal_lahir" 
                                 value="{{ guru.tanggal_lahir.strftime('%Y-%m-%d') if guru and guru.tanggal_lahir else '' }}">
                     </div>
                 </div>
             </div>
 
-            <!-- Baris 5: Jabatan - 1 Kolom Penuh -->
+            <!-- Baris 5: Pendidikan Terakhir - 1 Kolom Penuh -->
             <div class="form-group full">
-                <label>Jabatan <span class="text-danger">*</span></label>
+                <label><i class="fas fa-user-graduate"></i> Pendidikan Terakhir</label>
+                <div class="custom-select">
+                    <select name="pendidikan_terakhir">
+                        <option value="">Pilih Pendidikan</option>
+                        <option value="SD" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SD' else '' }}>SD / Sederajat</option>
+                        <option value="SMP" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMP' else '' }}>SMP / Sederajat</option>
+                        <option value="SMA" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMA' else '' }}>SMA / SMK / Sederajat</option>
+                        <option value="D1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D1' else '' }}>Diploma I (D1)</option>
+                        <option value="D2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D2' else '' }}>Diploma II (D2)</option>
+                        <option value="D3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D3' else '' }}>Diploma III (D3)</option>
+                        <option value="S1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S1' else '' }}>Sarjana / S1 / D4</option>
+                        <option value="S2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S2' else '' }}>Magister / S2</option>
+                        <option value="S3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S3' else '' }}>Doktor / S3</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Baris 6: Jabatan - 1 Kolom Penuh -->
+            <div class="form-group full">
+                <label><i class="fas fa-user-tie"></i> Jabatan <span class="text-danger">*</span></label>
                 <div class="custom-select">
                     <select name="jabatan" required>
                         <option value="">Pilih Jabatan</option>
@@ -60,31 +115,25 @@
                 </div>
             </div>
 
-
-            <!-- Baris 6: Tugas Tambahan - Dropdown Pencarian & Pilihan Banyak -->
+            <!-- Baris 7: Tugas Tambahan - Dropdown Pencarian & Pilihan Banyak -->
             <div class="form-group full">
-                <label>Tugas Tambahan</label>
+                <label><i class="fas fa-briefcase"></i> Tugas Tambahan</label>
                 <div class="custom-multiselect">
-                    <!-- ✅ Tampilan tugas yang sudah dipilih DALAM kotak -->
                     <div id="tugasTerpilih" class="tampilan-terpilih">
                         <input type="text" id="cariTugas" class="cari-tugas" placeholder="Pilih atau ketik nama tugas..." autocomplete="off">
                     </div>
-                    
-                    <!-- Kotak daftar pilihan -->
                     <div id="daftarTugasDropdown" class="dropdown-tugas">
                         <em class="text-muted" id="pesanTugas">Pilih jabatan terlebih dahulu untuk melihat daftar tugas</em>
                     </div>
                 </div>
-
-                <!-- Input tersembunyi tetap ada untuk kirim data -->
                 <input type="hidden" name="tugas_tambahan" id="inputTugasGabung" value="{{ guru.tugas_tambahan if guru else '' }}">
                 <small class="text-muted">Bisa pilih lebih dari satu, ketik untuk mencari tugas</small>
             </div>
 
-            <!-- Baris 7: Sertifikasi, Status, Nomor HP -->
+            <!-- Baris 8: Sertifikasi, Status, Nomor HP -->
             <div class="form-row">
                 <div class="form-group half">
-                    <label>Bersertifikasi?</label>
+                    <label><i class="fas fa-certificate"></i> Bersertifikasi?</label>
                     <div class="custom-select">
                         <select name="sertifikasi">
                             <option value="ya" {{ 'selected' if guru and guru.sertifikasi else '' }}>Ya</option>
@@ -93,7 +142,7 @@
                     </div>
                 </div>
                 <div class="form-group half">
-                    <label>Status</label>
+                    <label><i class="fas fa-toggle-on"></i> Status</label>
                     <div class="custom-select">
                         <select name="status">
                             <option value="Aktif" {{ 'selected' if guru and guru.status == 'Aktif' else '' }}>Aktif</option>
@@ -104,30 +153,24 @@
             </div>
 
             <div class="form-group full">
-                <label>Nomor HP</label>
-                <input type="text" 
-                    name="no_hp" 
-                    class="form-input" 
-                    placeholder="08xxxxxxxxx" 
-                    value="{{ guru.no_hp if guru else '' }}"
-                    pattern="[0-9]{8,13}"
-                    title="Hanya angka, minimal 8 digit, maksimal 13 digit"
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <label><i class="fas fa-mobile-alt"></i> Nomor HP</label>
+                <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxx" 
+                       value="{{ guru.no_hp if guru else '' }}"
+                       pattern="[0-9]{8,13}"
+                       title="Hanya angka, minimal 8 digit, maksimal 13 digit"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
 
             <div class="form-group full">
-                <label>Email</label>
-                <input type="email" 
-                    name="email" 
-                    class="form-input" 
-                    placeholder="guru@sekolah.sch.id" 
-                    value="{{ guru.email if guru else '' }}"
-                    title="Contoh: nama@domain.com">
+                <label><i class="fas fa-envelope-open-text"></i> Email</label>
+                <input type="email" name="email" class="form-input" placeholder="guru@sekolah.sch.id" 
+                       value="{{ guru.email if guru else '' }}"
+                       title="Contoh: nama@domain.com">
             </div>
 
-            <!-- Baris 8: Alamat Lengkap -->
+            <!-- Baris 9: Alamat Lengkap -->
             <div class="form-group full">
-                <label>Alamat Lengkap</label>
+                <label><i class="fas fa-home"></i> Alamat Lengkap</label>
                 <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ guru.alamat if guru else '' }}</textarea>
             </div>
 
@@ -136,12 +179,9 @@
                 <a href="{{ url_for('data_guru.halaman_data_guru') }}" class="btn btn-cancel">Kembali</a>
                 <button type="submit" class="btn btn-save">Simpan Data</button>
             </div>
-
         </form>
     </div>
 </div>
 
-<!-- Skrip: urutan HARUS seperti ini -->
 <input type="hidden" id="dataTugasKonfig" value='{{ daftar_tugas_konfig | tojson | safe }}'>
-
 <script src="{{ url_for('static', filename='js/form-guru.js') }}"></script>

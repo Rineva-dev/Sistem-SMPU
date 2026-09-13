@@ -94,12 +94,12 @@
 /* Input & Select */
 .form-input {
     width: 100%;
-    padding: 0.85rem 1rem;
+    padding: 0.5rem 1rem;
     font-size: 0.9rem;
     color: #0f172a;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
+    border-radius: 0.25rem;
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -185,11 +185,10 @@ textarea.form-input {
 
 /* Tampilan tugas yang dipilih */
 #tugasTerpilih {
-    margin-top: 8px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 0.85rem 1rem;
+    padding: 0.5rem 1rem;
 }
 
 #tugasTerpilih .badge {
@@ -227,11 +226,11 @@ textarea.form-input {
     align-items: center;
     gap: 6px;
     width: 100%;
-    min-height: 48px;
+    min-height: 28px;
     padding: 6px 8px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
+    border-radius: 0.25rem;
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -276,7 +275,6 @@ textarea.form-input {
     border: none;
     outline: none;
     background: transparent;
-    padding: 4px 0;
     font-size: 0.9rem;
     color: #0f172a;
 }
@@ -295,17 +293,17 @@ textarea.form-input {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-top: none;
-    border-radius: 0 0 0.75rem 0.75rem;
+    border-radius: 0 0 0.25rem 0.25rem;
     max-height: 200px;
     overflow-y: auto;
     z-index: 999;
-    padding: 8px;
+    padding: 0.5rem 1rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 /* Opsi tugas */
 .opsi-tugas {
-    padding: 0.85rem 1rem;
+    padding: 0.5rem 0;
     cursor: pointer;
     border-radius: 4px;
     margin: 2px 0;
@@ -323,4 +321,31 @@ textarea.form-input {
 
 .opsi-tugas.terpilih {
     background-color: #e3f2fd;
+}
+.form-group.third {
+    width: calc(33.333% - 1rem);
+}
+
+/* Responsif HP untuk kolom 1/3 */
+@media (max-width: 768px) {
+    .form-group.third {
+        width: 100%;
+    }
+}
+
+.custom-date__input-manual,
+.custom-select__option,
+.custom-select__trigger {
+    border-radius: 0.25rem !important;
+    padding: 0.5rem 1rem !important;
+    min-height: 20px !important;
+}
+
+.custom-date__trigger,
+.custom-select__options {
+    border-radius: 0.25rem !important;
+}
+
+.custom-select__option.selected {
+    border-radius: 0 !important;
 }

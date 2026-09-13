@@ -12,6 +12,13 @@ class Guru(db.Model):
     __tablename__ = 'guru'
 
     nip = db.Column(db.String(50), nullable=True)
+
+    nik = db.Column(db.String(20), nullable=True)
+    gelar_depan = db.Column(db.String(30), nullable=True)
+    gelar_belakang = db.Column(db.String(50), nullable=True)
+    pendidikan_terakhir = db.Column(db.String(10), nullable=True)
+    status_pernikahan = db.Column(db.String(20), nullable=True)
+    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nama = db.Column(db.String(100), nullable=False)
     jenis_kelamin = db.Column(db.String(20), nullable=False)
