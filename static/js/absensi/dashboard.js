@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const dataHadir = JSON.parse(document.getElementById('data-hadir').textContent);
     const dataTerlambat = JSON.parse(document.getElementById('data-terlambat').textContent);
     const dataIzin = JSON.parse(document.getElementById('data-izin').textContent);
-    const dataAlfa = JSON.parse(document.getElementById('data-alfa').textContent);
 
     const ctx = ctxEl.getContext('2d');
     new Chart(ctx, {
@@ -31,12 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     label: 'Izin/Sakit',
                     data: dataIzin,
                     backgroundColor: '#3b82f6',
-                    borderRadius: 6
-                },
-                {
-                    label: 'Alfa',
-                    data: dataAlfa,
-                    backgroundColor: '#ef4444',
                     borderRadius: 6
                 }
             ]

@@ -260,7 +260,6 @@ def dashboard():
         'hadir': semua_absensi.filter(AbsensiGuru.status == 'hadir').count(),
         'terlambat': semua_absensi.filter(AbsensiGuru.status == 'terlambat').count(),
         'izin': semua_absensi.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count(),
-        'alfa': semua_absensi.filter(AbsensiGuru.status == 'alfa').count(),
     }
     nama_bulan_lengkap = ['Jan','Peb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nop','Des']
     rentang_bulan = []
@@ -275,7 +274,6 @@ def dashboard():
     data_hadir = []
     data_terlambat = []
     data_izin = []
-    data_alfa = []
     for bln, thn in rentang_bulan:
         label_bulan.append(f"{nama_bulan_lengkap[bln - 1]}")
         filter_bulan = semua_absensi.filter(
@@ -285,7 +283,6 @@ def dashboard():
         data_hadir.append(filter_bulan.filter(AbsensiGuru.status == 'hadir').count())
         data_terlambat.append(filter_bulan.filter(AbsensiGuru.status == 'terlambat').count())
         data_izin.append(filter_bulan.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count())
-        data_alfa.append(filter_bulan.filter(AbsensiGuru.status == 'alfa').count())
     riwayat_terbaru = semua_absensi.order_by(
         AbsensiGuru.tanggal.desc()
     ).limit(5).all()
@@ -312,7 +309,6 @@ def dashboard():
         data_hadir=data_hadir,
         data_terlambat=data_terlambat,
         data_izin=data_izin,
-        data_alfa=data_alfa,
         halaman_aktif='absensi',
         active_page='dashboard',
         jam_masuk_tepat=jam_masuk_tepat,
@@ -371,7 +367,6 @@ def absensi_harian():
     total_hadir = absensi_query.filter(AbsensiGuru.status == 'hadir').count()
     total_terlambat = absensi_query.filter(AbsensiGuru.status == 'terlambat').count()
     total_izin = absensi_query.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count()
-    total_alfa = absensi_query.filter(AbsensiGuru.status == 'alfa').count()
 
     jam = ambil_jam_pengaturan()
     jam_masuk_tepat = jam['jam_masuk_tepat']
@@ -389,7 +384,6 @@ def absensi_harian():
         total_hadir=total_hadir,
         total_terlambat=total_terlambat,
         total_izin=total_izin,
-        total_alfa=total_alfa,
         filter_bulan=filter_bulan,
         filter_tahun=filter_tahun,
         halaman_aktif='absensi',
@@ -853,13 +847,14 @@ def rekap_absensi():
     jml_izin = rekap_query.filter(AbsensiGuru.status.in_(['izin', 'sakit'])).count()
     jml_alfa = rekap_query.filter(AbsensiGuru.status == 'alfa').count()
     
-    total_hari = jml_hadir + jml_terlambat + jml_izin + jml_alfa
+    total_kehadiran = jml_hadir + jml_terlambat + jml_izin
     
     # Hitung Persentase Kehadiran
-    persen_hadir = 0
-    if total_hari > 0:
-        persen_hadir = round(((jml_hadir + jml_terlambat) / total_hari) * 100, 1)
-    
+    if total_kehadiran > 0:
+        persen_hadir = round((jml_hadir / total_kehadiran) * 100, 1)
+    else:
+        persen_hadir = 0
+        
     # Nama Bulan
     nama_bulan = [
         'Januari','Pebruari','Maret','April','Mei','Juni',
@@ -885,9 +880,8 @@ def rekap_absensi():
         jml_terlambat=jml_terlambat,
         jml_izin=jml_izin,
         jml_alfa=jml_alfa,
-        total_hari=total_hari,
         persen_hadir=persen_hadir,
-        
+        total_kehadiran=total_kehadiran,
         riwayat_bulan_ini=riwayat_bulan_ini,
         
         halaman_aktif='absensi',
@@ -1034,7 +1028,8 @@ def export_rekap_absensi():
     jml_izin = sum(1 for r in data_absensi if r.status in ('izin','sakit'))
     jml_alfa = sum(1 for r in data_absensi if r.status == 'alfa')
     total = len(data_absensi)
-    persen = round(((jml_hadir + jml_terlambat) / total) * 100, 1) if total > 0 else 0
+    total_kehadiran = jml_hadir + jml_terlambat + jml_izin
+    persen = round((jml_hadir / total_kehadiran) * 100, 1) if total_kehadiran > 0 else 0
 
     # === 7. Buat Excel ===
     import pandas as pd
@@ -1047,7 +1042,6 @@ def export_rekap_absensi():
         {'Tanggal': '', 'Hari': '✅ Hadir', 'Jam Masuk': jml_hadir, 'Jam Pulang': 'hari', 'Status': '', 'Keterangan': ''},
         {'Tanggal': '', 'Hari': '⏰ Terlambat', 'Jam Masuk': jml_terlambat, 'Jam Pulang': 'hari', 'Status': '', 'Keterangan': ''},
         {'Tanggal': '', 'Hari': '📝 Izin/Sakit', 'Jam Masuk': jml_izin, 'Jam Pulang': 'hari', 'Status': '', 'Keterangan': ''},
-        {'Tanggal': '', 'Hari': '❌ Alfa', 'Jam Masuk': jml_alfa, 'Jam Pulang': 'hari', 'Status': '', 'Keterangan': ''},
         {'Tanggal': '', 'Hari': '📋 Total Hari', 'Jam Masuk': total, 'Jam Pulang': 'hari', 'Status': '', 'Keterangan': ''},
         {'Tanggal': '', 'Hari': '📈 Kehadiran', 'Jam Masuk': f'{persen} %', 'Jam Pulang': '', 'Status': '', 'Keterangan': ''},
     ])

@@ -4,8 +4,18 @@
 {% block title %}Rekapitulasi Absensi{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rekap_absensi.css') }}">
-
 <div class="rekapitulasi-absensi-wrapper">
+
+    <header class="hp-fixed-header">
+        <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h1 class="header-judul-halaman">Rekap Absensi</h1>
+        <a href="{{ url_for('absensi.logout_absensi') }}" class="header-keluar-btn" title="Keluar">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </header>
+    
     <!-- === JUDUL HALAMAN === -->
     <div class="page-header mb-4">
         <h3 class="page-title"><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Absensi Guru</h3>
@@ -48,21 +58,21 @@
         </div>
     </div>
 
-    <!-- === KARTU RINGKASAN STATISTIK — BERWARNA PENUH === -->
+    <!-- === KARTU RINGKASAN STATISTIK — TANPA ALFA === -->
     <div class="row g-4 mb-5">
-        <!-- HADIR -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+        <!-- HADIR TEPAT WAKTU -->
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card stat-hadir">
                 <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-content">
-                    <p class="stat-label">Hadir</p>
+                    <p class="stat-label">Hadir Tepat Waktu</p>
                     <h3 class="stat-value">{{jml_hadir}}</h3>
                     <p class="stat-unit">hari</p>
                 </div>
             </div>
         </div>
         <!-- TERLAMBAT -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card stat-terlambat">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-content">
@@ -73,7 +83,7 @@
             </div>
         </div>
         <!-- IZIN/SAKIT -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card stat-izin">
                 <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                 <div class="stat-content">
@@ -83,23 +93,12 @@
                 </div>
             </div>
         </div>
-        <!-- ALFA -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-6">
-            <div class="stat-card stat-alfa">
-                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="stat-content">
-                    <p class="stat-label">Alfa</p>
-                    <h3 class="stat-value">{{jml_alfa}}</h3>
-                    <p class="stat-unit">hari</p>
-                </div>
-            </div>
-        </div>
         <!-- PERSENTASE KEHADIRAN -->
-        <div class="col-xl-4 col-md-12 col-sm-12">
+        <div class="col-xl-3 col-md-12 col-sm-12">
             <div class="stat-card stat-persen">
                 <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-content">
-                    <p class="stat-label">Persentase Kehadiran</p>
+                    <p class="stat-label">Persentase Tepat Waktu</p>
                     <h2 class="stat-value-big">{{persen_hadir}}%</h2>
                     <p class="stat-unit">Dari {{total_hari}} hari tercatat</p>
                 </div>
@@ -174,23 +173,19 @@
                     <p class="export-subtitle">Unduh data dalam format Excel (.xlsx)</p>
                 </div>
             </div>
-
             <form action="{{ url_for('absensi_guru.export_rekap_absensi') }}" method="post" id="exportForm">
                 <input type="hidden" name="jenis_export" id="jenis_export" value="perbulan">
-
                 <div class="export-form-grid">
-                    <!-- PILIHAN JENIS EXPORT — KUSTOM SELECT -->
+                    <!-- PILIHAN JENIS EXPORT -->
                     <div class="form-group-wrap">
                         <label class="form-label-export">
                             <i class="fas fa-cog me-2"></i>Jenis Export
                         </label>
-                        <!-- TAMPILAN PILIHAN AKTIF -->
                         <div class="custom-select-trigger" id="exportSelectTrigger" onclick="toggleCustomSelect()">
                             <span class="trigger-icon"><i class="fas fa-calendar"></i></span>
                             <span class="trigger-text">Per Bulan</span>
                             <i class="fas fa-chevron-down trigger-arrow"></i>
                         </div>
-                        <!-- DAFTAR PILIHAN -->
                         <div class="custom-select-dropdown" id="exportSelectDropdown">
                             <div class="custom-option active" data-value="perbulan" data-icon="fa-calendar" data-text="Per Bulan" onclick="selectExportOption(this)">
                                 <i class="fas fa-calendar option-icon"></i>
@@ -313,18 +308,14 @@
             </form>
         </div>
     </div>
-
 </div>
 
 <!-- === JAVASCRIPT TAMPILAN RENTANG === -->
 <script>
-// Buka/tutup daftar pilihan — Cek ruang & tutup SMOOTH tanpa lompat
 function toggleCustomSelect() {
     const trigger = document.getElementById('exportSelectTrigger');
     const dropdown = document.getElementById('exportSelectDropdown');
     const wrap = document.querySelector('.form-group-wrap');
-
-    // Jika SEDANG TERBUKA → TUTUP
     if (dropdown.classList.contains('open')) {
         trigger.classList.remove('open');
         dropdown.classList.remove('open');
@@ -333,16 +324,12 @@ function toggleCustomSelect() {
             dropdown.style.top = '';
             dropdown.style.bottom = '';
         }, 350);
-    }
-    // Jika SEDANG TERTUTUP → BUKA
-    else {
+    } else {
         const rect = wrap.getBoundingClientRect();
         const ruangBawah = window.innerHeight - rect.bottom;
         const tinggiDaftar = 200;
-
         trigger.classList.add('open');
         dropdown.classList.add('open');
-
         if (ruangBawah < tinggiDaftar) {
             dropdown.classList.remove('down');
             dropdown.classList.add('up');
@@ -357,9 +344,7 @@ function toggleCustomSelect() {
     }
 }
 
-// Pilih salah satu opsi
 function selectExportOption(el) {
-    // Tutup daftar
     document.getElementById('exportSelectTrigger').classList.remove('open');
     document.getElementById('exportSelectDropdown').classList.remove('open');
     setTimeout(() => {
@@ -367,41 +352,26 @@ function selectExportOption(el) {
         document.getElementById('exportSelectDropdown').style.top = '';
         document.getElementById('exportSelectDropdown').style.bottom = '';
     }, 350);
-
-    // Hapus tanda aktif lama
     document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('active'));
     el.classList.add('active');
-
-    // Ambil data
     const value = el.dataset.value;
     const icon = el.dataset.icon;
     const text = el.dataset.text;
-
-    // Update tampilan terpilih
     document.querySelector('.trigger-icon i').className = `fas ${icon}`;
     document.querySelector('.trigger-text').textContent = text;
-
-    // Update input tersembunyi
     document.getElementById('jenis_export').value = value;
-
-    // Tampilkan field sesuai PILIHAN
     tampilkanFieldSesuaiJenis(value);
 }
 
-// === TAMPILKAN FIELD SESUAI JENIS EXPORT ===
 function tampilkanFieldSesuaiJenis(jenis) {
     const perbulan = document.querySelectorAll('.perbulan-field');
     const semua = document.querySelectorAll('.semua-field');
     const rentang = document.querySelectorAll('.rentang-field');
-
-    // Sembunyikan SEMUA — hapus dari tata letak
     [perbulan, semua, rentang].forEach(grup => {
         grup.forEach(el => {
             el.classList.remove('active');
         });
     });
-
-    // Tampilkan yang dipilih SAJA
     if (jenis === 'perbulan') {
         perbulan.forEach(el => el.classList.add('active'));
     } else if (jenis === 'semua') {
@@ -411,7 +381,6 @@ function tampilkanFieldSesuaiJenis(jenis) {
     }
 }
 
-// Tutup daftar jika klik di luar
 document.addEventListener('click', function(e) {
     const trigger = document.getElementById('exportSelectTrigger');
     const dropdown = document.getElementById('exportSelectDropdown');
@@ -426,7 +395,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Jalankan saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
     tampilkanFieldSesuaiJenis('perbulan');
 });

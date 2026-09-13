@@ -74,7 +74,7 @@
                 <div class="stat-icon"><i class="fas fa-check"></i></div>
                 <div class="stat-info">
                     <div class="stat-value">{{ statistik.hadir or 0 }}</div>
-                    <div class="stat-label">Hadir</div>
+                    <div class="stat-label">Tepat Waktu</div>
                 </div>
             </div>
             <div class="stat-card stat-terlambat">
@@ -91,19 +91,11 @@
                     <div class="stat-label">Izin / Sakit</div>
                 </div>
             </div>
-            <div class="stat-card stat-alfa">
-                <div class="stat-icon"><i class="fas fa-times"></i></div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ statistik.alfa or 0 }}</div>
-                    <div class="stat-label">Alfa</div>
-                </div>
-            </div>
         </div>
     </div>
     <!-- ✅ Indikator titik-titik scroll -->
     <div class="scroll-indicators">
         <span class="dot active"></span>
-        <span class="dot"></span>
         <span class="dot"></span>
         <span class="dot"></span>
     </div>
@@ -193,7 +185,6 @@
 <script type="application/json" id="data-hadir">{{ data_hadir | tojson }}</script>
 <script type="application/json" id="data-terlambat">{{ data_terlambat | tojson }}</script>
 <script type="application/json" id="data-izin">{{ data_izin | tojson }}</script>
-<script type="application/json" id="data-alfa">{{ data_alfa | tojson }}</script>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
