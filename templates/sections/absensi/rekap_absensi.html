@@ -4,9 +4,7 @@
 {% block title %}Rekapitulasi Absensi{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rekap_absensi.css') }}">
-
 <div class="rekapitulasi-absensi-wrapper">
-
     <header class="hp-fixed-header">
         <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
             <i class="fas fa-chevron-left"></i>
@@ -16,22 +14,20 @@
             <i class="fas fa-sign-out-alt"></i>
         </a>
     </header>
-
     <!-- === JUDUL HALAMAN === -->
     <div class="page-header">
         <h3><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Absensi Guru</h3>
         <p class="page-subtitle">Periode: {{nama_bulan_terpilih}} {{filter_tahun}} &nbsp;|&nbsp; Tahun Pelajaran: {{label_tp}}</p>
     </div>
-
     <!-- === FILTER BULAN & TAHUN === -->
     <div class="filter-card mb-4">
         <div class="filter-body">
-            <form method="get" class="row g-3 align-items-center justify-content-center">
+            <form method="get" class="row g-3 align-items-center justify-content-center" id="formFilterUtama">
                 <div class="col-auto">
                     <label class="filter-label"><i class="fas fa-calendar-alt me-1"></i> Bulan:</label>
                 </div>
                 <div class="col-auto">
-                    <select name="bulan" class="filter-select" onchange="this.form.submit()">
+                    <select name="bulan" id="filterBulanSelect" class="filter-select" onchange="this.form.submit()">
                         {% set bulan_list = [
                             ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
                             ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
@@ -48,7 +44,7 @@
                     <label class="filter-label"><i class="fas fa-calendar-check me-1"></i> Tahun:</label>
                 </div>
                 <div class="col-auto">
-                    <select name="tahun" class="filter-select" onchange="this.form.submit()">
+                    <select name="tahun" id="filterTahunSelect" class="filter-select" onchange="this.form.submit()">
                         {% set thn_sekarang = filter_tahun %}
                         {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
                         <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
@@ -58,7 +54,16 @@
             </form>
         </div>
     </div>
-
+    <div class="hp-datetime-bar">
+        <div class="hp-time-display"></div>
+        <div class="hp-date-selector">
+            <span class="hp-date-text" id="hp-bulan-tahun-teks">{{nama_bulan_terpilih}} {{filter_tahun}}</span>
+            <button class="hp-calendar-btn" id="btn-pilih-bulan-tahun">
+                <i class="fas fa-calendar-alt"></i>
+            </button>
+            <div id="kalenderBulanTahunHP" class="kalender-bulan-tahun-popup"></div>
+        </div>
+    </div>
     <!-- === KARTU RINGKASAN STATISTIK — TANPA ALFA === -->
     <div class="row g-4 mb-5">
         <!-- HADIR TEPAT WAKTU -->
@@ -106,7 +111,6 @@
             </div>
         </div>
     </div>
-
     <!-- === TABEL RIWAYAT ABSENSI === -->
     <div class="table-card">
         <div class="table-header">
@@ -119,8 +123,8 @@
                     <thead>
                         <tr>
                             <th><i class="fas fa-calendar-day me-1"></i> Tanggal</th>
-                            <th><i class="fas fa-sign-in-alt me-1"></i> Jam Masuk</th>
-                            <th><i class="fas fa-sign-out-alt me-1"></i> Jam Pulang</th>
+                            <th><i class="fas fa-sign-in-alt me-1"></i> Masuk</th>
+                            <th><i class="fas fa-sign-out-alt me-1"></i> Pulang</th>
                             <th><i class="fas fa-tag me-1"></i> Status</th>
                             <th><i class="fas fa-sticky-note me-1"></i> Keterangan</th>
                         </tr>
@@ -138,7 +142,6 @@
                                         'terlambat': 'badge-terlambat',
                                         'izin': 'badge-izin',
                                         'sakit': 'badge-sakit',
-                                        'alfa': 'badge-alfa'
                                     } %}
                                     {% set badge_class = status_class.get(item.status, 'badge-default') %}
                                     <span class="status-badge {{ badge_class }}">
@@ -160,7 +163,6 @@
             </div>
         </div>
     </div>
-
     <!-- === 📤 CARD EXPORT REKAPITULASI === -->
     <div class="export-card mb-5">
         <div class="export-card-decoration"></div>
@@ -202,7 +204,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- === PER BULAN: PILIH BULAN + TAHUN === -->
                     <div class="form-group-wrap perbulan-field" id="group_perbulan_bulan">
                         <label class="form-label-export">
@@ -230,7 +231,6 @@
                             {% endfor %}
                         </select>
                     </div>
-
                     <!-- === SEMUA BULAN: PILIH TAHUN === -->
                     <div class="form-group-wrap semua-field" id="group_semua_tahun">
                         <label class="form-label-export">
@@ -243,7 +243,6 @@
                             {% endfor %}
                         </select>
                     </div>
-
                     <!-- === RENTANG: DARI BULAN + TAHUN === -->
                     <div class="form-group-wrap rentang-field" id="group_bulan_awal">
                         <label class="form-label-export">
@@ -297,7 +296,6 @@
                             {% endfor %}
                         </select>
                     </div>
-
                     <!-- TOMBOL EXPORT -->
                     <div class="form-group-wrap btn-wrap">
                         <button type="submit" class="btn-export-xl">
@@ -310,8 +308,7 @@
         </div>
     </div>
 </div>
-
-<!-- === JAVASCRIPT TAMPILAN RENTANG === -->
+<!-- === JAVASCRIPT === -->
 <script>
 function toggleCustomSelect() {
     const trigger = document.getElementById('exportSelectTrigger');
@@ -344,7 +341,6 @@ function toggleCustomSelect() {
         }
     }
 }
-
 function selectExportOption(el) {
     document.getElementById('exportSelectTrigger').classList.remove('open');
     document.getElementById('exportSelectDropdown').classList.remove('open');
@@ -363,7 +359,6 @@ function selectExportOption(el) {
     document.getElementById('jenis_export').value = value;
     tampilkanFieldSesuaiJenis(value);
 }
-
 function tampilkanFieldSesuaiJenis(jenis) {
     const perbulan = document.querySelectorAll('.perbulan-field');
     const semua = document.querySelectorAll('.semua-field');
@@ -381,7 +376,6 @@ function tampilkanFieldSesuaiJenis(jenis) {
         rentang.forEach(el => el.classList.add('active'));
     }
 }
-
 document.addEventListener('click', function(e) {
     const trigger = document.getElementById('exportSelectTrigger');
     const dropdown = document.getElementById('exportSelectDropdown');
@@ -395,9 +389,155 @@ document.addEventListener('click', function(e) {
         }, 350);
     }
 });
-
 document.addEventListener('DOMContentLoaded', () => {
     tampilkanFieldSesuaiJenis('perbulan');
+});
+
+// === KALENDER PILIH BULAN/TAHUN HANYA BAGIAN HP ===
+document.addEventListener('DOMContentLoaded', function () {
+    const bulanNama = [
+        'Januari', 'Pebruari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'Nopember', 'Desember'
+    ];
+
+    // Ambil nilai dari variabel Jinja — aman
+    let tampilanAwal = { 
+        bulan: {{filter_bulan}}, 
+        tahun: {{filter_tahun}} 
+    };
+
+    // Elemen yang BENAR-BENAR ADA di halaman
+    const teksHP = document.getElementById('hp-bulan-tahun-teks');
+    const btnBukaHP = document.getElementById('btn-pilih-bulan-tahun');
+    const popupKalenderHP = document.getElementById('kalenderBulanTahunHP');
+    const selectBulan = document.getElementById('filterBulanSelect');
+    const selectTahun = document.getElementById('filterTahunSelect');
+    const formFilter = document.getElementById('formFilterUtama');
+
+    function perbaruiTeks() {
+        const namaBulan = bulanNama[tampilanAwal.bulan - 1];
+        const teks = `${namaBulan} ${tampilanAwal.tahun}`;
+        if (teksHP) teksHP.textContent = teks;
+    }
+
+    function tampilkanKalender(container) {
+        const tahun = tampilanAwal.tahun;
+        const bulanAktif = tampilanAwal.bulan - 1;
+        let html = `
+            <div class="calendar-header">
+                <button type="button" class="calendar-nav prev">&larr;</button>
+                <div class="calendar-title">${tahun}</div>
+                <button type="button" class="calendar-nav next">&rarr;</button>
+            </div>
+            <div class="calendar-months">
+        `;
+        bulanNama.forEach((nama, indeks) => {
+            const aktif = indeks === bulanAktif ? 'active' : '';
+            html += `<div class="month-item ${aktif}" data-bulan="${indeks + 1}">${nama}</div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+
+        // Navigasi Tahun
+        container.querySelector('.prev').onclick = e => {
+            e.stopPropagation();
+            tampilanAwal.tahun--;
+            tampilkanKalender(container);
+        };
+        container.querySelector('.next').onclick = e => {
+            e.stopPropagation();
+            tampilanAwal.tahun++;
+            tampilkanKalender(container);
+        };
+        container.querySelector('.calendar-title').onclick = e => {
+            e.stopPropagation();
+            tampilkanPemilihTahun(container);
+        };
+
+        // ✅ SAAT PILIH BULAN → UBAH SELECT DI FORM LALAN SUBMIT
+        container.querySelectorAll('.month-item').forEach(el => {
+            el.onclick = e => {
+                e.stopPropagation();
+                const bulanTerpilih = parseInt(el.dataset.bulan);
+                const tahunTerpilih = tampilanAwal.tahun;
+
+                // Ubah nilai di <select> yang sudah ada di halaman
+                if (selectBulan) selectBulan.value = String(bulanTerpilih).padStart(2, '0');
+                if (selectTahun) selectTahun.value = tahunTerpilih;
+
+                perbaruiTeks();
+                tutupKalender();
+
+                // Kirim form → halaman refresh dengan bulan/tahun baru
+                if (formFilter) formFilter.submit();
+            };
+        });
+    }
+
+    function tampilkanPemilihTahun(container) {
+        const mulai = Math.floor(tampilanAwal.tahun / 10) * 10;
+        const akhir = mulai + 9;
+        let html = `
+            <div class="calendar-header">
+                <button type="button" class="calendar-nav prev">&larr;</button>
+                <div class="calendar-title">${mulai} - ${akhir}</div>
+                <button type="button" class="calendar-nav next">&rarr;</button>
+            </div>
+            <div class="calendar-years">
+        `;
+        for (let t = mulai; t <= akhir; t++) {
+            const aktif = t === tampilanAwal.tahun ? 'active' : '';
+            html += `<div class="year-item ${aktif}" data-tahun="${t}">${t}</div>`;
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+
+        container.querySelector('.prev').onclick = e => {
+            e.stopPropagation();
+            container.querySelectorAll('.year-item').forEach(y => {
+                y.dataset.tahun = parseInt(y.dataset.tahun) - 10;
+                y.textContent = parseInt(y.textContent) - 10;
+            });
+        };
+        container.querySelector('.next').onclick = e => {
+            e.stopPropagation();
+            container.querySelectorAll('.year-item').forEach(y => {
+                y.dataset.tahun = parseInt(y.dataset.tahun) + 10;
+                y.textContent = parseInt(y.textContent) + 10;
+            });
+        };
+        container.querySelectorAll('.year-item').forEach(el => {
+            el.onclick = e => {
+                e.stopPropagation();
+                tampilanAwal.tahun = parseInt(el.dataset.tahun);
+                tampilkanKalender(container);
+            };
+        });
+    }
+
+    function tutupKalender() {
+        popupKalenderHP?.classList.remove('buka');
+    }
+
+    // Buka kalender saat tombol diklik
+    if (btnBukaHP && popupKalenderHP) {
+        btnBukaHP.onclick = e => {
+            e.stopPropagation();
+            const sedangBuka = popupKalenderHP.classList.contains('buka');
+            tutupKalender();
+            if (!sedangBuka) {
+                tampilkanKalender(popupKalenderHP);
+                popupKalenderHP.classList.add('buka');
+            }
+        };
+    }
+
+    // Tutup saat klik di luar
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.hp-date-selector')) {
+            tutupKalender();
+        }
+    });
 });
 </script>
 {% endblock %}

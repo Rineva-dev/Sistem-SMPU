@@ -599,6 +599,7 @@
   position: relative;
 }
 
+.hp-datetime-bar,
 .hp-fixed-header {
     display: none;
 }
@@ -616,6 +617,57 @@
     }
     .mb-5 {
         margin-bottom: 1rem !important;
+    }
+
+    .hp-datetime-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .hp-date-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+    }
+    .hp-date-text {
+        font-size: 12px;
+        font-weight: 500;
+        color: #0f172a;
+    }
+    .hp-calendar-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 4px;
+        border: none;
+        color: #2563eb;
+        font-size: 12px;
+        cursor: pointer !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .hp-calendar-btn:active {
+        transform: scale(0.92);
+        background: #bfdbfe;
+    }
+
+    #input-tanggal-pilih {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .table-title {
+      font-size: 14px;
     }
 
     .rekapitulasi-absensi-wrapper {
@@ -705,4 +757,74 @@ main {
     max-width: 100% !important;
     margin: 0 !important;
     box-sizing: border-box !important;
+}
+
+/* ==========================================
+   PEMILIH BULAN & TAHUN — GAYA SESUAI GAMBAR
+========================================== */
+.bulan-tahun-pilih-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.bulan-tahun-pilih-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: #1e293b;
+    transition: all 0.2s;
+}
+
+.bulan-tahun-pilih-trigger:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.bulan-tahun-pilih-trigger i {
+    color: #64748b;
+}
+
+/* Popup Kalender Bulan+Tahun */
+.kalender-bulan-tahun-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    width: 260px;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    border: 1px solid #e2e8f0;
+    padding: 0.7rem;
+    z-index: 999999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+}
+
+.kalender-bulan-tahun-popup.buka {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Sesuaikan untuk HP */
+.hp-date-selector {
+    position: relative;
+}
+
+.hp-date-selector .kalender-bulan-tahun-popup {
+    left: auto;
+    right: 0;
+    transform: translateY(-8px);
+}
+
+.hp-date-selector .kalender-bulan-tahun-popup.buka {
+    transform: translateY(0);
 }
