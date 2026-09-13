@@ -329,13 +329,13 @@
   color: #fff;
 }
 .export-title {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
   color: #064e3b;
   margin: 0 ;
 }
 .export-subtitle {
-  font-size: 12px;
+  font-size: 14px;
   color: #047857;
   margin: 0;
   opacity: 0.8;
@@ -687,7 +687,7 @@
     }
 
     .table-title {
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .rekapitulasi-absensi-wrapper {
@@ -752,7 +752,14 @@
       top: -30%;
     }
 
+    .export-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
 
+    .export-subtitle {
+      font-size: 12px;
+    }
 
 }
 
