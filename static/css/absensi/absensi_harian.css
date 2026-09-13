@@ -589,7 +589,6 @@
 .kamera-frame {
     text-align: center;
     position: relative;
-    padding: 8px 0;
 }
 .kamera-frame video {
     width: 100%;
@@ -645,8 +644,8 @@
 }
 @media (max-width: 480px) {
     .modal-header, .modal-body {
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
     }
     .modal-footer {
         flex-direction: column-reverse;
@@ -1305,27 +1304,23 @@
    ========================================== */
 /* Frame Kamera — Pas & Rapi di HP */
 .kamera-frame {
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-  margin: 0 auto;
-  border-radius: 20px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  box-shadow: 
-    0 0 0 4px rgba(22, 163, 74, 0.12),
-    0 0 40px rgba(15, 23, 42, 0.4),
-    inset 0 0 60px rgba(59, 130, 246, 0.08);
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 }
 
 /* Video Kamera */
 .kamera-frame video {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 20px;
-  background: #0f172a;
-  transform: scale(1.02);
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 20px;
+    background: #0f172a;
+    transform: scale(1.02);
 }
 
 /* Kanvas Pemindai — Tersembunyi tapi tetap berfungsi */
@@ -1387,21 +1382,20 @@
   pointer-events: none;
 }
 @keyframes scanMove {
-  0% { top: 27.5%; opacity: 1; }
-  50% { top: 70%; opacity: 0.8; }
-  100% { top: 27.5%; opacity: 1; }
+    0% { top: 27.5%; opacity: 1; }
+    50% { top: 70%; opacity: 0.8; }
+    100% { top: 27.5%; opacity: 1; }
 }
 
 /* ✅ Status Teks di Bawah Video */
 #kamera-status {
-  text-align: center;
-  margin-top: 14px;
-  font-size: 14px;
-  color: #64748b;
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
 }
 #kamera-status.scanning {
-  color: #059669;
-  font-weight: 500;
+    color: #059669;
+    font-weight: 500;
 }
 
 /* ==========================================
@@ -1410,9 +1404,8 @@
 @media (max-width: 768px) {
   /* Frame kamera di HP — lebar & tinggi seimbang */
     .kamera-frame {
-        width: 88% !important;        /* Lebar 88% layar, ada jarak pinggir */
         max-width: 300px !important;  /* Batas maksimal tidak terlalu besar */
-        aspect-ratio: 4/3 !important;  /* Tinggi otomatis pas, tidak kebesaran */
+        aspect-ratio: 4/4 !important;  /* Tinggi otomatis pas, tidak kebesaran */
         border-radius: 16px !important;
     }
 
@@ -1446,6 +1439,12 @@
     .scan-line {
         width: 70% !important;
         left: 15% !important;
+    }
+    
+    #btn-tutup-kamera {
+        padding: 8px 16px;
+        border: 1px solid #6696ff;
+        border-radius:8px;
     }
 }
 
