@@ -701,22 +701,22 @@
    ✅ TAMPILAN HP — GAYA MODERN MEWAH
    ========================================== */
 @media (max-width: 768px) {
-    /* ✅ Latar belakang HP jadi gradasi mewah */
+
     body {
         background: linear-gradient(180deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
         background-attachment: fixed;
         min-height: 100vh;
     }
-    /* ✅ Hilangkan header halaman di HP */
+
     .header {
         display: none !important;
     }
-    /* ✅ Beri jarak atas agar tidak tertutup tombol kembali */
+
     .absensi-harian-wrapper {
         padding: 40px 0 70px 0 !important;
         background: transparent;
     }
-    /* ✅ KARTU JAM — LEBIH MEWAH & BESAR DI HP */
+
     .saas-datetime-card {
         padding: 28px 20px !important;
         margin: 0 0 20px !important;
@@ -726,29 +726,35 @@
             inset 0 1px 0 rgba(255,255,255,0.08);
         border: 1px solid rgba(255,255,255,0.08);
     }
+    
     .datetime-main-row {
         flex-direction: column;
         text-align: center;
         gap: 12px;
     }
+
     .datetime-left-col {
         font-size: 52px !important;
         letter-spacing: 2px;
     }
+
     .datetime-right-col {
         text-align: center !important;
     }
+
     .tanggal-masehi {
         font-size: 18px !important;
     }
+
     .tanggal-hijriah {
         font-size: 13px !important;
     }
+
     .wita-label {
         font-size: 11px !important;
         opacity: 0.7;
     }
-    /* ✅ Aturan masuk/pulang — rapi 2 baris di HP */
+
     .absen-rules-row {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
