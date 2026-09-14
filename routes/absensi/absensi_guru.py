@@ -25,7 +25,7 @@ def cek_dari_wifi_sekolah():
     ip = dapatkan_ip_klien()
     
     IP_DIPERBOLEHKAN = [
-        "125.164."
+        "125.164.",
         "125.163."
     ]
     
