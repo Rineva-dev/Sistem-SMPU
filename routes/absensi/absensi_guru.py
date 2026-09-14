@@ -430,6 +430,10 @@ def absen_masuk():
     hari_ini = waktu_wita().date()
     jam_sekarang = waktu_wita().strftime("%H:%M")
     alasan_telat = request.form.get('alasan_keterlambatan', '').strip()
+
+    if status == 'terlambat' and not alasan_telat:
+        flash('<i class="fas fa-exclamation-circle"></i> Alasan keterlambatan WAJIB diisi!', 'absensi_danger')
+        return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
     absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
     if absensi and absensi.jam_masuk:

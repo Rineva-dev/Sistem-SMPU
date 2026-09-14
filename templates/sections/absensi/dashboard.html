@@ -21,10 +21,23 @@
 
         <div class="mobile-header-content">
             <div class="avatar-box">
-                <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://ui-avatars.com/api/?name={{ user.nama|urlencode }}&background=fff&color=2563eb&size=128'">
+                {% set tampil_nama = user.nama|default('', true) %}
+                
+                {# Tambahkan Gelar Belakang dengan koma #}
+                {% if user.gelar_belakang %}
+                    {% set tampil_nama = tampil_nama ~ ', ' ~ user.gelar_belakang %}
+                {% endif %}
+                
+                {# Tambahkan Gelar Depan di depan nama — TANPA koma #}
+                {% if user.gelar_depan %}
+                    {% set tampil_nama = user.gelar_depan ~ ' ' ~ tampil_nama %}
+                {% endif %}
+                
+                <img src="{{ url_for('static', filename='img/avatar.png') }}" alt="Avatar" class="avatar-img" 
+                    onerror="this.src='https://ui-avatars.com/api/?name={{ tampil_nama|urlencode }}&background=fff&color=2563eb&size=128'">
             </div>
             <div class="welcome-text">
-                <h4>Hi, {{ user.nama if user.nama else 'Guru' }} 👋</h4>
+                <h4>Hi, {{ tampil_nama if tampil_nama else 'Guru' }} 👋</h4>
                 <p>Pastikan kehadiran anda selalu tercatat</p>
             </div>
         </div>

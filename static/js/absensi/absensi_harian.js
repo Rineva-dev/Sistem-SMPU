@@ -257,6 +257,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (modalSubmit) {
         modalSubmit.addEventListener('click', () => {
             const alasan = document.getElementById('modal-reason').value.trim();
+
+            if (!alasan) {
+                notif.tampil(
+                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum mengajukan izin.`,
+                    'peringatan'
+                );
+                document.getElementById('modal-reason').focus();
+                return;
+            }
             kirimAbsenMasuk(alasan);
         });
     }
@@ -364,6 +373,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (modalTelatSimpan) {
         modalTelatSimpan.addEventListener('click', () => {
             const alasan = document.getElementById('alasan-keterlambatan').value.trim();
+
+            if (!alasan) {
+                notif.tampil(
+                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN KETERLAMBATAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
+                    'peringatan'
+                );
+                document.getElementById('alasan-keterlambatan').focus();
+                return;
+            }
             kirimAbsenMasuk(alasan);
         });
     }
