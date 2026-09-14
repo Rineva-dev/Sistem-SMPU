@@ -428,6 +428,8 @@ def absen_masuk():
     jam_sekarang = waktu_wita().strftime("%H:%M")
     alasan_telat = request.form.get('alasan_keterlambatan', '').strip()
 
+    status, keterangan = hitung_status_absensi(jam_sekarang)
+
     if status == 'terlambat' and not alasan_telat:
         flash('<i class="fas fa-exclamation-circle"></i> Alasan keterlambatan WAJIB diisi!', 'absensi_danger')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
@@ -437,7 +439,6 @@ def absen_masuk():
         flash('Anda sudah absen masuk hari ini.', 'absensi_info')
         return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
     
-    status, keterangan = hitung_status_absensi(jam_sekarang)
     if alasan_telat and status == 'terlambat':
         if keterangan:
             keterangan = f"{keterangan} | Alasan: {alasan_telat}"
