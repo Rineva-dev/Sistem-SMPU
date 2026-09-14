@@ -23,15 +23,12 @@ def cek_dari_wifi_sekolah():
     Rentang IP yang sudah terdeteksi: 10.10.12.x
     """
     ip = dapatkan_ip_klien()
-    
-    IP_DIPERBOLEHKAN = [
-        "192.168.1"
-    ]
-    
-    for rentang in IP_DIPERBOLEHKAN:
-        if ip.startswith(rentang):
-            return True, ip
+
+    if ip.startswith("192.168.1."):
+        return True, ip
+
     return False, ip
+    
 # ✅ === SELESAI FUNGSI CEK IP ===
 
 def hitung_status_absensi(jam_masuk_str):
