@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!alasan) {
                 notif.tampil(
-                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN KETERLAMBATAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
+                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
                     'peringatan'
                 );
                 document.getElementById('alasan-keterlambatan').focus();
