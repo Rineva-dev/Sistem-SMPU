@@ -236,6 +236,7 @@
                 {% if item.foto_profil %}
                     <img src="{{ url_for('tampilkan_foto_profil', filename=item.foto_profil) }}" 
                         alt="{{ item.nama }}"
+                        style="width:100%; height:100%; object-fit:cover; border-radius:0.85rem;"
                         onerror="this.style.display='none'; this.parentElement.innerHTML='{{ item.nama[:2]|upper }}';">
                 {% else %}
                     {{ item.nama[:2]|upper }}
@@ -717,6 +718,14 @@ btnSimpan.addEventListener('click', async () => {
     font-size: 1.1rem;
     flex-shrink: 0;
 }
+
+.guru-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
 .guru-identitas {
     flex: 1;
     min-width: 0;
