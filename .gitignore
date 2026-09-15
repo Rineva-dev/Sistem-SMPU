@@ -17,3 +17,9 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+
+static/uploads
+uploads
+*.jpg
+*.jpeg
+*.png
