@@ -20,7 +20,7 @@
         </div>
 
         <div class="mobile-header-content">
-            <div class="avatar-box">
+            <div class="avatar-box" style="position:relative;">
                 {% set tampil_nama = user.nama|default('', true) %}
                 
                 {# Tambahkan Gelar Belakang dengan koma #}
@@ -32,10 +32,21 @@
                 {% if user.gelar_depan %}
                     {% set tampil_nama = user.gelar_depan ~ ' ' ~ tampil_nama %}
                 {% endif %}
-                
-                <img src="{% if user.foto_profil %}{{ url_for('tampilkan_foto_profil', filename=user.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
-                    alt="Avatar" class="avatar-img" 
-                    onerror="this.parentElement.innerHTML='{{ tampil_nama | inisial_avatar }}'; this.style.display='none';">
+
+                {# ✅ Avatar = Link ke Biodata #}
+                <a href="{{ url_for('absensi_profil.biodata') }}" title="Lihat & Ubah Profil" style="display:block; text-decoration:none;">
+                    <img src="{% if user.foto_profil %}{{ url_for('tampilkan_foto_profil', filename=user.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
+                        alt="Avatar" class="avatar-img" 
+                        onerror="this.parentElement.innerHTML='{{ tampil_nama | inisial_avatar }}'; this.style.display='none';"
+                        style="cursor:pointer;">
+                </a>
+
+                {# ✅ Tombol Kecil Penanda #}
+                <a href="{{ url_for('absensi_profil.biodata') }}" 
+                    title="Lihat & Ubah Profil"
+                    style="position:absolute; right:0; bottom:0; width:20px; height:20px; background:#2563eb; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; box-shadow:0 2px 6px rgba(0,0,0,0.15); text-decoration:none; z-index:10;">
+                    <i class="fas fa-user"></i>
+                </a>
             </div>
             <div class="welcome-text">
                 <h4>Hi, {{ tampil_nama if tampil_nama else 'Guru' }} 👋</h4>
