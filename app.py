@@ -216,7 +216,6 @@ def sebelum_permintaan():
     # JIKA BELUM LOGIN → ARAHKAN KE LOGIN SESUAI SUBDOMAIN
     # =========================================================
     if not sudah_login:
-    # ⚠️ JANGAN mengalihkan jika SUDAH di halaman login
         if g.sistem_mode == 'absensi':
             if request.endpoint != 'absensi.login_absensi':
                 flash('Silakan login terlebih dahulu untuk sistem absensi.', 'absensi_warning')
