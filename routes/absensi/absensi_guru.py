@@ -221,7 +221,7 @@ def dashboard():
         flash('Silakan login terlebih dahulu.', 'absensi_warning')
         return redirect(url_for('absensi.login_absensi'))
 
-    guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
+    guru = Guru.query.filter_by(id=str(session.get('absensi_guru_id'))).first()
 
     if not guru:
         flash('Akun ini tidak memiliki akses.', 'absensi_danger')

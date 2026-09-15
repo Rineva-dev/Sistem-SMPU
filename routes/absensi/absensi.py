@@ -71,7 +71,7 @@ def login_absensi():
             session['absensi_logged_in'] = True
             session['absensi_sistem_mode'] = 'absensi'
             session['absensi_user_id'] = user.id
-            session['absensi_guru_id'] = user.guru.id
+            session['absensi_guru_id'] = str(user.guru.id)
             session['absensi_user_name'] = user.guru.nama
             session['absensi_halaman'] = 'absensi'
 

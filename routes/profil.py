@@ -115,13 +115,13 @@ def biodata():
             return redirect(url_for('absensi.login_absensi'))
         return redirect(url_for('login.halaman_login'))
     
-    user = User.query.get(user_id)
+    user = User.query.get(str(user_id))
     print("Apakah User ditemukan?", user)
     if user:
         print("User punya guru?", user.guru)
     
     if not session.get('user_id'):
-        user = User.query.get(user_id)
+        user = User.query.get(str(user_id))
         if user and user.guru:
             session['user_id'] = user.id
             session['user_name'] = user.guru.nama
@@ -137,7 +137,7 @@ def biodata():
             else:
                 return redirect(url_for('profil.biodata'))
     
-    user = User.query.get(user_id)
+    user = User.query.get(str(user_id))
     guru = user.guru if user else None
     
     daftar_tugas = []
@@ -185,7 +185,7 @@ def ubah_akun():
         return redirect(url_for('login.halaman_login'))
 
     if not session.get('user_id'):
-        user = User.query.get(user_id)
+        user = User.query.get(str(user_id))
         if user and user.guru:
             session['user_id'] = user.id
             session['user_name'] = user.guru.nama
@@ -194,7 +194,7 @@ def ubah_akun():
                 [nama[0].upper() for nama in user.guru.nama.split()[:2]]
             )
 
-    user = User.query.get(user_id)
+    user = User.query.get(str(user_id))
     if not user:
         flash('Pengguna tidak ditemukan', 'danger')
         if g.sistem_mode == 'absensi':
@@ -255,7 +255,7 @@ def ubah_foto():
         return redirect(url_for('login.halaman_login'))
 
     if not session.get('user_id'):
-        user = User.query.get(user_id)
+        user = User.query.get(str(user_id))
         if user and user.guru:
             session['user_id'] = user.id
             session['user_name'] = user.guru.nama
@@ -264,7 +264,7 @@ def ubah_foto():
                 [nama[0].upper() for nama in user.guru.nama.split()[:2]]
             )
     
-    user = User.query.get(user_id)
+    user = User.query.get(str(user_id))
     guru = user.guru if user else None
     if not guru:
         flash('Data guru tidak ditemukan', 'danger')
@@ -321,7 +321,7 @@ def edit_biodata():
         return redirect(url_for('login.halaman_login'))
 
     if not session.get('user_id'):
-        user = User.query.get(user_id)
+        user = User.query.get(str(user_id))
         if user and user.guru:
             session['user_id'] = user.id
             session['user_name'] = user.guru.nama
@@ -330,7 +330,7 @@ def edit_biodata():
                 [nama[0].upper() for nama in user.guru.nama.split()[:2]]
             )
     
-    user = User.query.get(user_id)
+    user = User.query.get(str(user_id))
     guru = user.guru if user else None
     if not guru:
         flash('Data guru tidak ditemukan', 'danger')
