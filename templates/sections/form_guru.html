@@ -179,8 +179,9 @@
                 <label><i class="fas fa-image"></i> Foto Profil</label>
                 {% if guru and guru.foto_profil %}
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                        <img src="{{ url_for('static', filename='uploads/foto_profil/' ~ guru.foto_profil) }}" 
-                            alt="Foto Lama" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:1px solid #ddd;">
+                        <img src="{% if guru.foto_profil %}{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
+                            alt="Foto Lama" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:1px solid #ddd;"
+                            onerror="this.src='{{ url_for('static', filename='img/avatar.png') }}'">
                         <span style="font-size:0.9rem; color:#374151;">{{ guru.foto_profil }}</span>
                         <button type="submit" name="hapus_foto" value="1" class="btn btn-sm btn-danger" 
                                 style="padding:4px 10px; font-size:0.85rem;"

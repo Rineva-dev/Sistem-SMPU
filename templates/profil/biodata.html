@@ -314,7 +314,7 @@
     <div class="profile-avatar" id="avatarWrapper">
       {% if guru.foto_profil %}
         {% set inisial = (guru.gelar_depan[0] if guru.gelar_depan else '') ~ guru.nama[0] ~ (guru.gelar_belakang[0] if guru.gelar_belakang else '') | upper %}
-        <img id="fotoProfil" src="{{ url_for('static', filename='uploads/foto_profil/' ~ guru.foto_profil) }}" 
+        <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
              alt="Foto Profil"
              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ inisial }}';">
       {% else %}

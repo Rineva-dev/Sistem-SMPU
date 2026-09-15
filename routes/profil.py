@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, g
 from models import db, Guru, User
 from werkzeug.security import generate_password_hash, check_password_hash
+from config import Config
 
 profil_bp = Blueprint('profil', __name__, url_prefix='/profil')
 

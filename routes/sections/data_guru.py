@@ -6,6 +6,10 @@ from models import db, Guru, User
 import os
 from werkzeug.utils import secure_filename
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, '..', 'static', 'uploads', 'foto_profil')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Buat Blueprint
 data_guru_bp = Blueprint('data_guru', __name__, url_prefix='/guru')
 
@@ -233,19 +237,18 @@ def tambah_guru():
 
         tugas_tambahan = bersihkan_tugas(jabatan, tugas_tambahan, "")
 
-        # ✅ === PROSES UPLOAD FOTO PROFIL ===
+        # === PROSES UPLOAD FOTO PROFIL ===
         foto_profil_nama = None
         if 'foto_profil' in request.files and request.files['foto_profil'].filename:
             file = request.files['foto_profil']
             if file.filename:
-                # Ekstensi file
+
                 ekstensi = secure_filename(file.filename).rsplit('.', 1)[-1].lower()
                 if ekstensi not in ['jpg','jpeg','png','gif','webp']:
                     flash("Format foto tidak didukung! Gunakan JPG, PNG, atau WebP", "danger")
                     return redirect(url_for('data_guru.tambah_guru'))
-
                 foto_profil_nama = f"temp_{datetime.now().strftime('%Y%m%d%H%M%S')}.{ekstensi}"
-                folder_simpan = os.path.join('static', 'uploads', 'foto_profil')
+                folder_simpan = UPLOAD_FOLDER
                 os.makedirs(folder_simpan, exist_ok=True)
                 simpan_di = os.path.join(folder_simpan, foto_profil_nama)
                 file.save(simpan_di)
@@ -278,8 +281,8 @@ def tambah_guru():
         if foto_profil_nama:
             ekstensi = foto_profil_nama.rsplit('.',1)[-1]
             nama_baru = f"guru_{guru_baru.id}.{ekstensi}"
-            lama = os.path.join('static', 'uploads', 'foto_profil', foto_profil_nama)
-            baru = os.path.join('static', 'uploads', 'foto_profil', nama_baru)
+            lama = os.path.join(UPLOAD_FOLDER, foto_profil_nama)
+            baru = os.path.join(UPLOAD_FOLDER, nama_baru)
             if os.path.exists(lama):
                 os.rename(lama, baru)
             guru_baru.foto_profil = nama_baru
@@ -386,15 +389,15 @@ def ubah_guru(id):
         guru.email = email if email else None
         guru.alamat = alamat
 
-        # ✅ === PROSES HAPUS FOTO ===
+        # === PROSES HAPUS FOTO ===
         if 'hapus_foto' in request.form:
             if guru.foto_profil:
-                lama = os.path.join('static', 'uploads', 'foto_profil', guru.foto_profil)
+                lama = os.path.join(UPLOAD_FOLDER, guru.foto_profil)
                 if os.path.exists(lama):
                     os.remove(lama)
             guru.foto_profil = None
 
-        # ✅ === PROSES UPLOAD FOTO BARU ===
+        # === PROSES UPLOAD FOTO BARU ===
         if 'foto_profil' in request.files and request.files['foto_profil'].filename:
             file = request.files['foto_profil']
             ekstensi = secure_filename(file.filename).rsplit('.',1)[-1].lower()
@@ -403,12 +406,12 @@ def ubah_guru(id):
                 return redirect(url_for('data_guru.ubah_guru', id=id))
             # Hapus foto lama kalau ada
             if guru.foto_profil:
-                lama = os.path.join('static', 'uploads', 'foto_profil', guru.foto_profil)
+                lama = os.path.join(UPLOAD_FOLDER, guru.foto_profil)
                 if os.path.exists(lama):
                     os.remove(lama)
             # Simpan foto baru pakai ID Guru
             nama_file = f"guru_{guru.id}.{ekstensi}"
-            folder_simpan = os.path.join('static', 'uploads', 'foto_profil')
+            folder_simpan = UPLOAD_FOLDER
             os.makedirs(folder_simpan, exist_ok=True)
             file.save(os.path.join(folder_simpan, nama_file))
             guru.foto_profil = nama_file

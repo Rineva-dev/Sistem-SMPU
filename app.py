@@ -1,10 +1,10 @@
-from flask import Flask, request, g, session, flash, url_for, redirect
+from flask import Flask, request, g, session, flash, url_for, redirect, send_from_directory
 from config import Config
 from models import db, TahunPelajaran
 from flask_migrate import Migrate
-
-# ✅ Impor filter
 from routes import number_format
+from config import Config
+import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -43,10 +43,8 @@ class SesuaiSubdomainSessionInterface(SecureCookieSessionInterface):
             return 'sesi_sekolah'
         return 'sesi_umum'
 
-# Pasang antarmuka sesi khusus — ini yang memisahkan sesi
 app.session_interface = SesuaiSubdomainSessionInterface()
 
-# ✅ Daftarkan filter ke Jinja
 app.jinja_env.filters['number_format'] = number_format
 
 def nama_singkat(nama, maks_kata=2):
@@ -82,23 +80,17 @@ def nama_singkat(nama, maks_kata=2):
     """
     if not nama:
         return "Pengguna"
-    
-    # Hapus gelar/bagian setelah koma/koma-spasi
+
     nama_bersih = nama.split(',')[0].strip()
-    
-    # Pisah per kata
     kata = nama_bersih.split()
-    
-    # Ambil maks 2 kata pertama
+
     if len(kata) > maks_kata:
         return ' '.join(kata[:maks_kata])
     
     return nama_bersih
 
-# Daftarkan filter
 app.jinja_env.filters['nama_singkat'] = nama_singkat
 
-# ✅ === TAMBAHKAN FILTER BARU DI BAWAH INI ===
 import re
 
 def nama_singkat_dropdown(nama_lengkap):
@@ -324,6 +316,15 @@ app.register_blueprint(absensi_profil_bp, name='absensi_profil', url_prefix='/ab
 @app.context_processor
 def tambah_model_ke_template():
     return dict(TahunPelajaran=TahunPelajaran)
+
+# === RUTE UNTUK MENAMPILKAN FOTO PROFIL ===
+@app.route('/uploads/foto_profil/<filename>')
+def tampilkan_foto_profil(filename):
+    return send_from_directory(
+        os.path.join(Config.UPLOAD_FOLDER, 'foto_profil'),
+        filename,
+        as_attachment=False
+    )
 
 # Buat tabel database jika belum ada
 with app.app_context():

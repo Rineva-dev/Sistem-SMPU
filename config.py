@@ -12,5 +12,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///sekolah.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads')
+    UPLOAD_FOLDER = os.path.join(basedir, '..', 'static', 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
