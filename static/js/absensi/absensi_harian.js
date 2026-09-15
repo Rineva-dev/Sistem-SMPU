@@ -127,20 +127,16 @@ async function prosesHasilScan(dataQR) {
     // ==================================================
     const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
     if (!sudahMasuk) {
-        // Hanya cek terlambat kalau BELUM absen masuk
         const jamSaatIni = ambilJamSaatIni();
-        const batasMenit = jamKeMenit(ABSENSI.BATAS_TEPAT_WAKTU);
+        const batasMenit = jamKeMenit(ABSENSI.BATAS_TERLAMBAT);
         const saatIniMenit = jamKeMenit(jamSaatIni);
 
-        if (saatIniMenit > batasMenit) {
-            // ⏰ TERLAMBAT → BUKA MODAL ALASAN, JANGAN LANGSUNG KIRIM!
-            bukaModalAlasanTelatDariQR(jamSaatIni, dataQR);
-            return; // HENTIKAN proses fetch, tunggu alasan dari modal
+        if (sudahLewatBatasWaktu()) {
+            tampilkanPeringatanAlfa();
+            return;
         }
     }
-    // ==================================================
 
-    // Kalau TIDAK terlambat → langsung kirim seperti biasa
     try {
         const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
             method: 'POST',
@@ -159,7 +155,6 @@ async function prosesHasilScan(dataQR) {
     }
 }
 
-// --- BACA QR DARI KAMERA ---
 function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
     if (!pemindaianAktifRef.value) return;
 
@@ -176,11 +171,10 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
 
     const kameraStatus = document.getElementById('kamera-status');
 
-    // ✅ SAAT SEDANG MEMINDAI
     if (kameraStatus) {
         kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan QR ke bingkai';
         kameraStatus.style.color = '#2563eb';
-        kameraStatus.classList.add('scanning'); // ← pastikan kelas scanning aktif
+        kameraStatus.classList.add('scanning');
     }
 
     try {
@@ -390,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         const jamSaatIni = ambilJamSaatIni();
-        const batasMenit = jamKeMenit(ABSENSI.BATAS_TEPAT_WAKTU);
+        const batasMenit = jamKeMenit(ABSENSI.BATAS_TERLAMBAT);
         const saatIniMenit = jamKeMenit(jamSaatIni);
         if (saatIniMenit > batasMenit) {
             bukaModalAlasanTelat(jamSaatIni);

@@ -463,7 +463,7 @@
         <div class="modal-header-content">
             <h4>Anda Datang Terlambat</h4>
             <div class="jam-info">
-                <span>Jam batas tepat waktu: <strong>07:15</strong></span>
+                <span>Batas toleransi masuk: <strong>{{ batas_terlambat }}</strong></span>
                 <span>Saat ini: <strong id="jam-saat-ini">--:--</strong></span>
             </div>
         </div>
@@ -556,6 +556,7 @@
 <script>
 const ABSENSI = {
     BATAS_TEPAT_WAKTU: "{{ jam_masuk_tepat }}",
+    BATAS_TERLAMBAT: "{{ batas_terlambat }}",
     BATAS_TUTUP_ABSENSI: "{{ jam_tutup_absensi }}",
     BATAS_PULANG: "{{ jam_pulang_resmi }}",
     SUDAH_ABSEN_MASUK: {{ 'true' if (absensi and absensi.jam_masuk) else 'false' }},

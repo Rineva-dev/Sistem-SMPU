@@ -406,19 +406,25 @@ overflow: hidden;
         align-items: center;
         justify-content: center;
         margin: 0 auto 16px;
-        overflow: hidden;
+        /* ❌ HAPUS: overflow: hidden; ← ini penyebab tombol terpotong */
         position: relative;
         cursor: pointer;
         box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
-    .hp-profile-avatar img {
+    .hp-profile-avatar img,
+    .hp-profile-avatar > span {
         width: 100%;
         height: 100%;
+        border-radius: 50%;
         object-fit: cover;
+        display: block;
+        /* ✅ Ganti: pindahkan pembatasan bulat ke sini */
+        overflow: hidden;
+        clip-path: circle(50%);
     }
 
-    /* Tombol kamera di pojok foto */
+    /* Tombol kamera di pojok foto — diperbaiki posisinya */
     .hp-btn-edit-foto {
         position: absolute;
         right: 0;
@@ -428,7 +434,7 @@ overflow: hidden;
         border-radius: 50%;
         background: #2563eb;
         color: #fff;
-        border: 3px solid #1f1f1f;
+        border: 3px solid #ffffff; /* ✅ Ganti jadi putih agar kontras */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -436,7 +442,9 @@ overflow: hidden;
         cursor: pointer;
         padding: 0;
         margin: 0;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        z-index: 10; /* ✅ Pastikan tombol ada di lapisan atas */
+        transform: translate(2px, 2px); /* ✅ Sedikit keluar agar tidak terpotong */
     }
 
     .hp-profile-name {
