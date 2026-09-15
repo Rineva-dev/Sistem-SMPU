@@ -216,12 +216,15 @@ def sebelum_permintaan():
     # JIKA BELUM LOGIN → ARAHKAN KE LOGIN SESUAI SUBDOMAIN
     # =========================================================
     if not sudah_login:
+    # ⚠️ JANGAN mengalihkan jika SUDAH di halaman login
         if g.sistem_mode == 'absensi':
-            flash('Silakan login terlebih dahulu untuk sistem absensi.', 'absensi_warning')
-            return redirect(url_for('absensi.login_absensi'))
+            if request.endpoint != 'absensi.login_absensi':
+                flash('Silakan login terlebih dahulu untuk sistem absensi.', 'absensi_warning')
+                return redirect(url_for('absensi.login_absensi'))
         else:
-            flash('Silakan login terlebih dahulu untuk sistem utama.', 'warning')
-            return redirect(url_for('login.halaman_login'))
+            if request.endpoint != 'login.halaman_login':
+                flash('Silakan login terlebih dahulu untuk sistem utama.', 'warning')
+                return redirect(url_for('login.halaman_login'))
             
 
     # =========================================================
