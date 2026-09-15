@@ -178,6 +178,7 @@ def monitoring_absensi():
             'nama': guru.nama,
             'nip': guru.nip,
             'jabatan': guru.jabatan,
+            'foto_profil': guru.foto_profil,
             'hadir': jml_hadir,
             'terlambat': jml_terlambat,
             'izin': jml_izin,

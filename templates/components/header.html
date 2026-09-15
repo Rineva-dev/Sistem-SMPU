@@ -119,7 +119,7 @@
           </li>
         </ul>
         <div class="dropdown-logout">
-          <a href="{{ url_for('login.logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <a href="{% if g.sistem_mode == 'absensi' %}{{ url_for('absensi.login_absensi') }}{% else %}{{ url_for('login.halaman_login') }}{% endif %}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
       </div>
     </div>

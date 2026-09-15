@@ -233,7 +233,13 @@
         {# Bagian Kepala Kartu — Mirip ID Card #}
         <div class="guru-card-header">
             <div class="guru-avatar">
-                {{ item.nama[:2]|upper }}
+                {% if item.foto_profil %}
+                    <img src="{{ url_for('tampilkan_foto_profil', filename=item.foto_profil) }}" 
+                        alt="{{ item.nama }}"
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='{{ item.nama[:2]|upper }}';">
+                {% else %}
+                    {{ item.nama[:2]|upper }}
+                {% endif %}
             </div>
             <div class="guru-identitas">
                 <h6 class="guru-nama">{{ item.nama }}</h6>
@@ -259,10 +265,6 @@
             <div class="stat-item">
                 <span class="label">Izin</span>
                 <span class="nilai text-info">{{ item.izin }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="label">Alfa</span>
-                <span class="nilai text-danger">{{ item.alfa }}</span>
             </div>
         </div>
 
