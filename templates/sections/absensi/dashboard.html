@@ -35,7 +35,7 @@
                 
                 <img src="{% if user.foto_profil %}{{ url_for('tampilkan_foto_profil', filename=user.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
                     alt="Avatar" class="avatar-img" 
-                    onerror="this.src='https://ui-avatars.com/api/?name={{ tampil_nama|urlencode }}&background=fff&color=2563eb&size=128'; this.onerror=null;">
+                    onerror="this.parentElement.innerHTML='{{ tampil_nama | inisial_avatar }}'; this.style.display='none';">
             </div>
             <div class="welcome-text">
                 <h4>Hi, {{ tampil_nama if tampil_nama else 'Guru' }} 👋</h4>

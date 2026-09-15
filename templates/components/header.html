@@ -39,13 +39,14 @@
     <!-- Profil Pengguna -->
     <div class="user-profile" id="userProfileBtn">
       <div class="user-avatar">
+        {% set nama_pengguna = session.get('user_name') or session.get('absensi_user_name', 'Pengguna') %}
         {% set foto = session.get('foto_profil') %}
         {% if foto %}
           <img src="{{ url_for('tampilkan_foto_profil', filename=foto) }}" 
               alt="Foto Profil"
-              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ session.get('user_initials', 'US') }}';">
+              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_pengguna | inisial_avatar }}';">
         {% else %}
-          {{ session.get('user_initials', 'US') }}
+          {{ nama_pengguna | inisial_avatar }}
         {% endif %}
       </div>
       <div class="user-info">
@@ -79,13 +80,12 @@
       <div class="user-dropdown" id="userDropdown">
         <div class="dropdown-header">
           <div class="dropdown-avatar">
-            {% set foto = session.get('foto_profil') %}
             {% if foto %}
               <img src="{{ url_for('tampilkan_foto_profil', filename=foto) }}"
                   alt="Foto Profil"
-                  onerror="this.style.display='none'; this.parentElement.innerHTML='{{ session.get('user_initials', 'US') }}';">
+                  onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_pengguna | inisial_avatar }}';">
             {% else %}
-              {{ session.get('user_initials', 'US') }}
+              {{ nama_pengguna | inisial_avatar }}
             {% endif %}
           </div>
           <div class="user-mail">

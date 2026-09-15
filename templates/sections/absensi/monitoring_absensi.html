@@ -178,7 +178,7 @@
             <i class="fas fa-check-circle"></i>
         </div>
         <div class="stat-info">
-            <p>Hadir</p>
+            <p>Hadir Tepat Waktu</p>
             <h3>{{ ringkasan.hadir }}</h3>
         </div>
     </div>
@@ -189,15 +189,6 @@
         <div class="stat-info">
             <p>Terlambat</p>
             <h3>{{ ringkasan.terlambat }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon bg-danger">
-            <i class="fas fa-times-circle"></i>
-        </div>
-        <div class="stat-info">
-            <p>Alfa</p>
-            <h3>{{ ringkasan.alfa }}</h3>
         </div>
     </div>
 </div>
@@ -237,9 +228,9 @@
                     <img src="{{ url_for('tampilkan_foto_profil', filename=item.foto_profil) }}" 
                         alt="{{ item.nama }}"
                         style="width:100%; height:100%; object-fit:cover; border-radius:0.85rem;"
-                        onerror="this.style.display='none'; this.parentElement.innerHTML='{{ item.nama[:2]|upper }}';">
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='{{ item.nama | inisial_avatar }}';">
                 {% else %}
-                    {{ item.nama[:2]|upper }}
+                    {{ item.nama | inisial_avatar }}
                 {% endif %}
             </div>
             <div class="guru-identitas">
@@ -256,7 +247,7 @@
         {# Statistik Angka #}
         <div class="guru-stats">
             <div class="stat-item">
-                <span class="label">Hadir</span>
+                <span class="label">Hadir Tepat Waktu</span>
                 <span class="nilai text-success">{{ item.hadir }}</span>
             </div>
             <div class="stat-item">

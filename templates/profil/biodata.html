@@ -312,13 +312,13 @@
   <div class="profile-sidebar">
     <!-- Klik Avatar → Lihat Foto Besar -->
     <div class="profile-avatar" id="avatarWrapper">
+      {% set nama_lengkap = ((guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '')) %}
       {% if guru.foto_profil %}
-        {% set inisial = (guru.gelar_depan[0] if guru.gelar_depan else '') ~ guru.nama[0] ~ (guru.gelar_belakang[0] if guru.gelar_belakang else '') | upper %}
-        <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
-             alt="Foto Profil"
-             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ inisial }}';">
+          <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
+              alt="Foto Profil"
+              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
       {% else %}
-        <span id="fotoProfil">{{ (guru.gelar_depan[0] if guru.gelar_depan else '') ~ guru.nama[0] ~ (guru.gelar_belakang[0] if guru.gelar_belakang else '') | upper }}</span>
+          <span id="fotoProfil">{{ nama_lengkap | inisial_avatar }}</span>
       {% endif %}
     </div>
 

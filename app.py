@@ -133,6 +133,29 @@ def nama_singkat_dropdown(nama_lengkap):
 # ✅ Daftarkan filter baru ke Jinja
 app.jinja_env.filters['nama_singkat_dropdown'] = nama_singkat_dropdown
 
+# =========================================================
+# ✅ FILTER: AMBIL INISIAL UNTUK AVATAR (TERPUSAT)
+# =========================================================
+def ambil_inisial(nama, jumlah=2):
+    """
+    Ambil huruf depan dari nama, maksimal 2 huruf, UPPERCASE
+    Contoh: "Budi Santoso" → "BS"
+    Kalau nama kosong → tampilkan "US" sebagai default
+    """
+    if not nama or not nama.strip():
+        return "US"  # ↓ INI PATOKAN UTAMA
+    
+    kata = nama.strip().split()
+    inisial = ""
+    if len(kata) >= 1:
+        inisial += kata[0][0]
+    if len(kata) >= 2 and jumlah >= 2:
+        inisial += kata[-1][0]  # Ambil huruf depan nama belakang
+    return inisial.upper()
+
+# ✅ Daftarkan filter ke Jinja
+app.jinja_env.filters['inisial_avatar'] = ambil_inisial
+
 # Inisialisasi Database
 db.init_app(app)
 migrate = Migrate(app, db)
