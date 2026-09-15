@@ -326,7 +326,6 @@ def tampilkan_foto_profil(filename):
         as_attachment=False
     )
 
-# Buat tabel database jika belum ada
 with app.app_context():
     db.create_all()
 
