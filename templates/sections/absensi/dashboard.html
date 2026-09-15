@@ -1,13 +1,14 @@
 {% extends "layout.html" %}
 {% set active_page = "dashboard" %}
 {% set halaman_aktif = "absensi" %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/dashboard.css') }}">
 
 <div class="absensi-dashboard-wrapper">
 
-    <!-- ✅ HEADER KHUSUS HP — Latar Biru + Avatar -->
+    <!-- HEADER KHUSUS HP -->
     <div class="mobile-header-section">
         <div class="header-dashboard">
             <div class="mobile-logo-top">

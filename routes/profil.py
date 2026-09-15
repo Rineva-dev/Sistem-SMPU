@@ -5,24 +5,21 @@ from config import Config
 
 profil_bp = Blueprint('profil', __name__, url_prefix='/profil')
 
-# ✅ HALAMAN BIODATA GURU — DILENGKAPI VARIABEL SIDEBAR
+# HALAMAN BIODATA GURU
 @profil_bp.route('/biodata')
 def biodata():
-    # Baca dari kedua sumber
-    print("===== DEBUG SESI =====")
-    print("user_id dari sesi:", session.get('user_id'))
-    print("absensi_user_id:", session.get('absensi_user_id'))
-    print("absensi_logged_in:", session.get('absensi_logged_in'))
     user_id = session.get('user_id') or session.get('absensi_user_id')
-    print("user_id yang dipakai:", user_id)
-    
-    # ✅ BACA halaman_aktif
+
+    referer = request.referrer
+    if referer and not referer.endswith('/profil/biodata') and not 'login' in referer:
+        session['kembali_ke'] = referer
+        print("✅ Disimpan kembali_ke:", referer)
+
     halaman_aktif = session.get('halaman_aktif', 'utama')
     session.setdefault('halaman_aktif', halaman_aktif)
-    
-    # ✅ DETEKSI OTOMATIS DARI URL ASAL — LENGKAP ABSENSI
+
     referer = request.referrer or ''
-    active_page = session.get('active_page', 'dashboard')  # nilai bawaan
+    active_page = session.get('active_page', 'dashboard')
     
     # ========== SISTEM ABSENSI ==========
     if '/absensi-guru/dashboard' in referer or 'dashboard' in referer and 'absensi' in referer:
@@ -102,7 +99,7 @@ def biodata():
     elif 'dashboard-guru' in referer:
         active_page = 'dashboard_guru'
     elif 'dashboard' in referer:
-        active_page = 'dashboard'  # Halaman utama / Kepala Sekolah / TU
+        active_page = 'dashboard'
     
     # ✅ Simpan ke sesi agar konsisten antar halaman profil
     session['active_page'] = active_page
@@ -133,11 +130,6 @@ def biodata():
             session['email'] = getattr(user.guru, 'email', None)
             session['no_hp'] = getattr(user.guru, 'no_hp', None) or getattr(user.guru, 'telepon', None)
             
-            if g.sistem_mode == 'absensi':
-                return redirect(url_for('absensi_profil.biodata'))
-            else:
-                return redirect(url_for('profil.biodata'))
-    
     user = User.query.get(str(user_id))
     guru = user.guru if user else None
     

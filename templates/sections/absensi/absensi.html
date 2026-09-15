@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 {% set active_page = "absensi_harian" %}
 {% set halaman_aktif = "absensi" %}
+{% block title %}Absensi{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/absensi_harian.css') }}">
 
 <div class="absensi-harian-wrapper">
 
-    <!-- ✅ HEADER TETAP DI ATAS KHUSUS HP -->
+    <!-- HEADER KHUSUS HP -->
     <header class="hp-fixed-header">
         <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
             <i class="fas fa-chevron-left"></i>

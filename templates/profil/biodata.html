@@ -1,414 +1,216 @@
 {% extends "layout.html" %}
+{% block title %}Biodata{% endblock %}
 {% block content %}
-<style>
-  /* === TATA LETAK UTAMA === */
-  .biodata-container {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 24px;
-    padding: 20px;
-  }
-  /* === KIRI: PROFIL SIDEBAR === */
-  .profile-sidebar {
-    background: #fff;
-    border-radius: 16px;
-    padding: 30px 20px;
-    text-align: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    height: fit-content;
-  }
-  .profile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: white;
-    font-size: 42px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    box-shadow: 0 4px 12px rgba(37,99,235,0.2);
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  .profile-avatar:hover {
-    transform: scale(1.05);
-  }
-  .profile-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  .profile-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 4px;
-  }
-  .profile-id {
-    font-size: 13px;
-    color: #6b7280;
-    background: #f3f4f6;
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    letter-spacing: 1px;
-  }
-  .profile-role {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 20px;
-  }
-  .status-badge {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    background: #dcfce7;
-    color: #166534;
-    font-weight: 600;
-    font-size: 13px;
-  }
-  /* === KANAN: KARTU INFORMASI === */
-  .info-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  }
-  .info-card h4 {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px 24px;
-  }
-  .info-group.full {
-    grid-column: 1 / -1;
-  }
-  .info-label {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 4px;
-  }
 
-    .info-label i {
-      margin-right: 4px;
-    }
-
-  .info-value {
-    font-size: 15px;
-    color: #1f2937;
-    font-weight: 500;
-  }
-  .info-value.empty {
-    color: #9ca3af;
-    font-style: italic;
-  }
-  /* === TOMBOL SIDEBAR === */
-  .sidebar-actions {
-    margin-top: 24px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .sidebar-btn {
-    padding: 10px 8px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .sidebar-btn.foto {
-    background: #eff6ff;
-    color: #2563eb;
-  }
-  .sidebar-btn.foto:hover {
-    background: #dbeafe;
-    color: #1d4ed8;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
-  }
-  .sidebar-btn.edit {
-    background: #f0fdf4;
-    color: #16a34a;
-  }
-  .sidebar-btn.edit:hover {
-    background: #dcfce7;
-    color: #15803d;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.15);
-  }
-  /* === MODAL LIHAT FOTO BESAR === */
-  .view-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 99999;
-    padding: 20px;
-  }
-  .view-modal.show { display: flex; }
-  .view-foto {
-    max-width: 90%;
-    max-height: 85vh;
-    border-radius: 12px;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
-  }
-  .btn-tutup {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-    transition: background 0.2s;
-  }
-  .btn-tutup:hover {
-    background: rgba(255,255,255,0.3);
-  }
-  /* === MODAL UMUM === */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 20px;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal-box {
-    background: #fff;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 580px;
-    max-height: 90vh;
-    overflow: hidden;
-  }
-  .modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    font-weight: 600;
-    font-size: 16px;
-    gap: 10px
-  }
-  .modal-body {
-    padding: 20px;
-    background: #f8fafc;
-    overflow-y: auto;
-    max-height: calc(90vh - 130px);
-  }
-  .modal-body .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px 20px;
-  }
-  .modal-body .form-group.full {
-    grid-column: 1 / -1;
-  }
-  .modal-body label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 4px;
-    display: block;
-  }
-  .modal-body input,
-  .modal-body textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
-  }
-  .modal-body input:focus,
-  .modal-body textarea:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-  .modal-body textarea {
-    min-height: 70px;
-    resize: vertical;
-  }
-  .modal-footer {
-    padding: 14px 20px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    border-top: 1px solid #e5e7eb;
-  }
-  .btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-  }
-  .btn.batal { background: #f1f5f9; color: #475569; }
-  .btn.batal:hover { background: #e2e8f0; }
-  .btn.simpan { background: #2563eb; color: #fff; }
-  .btn.simpan:hover { background: #1d4ed8; }
-  /* === MODAL CROP KHUSUS === */
-  .crop-container {
-    width: 100%;
-    height: 380px;
-    background: #333;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  /* === RESPONSIF === */
-  @media (max-width: 900px) {
-    .biodata-container { grid-template-columns: 1fr; }
-    .info-grid, .modal-body .form-grid { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 360px) {
-    .sidebar-actions { grid-template-columns: 1fr; }
-  }
-</style>
-
-<!-- Sertakan Cropper.js -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profil/biodata.css') }}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
 <div class="biodata-container">
-  <!-- SIDEBAR PROFIL -->
-  <div class="profile-sidebar">
-    <!-- Klik Avatar → Lihat Foto Besar -->
-    <div class="profile-avatar" id="avatarWrapper">
+
+  <!-- ✅ HEADER HP -->
+  <header class="hp-fixed-header">
+    <a href="{{ session.get('kembali_ke') or url_for('profil.biodata') }}" class="header-kembali-btn">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    <h1 class="header-judul-halaman">Akun</h1>
+    <a href="{% if g.sistem_mode == 'absensi' %}{{ url_for('absensi.logout_absensi') }}{% else %}{{ url_for('login.logout') }}{% endif %}" class="header-keluar-btn" title="Keluar">
+      <i class="fas fa-sign-out-alt"></i>
+    </a>
+  </header>
+
+  <!-- ✅ PROFIL BAGIAN ATAS — KHUSUS HP -->
+  <div class="hp-profile-section">
+    <div class="hp-profile-avatar" id="avatarWrapper">
       {% set nama_lengkap = ((guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '')) %}
       {% if guru.foto_profil %}
-          <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
-              alt="Foto Profil"
-              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
+        <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
+             alt="Foto Profil"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
       {% else %}
-          <span id="fotoProfil">{{ nama_lengkap | inisial_avatar }}</span>
+        <span id="fotoProfil">{{ nama_lengkap | inisial_avatar }}</span>
       {% endif %}
+      <!-- Tombol edit foto di pojok foto -->
+      <button type="button" class="hp-btn-edit-foto" id="btnGantiFoto" title="Ubah Foto">
+        <i class="fas fa-camera"></i>
+      </button>
     </div>
-
-    <h3 class="profile-name">
+    <h3 class="hp-profile-name">
       {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
     </h3>
-    <div class="profile-id">ID: {{ guru.id }}</div>
-    <p class="profile-role">{{ nama_halaman_aktif }}</p>
-    <div class="status-badge">
-      {{ '🟢 Aktif' if guru.status == 'Aktif' else '🔴 Tidak Aktif' }}
+    <p class="hp-profile-email">{{ guru.email or 'Belum diisi' }}</p>
+  </div>
+
+  <!-- ✅ DAFTAR MENU INFORMASI — KHUSUS HP -->
+  <div class="hp-menu-list">
+    <div class="hp-menu-group">
+      <div class="hp-menu-item">
+        <i class="fas fa-id-card hp-menu-icon"></i>
+        <span class="hp-menu-label">ID Guru</span>
+        <span class="hp-menu-value">{{ guru.id }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-user hp-menu-icon"></i>
+        <span class="hp-menu-label">NIK</span>
+        <span class="hp-menu-value">{{ guru.nik or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-venus-mars hp-menu-icon"></i>
+        <span class="hp-menu-label">Jenis Kelamin</span>
+        <span class="hp-menu-value">{{ guru.jenis_kelamin or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-birthday-cake hp-menu-icon"></i>
+        <span class="hp-menu-label">TTL</span>
+        <span class="hp-menu-value">{{ guru.tempat_lahir or '-' }}, {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-ring hp-menu-icon"></i>
+        <span class="hp-menu-label">Status Pernikahan</span>
+        <span class="hp-menu-value">{{ guru.status_pernikahan or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-graduation-cap hp-menu-icon"></i>
+        <span class="hp-menu-label">Pendidikan</span>
+        <span class="hp-menu-value">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-certificate hp-menu-icon"></i>
+        <span class="hp-menu-label">Sertifikasi</span>
+        <span class="hp-menu-value">{% if guru.sertifikasi %}✅ Bersertifikasi{% else %}❌ Belum{% endif %}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-briefcase hp-menu-icon"></i>
+        <span class="hp-menu-label">Jabatan</span>
+        <span class="hp-menu-value">{{ guru.jabatan }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-tasks hp-menu-icon"></i>
+        <span class="hp-menu-label">Tugas Tambahan</span>
+        <span class="hp-menu-value">{{ guru.tugas_tambahan or 'Tidak ada' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-phone-alt hp-menu-icon"></i>
+        <span class="hp-menu-label">Nomor HP</span>
+        <span class="hp-menu-value">{{ guru.no_hp or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item">
+        <i class="fas fa-envelope hp-menu-icon"></i>
+        <span class="hp-menu-label">Email</span>
+        <span class="hp-menu-value">{{ guru.email or 'Belum diisi' }}</span>
+      </div>
+      <div class="hp-menu-item hp-menu-full">
+        <i class="fas fa-home hp-menu-icon"></i>
+        <span class="hp-menu-label">Alamat</span>
+        <span class="hp-menu-value">{{ guru.alamat or 'Belum diisi' }}</span>
+      </div>
     </div>
 
-    <!-- TOMBOL FOTO & EDIT -->
-    <div class="sidebar-actions">
-      <button type="button" class="sidebar-btn foto" id="btnGantiFoto">
-        <i class="fas fa-camera"></i> Foto
-      </button>
-      <button type="button" class="sidebar-btn edit" id="btnEdit">
-        <i class="fas fa-pen"></i> Edit
+    <!-- Tombol Edit Biodata -->
+    <div class="hp-menu-group">
+      <button type="button" class="hp-edit-btn" id="btnEdit">
+        <i class="fas fa-pen"></i> Ubah Biodata
       </button>
     </div>
   </div>
 
-  <!-- BIODATA LENGKAP -->
-  <div class="info-card">
-    <h4><i class="fas fa-address-card"></i> Informasi Pribadi</h4>
-    <div class="info-grid">
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-user"></i> Nama Lengkap</div>
-        <div class="info-value">
-          {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
-        </div>
+  <!-- ✅ TAMPILAN KOMPUTER — TETAP SEPERTI SEKARANG -->
+  <div class="desktop-layout">
+    <div class="profile-sidebar">
+      <div class="profile-avatar" id="avatarWrapperDesktop">
+        {% set nama_lengkap = ((guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '')) %}
+        {% if guru.foto_profil %}
+          <img src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
+               alt="Foto Profil"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
+        {% else %}
+          <span>{{ nama_lengkap | inisial_avatar }}</span>
+        {% endif %}
       </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-hashtag"></i> ID Guru</div>
-        <div class="info-value">{{ guru.id }}</div>
+      <h3 class="profile-name">
+        {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
+      </h3>
+      <div class="profile-id">ID: {{ guru.id }}</div>
+      <p class="profile-role">{{ nama_halaman_aktif }}</p>
+      <div class="status-badge">
+        {{ '🟢 Aktif' if guru.status == 'Aktif' else '🔴 Tidak Aktif' }}
       </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-id-card"></i> NIK</div>
-        <div class="info-value {{ 'empty' if not guru.nik }}">{{ guru.nik or 'Belum diisi' }}</div>
+      <div class="sidebar-actions">
+        <button type="button" class="sidebar-btn foto" id="btnGantiFotoDesktop">
+          <i class="fas fa-camera"></i> Foto
+        </button>
+        <button type="button" class="sidebar-btn edit" id="btnEditDesktop">
+          <i class="fas fa-pen"></i> Edit
+        </button>
       </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-venus-mars"></i> Jenis Kelamin</div>
-        <div class="info-value {{ 'empty' if not guru.jenis_kelamin }}">{{ guru.jenis_kelamin or 'Belum diisi' }}</div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-birthday-cake"></i> Tempat, Tanggal Lahir</div>
-        <div class="info-value">
-          {{ guru.tempat_lahir or '-' }}, 
-          {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}
-        </div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-ring"></i> Status Pernikahan</div>
-        <div class="info-value {{ 'empty' if not guru.status_pernikahan }}">{{ guru.status_pernikahan or 'Belum diisi' }}</div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-graduation-cap"></i> Pendidikan Terakhir</div>
-        <div class="info-value {{ 'empty' if not guru.pendidikan_terakhir }}">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-certificate"></i> Sertifikasi</div>
-        <div class="info-value">
-          {% if guru.sertifikasi %}
-            <i class="fas fa-check-circle text-success"></i> Bersertifikasi
-          {% else %}
-            <i class="fas fa-times-circle text-danger"></i> Belum Bersertifikasi
-          {% endif %}
-        </div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-briefcase"></i> Jabatan</div>
-        <div class="info-value">{{ guru.jabatan }}</div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-tasks"></i> Tugas Tambahan</div>
-        <div class="info-value {{ 'empty' if not guru.tugas_tambahan }}">{{ guru.tugas_tambahan or 'Tidak ada' }}</div>
-      </div>
+    </div>
 
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-phone-alt"></i> Nomor HP</div>
-        <div class="info-value {{ 'empty' if not guru.no_hp }}">{{ guru.no_hp or 'Belum diisi' }}</div>
-      </div>
-      <div class="info-group">
-        <div class="info-label"><i class="fas fa-envelope"></i> Email</div>
-        <div class="info-value {{ 'empty' if not guru.email }}">{{ guru.email or 'Belum diisi' }}</div>
-      </div>
-      <div class="info-group full">
-        <div class="info-label"><i class="fas fa-home"></i> Alamat Lengkap</div>
-        <div class="info-value {{ 'empty' if not guru.alamat }}">{{ guru.alamat or 'Belum diisi' }}</div>
+    <div class="info-card">
+      <h4><i class="fas fa-address-card"></i> Informasi Pribadi</h4>
+      <div class="info-grid">
+        <div class="info-group">
+          <div class="info-label">Nama Lengkap</div>
+          <div class="info-value">
+            {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
+          </div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">ID Guru</div>
+          <div class="info-value">{{ guru.id }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">NIK</div>
+          <div class="info-value {{ 'empty' if not guru.nik }}">{{ guru.nik or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Jenis Kelamin</div>
+          <div class="info-value {{ 'empty' if not guru.jenis_kelamin }}">{{ guru.jenis_kelamin or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Tempat, Tanggal Lahir</div>
+          <div class="info-value">
+            {{ guru.tempat_lahir or '-' }}, 
+            {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}
+          </div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Status Pernikahan</div>
+          <div class="info-value {{ 'empty' if not guru.status_pernikahan }}">{{ guru.status_pernikahan or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Pendidikan Terakhir</div>
+          <div class="info-value {{ 'empty' if not guru.pendidikan_terakhir }}">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Sertifikasi</div>
+          <div class="info-value">
+            {% if guru.sertifikasi %}
+              <i class="fas fa-check-circle text-success"></i> Bersertifikasi
+            {% else %}
+              <i class="fas fa-times-circle text-danger"></i> Belum Bersertifikasi
+            {% endif %}
+          </div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Jabatan</div>
+          <div class="info-value">{{ guru.jabatan }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Tugas Tambahan</div>
+          <div class="info-value {{ 'empty' if not guru.tugas_tambahan }}">{{ guru.tugas_tambahan or 'Tidak ada' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Nomor HP</div>
+          <div class="info-value {{ 'empty' if not guru.no_hp }}">{{ guru.no_hp or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Email</div>
+          <div class="info-value {{ 'empty' if not guru.email }}">{{ guru.email or 'Belum diisi' }}</div>
+        </div>
+        <div class="info-group full">
+          <div class="info-label">Alamat Lengkap</div>
+          <div class="info-value {{ 'empty' if not guru.alamat }}">{{ guru.alamat or 'Belum diisi' }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -500,28 +302,29 @@
   // LIHAT FOTO BESAR
   // ==========================================
   const avatarWrapper = document.getElementById('avatarWrapper');
+  const avatarWrapperDesktop = document.getElementById('avatarWrapperDesktop');
   const viewModal = document.getElementById('viewModal');
   const viewFoto = document.getElementById('viewFoto');
   const btnTutupFoto = document.getElementById('btnTutupFoto');
 
-  avatarWrapper.addEventListener('click', () => {
-    const imgAvatar = document.getElementById('fotoProfil');
-    if (imgAvatar.tagName === 'IMG' && imgAvatar.src) {
+  function tampilkanFotoBesar(elemen) {
+    const imgAvatar = elemen.querySelector('#fotoProfil') || elemen.querySelector('img');
+    if (imgAvatar && imgAvatar.tagName === 'IMG' && imgAvatar.src) {
       viewFoto.src = imgAvatar.src;
       viewModal.classList.add('show');
     }
-  });
+  }
 
-  // ✅ HANYA TOMBOL X YANG BISA TUTUP
-  btnTutupFoto.addEventListener('click', () => {
-    viewModal.classList.remove('show');
-  });
-  // ❌ TIDAK BISA TUTUP SAAT KLIK DI LUAR FOTO
+  if (avatarWrapper) avatarWrapper.addEventListener('click', () => tampilkanFotoBesar(avatarWrapper));
+  if (avatarWrapperDesktop) avatarWrapperDesktop.addEventListener('click', () => tampilkanFotoBesar(avatarWrapperDesktop));
+
+  btnTutupFoto.addEventListener('click', () => viewModal.classList.remove('show'));
 
   // ==========================================
-  // GANTI FOTO — TOMBOL FOTO
+  // GANTI FOTO
   // ==========================================
   const btnGantiFoto = document.getElementById('btnGantiFoto');
+  const btnGantiFotoDesktop = document.getElementById('btnGantiFotoDesktop');
   const fileInput = document.getElementById('fileInput');
   const cropModal = document.getElementById('cropModal');
   const cropImage = document.getElementById('cropImage');
@@ -531,7 +334,13 @@
   const formUploadFoto = document.getElementById('formUploadFoto');
   let cropper;
 
-  btnGantiFoto.addEventListener('click', () => fileInput.click());
+  function bukaPilihFoto(e) {
+    e.stopPropagation();
+    fileInput.click();
+  }
+
+  if (btnGantiFoto) btnGantiFoto.addEventListener('click', bukaPilihFoto);
+  if (btnGantiFotoDesktop) btnGantiFotoDesktop.addEventListener('click', bukaPilihFoto);
 
   fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -560,7 +369,6 @@
     reader.readAsDataURL(file);
   });
 
-  // ✅ HANYA TOMBOL BATAL YANG BISA TUTUP MODAL CROP
   btnBatalFoto.addEventListener('click', () => {
     cropModal.classList.remove('show');
     fileInput.value = '';
@@ -569,12 +377,7 @@
 
   btnSimpanFoto.addEventListener('click', () => {
     if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({
-      width: 400,
-      height: 400,
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: 'high',
-    });
+    const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
     fotoData.value = canvas.toDataURL('image/jpeg', 0.9);
     formUploadFoto.submit();
   });
@@ -583,17 +386,18 @@
   // EDIT BIODATA
   // ==========================================
   const btnEdit = document.getElementById('btnEdit');
+  const btnEditDesktop = document.getElementById('btnEditDesktop');
   const editModal = document.getElementById('editModal');
   const btnBatalEdit = document.getElementById('btnBatalEdit');
 
-  btnEdit.addEventListener('click', () => {
+  function bukaEditBiodata(e) {
+    e.stopPropagation();
     editModal.classList.add('show');
-  });
+  }
 
-  // ✅ HANYA TOMBOL BATAL YANG BISA TUTUP MODAL EDIT
-  btnBatalEdit.addEventListener('click', () => {
-    editModal.classList.remove('show');
-  });
+  if (btnEdit) btnEdit.addEventListener('click', bukaEditBiodata);
+  if (btnEditDesktop) btnEditDesktop.addEventListener('click', bukaEditBiodata);
 
+  btnBatalEdit.addEventListener('click', () => editModal.classList.remove('show'));
 </script>
 {% endblock %}
