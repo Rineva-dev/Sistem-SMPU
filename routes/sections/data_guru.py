@@ -243,8 +243,7 @@ def tambah_guru():
                 if ekstensi not in ['jpg','jpeg','png','gif','webp']:
                     flash("Format foto tidak didukung! Gunakan JPG, PNG, atau WebP", "danger")
                     return redirect(url_for('data_guru.tambah_guru'))
-                # Nanti ID Guru jadi 6 digit, jadi nama file ikut pakai ID baru
-                # Untuk tambah: simpan sementara, nanti diubah setelah disimpan
+
                 foto_profil_nama = f"temp_{datetime.now().strftime('%Y%m%d%H%M%S')}.{ekstensi}"
                 folder_simpan = os.path.join('static', 'uploads', 'foto_profil')
                 os.makedirs(folder_simpan, exist_ok=True)
@@ -312,7 +311,7 @@ def tambah_guru():
 # ==========================================
 # RUTE UBAH DATA GURU
 # ==========================================
-@data_guru_bp.route('/ubah/<int:id>', methods=['GET', 'POST'])
+@data_guru_bp.route('/ubah/<id>', methods=['GET', 'POST'])
 def ubah_guru(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
@@ -442,7 +441,7 @@ def ubah_guru(id):
 # ==========================================
 # RUTE HAPUS DATA GURU
 # ==========================================
-@data_guru_bp.route('/hapus/<int:id>', methods=['POST'])
+@data_guru_bp.route('/hapus/<id>', methods=['POST'])
 def hapus_guru(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
@@ -461,7 +460,7 @@ def hapus_guru(id):
 # ==========================================
 # RUTE LIHAT DETAIL
 # ==========================================
-@data_guru_bp.route('/detail/<int:id>')
+@data_guru_bp.route('/detail/<id>')
 def detail_guru(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
@@ -491,7 +490,7 @@ def detail_guru(id):
         bisa_atur_akun=bisa_atur_akun()
     )
 
-@data_guru_bp.route('/atur-ulang-password/<int:id>', methods=['GET', 'POST'])
+@data_guru_bp.route('/atur-ulang-password/<id>', methods=['GET', 'POST'])
 def atur_ulang_password(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
@@ -533,7 +532,7 @@ def atur_ulang_password(id):
         bisa_atur_akun=bisa_atur_akun()
     )
 
-@data_guru_bp.route('/buat-akun/<int:id>', methods=['GET', 'POST'])
+@data_guru_bp.route('/buat-akun/<id>', methods=['GET', 'POST'])
 def buat_akun(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
@@ -596,7 +595,7 @@ def buat_akun(id):
 # ==========================================
 # RUTE ATUR ULANG / UBAH PASSWORD
 # ==========================================
-@data_guru_bp.route('/ubah-password/<int:id>', methods=['GET', 'POST'])
+@data_guru_bp.route('/ubah-password/<id>', methods=['GET', 'POST'])
 def ubah_password(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
