@@ -33,7 +33,7 @@
                     {% set tampil_nama = user.gelar_depan ~ ' ' ~ tampil_nama %}
                 {% endif %}
                 
-                <img src="{% if user.foto_profil %}{{ url_for('static', filename='foto_profil/' ~ user.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
+                <img src="{% if user.foto_profil %}{{ url_for('tampilkan_foto_profil', filename=user.foto_profil) }}{% else %}{{ url_for('static', filename='img/avatar.png') }}{% endif %}" 
                     alt="Avatar" class="avatar-img" 
                     onerror="this.src='https://ui-avatars.com/api/?name={{ tampil_nama|urlencode }}&background=fff&color=2563eb&size=128'; this.onerror=null;">
             </div>
