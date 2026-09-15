@@ -49,6 +49,98 @@ app.session_interface = SesuaiSubdomainSessionInterface()
 # ✅ Daftarkan filter ke Jinja
 app.jinja_env.filters['number_format'] = number_format
 
+def nama_singkat(nama, maks_kata=2):
+    """
+    Ambil maksimal 2 kata pertama, gelar di belakang otomatis dilewati
+    Contoh: "Siti Aminah, S.Pd., M.Pd." → "Siti Aminah"
+    Contoh: "Budi Santoso Hutagalung" → "Budi Santoso"
+    """
+    if not nama:
+        return "Pengguna"
+    
+    # Hapus gelar/bagian setelah koma/koma-spasi
+    nama_bersih = nama.split(',')[0].strip()
+    
+    # Pisah per kata
+    kata = nama_bersih.split()
+    
+    # Ambil maks 2 kata pertama
+    if len(kata) > maks_kata:
+        return ' '.join(kata[:maks_kata])
+    
+    return nama_bersih
+
+# Daftarkan filter
+app.jinja_env.filters['nama_singkat'] = nama_singkat
+
+# ==== SUDAH ADA DI SANA ====
+def nama_singkat(nama, maks_kata=2):
+    """
+    Ambil maksimal 2 kata pertama, gelar di belakang otomatis dilewati
+    Contoh: "Siti Aminah, S.Pd., M.Pd." → "Siti Aminah"
+    Contoh: "Budi Santoso Hutagalung" → "Budi Santoso"
+    """
+    if not nama:
+        return "Pengguna"
+    
+    # Hapus gelar/bagian setelah koma/koma-spasi
+    nama_bersih = nama.split(',')[0].strip()
+    
+    # Pisah per kata
+    kata = nama_bersih.split()
+    
+    # Ambil maks 2 kata pertama
+    if len(kata) > maks_kata:
+        return ' '.join(kata[:maks_kata])
+    
+    return nama_bersih
+
+# Daftarkan filter
+app.jinja_env.filters['nama_singkat'] = nama_singkat
+
+# ✅ === TAMBAHKAN FILTER BARU DI BAWAH INI ===
+import re
+
+def nama_singkat_dropdown(nama_lengkap):
+    """
+    Singkatkan nama sesuai aturan:
+    - Hilangkan gelar depan sementara, proses nama, lalu gabung lagi
+    - Jika kata pertama ≥4 huruf → ambil 1 kata
+    - Jika kata pertama ≤3 huruf → ambil 2 kata
+    - Gelar depan tetap ditampilkan
+    """
+    if not nama_lengkap:
+        return "Pengguna"
+    
+    nama_lengkap = nama_lengkap.strip()
+
+    gelar_depan = r"^(Dr\.|Drg\.|Prof\.|Ir\.|Sdr\.|H\.|K\.H\.|Alm\.|Almh\.|Drs\.|M\.|Bpk\.|Ibu\.|Ny\.|Tn\.)\s+"
+    
+    gelar = ""
+    nama_murni = nama_lengkap
+
+    cocok = re.match(gelar_depan, nama_lengkap)
+    if cocok:
+        gelar = cocok.group(0)
+        nama_murni = nama_lengkap[cocok.end():]
+
+    kata = nama_murni.split()
+    if not kata:
+        return gelar + "Pengguna"
+
+    kata1 = kata[0].strip(".,")
+    if len(kata1) >= 4:
+
+        nama_terambil = kata[0]
+    else:
+        nama_terambil = " ".join(kata[:2])
+
+    return f"{gelar}{nama_terambil}"
+
+
+# ✅ Daftarkan filter baru ke Jinja
+app.jinja_env.filters['nama_singkat_dropdown'] = nama_singkat_dropdown
+
 # Inisialisasi Database
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -74,7 +166,11 @@ def sebelum_permintaan():
         g.sistem_mode = 'sekolah'
     else:
         # Fallback: deteksi dari path jika bukan subdomain
-        if request.path.startswith('/absensi-guru') or request.path.startswith('/login-absensi') or request.path.startswith('/logout-absensi'):
+        if (
+            request.path.startswith('/absensi-guru') or 
+            request.path.startswith('/login-absensi') or 
+            request.path.startswith('/logout-absensi')
+        ):
             g.sistem_mode = 'absensi'
         else:
             g.sistem_mode = 'sekolah'
@@ -82,12 +178,14 @@ def sebelum_permintaan():
     # =========================================================
     # HALAMAN LOGIN / LOGOUT — TIDAK PERLU CEK LOGIN
     # =========================================================
-    if request.path in [
-        '/login',
-        '/login-absensi',
-        '/proses-login',
-        '/logout-absensi'
-    ]:
+    if (
+        request.path in [
+            '/login',
+            '/login-absensi',
+            '/proses-login',
+            '/logout-absensi'
+        ]
+    ):
         if g.sistem_mode == 'absensi':
             aktif = TahunPelajaran.query.filter_by(aktif=True).first()
             g.tahun_pelajaran = aktif.kode if aktif else "2025/2026"
@@ -124,6 +222,7 @@ def sebelum_permintaan():
         else:
             flash('Silakan login terlebih dahulu untuk sistem utama.', 'warning')
             return redirect(url_for('login.halaman_login'))
+            
 
     # =========================================================
     # SET TAHUN PELAJARAN
@@ -136,6 +235,24 @@ def sebelum_permintaan():
             aktif = TahunPelajaran.query.filter_by(aktif=True).first()
             session["tahun_pelajaran"] = aktif.kode if aktif else "2025/2026"
         g.tahun_pelajaran = session["tahun_pelajaran"]
+
+        # =========================================================
+    # ✅ AMBIL FOTO PROFIL & SIMPAN KE SESI
+    # =========================================================
+    from models import User, Guru  # Pastikan model sudah diimpor di atas, ini cadangan saja
+    if g.sistem_mode == 'absensi':
+        user_id = session.get('absensi_user_id')
+    else:
+        user_id = session.get('user_id')
+
+    if user_id:
+        akun = User.query.get(user_id)
+        if akun and akun.guru:
+            session['foto_profil'] = akun.guru.foto_profil
+        else:
+            session.pop('foto_profil', None)
+    else:
+        session.pop('foto_profil', None)
 
 # ==========================================
 # 📋 IMPOR & DAFTARKAN SEMUA BLUEPRINT
@@ -166,6 +283,7 @@ from routes.sections.bendahara.bendahara import bendahara_bp
 from routes.absensi.absensi import absensi_bp
 from routes.absensi.absensi_guru import absensi_guru_bp
 from routes.absensi.monitoring_absensi import monitoring_bp
+from routes.profil import profil_bp
 
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
@@ -192,6 +310,11 @@ app.register_blueprint(data_peminatan_bp)
 app.register_blueprint(absensi_bp)
 app.register_blueprint(absensi_guru_bp, url_prefix='/absensi-guru')
 app.register_blueprint(monitoring_bp)
+app.register_blueprint(profil_bp)
+
+# ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
+from routes.profil import profil_bp as absensi_profil_bp
+app.register_blueprint(absensi_profil_bp, name='absensi_profil', url_prefix='/absensi-guru')
 
 # ==========================================
 # 📅 LOGIKA TAHUN PELAJARAN GLOBAL

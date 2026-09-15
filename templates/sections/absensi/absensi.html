@@ -68,7 +68,11 @@
     <div class="status-today-card">
         <div>
             {% if absensi %}
-                {% if absensi.jam_masuk and absensi.jam_pulang %}
+                {% if absensi.status in ['izin','sakit'] %}
+                    <div class="status-text">
+                        <i class="fas fa-calendar-times"></i> Anda {{ absensi.status|title }} hari ini
+                    </div>
+                {% elif absensi.jam_masuk and absensi.jam_pulang %}
                     <div class="status-text">
                         <i class="fas fa-check-circle"></i> Absensi hari ini sudah lengkap
                     </div>
@@ -129,13 +133,18 @@
             SEMUA tombol absensi disembunyikan.
             ===================================================== #}
 
-            {% if absensi and absensi.jam_masuk and absensi.jam_pulang %}
-
+            {% if absensi and (absensi.jam_masuk and absensi.jam_pulang) %}
+                {# ✅ Kalau Hadir lengkap (Masuk + Pulang) #}
                 <div class="absensi-selesai">
                     <i class="fas fa-check-circle"></i>
                     <span>Absensi Hari Ini Sudah Selesai</span>
                 </div>
-
+            {% elif absensi and absensi.status in ['izin','sakit'] %}
+                {# ✅ Kalau Izin/Sakit → Tampil pesan khusus #}
+                <div class="absensi-selesai">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Izin Berhasil — Semoga urusan anda lancar</span>
+                </div>
             {% else %}
 
                 {# =================================================
@@ -217,55 +226,92 @@
         <h5 class="card-title-info">
             <i class="fas fa-info-circle"></i> Informasi Kehadiran Hari Ini
         </h5>
-        {% if absensi and absensi.jam_masuk %}
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-icon masuk">
-                    <i class="fas fa-sign-in-alt"></i>
+        {% if absensi %}
+            {% if absensi.status == 'izin' or absensi.status == 'sakit' %}
+            <!-- ✅ STATUS IZIN / SAKIT -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon status">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Status</span>
+                        <span class="info-value {% if absensi.status == 'izin' %}badge-izin{% else %}badge-sakit{% endif %}">
+                            Anda {{ absensi.status|title }} hari ini
+                        </span>
+                    </div>
                 </div>
-                <div class="info-content">
-                    <span class="info-label">Jam Masuk</span>
-                    <span class="info-value">{{ absensi.jam_masuk }}</span>
+                <div class="info-item">
+                    <div class="info-icon masuk">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Waktu Izin</span>
+                        <span class="info-value">
+                            {{ hari_ini }}
+                            {% if absensi.jam_izin %}
+                                &nbsp; {{ absensi.jam_izin }}
+                            {% endif %}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="info-item">
-                <div class="info-icon pulang">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label">Jam Pulang</span>
-                    <span class="info-value">{{ absensi.jam_pulang or '-' }}</span>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-icon status">
-                    <i class="fas fa-check-square"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label">Status</span>
-                    {% if absensi.status == 'hadir' %}
-                    <span class="info-value badge-hadir">Hadir Tepat Waktu</span>
-                    {% elif absensi.status == 'terlambat' %}
-                    <span class="info-value badge-terlambat">Terlambat</span>
-                    {% elif absensi.status == 'izin' %}
-                    <span class="info-value badge-izin">Izin</span>
-                    {% elif absensi.status == 'sakit' %}
-                    <span class="info-value badge-sakit">Sakit</span>
-                    {% else %}
-                    <span class="info-value badge-alfa">Tidak Hadir</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-icon catatan">
-                    <i class="fas fa-sticky-note"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label">Catatan</span>
-                    <span class="info-value">{{ absensi.keterangan or 'Tidak ada catatan' }}</span>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-icon catatan">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Keterangan</span>
+                        <span class="info-value">{{ absensi.keterangan or 'Izin Terkirim — semoga urusan anda lancar' }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
+            {% elif absensi.jam_masuk %}
+            <!-- Status Hadir / Masuk seperti biasa -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon masuk">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Jam Masuk</span>
+                        <span class="info-value">{{ absensi.jam_masuk }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon pulang">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Jam Pulang</span>
+                        <span class="info-value">{{ absensi.jam_pulang or '-' }}</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon status">
+                        <i class="fas fa-check-square"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Status</span>
+                        {% if absensi.status == 'hadir' %}
+                        <span class="info-value badge-hadir">Hadir Tepat Waktu</span>
+                        {% elif absensi.status == 'terlambat' %}
+                        <span class="info-value badge-terlambat">Terlambat</span>
+                        {% else %}
+                        <span class="info-value badge-alfa">Tidak Hadir</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon catatan">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="info-content">
+                        <span class="info-label">Catatan</span>
+                        <span class="info-value">{{ absensi.keterangan or 'Tidak ada catatan' }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% else %}
         <div class="info-empty">
             <i class="fas fa-clock fa-2x"></i>
@@ -316,8 +362,16 @@
                         {% endif %}
                     </div>
                     <div class="riwayat-times">
-                        <span class="time-in"><i class="fas fa-sign-in-alt"></i> {{ item.jam_masuk or '-' }}</span>
-                        <span class="time-out"><i class="fas fa-sign-out-alt"></i> {{ item.jam_pulang or '-' }}</span>
+                        {% if item.status in ['izin','sakit'] %}
+                            {# ✅ Kalau Izin/Sakit → TAMPILKAN JAM IZIN SAJA #}
+                            {% if item.jam_izin %}
+                            <span class="time-in"><i class="fas fa-clock"></i> {{ item.jam_izin }}</span>
+                            {% endif %}
+                        {% else %}
+                            {# ✅ Kalau Hadir/Biasa → TAMPILKAN Jam Masuk & Pulang #}
+                            <span class="time-in"><i class="fas fa-sign-in-alt"></i> {{ item.jam_masuk or '-' }}</span>
+                            <span class="time-out"><i class="fas fa-sign-out-alt"></i> {{ item.jam_pulang or '-' }}</span>
+                        {% endif %}
                     </div>
                     {% if item.keterangan %}
                     <div class="riwayat-note">
@@ -508,6 +562,7 @@ const ABSENSI = {
     URL_ABSENSI_HARIAN: "{{ url_for('absensi_guru.absensi_harian') }}",
     URL_ABSEN_MASUK: "{{ url_for('absensi_guru.absen_masuk') }}",
     URL_ABSEN_PULANG: "{{ url_for('absensi_guru.absen_pulang') }}",
+    URL_AJUKAN_IZIN: "{{ url_for('absensi_guru.ajukan_izin') }}",
     URL_QR_DATA: "{{ url_for('absensi_guru.qr_absensi_data') }}",
     URL_SCAN_QR_PROSES: "{{ url_for('absensi_guru.scan_qr_proses') }}"
 };

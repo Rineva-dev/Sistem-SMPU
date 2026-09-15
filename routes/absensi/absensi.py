@@ -74,6 +74,18 @@ def login_absensi():
             session['absensi_guru_id'] = user.guru.id
             session['absensi_user_name'] = user.guru.nama
             session['absensi_halaman'] = 'absensi'
+
+            session['user_id'] = user.id
+            session['user_name'] = user.guru.nama
+            session['jabatan'] = user.guru.jabatan or 'Guru'
+            session['user_initials'] = ''.join(
+                [nama[0].upper() for nama in user.guru.nama.split()[:2]]
+            )
+            # Ambil kontak dari Guru, BUKAN dari User
+            session['email'] = getattr(user.guru, 'email', None)
+            session['no_hp'] = getattr(user.guru, 'no_hp', None) or getattr(user.guru, 'telepon', None)
+            session['halaman_aktif'] = 'absensi'
+
             flash(
                 f'Selamat datang, {user.guru.nama}',
                 'absensi_success'
@@ -95,6 +107,13 @@ def login_absensi():
 # ==============================================================
 @absensi_bp.route('/logout-absensi')
 def logout_absensi():
-    # ✅ HAPUS SESI ABSENSI SAJA — TIDAK MENGGANGGU SESI SEKOLAH
-    session.clear()
+
+    hapus_kunci = [
+        'absensi_logged_in', 'absensi_sistem_mode', 'absensi_user_id',
+        'absensi_guru_id', 'absensi_user_name', 'absensi_halaman',
+        'halaman_aktif', 'user_id', 'user_name', 'jabatan', 'user_initials',
+        'email', 'no_hp'
+    ]
+    for kunci in hapus_kunci:
+        session.pop(kunci, None)
     return redirect(url_for('absensi.login_absensi'))

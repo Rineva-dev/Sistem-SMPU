@@ -6,24 +6,23 @@
     </button>
     <h2 class="page-title">Dashboard</h2>
   </div>
-
   <div class="header-right d-flex align-items-center gap-3">
     <!-- PEMILIH TAHUN PELAJARAN -->
     <div class="tahun-pemilih">
       <form action="{{ url_for('umum.ganti_tahun') }}" method="POST">
-        <div class="custom-select"> <!-- ✅ PEMBUNGKUS BARU -->
+        <div class="custom-select">
           <select name="tahun_pelajaran" onchange="this.form.submit()">
             {% set daftar_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all() %}
             {% for tp in daftar_tahun %}
             <option value="{{ tp.kode }}" {{ 'selected' if g.tahun_pelajaran == tp.kode else '' }}>
-                {% set potong = tp.nama.replace('Tahun Pelajaran ', '').split(' - ') %}
-                {% if potong | length == 2 %}
-                    {% set nomor_semester = potong[1].replace('Semester ', '') %}
-                    {% set nama_semester = 'Ganjil' if nomor_semester == '1' else 'Genap' %}
-                    {{ potong[0] }} - {{ nama_semester }}
-                {% else %}
-                    {{ tp.nama }}
-                {% endif %}
+              {% set potong = tp.nama.replace('Tahun Pelajaran ', '').split(' - ') %}
+              {% if potong | length == 2 %}
+                {% set nomor_semester = potong[1].replace('Semester ', '') %}
+                {% set nama_semester = 'Ganjil' if nomor_semester == '1' else 'Genap' %}
+                {{ potong[0] }} - {{ nama_semester }}
+              {% else %}
+                {{ tp.nama }}
+              {% endif %}
             </option>
             {% endfor %}
           </select>
@@ -38,13 +37,115 @@
     </button>
 
     <!-- Profil Pengguna -->
-    <div class="user-profile">
-      <div class="user-avatar">AD</div>
+    <div class="user-profile" id="userProfileBtn">
+      <div class="user-avatar">
+        {% set foto = session.get('foto_profil') %}
+        {% if foto %}
+          <img src="{{ url_for('static', filename='uploads/foto_profil/' ~ foto) }}" 
+              alt="Foto Profil"
+              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ session.get('user_initials', 'US') }}';">
+        {% else %}
+          {{ session.get('user_initials', 'US') }}
+        {% endif %}
+      </div>
       <div class="user-info">
-        <div class="user-name">Admin Sekolah</div>
-        <div class="user-role">Pengelola Sistem</div>
+        <div class="user-name">
+          {{ (session.get('user_name') or session.get('absensi_user_name', 'Pengguna')) | nama_singkat_dropdown }}
+        </div>
+        <div class="user-role">
+          {% set aktif = session.get('halaman_aktif') | default('utama') %}
+          {% if aktif == 'absensi' %}
+            Guru
+          {% elif aktif == 'bendahara' %}
+            Bendahara
+          {% elif aktif == 'admin_sistem' %}
+            Admin Sistem
+          {% elif aktif == 'wali_kelas' %}
+            Wali Kelas
+          {% elif aktif == 'waka_kurikulum' %}
+            Waka Kurikulum
+          {% elif aktif == 'waka_kesiswaan' %}
+            Waka Kesiswaan
+          {% elif aktif == 'pembina_ekskul' %}
+            Pembina Ekstrakurikuler
+          {% else %}
+            {{ session.get('jabatan') or session.get('role', 'Pengguna Sistem') }}
+          {% endif %}
+        </div>
       </div>
       <i class="fas fa-chevron-down text-muted"></i>
+
+      <!-- DROPDOWN MENU PROFIL -->
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar">
+            {% set foto = session.get('foto_profil') %}
+            {% if foto %}
+              <img src="{{ url_for('static', filename='uploads/foto_profil/' ~ foto) }}" 
+                  alt="Foto Profil"
+                  onerror="this.style.display='none'; this.parentElement.innerHTML='{{ session.get('user_initials', 'US') }}';">
+            {% else %}
+              {{ session.get('user_initials', 'US') }}
+            {% endif %}
+          </div>
+          <div class="user-mail">
+            <div class="dropdown-name">{{ session.get('user_name', 'Pengguna') }}</div>
+            <div class="dropdown-email">
+              {% if session.get('email') %}
+                {{ session.get('email') }}
+              {% elif session.get('no_hp') or session.get('nomor_hp') or session.get('telepon') %}
+                {{ session.get('no_hp') or session.get('nomor_hp') or session.get('telepon') }}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <ul class="dropdown-menu">
+          <!-- ✅ BIODATA → otomatis pilih rute sesuai sistem -->
+          <li>
+            {% if g.sistem_mode == 'absensi' %}
+              <a href="{{ url_for('absensi_profil.biodata') }}"><i class="fas fa-user"></i> Account</a>
+            {% else %}
+              <a href="{{ url_for('profil.biodata') }}"><i class="fas fa-user"></i> Account</a>
+            {% endif %}
+          </li>
+
+          <!-- ✅ UBAH AKUN → otomatis pilih rute sesuai sistem -->
+          <li>
+            {% if g.sistem_mode == 'absensi' %}
+              <a href="{{ url_for('absensi_profil.ubah_akun') }}"><i class="fas fa-cog"></i> Manage Account</a>
+            {% else %}
+              <a href="{{ url_for('profil.ubah_akun') }}"><i class="fas fa-cog"></i> Manage Account</a>
+            {% endif %}
+          </li>
+        </ul>
+        <div class="dropdown-logout">
+          <a href="{{ url_for('login.logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
     </div>
   </div>
 </header>
+
+<script>
+const userProfileBtn = document.getElementById('userProfileBtn');
+const userDropdown = document.getElementById('userDropdown');
+
+// ✅ HANYA BUKA/TUTUP saat klik pada tombol profil
+userProfileBtn.addEventListener('click', function(e) {
+    e.stopPropagation(); // ❗ PENTING: JANGAN sampai ikut ke pengecekkan luar
+    this.classList.toggle('open');
+});
+
+// ✅ TUTUP JIKA DIKLIK DI LUAR AREA
+document.addEventListener('click', function(e) {
+    // Cek: klik di luar tombol DAN di luar dropdown? → tutup
+    if (!userProfileBtn.contains(e.target)) {
+        userProfileBtn.classList.remove('open');
+    }
+});
+
+// ✅ KLIK DI DALAM DROPDOWN → JANGAN TUTUP
+userDropdown.addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>

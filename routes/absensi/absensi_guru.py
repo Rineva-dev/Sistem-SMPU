@@ -91,7 +91,6 @@ def belum_jam_pulang():
 
     return jam_ke_menit(jam_sekarang) < jam_ke_menit(BATAS_PULANG)
 
-# === ✅ FUNGSI AMBIL JAM DARI PENGATURAN DATABASE ===
 # === ✅ FUNGSI AMBIL JAM — OTOMATIS BIASA / JUMAT ===
 
 def ambil_jam_pengaturan():
@@ -413,6 +412,7 @@ def absen_masuk():
         halaman_asal = None
 
     # ✅ === CEK WIFI SEKOLAH — WAJIB ===
+    alasan_telat = request.form.get('alasan_keterlambatan', '').strip()
     dari_sekolah, ip_klien = cek_dari_wifi_sekolah()
     if not dari_sekolah:
         flash(f'<i class="fas fa-wifi"></i> Absen Masuk hanya bisa dari Wifi Sekolah.', 'absensi_danger')
@@ -430,8 +430,6 @@ def absen_masuk():
     
     hari_ini = waktu_wita().date()
     jam_sekarang = waktu_wita().strftime("%H:%M")
-    alasan_telat = request.form.get('alasan_keterlambatan', '').strip()
-
     status, keterangan = hitung_status_absensi(jam_sekarang)
 
     if status == 'terlambat' and not alasan_telat:
@@ -462,6 +460,64 @@ def absen_masuk():
     
     db.session.commit()
     flash(f"Absen Masuk berhasil: {jam_sekarang} — {status.upper()}", "absensi_success")
+    return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
+
+# === ✅ TOMBOL AJUKAN IZIN / SAKIT ===
+@absensi_guru_bp.route('/ajukan-izin', methods=['POST'])
+def ajukan_izin():
+    if not (
+        session.get('absensi_logged_in') is True and
+        session.get('absensi_sistem_mode') == 'absensi' and
+        session.get('absensi_user_id')
+    ):
+        flash('Silakan login terlebih dahulu.', 'absensi_warning')
+        return redirect(url_for('absensi.login_absensi'))
+
+    halaman_asal = request.referrer
+    if halaman_asal and request.host not in halaman_asal:
+        halaman_asal = None
+
+    # ✅ Izin TIDAK perlu cek WiFi
+    if sudah_lewat_batas_absensi():
+        jam = ambil_jam_pengaturan()
+        flash(f'<i class="fas fa-exclamation-triangle"></i> Sudah lewat jam {jam["jam_tutup_absensi"]}. Absensi ditutup.', 'absensi_danger')
+        return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
+
+    guru = Guru.query.filter_by(id=session.get('absensi_guru_id')).first()
+    if not guru:
+        flash('Akun tidak valid.', 'absensi_danger')
+        return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
+
+    hari_ini = waktu_wita().date()
+    jam_sekarang = waktu_wita().strftime("%H:%M")
+    alasan = request.form.get('alasan_izin', '').strip()
+    if not alasan:
+        flash('<i class="fas fa-exclamation-circle"></i> Alasan wajib diisi!', 'absensi_danger')
+        return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
+
+    absensi = AbsensiGuru.query.filter_by(guru_id=guru.id, tanggal=hari_ini).first()
+    if absensi:
+        if absensi.status == 'izin':
+            flash('Izin Anda sudah tercatat hari ini.', 'absensi_info')
+            return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
+
+        absensi.status = 'izin'
+        absensi.keterangan = alasan
+
+    else:
+        absensi = AbsensiGuru(
+            guru_id=guru.id,
+            tanggal=hari_ini,
+            jam_masuk=None,
+            jam_pulang=None,
+            jam_izin=datetime.now().strftime("%H:%M"),
+            status='izin',
+            keterangan=f"Izin Terkirim — semoga urusan anda lancar. Alasan: {alasan}"
+        )
+        db.session.add(absensi)
+
+    db.session.commit()
+    flash("✅ Izin Terkirim — semoga urusan anda lancar", "absensi_success")
     return redirect(halaman_asal or url_for('absensi_guru.dashboard'))
 
 # === 2. Tombol Absen Pulang ===
@@ -610,6 +666,7 @@ def scan_qr_proses():
                 tipe = "masuk"
             else:
                 tipe = "pulang"
+
     elif data_scan.startswith("guru:"):
         bagian = data_scan.split(":")
         if len(bagian) >= 8:
@@ -622,6 +679,7 @@ def scan_qr_proses():
             tanggal_qr = bagian[3]
             tipe = bagian[5]
             pembuat_qr = 'guru'
+
     else:
         guru = Guru.query.filter_by(nip=data_scan).first()
         if guru:
@@ -697,10 +755,13 @@ def scan_qr_proses():
                 "status": "error",
                 "pesan": f'<i class="fas fa-clock"></i> Belum jam {jam["jam_pulang_resmi"]}. Absen pulang belum diperbolehkan.'
             }), 403
+
         if not absensi or not absensi.jam_masuk:
             return jsonify({"status": "error", "pesan": "❌ Belum absen masuk. Silakan absen masuk terlebih dahulu."}), 403
+
         if absensi.jam_pulang:
             return jsonify({"status": "info", "pesan": "✅ Sudah absen pulang", "jam": absensi.jam_pulang})
+
         absensi.jam_pulang = jam_sekarang
         db.session.commit()
         return jsonify({
@@ -715,7 +776,9 @@ def scan_qr_proses():
     elif tipe == "masuk":
         if absensi and absensi.jam_masuk:
             return jsonify({"status": "info", "pesan": "✅ Sudah absen masuk", "jam": absensi.jam_masuk})
+
         status, keterangan = hitung_status_absensi(jam_sekarang)
+
         if not absensi:
             absensi = AbsensiGuru(
                 guru_id=guru.id, tanggal=hari_ini_date,
@@ -726,6 +789,7 @@ def scan_qr_proses():
             absensi.jam_masuk = jam_sekarang
             absensi.status = status
             absensi.keterangan = keterangan
+
         db.session.commit()
         return jsonify({
             "status": "sukses",

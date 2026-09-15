@@ -10,7 +10,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" class="form-layout">
+        <form method="POST" class="form-layout" enctype="multipart/form-data">
             <!-- Baris 1: NIK Guru -->
             <div class="form-group full">
                 <label><i class="fa fa-id-card" aria-hidden="true"></i> NIK Guru</label>
@@ -172,6 +172,25 @@
             <div class="form-group full">
                 <label><i class="fas fa-home"></i> Alamat Lengkap</label>
                 <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ guru.alamat if guru else '' }}</textarea>
+            </div>
+
+            <!-- ✅ TAMBAHKAN BAGIAN UPLOAD FOTO DI SINI -->
+            <div class="form-group full">
+                <label><i class="fas fa-image"></i> Foto Profil</label>
+                {% if guru and guru.foto_profil %}
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                        <img src="{{ url_for('static', filename='uploads/foto_profil/' ~ guru.foto_profil) }}" 
+                            alt="Foto Lama" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:1px solid #ddd;">
+                        <span style="font-size:0.9rem; color:#374151;">{{ guru.foto_profil }}</span>
+                        <button type="submit" name="hapus_foto" value="1" class="btn btn-sm btn-danger" 
+                                style="padding:4px 10px; font-size:0.85rem;"
+                                onclick="return confirm('Yakin hapus foto profil?')">Hapus Foto</button>
+                    </div>
+                {% else %}
+                    <em style="color:#6b7280; font-size:0.9rem;">Belum ada foto, silakan pilih file</em>
+                {% endif %}
+                <input type="file" name="foto_profil" accept="image/*" class="form-input" style="padding:0.4rem;">
+                <small class="text-muted">Format: JPG, PNG. Ukuran disarankan maksimal 2MB.</small>
             </div>
 
             <!-- Tombol Aksi -->

@@ -109,6 +109,7 @@ function kirimAbsenPulang() {
 }
 
 // --- PROSES HASIL SCAN QR ---
+// --- PROSES HASIL SCAN QR ---
 async function prosesHasilScan(dataQR) {
     // Tutup kamera & modal dulu
     if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
@@ -121,6 +122,25 @@ async function prosesHasilScan(dataQR) {
     if (modalKameraOverlay) modalKameraOverlay.style.display = 'none';
     if (modalKamera) modalKamera.style.display = 'none';
 
+    // ==================================================
+    // ✅ TAMBAHKAN CEK TERLAMBAT DI SINI!
+    // ==================================================
+    const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
+    if (!sudahMasuk) {
+        // Hanya cek terlambat kalau BELUM absen masuk
+        const jamSaatIni = ambilJamSaatIni();
+        const batasMenit = jamKeMenit(ABSENSI.BATAS_TEPAT_WAKTU);
+        const saatIniMenit = jamKeMenit(jamSaatIni);
+
+        if (saatIniMenit > batasMenit) {
+            // ⏰ TERLAMBAT → BUKA MODAL ALASAN, JANGAN LANGSUNG KIRIM!
+            bukaModalAlasanTelatDariQR(jamSaatIni, dataQR);
+            return; // HENTIKAN proses fetch, tunggu alasan dari modal
+        }
+    }
+    // ==================================================
+
+    // Kalau TIDAK terlambat → langsung kirim seperti biasa
     try {
         const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
             method: 'POST',
@@ -257,7 +277,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (modalSubmit) {
         modalSubmit.addEventListener('click', () => {
             const alasan = document.getElementById('modal-reason').value.trim();
-
             if (!alasan) {
                 notif.tampil(
                     `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum mengajukan izin.`,
@@ -266,7 +285,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('modal-reason').focus();
                 return;
             }
-            kirimAbsenMasuk(alasan);
+            // ✅ KIRIM KE ROUTE AJUKAN IZIN, BUKAN absen-masuk
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = ABSENSI.URL_AJUKAN_IZIN;
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'alasan_izin';
+            input.value = alasan;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
         });
     }
 
@@ -644,5 +673,66 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inisialisasi saat halaman dimuat
     perbaruiTeksPaginasi();
     renderTombolPaginasi();
+
+    // --- BUKA MODAL ALASAN TERLAMBAT DARI SCAN QR ---
+    let _dataQRTerlambat = null; // simpan data QR sementara
+    function bukaModalAlasanTelatDariQR(jamSaatIni, dataQR) {
+        _dataQRTerlambat = dataQR; // simpan untuk dipakai nanti
+        document.getElementById('jam-saat-ini').textContent = jamSaatIni;
+        document.getElementById('alasan-keterlambatan').value = '';
+        modalTelatOverlay.style.display = 'block';
+        modalTelat.style.display = 'block';
+        setTimeout(() => {
+            modalTelatOverlay.classList.add('active');
+            modalTelat.classList.add('active');
+        }, 10);
+    }
+
+    // --- OVERRIDE: Saat Simpan Alasan, KIRIM BESERTA DATA QR ---
+    // Ganti bagian lama: modalTelatSimpan.addEventListener('click', ...)
+    // Menjadi seperti di bawah ini:
+
+    if (modalTelatSimpan) {
+        modalTelatSimpan.addEventListener('click', async () => {
+            const alasan = document.getElementById('alasan-keterlambatan').value.trim();
+            if (!alasan) {
+                notif.tampil(
+                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
+                    'peringatan'
+                );
+                document.getElementById('alasan-keterlambatan').focus();
+                return;
+            }
+
+            tutupModalTelat();
+
+            // ✅ Kalau asalnya DARI QR → kirim lewat jalur QR + alasan
+            if (_dataQRTerlambat) {
+                try {
+                    const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            data_qr: _dataQRTerlambat,
+                            alasan_keterlambatan: alasan  // ← kirim alasan juga!
+                        })
+                    });
+                    const hasil = await res.json();
+                    _dataQRTerlambat = null; // bersihkan
+                    if (hasil.status === 'sukses' || hasil.status === 'info') {
+                        notifSukses(hasil.pesan || 'Absensi berhasil tercatat!');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        notifError(hasil.pesan || 'Gagal memproses QR.');
+                    }
+                } catch (err) {
+                    notifError(`Kesalahan: ${err.message}`);
+                }
+            } else {
+                // ✅ Kalau asalnya DARI TOMBOL MANUAL → jalur lama
+                kirimAbsenMasuk(alasan);
+            }
+        });
+    }
 
 });

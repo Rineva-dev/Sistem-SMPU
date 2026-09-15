@@ -3,6 +3,7 @@ from sqlalchemy import UniqueConstraint, CheckConstraint
 from datetime import datetime, date, time
 from sqlalchemy import String
 from werkzeug.security import generate_password_hash, check_password_hash
+import random
 
 # ✅ Inisialisasi database
 db = SQLAlchemy()
@@ -19,8 +20,9 @@ class Guru(db.Model):
     pendidikan_terakhir = db.Column(db.String(10), nullable=True)
     status_pernikahan = db.Column(db.String(20), nullable=True)
     
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String(6), primary_key=True, unique=True, nullable=False)
     nama = db.Column(db.String(100), nullable=False)
+
     jenis_kelamin = db.Column(db.String(20), nullable=False)
     tempat_lahir = db.Column(db.String(100))
     tanggal_lahir = db.Column(db.Date)
@@ -34,6 +36,20 @@ class Guru(db.Model):
     
     alamat = db.Column(db.Text)
     dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    foto_profil = db.Column(db.String(255), nullable=True)
+
+    @staticmethod
+    def buat_id_unik():
+        while True:
+            angka = random.randint(100000, 999999)
+            id_calon = str(angka)
+            if not Guru.query.get(id_calon):
+                return id_calon
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not self.id:
+            self.id = Guru.buat_id_unik()
 
     # Relasi ke akun pengguna
     akun = db.relationship('User', backref='guru', uselist=False)
@@ -43,7 +59,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    guru_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True, unique=True)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True, unique=True)
     siswa_id = db.Column(db.Integer, db.ForeignKey('siswa.id'), nullable=True, unique=True)
     jabatan = db.Column(db.String(50))
     tugas_tambahan = db.Column(db.Text)
@@ -100,7 +116,7 @@ class PenandatanganSurat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     surat_id = db.Column(db.Integer, db.ForeignKey('surat_keluar.id'), nullable=False)
     jenis = db.Column(db.String(50))
-    id_guru = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True)
+    id_guru = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True)
     nama = db.Column(db.String(150), nullable=False)
     jabatan = db.Column(db.String(150), nullable=False)
     
@@ -205,7 +221,7 @@ class Kelas(db.Model):
         index=True
     )
     
-    wali_kelas_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True)
+    wali_kelas_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True)
 
     wali_kelas = db.relationship('Guru', backref=db.backref('kelas_diampu', lazy=True))
     daftar_siswa = db.relationship('Siswa', back_populates='kelas_sekarang', foreign_keys='Siswa.kelas_id', lazy=True)
@@ -236,7 +252,7 @@ class PengaturanMapelKelas(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     kelas_id = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=False)
     mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
-    guru_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True)
     jumlah_jp = db.Column(db.Integer, nullable=False, default=0)
     tahun_pelajaran = db.Column(db.String(30), nullable=False)
 
@@ -373,7 +389,7 @@ class JadwalPelajaran(db.Model):
     jam_mulai = db.Column(db.String(10), nullable=False)
     jam_selesai = db.Column(db.String(10), nullable=False)
     mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
-    guru_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=False) # Otomatis dari PengaturanMapelKelas
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False) # Otomatis dari PengaturanMapelKelas
 
     __table_args__ = (
         db.UniqueConstraint('kelas_id', 'tahun_pelajaran', 'hari', 'jam_mulai', name='_jadwal_unik'),
@@ -532,20 +548,12 @@ class Ekstrakurikuler(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nama = db.Column(db.String(100), nullable=False)
-    pembina_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True)
+    pembina_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True)
     keterangan = db.Column(db.Text, nullable=True)
     dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # ✅ TETAP PAKAI TANGGAL SAJA
     tgl_mulai = db.Column(db.Date, nullable=False)
     tgl_selesai = db.Column(db.Date, nullable=False)
-
     tahun_pelajaran = db.Column(db.String(20), nullable=False, index=True)
-
-    # ✅ HAPUS KOLOM MANUAL INI:
-    # aktif = db.Column(db.Boolean, default=True)
-    # status_kegiatan = db.Column(db.String(20), default='aktif')
-
     anggota = db.relationship('Siswa', secondary=ekskul_anggota, backref='ekstrakurikuler')
     pembina = db.relationship('Guru', backref='ekstrakurikuler_dibina')
 
@@ -600,18 +608,15 @@ class Peminatan(db.Model):
     nama = db.Column(db.String(100), nullable=False)
     tahun_pelajaran = db.Column(db.String(20), nullable=False, index=True)
     
-    # ✅ PERBAIKI: Merujuk ke tabel Guru, bukan User
-    pembina_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=True)
+    pembina_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=True)
     
     tgl_mulai = db.Column(db.Date, nullable=False)
     tgl_selesai = db.Column(db.Date, nullable=False)
     keterangan = db.Column(db.Text, nullable=True)
 
-    # ✅ PERBAIKI: Relasi ke Guru, persis seperti Ekstrakurikuler
     pembina = db.relationship('Guru', backref='peminatan_dibina', foreign_keys=[pembina_id])
     anggota = db.relationship('Siswa', secondary=peminatan_anggota, backref='peminatan_diikuti')
 
-    # ✅ Tambah aturan unik persis seperti Ekskul
     __table_args__ = (
         db.UniqueConstraint('nama', 'tahun_pelajaran', name='_nama_peminatan_tahun_uc'),
     )
@@ -751,7 +756,7 @@ class AbsensiJurnalPeminatan(db.Model):
 class AbsensiGuru(db.Model):
     __tablename__ = 'absensi_guru'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    guru_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=False)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
     tanggal = db.Column(db.Date, nullable=False)
     jam_masuk = db.Column(db.String(10), nullable=True)
     jam_pulang = db.Column(db.String(10), nullable=True) 
@@ -765,7 +770,7 @@ class AbsensiGuru(db.Model):
     __table_args__ = (
         db.UniqueConstraint('guru_id', 'tanggal', name='_guru_tanggal_unik'),
     )
-
+    jam_izin = db.Column(db.String(5), nullable=True)
     def __repr__(self):
         return f"<AbsensiGuru {self.tanggal} - {self.guru.nama}: {self.status}>"
 
@@ -775,7 +780,7 @@ class AbsensiGuru(db.Model):
 class GajiGuru(db.Model):
     __tablename__ = 'gaji_guru'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    guru_id = db.Column(db.Integer, db.ForeignKey('guru.id'), nullable=False)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
     bulan = db.Column(db.Integer, nullable=False)   # 1-12
     tahun = db.Column(db.Integer, nullable=False)
     

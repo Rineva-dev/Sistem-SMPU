@@ -73,6 +73,8 @@ def proses_login():
             else []
         )
         session['halaman_aktif'] = 'utama'
+        session['email'] = user.guru.email if user.guru else None
+        session['no_hp'] = user.guru.no_hp if user.guru else None
 
         # INISIAL NAMA
         if user.guru:

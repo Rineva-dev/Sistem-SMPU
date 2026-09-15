@@ -965,6 +965,7 @@
         transition: all 0.2s ease;
         box-shadow: 0 6px 16px rgb(5 150 105 / 56%);
         z-index: 999;
+        border: none;
     }
     .nav-btn.main-btn:active {
         transform: translateX(-50%) scale(0.96);

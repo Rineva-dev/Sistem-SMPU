@@ -1,0 +1,599 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  /* === TATA LETAK UTAMA === */
+  .biodata-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+  /* === KIRI: PROFIL SIDEBAR === */
+  .profile-sidebar {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    height: fit-content;
+  }
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    font-size: 42px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .profile-avatar:hover {
+    transform: scale(1.05);
+  }
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .profile-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
+  .profile-id {
+    font-size: 13px;
+    color: #6b7280;
+    background: #f3f4f6;
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    letter-spacing: 1px;
+  }
+  .profile-role {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 20px;
+  }
+  .status-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  /* === KANAN: KARTU INFORMASI === */
+  .info-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .info-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 24px;
+  }
+  .info-group.full {
+    grid-column: 1 / -1;
+  }
+  .info-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+    .info-label i {
+      margin-right: 4px;
+    }
+
+  .info-value {
+    font-size: 15px;
+    color: #1f2937;
+    font-weight: 500;
+  }
+  .info-value.empty {
+    color: #9ca3af;
+    font-style: italic;
+  }
+  /* === TOMBOL SIDEBAR === */
+  .sidebar-actions {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .sidebar-btn {
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .sidebar-btn.foto {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+  .sidebar-btn.foto:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+  }
+  .sidebar-btn.edit {
+    background: #f0fdf4;
+    color: #16a34a;
+  }
+  .sidebar-btn.edit:hover {
+    background: #dcfce7;
+    color: #15803d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.15);
+  }
+  /* === MODAL LIHAT FOTO BESAR === */
+  .view-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+  }
+  .view-modal.show { display: flex; }
+  .view-foto {
+    max-width: 90%;
+    max-height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  }
+  .btn-tutup {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+  }
+  .btn-tutup:hover {
+    background: rgba(255,255,255,0.3);
+  }
+  /* === MODAL UMUM === */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    font-size: 16px;
+    gap: 10px
+  }
+  .modal-body {
+    padding: 20px;
+    background: #f8fafc;
+    overflow-y: auto;
+    max-height: calc(90vh - 130px);
+  }
+  .modal-body .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 20px;
+  }
+  .modal-body .form-group.full {
+    grid-column: 1 / -1;
+  }
+  .modal-body label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .modal-body input,
+  .modal-body textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .modal-body input:focus,
+  .modal-body textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .modal-body textarea {
+    min-height: 70px;
+    resize: vertical;
+  }
+  .modal-footer {
+    padding: 14px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid #e5e7eb;
+  }
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+  .btn.batal { background: #f1f5f9; color: #475569; }
+  .btn.batal:hover { background: #e2e8f0; }
+  .btn.simpan { background: #2563eb; color: #fff; }
+  .btn.simpan:hover { background: #1d4ed8; }
+  /* === MODAL CROP KHUSUS === */
+  .crop-container {
+    width: 100%;
+    height: 380px;
+    background: #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  /* === RESPONSIF === */
+  @media (max-width: 900px) {
+    .biodata-container { grid-template-columns: 1fr; }
+    .info-grid, .modal-body .form-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 360px) {
+    .sidebar-actions { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- Sertakan Cropper.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+
+<div class="biodata-container">
+  <!-- SIDEBAR PROFIL -->
+  <div class="profile-sidebar">
+    <!-- Klik Avatar → Lihat Foto Besar -->
+    <div class="profile-avatar" id="avatarWrapper">
+      {% if guru.foto_profil %}
+        {% set inisial = (guru.gelar_depan[0] if guru.gelar_depan else '') ~ guru.nama[0] ~ (guru.gelar_belakang[0] if guru.gelar_belakang else '') | upper %}
+        <img id="fotoProfil" src="{{ url_for('static', filename='uploads/foto_profil/' ~ guru.foto_profil) }}" 
+             alt="Foto Profil"
+             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ inisial }}';">
+      {% else %}
+        <span id="fotoProfil">{{ (guru.gelar_depan[0] if guru.gelar_depan else '') ~ guru.nama[0] ~ (guru.gelar_belakang[0] if guru.gelar_belakang else '') | upper }}</span>
+      {% endif %}
+    </div>
+
+    <h3 class="profile-name">
+      {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
+    </h3>
+    <div class="profile-id">ID: {{ guru.id }}</div>
+    <p class="profile-role">{{ nama_halaman_aktif }}</p>
+    <div class="status-badge">
+      {{ '🟢 Aktif' if guru.status == 'Aktif' else '🔴 Tidak Aktif' }}
+    </div>
+
+    <!-- TOMBOL FOTO & EDIT -->
+    <div class="sidebar-actions">
+      <button type="button" class="sidebar-btn foto" id="btnGantiFoto">
+        <i class="fas fa-camera"></i> Foto
+      </button>
+      <button type="button" class="sidebar-btn edit" id="btnEdit">
+        <i class="fas fa-pen"></i> Edit
+      </button>
+    </div>
+  </div>
+
+  <!-- BIODATA LENGKAP -->
+  <div class="info-card">
+    <h4><i class="fas fa-address-card"></i> Informasi Pribadi</h4>
+    <div class="info-grid">
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-user"></i> Nama Lengkap</div>
+        <div class="info-value">
+          {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
+        </div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-hashtag"></i> ID Guru</div>
+        <div class="info-value">{{ guru.id }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-id-card"></i> NIK</div>
+        <div class="info-value {{ 'empty' if not guru.nik }}">{{ guru.nik or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-venus-mars"></i> Jenis Kelamin</div>
+        <div class="info-value {{ 'empty' if not guru.jenis_kelamin }}">{{ guru.jenis_kelamin or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-birthday-cake"></i> Tempat, Tanggal Lahir</div>
+        <div class="info-value">
+          {{ guru.tempat_lahir or '-' }}, 
+          {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}
+        </div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-ring"></i> Status Pernikahan</div>
+        <div class="info-value {{ 'empty' if not guru.status_pernikahan }}">{{ guru.status_pernikahan or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-graduation-cap"></i> Pendidikan Terakhir</div>
+        <div class="info-value {{ 'empty' if not guru.pendidikan_terakhir }}">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-certificate"></i> Sertifikasi</div>
+        <div class="info-value">
+          {% if guru.sertifikasi %}
+            <i class="fas fa-check-circle text-success"></i> Bersertifikasi
+          {% else %}
+            <i class="fas fa-times-circle text-danger"></i> Belum Bersertifikasi
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-briefcase"></i> Jabatan</div>
+        <div class="info-value">{{ guru.jabatan }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-tasks"></i> Tugas Tambahan</div>
+        <div class="info-value {{ 'empty' if not guru.tugas_tambahan }}">{{ guru.tugas_tambahan or 'Tidak ada' }}</div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-phone-alt"></i> Nomor HP</div>
+        <div class="info-value {{ 'empty' if not guru.no_hp }}">{{ guru.no_hp or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group">
+        <div class="info-label"><i class="fas fa-envelope"></i> Email</div>
+        <div class="info-value {{ 'empty' if not guru.email }}">{{ guru.email or 'Belum diisi' }}</div>
+      </div>
+      <div class="info-group full">
+        <div class="info-label"><i class="fas fa-home"></i> Alamat Lengkap</div>
+        <div class="info-value {{ 'empty' if not guru.alamat }}">{{ guru.alamat or 'Belum diisi' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL LIHAT FOTO BESAR -->
+<!-- ========================================== -->
+<div class="view-modal" id="viewModal">
+  <button class="btn-tutup" id="btnTutupFoto">&times;</button>
+  <img src="" alt="Foto Besar" class="view-foto" id="viewFoto">
+</div>
+
+<!-- ========================================== -->
+<!-- INPUT FILE & MODAL CROP FOTO -->
+<!-- ========================================== -->
+<input type="file" id="fileInput" accept="image/*" style="display:none;">
+<div class="modal-overlay" id="cropModal">
+  <div class="modal-box">
+    <div class="modal-header">Sesuaikan Foto Profil</div>
+    <div class="modal-body">
+      <div class="crop-container">
+        <img id="cropImage" src="" alt="Pratinjau Foto">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn batal" id="btnBatalFoto">Batal</button>
+      <button class="btn simpan" id="btnSimpanFoto"><i class="fas fa-check"></i> Simpan Foto</button>
+    </div>
+  </div>
+</div>
+<form id="formUploadFoto" method="post" action="{{ url_for('profil.ubah_foto') }}">
+  <input type="hidden" name="foto_data" id="fotoData">
+</form>
+
+<!-- ========================================== -->
+<!-- MODAL EDIT BIODATA -->
+<!-- ========================================== -->
+<div class="modal-overlay" id="editModal">
+  <form id="formEdit" method="post" action="{{ url_for('profil.edit_biodata') }}">
+    <div class="modal-box">
+      <div class="modal-header"><i class="fas fa-pen"></i> Ubah Biodata</div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Gelar Depan</label>
+            <input type="text" name="gelar_depan" value="{{ guru.gelar_depan or '' }}" placeholder="Contoh: Dr.">
+          </div>
+          <div class="form-group">
+            <label>Gelar Belakang</label>
+            <input type="text" name="gelar_belakang" value="{{ guru.gelar_belakang or '' }}" placeholder="Contoh: S.Pd., M.Pd.">
+          </div>
+          <div class="form-group full">
+            <label>NIK</label>
+            <input type="text" name="nik" value="{{ guru.nik or '' }}" placeholder="16 Digit NIK">
+          </div>
+          <div class="form-group">
+            <label>Pendidikan Terakhir</label>
+            <input type="text" name="pendidikan_terakhir" value="{{ guru.pendidikan_terakhir or '' }}" placeholder="Contoh: S1">
+          </div>
+          <div class="form-group">
+            <label>Status Pernikahan</label>
+            <input type="text" name="status_pernikahan" value="{{ guru.status_pernikahan or '' }}" placeholder="Contoh: Menikah">
+          </div>
+          <div class="form-group">
+            <label>Nomor HP</label>
+            <input type="text" name="no_hp" value="{{ guru.no_hp or '' }}" placeholder="08xxxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ guru.email or '' }}" placeholder="nama@domain.com">
+          </div>
+          <div class="form-group full">
+            <label>Alamat Lengkap</label>
+            <textarea name="alamat" placeholder="Masukkan alamat lengkap">{{ guru.alamat or '' }}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn batal" id="btnBatalEdit">Batal</button>
+        <button type="submit" class="btn simpan"><i class="fas fa-check"></i> Simpan Perubahan</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // ==========================================
+  // LIHAT FOTO BESAR
+  // ==========================================
+  const avatarWrapper = document.getElementById('avatarWrapper');
+  const viewModal = document.getElementById('viewModal');
+  const viewFoto = document.getElementById('viewFoto');
+  const btnTutupFoto = document.getElementById('btnTutupFoto');
+
+  avatarWrapper.addEventListener('click', () => {
+    const imgAvatar = document.getElementById('fotoProfil');
+    if (imgAvatar.tagName === 'IMG' && imgAvatar.src) {
+      viewFoto.src = imgAvatar.src;
+      viewModal.classList.add('show');
+    }
+  });
+
+  // ✅ HANYA TOMBOL X YANG BISA TUTUP
+  btnTutupFoto.addEventListener('click', () => {
+    viewModal.classList.remove('show');
+  });
+  // ❌ TIDAK BISA TUTUP SAAT KLIK DI LUAR FOTO
+
+  // ==========================================
+  // GANTI FOTO — TOMBOL FOTO
+  // ==========================================
+  const btnGantiFoto = document.getElementById('btnGantiFoto');
+  const fileInput = document.getElementById('fileInput');
+  const cropModal = document.getElementById('cropModal');
+  const cropImage = document.getElementById('cropImage');
+  const btnBatalFoto = document.getElementById('btnBatalFoto');
+  const btnSimpanFoto = document.getElementById('btnSimpanFoto');
+  const fotoData = document.getElementById('fotoData');
+  const formUploadFoto = document.getElementById('formUploadFoto');
+  let cropper;
+
+  btnGantiFoto.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      cropImage.src = evt.target.result;
+      cropModal.classList.add('show');
+      setTimeout(() => {
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.9,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+        });
+      }, 100);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ✅ HANYA TOMBOL BATAL YANG BISA TUTUP MODAL CROP
+  btnBatalFoto.addEventListener('click', () => {
+    cropModal.classList.remove('show');
+    fileInput.value = '';
+    if (cropper) { cropper.destroy(); cropper = null; }
+  });
+
+  btnSimpanFoto.addEventListener('click', () => {
+    if (!cropper) return;
+    const canvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high',
+    });
+    fotoData.value = canvas.toDataURL('image/jpeg', 0.9);
+    formUploadFoto.submit();
+  });
+
+  // ==========================================
+  // EDIT BIODATA
+  // ==========================================
+  const btnEdit = document.getElementById('btnEdit');
+  const editModal = document.getElementById('editModal');
+  const btnBatalEdit = document.getElementById('btnBatalEdit');
+
+  btnEdit.addEventListener('click', () => {
+    editModal.classList.add('show');
+  });
+
+  // ✅ HANYA TOMBOL BATAL YANG BISA TUTUP MODAL EDIT
+  btnBatalEdit.addEventListener('click', () => {
+    editModal.classList.remove('show');
+  });
+
+</script>
+{% endblock %}
