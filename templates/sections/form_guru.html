@@ -15,7 +15,7 @@
             <div class="form-group full">
                 <label><i class="fa fa-id-card" aria-hidden="true"></i> NIK Guru</label>
                 <input type="text" name="nik" class="form-input" placeholder="16 Digit NIK" 
-                        value="{{ guru.nik if guru else '' }}"
+                        value="{{ (guru.nik) or '' }}"
                         pattern="[0-9]{16}"
                         title="NIK harus 16 digit angka"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -26,13 +26,13 @@
                 <div class="form-group half">
                     <label><i class="fas fa-user-graduate"></i> Gelar Depan</label>
                     <input type="text" name="gelar_depan" class="form-input" placeholder="Contoh: Dr." 
-                           value="{{ guru.gelar_depan if guru else '' }}">
+                            value="{{ (guru.gelar_depan) or '' }}">
                 </div>
 
                 <div class="form-group half">
                     <label><i class="fas fa-user-graduate"></i> Gelar Belakang</label>
                     <input type="text" name="gelar_belakang" class="form-input" placeholder="Contoh: S.Pd., M.Pd." 
-                           value="{{ guru.gelar_belakang if guru else '' }}">
+                           value="{{ (guru.gelar_belakang) or '' }}">
                 </div>
             </div>
 
@@ -72,7 +72,7 @@
                 <div class="form-group half">
                     <label><i class="fas fa-map-marker-alt"></i> Tempat Lahir</label>
                     <input type="text" name="tempat_lahir" class="form-input" 
-                            value="{{ guru.tempat_lahir if guru else '' }}">
+                            value="{{ (guru.tempat_lahir) or '' }}">
                 </div>
                 <div class="form-group half">
                     <label><i class="fas fa-birthday-cake"></i> Tanggal Lahir</label>
@@ -155,23 +155,23 @@
             <div class="form-group full">
                 <label><i class="fas fa-mobile-alt"></i> Nomor HP</label>
                 <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxx" 
-                       value="{{ guru.no_hp if guru else '' }}"
-                       pattern="[0-9]{8,13}"
-                       title="Hanya angka, minimal 8 digit, maksimal 13 digit"
-                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        value="{{ (guru.no_hp) or '' }}"
+                        pattern="[0-9]{8,13}"
+                        title="Hanya angka, minimal 8 digit, maksimal 13 digit"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
 
             <div class="form-group full">
                 <label><i class="fas fa-envelope-open-text"></i> Email</label>
                 <input type="email" name="email" class="form-input" placeholder="guru@sekolah.sch.id" 
-                       value="{{ guru.email if guru else '' }}"
-                       title="Contoh: nama@domain.com">
+                        value="{{ (guru.email) or '' }}"
+                        title="Contoh: nama@domain.com">
             </div>
 
             <!-- Baris 9: Alamat Lengkap -->
             <div class="form-group full">
                 <label><i class="fas fa-home"></i> Alamat Lengkap</label>
-                <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ guru.alamat if guru else '' }}</textarea>
+                <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ (guru.alamat) or '' }}</textarea>
             </div>
 
             <!-- ✅ TAMBAHKAN BAGIAN UPLOAD FOTO DI SINI -->
