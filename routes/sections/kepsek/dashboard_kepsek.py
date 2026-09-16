@@ -90,8 +90,16 @@ def index():
     user_role = session.get('role', '')
     daftar_tugas = session.get('daftar_tugas', [])
 
+    user_id = session.get('user_id')
+    user_db = User.query.get(user_id) if user_id else None
+
+    # Gelar ada di tabel Guru, lewat relasi .guru
+    guru_data = user_db.guru if user_db else None
+
     user = {
         'nama': session.get('user_name', 'Kepala Sekolah'),
+        'gelar_depan': guru_data.gelar_depan if guru_data else None,
+        'gelar_belakang': guru_data.gelar_belakang if guru_data else None,
         'jabatan': user_role,
         'tugas_tambahan': ", ".join(daftar_tugas) if isinstance(daftar_tugas, list) else daftar_tugas,
         'inisial': session.get('user_initials', 'KS')

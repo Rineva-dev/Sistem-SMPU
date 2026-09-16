@@ -9,7 +9,14 @@
         <div class="titik titik-3"></div>
 
         <div>
-            <h2>Selamat Datang, {{ user_name | default('Kepala Sekolah') }}!</h2>
+            {% set tampil_nama = user.nama|default('', true) %}
+            {% if user.gelar_belakang %}
+                {% set tampil_nama = tampil_nama ~ ', ' ~ user.gelar_belakang %}
+            {% endif %}
+            {% if user.gelar_depan %}
+                {% set tampil_nama = user.gelar_depan ~ ' ' ~ tampil_nama %}
+            {% endif %}
+            <h2>Selamat Datang, {{ tampil_nama if tampil_nama else user_name | default('Kepala Sekolah') }}!</h2>
             <p class="text-muted">Anda masuk sebagai <strong>Kepala Sekolah</strong> - Pemantau Utama Operasional Sekolah</p>
         </div>
 

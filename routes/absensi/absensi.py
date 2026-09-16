@@ -50,22 +50,22 @@ def login_absensi():
 
         if not user:
             flash('Username tidak terdaftar.', 'absensi_danger')
-            session['error_username'] = True       # ✅ Tandai username salah
+            session['error_username'] = True
             session['error_password'] = False
         elif not user.aktif:
             flash('Akun ini sudah dinonaktifkan.', 'absensi_danger')
-            session['error_username'] = True       # ✅ Tandai username salah
+            session['error_username'] = True
             session['error_password'] = False
         elif not check_password_hash(user.password_hash, password):
             flash('Kata sandi salah.', 'absensi_danger')
-            session['error_username'] = False      # ✅ Username benar
-            session['error_password'] = True       # ✅ Tandai sandi salah
+            session['error_username'] = False
+            session['error_password'] = True
         elif not user.guru:
             flash('Akun ini belum terhubung ke data Guru.', 'absensi_danger')
             session['error_username'] = True
             session['error_password'] = False
         else:
-            # ✅ HAPUS SESI ABSENSI LAMA → CUKUP CLEAR SAJA
+            # ✅ HAPUS SESI ABSENSI LAMA
             session.clear()
             # BUAT SESI ABSENSI BARU
             session['absensi_logged_in'] = True

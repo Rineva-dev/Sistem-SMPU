@@ -38,7 +38,7 @@ def cek_dari_wifi_sekolah():
 def hitung_status_absensi(jam_masuk_str):
     jam = ambil_jam_pengaturan()
     JAM_MASUK_TEPAT = datetime.strptime(jam['jam_masuk_tepat'], "%H:%M").time()
-    BATAS_TERLAMBAT = datetime.strptime(jam['batas_terlambat'], "%H:%M").time()  # ✅ BARU
+    BATAS_TERLAMBAT = datetime.strptime(jam['batas_terlambat'], "%H:%M").time()
     JAM_TUTUP_ABSEN = datetime.strptime(jam['jam_tutup_absensi'], "%H:%M").time()
     JAM_PULANG_RESMI = datetime.strptime(jam['jam_pulang_resmi'], "%H:%M").time()
     
@@ -59,7 +59,7 @@ def hitung_status_absensi(jam_masuk_str):
             ).seconds // 60
             keterangan = f"Terlambat {terlambat_menit} menit"
         elif jam_masuk > JAM_MASUK_TEPAT:
-            status = "batas_waktu"
+            status = "hadir"
             keterangan = "Masuk pada batas waktu toleransi"
         else:
             status = "hadir"
