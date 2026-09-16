@@ -26,7 +26,13 @@
     </div>
 </div>
 
-{# ===== KARTU PENGATURAN JAM KERJA — DIPERBARUI JADI 4 INPUT ===== #}
+{# ===== KARTU PENGATURAN JAM KERJA — HANYA TAMPIL UNTUK TERTENTU ===== #}
+{% set halaman_aktif_saat_ini = halaman_aktif | default('utama') %}
+{% if 
+  halaman_aktif_saat_ini == 'admin_sistem' 
+  or halaman_aktif_saat_ini in ['tata_usaha', 'tu']
+  or halaman_aktif_saat_ini == 'admin_dev'
+%}
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5><i class="fas fa-clock me-2"></i>Pengaturan Jam Kerja Absensi</h5>
@@ -56,21 +62,21 @@
             <div class="tab-pane fade show active" id="panel-standar" role="tabpanel">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">🕖 Jam Masuk Tepat</label>
+                        <label class="form-label"><i class="fas fa-clock"></i> Jam Masuk Tepat</label>
                         <input type="time" id="jam_masuk" class="form-control" value="{{ jam_masuk }}" disabled>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">⚠️ Batas Terlambat</label>
+                        <label class="form-label"><i class="fas fa-exclamation-triangle"></i> Batas Terlambat</label>
                         <input type="time" id="batas_terlambat" class="form-control" value="{{ batas_terlambat }}" disabled>
                         <small class="text-muted">Maksimal terlambat 15 menit</small>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">🔒 Batas Akhir Absen</label>
+                        <label class="form-label"><i class="fas fa-lock"></i> Batas Akhir Absen</label>
                         <input type="time" id="jam_tutup_absensi" class="form-control" value="{{ jam_tutup_absensi }}" disabled>
                         <small class="text-muted">Tidak bisa absen setelah jam ini</small>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">🏠 Jam Pulang Resmi</label>
+                        <label class="form-label"><i class="fas fa-home"></i> Jam Pulang Resmi</label>
                         <input type="time" id="jam_pulang" class="form-control" value="{{ jam_pulang }}" disabled>
                     </div>
                 </div>
@@ -80,21 +86,21 @@
             <div class="tab-pane fade" id="panel-jumat" role="tabpanel">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">🕖 Jam Masuk Jumat</label>
+                        <label class="form-label"><i class="fas fa-clock"></i> Jam Masuk Jumat</label>
                         <input type="time" id="jam_masuk_jumat" class="form-control" value="{{ jam_masuk_jumat }}" disabled>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">⚠️ Batas Terlambat</label>
+                        <label class="form-label"><i class="fas fa-exclamation-triangle"></i> Batas Terlambat</label>
                         <input type="time" id="batas_terlambat_jumat" class="form-control" value="{{ batas_terlambat_jumat }}" disabled>
                         <small class="text-muted">Maksimal terlambat 15 menit</small>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">🔒 Batas Akhir Absen</label>
+                        <label class="form-label"><i class="fas fa-lock"></i> Batas Akhir Absen</label>
                         <input type="time" id="jam_tutup_absensi_jumat" class="form-control" value="{{ jam_tutup_absensi_jumat }}" disabled>
                         <small class="text-muted">Tidak bisa absen setelah jam ini</small>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">🏠 Jam Pulang Hari Jumat</label>
+                        <label class="form-label"><i class="fas fa-home"></i> Jam Pulang Hari Jumat</label>
                         <input type="time" id="jam_pulang_jumat" class="form-control" value="{{ jam_pulang_jumat }}" disabled>
                     </div>
                 </div>
@@ -129,6 +135,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 {# ===== FILTER PERIODE — KARTU RAPI ===== #}
 <div class="card mb-4">
@@ -162,24 +169,15 @@
     </div>
 </div>
 
-{# ===== KARTU STATISTIK — SAMA PERSIS DENGAN GAYA DASHBOARD ===== #}
+{# ===== KARTU STATISTIK — HARI INI SAJA ===== #}
 <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon bg-primary">
-            <i class="fas fa-calendar-day"></i>
-        </div>
-        <div class="stat-info">
-            <p>Hari Efektif</p>
-            <h3>{{ ringkasan.total }}</h3>
-        </div>
-    </div>
     <div class="stat-card">
         <div class="stat-icon bg-success">
             <i class="fas fa-check-circle"></i>
         </div>
         <div class="stat-info">
-            <p>Hadir Tepat Waktu</p>
-            <h3>{{ ringkasan.hadir }}</h3>
+            <p>Tepat Waktu</p>
+            <h3>{{ ringkasan_hari_ini.hadir }}</h3>
         </div>
     </div>
     <div class="stat-card">
@@ -188,7 +186,25 @@
         </div>
         <div class="stat-info">
             <p>Terlambat</p>
-            <h3>{{ ringkasan.terlambat }}</h3>
+            <h3>{{ ringkasan_hari_ini.terlambat }}</h3>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-info">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <p>Izin/Sakit</p>
+            <h3>{{ ringkasan_hari_ini.izin }}</h3>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-secondary">
+            <i class="fas fa-hourglass-start"></i>
+        </div>
+        <div class="stat-info">
+            <p>Belum Absen</p>
+            <h3>{{ ringkasan_hari_ini.belum_absen }}</h3>
         </div>
     </div>
 </div>
@@ -551,54 +567,57 @@ function setKunciInput(kunci) {
     });
 }
 
-// Klik: Edit Pengaturan → Buka input, ganti tombol
-btnEdit.addEventListener('click', () => {
-    modeEdit = true;
-    setKunciInput(false);
-    btnEdit.classList.add('d-none');
-    btnSimpan.classList.remove('d-none');
-});
+// ✅ HANYA pasang listener jika elemen ADA di halaman
+if (btnEdit && btnSimpan) {
+    btnEdit.addEventListener('click', () => {
+        modeEdit = true;
+        setKunciInput(false);
+        btnEdit.classList.add('d-none');
+        btnSimpan.classList.remove('d-none');
+    });
 
-// Klik: Simpan Pengaturan → Kirim ke server
-btnSimpan.addEventListener('click', async () => {
-    const data = {
-        jam_masuk: document.getElementById('jam_masuk').value,
-        batas_terlambat: document.getElementById('batas_terlambat').value,
-        jam_tutup_absensi: document.getElementById('jam_tutup_absensi').value, // ✅ BARU
-        jam_pulang: document.getElementById('jam_pulang').value,
-        jam_masuk_jumat: document.getElementById('jam_masuk_jumat').value,
-        batas_terlambat_jumat: document.getElementById('batas_terlambat_jumat').value,
-        jam_tutup_absensi_jumat: document.getElementById('jam_tutup_absensi_jumat').value,
-        jam_pulang_jumat: document.getElementById('jam_pulang_jumat').value
-    };
-
-    try {
-        const res = await fetch("{{ url_for('monitoring_absensi.simpan_pengaturan_jam') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        const hasil = await res.json();
-        if (hasil.status === 'sukses') {
-            alert('✅ Pengaturan berhasil disimpan!');
-            modeEdit = false;
-            setKunciInput(true);
-            btnSimpan.classList.add('d-none');
-            btnEdit.classList.remove('d-none');
-        } else {
-            alert('❌ Gagal: ' + hasil.pesan);
+    btnSimpan.addEventListener('click', async () => {
+        const data = {
+            jam_masuk: document.getElementById('jam_masuk').value,
+            batas_terlambat: document.getElementById('batas_terlambat').value,
+            jam_tutup_absensi: document.getElementById('jam_tutup_absensi').value,
+            jam_pulang: document.getElementById('jam_pulang').value,
+            jam_masuk_jumat: document.getElementById('jam_masuk_jumat').value,
+            batas_terlambat_jumat: document.getElementById('batas_terlambat_jumat').value,
+            jam_tutup_absensi_jumat: document.getElementById('jam_tutup_absensi_jumat').value,
+            jam_pulang_jumat: document.getElementById('jam_pulang_jumat').value
+        };
+        try {
+            const res = await fetch("{{ url_for('monitoring_absensi.simpan_pengaturan_jam') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const hasil = await res.json();
+            if (hasil.status === 'sukses') {
+                alert('✅ Pengaturan berhasil disimpan!');
+                modeEdit = false;
+                setKunciInput(true);
+                btnSimpan.classList.add('d-none');
+                btnEdit.classList.remove('d-none');
+            } else {
+                alert('❌ Gagal: ' + hasil.pesan);
+            }
+        } catch (err) {
+            alert('❌ Kesalahan jaringan: ' + err.message);
         }
-    } catch (err) {
-        alert('❌ Kesalahan jaringan: ' + err.message);
-    }
-});
+    });
+}
 </script>
 
 {% endblock %}
 
 {% block extra_css %}
 <style>
-/* Header gradient sama persis dengan dashboard */
+.page-header {
+    margin: 0;
+}
+
 .welcome-box {
     background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
     color: #ffffff;
@@ -645,6 +664,14 @@ btnSimpan.addEventListener('click', async () => {
 }
 .date-box i { font-size:1.7rem; margin-bottom:0.4rem; opacity:0.95; }
 .date-box span { font-size:1.15rem; font-weight:600; letter-spacing:0.5px; }
+
+.form-label {
+    margin-bottom: .5rem;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+}
 
 /* Grid kartu statistik */
 .stats-grid {

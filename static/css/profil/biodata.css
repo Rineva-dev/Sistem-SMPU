@@ -74,6 +74,11 @@
   padding: 28px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
+
+.info-card i {
+    margin-bottom: 8px;
+}
+
 .info-card h4 {
   font-size: 18px;
   font-weight: 700;
