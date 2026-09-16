@@ -21,6 +21,137 @@
     font-size: 14px;
 }
 
+/* ==========================================
+   WELCOME BOX KHUSUS LAYAR KOMPUTER
+========================================== */
+.welcome-box-desktop {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
+    color: #ffffff;
+    border-radius: 1.25rem;
+    padding: 2rem 2.25rem;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22), 0 3px 8px rgba(37, 99, 235, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lingkaran dekorasi besar */
+.welcome-box-desktop::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    top: -70px;
+    right: -70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    filter: blur(4px);
+}
+
+/* Lingkaran dekorasi kecil */
+.welcome-box-desktop::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    bottom: -40px;
+    left: 18%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    filter: blur(2px);
+}
+
+/* Garis lengkung samar */
+.welcome-box-desktop .garis-1 {
+    position: absolute;
+    top: 30%;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
+.welcome-box-desktop .garis-2 {
+    position: absolute;
+    bottom: 20%;
+    right: 25%;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+/* Titik-titik dekorasi halus */
+.welcome-box-desktop .titik {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.welcome-box-desktop .titik-1 { width: 12px; height: 12px; top: 25%; left: 20%; }
+.welcome-box-desktop .titik-2 { width: 8px; height: 8px; top: 65%; right: 30%; }
+.welcome-box-desktop .titik-3 { width: 15px; height: 15px; bottom: 20%; left: 40%; }
+
+.welcome-box-desktop h2 {
+    font-size: 1.9rem;
+    margin: 0 0 0.6rem 0;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-box-desktop p {
+    margin: 0;
+    opacity: 0.92;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+    color: #dbeafe !important;
+}
+
+.date-box-absensi {
+    background: rgba(255, 255, 255, 0.18);
+    padding: 1.25rem 1.75rem;
+    border-radius: 1rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+    position: relative;
+    z-index: 2;
+    color: #ffffff !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.date-box-absensi i {
+    font-size: 1.7rem;
+    opacity: 0.95;
+}
+
+.date-box-absensi span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Sembunyikan di HP */
+@media (max-width: 768px) {
+    .welcome-box-desktop,
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+
 /* ===== KARTU STATISTIK ===== */
 .stats-row {
     display: grid;
@@ -1211,3 +1342,4 @@
 .birthday-overlay.has-card-visible > .gift-wrapper {
   display: none !important;
 }
+

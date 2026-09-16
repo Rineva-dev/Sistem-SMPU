@@ -87,10 +87,20 @@
         </div>
     </div>
 
-    <!-- ❌ Sembunyikan header lama di HP -->
-    <div class="page-header desktop-only">
-        <h3>Dashboard Absensi</h3>
-        <p>Ringkasan kehadiran Anda per tahun pelajaran saat ini.</p>
+    <div class="welcome-box-desktop desktop-only">
+        <div class="garis-1"></div>
+        <div class="garis-2"></div>
+        <div class="titik titik-1"></div>
+        <div class="titik titik-2"></div>
+        <div class="titik titik-3"></div>
+        <div>
+            <h2>Selamat Datang, {{ tampil_nama if tampil_nama else 'Bapak/Ibu Guru' }}!</h2>
+            <p class="text-muted">Absensi & Kehadiran Guru</p>
+        </div>
+        <div class="date-box-absensi">
+            <i class="far fa-calendar-alt"></i>
+            <span>{{ hari_ini | default('Tanggal tidak tersedia') }}</span>
+        </div>
     </div>
 
     <!-- ✅ KARTU STATISTIK BISA DI-SCROLL -->
