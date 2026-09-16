@@ -206,6 +206,51 @@
 
 </div>
 
+<!-- ========================================== -->
+<!-- 🎉 KADO KEJUTAN INTERAKTIF -->
+<!-- ========================================== -->
+<div id="birthdayOverlay" class="birthday-overlay">
+  <!-- 🎈 Balon latar belakang -->
+  <div class="balloon-container">
+    <div class="balloon" style="left: 8%; animation-delay: 0s;">🎈</div>
+    <div class="balloon" style="left: 22%; animation-delay: 0.6s;">🎈</div>
+    <div class="balloon" style="left: 38%; animation-delay: 1.2s;">🎈</div>
+    <div class="balloon" style="left: 54%; animation-delay: 0.3s;">🎈</div>
+    <div class="balloon" style="left: 70%; animation-delay: 0.9s;">🎈</div>
+    <div class="balloon" style="left: 86%; animation-delay: 1.5s;">🎈</div>
+    <div class="balloon" style="left: 15%; animation-delay: 1.8s;">🎈</div>
+    <div class="balloon" style="left: 78%; animation-delay: 2.1s;">🎈</div>
+  </div>
+
+  <!-- 🎉 Wadah Konfeti Ledakan -->
+  <div class="confetti-container" id="confettiContainer"></div>
+  <div class="explosion-container" id="explosionContainer"></div>
+
+  <!-- 🎁 KADO YANG DIKLIK -->
+  <div class="gift-wrapper" id="giftWrapper">
+    <div class="gift-box" id="giftBox">
+      <div class="gift-lid"></div>
+      <div class="gift-body">
+        <div class="gift-ribbon-v"></div>
+        <div class="gift-ribbon-h"></div>
+        <div class="gift-bow">🎀</div>
+      </div>
+    </div>
+    <p class="gift-hint">Klik kado ini ya! 🎁</p>
+  </div>
+
+  <!-- ✨ UCAPAN — Tersembunyi sampai kado dibuka -->
+  <div class="birthday-card hidden" id="birthdayCard">
+    <div class="birthday-icon">🎂</div>
+    <h2 class="birthday-title">Selamat Ulang Tahun!</h2>
+    <p class="birthday-name" id="birthdayName"></p>
+    <p class="birthday-wish">Semoga sehat, bahagia, dan sukses selalu! 🥳<br>Terima kasih atas dedikasi Anda mengajar anak-anak didik kami.</p>
+    <button class="birthday-close-btn" id="birthdayClose">
+      Terima Kasih 😊
+    </button>
+  </div>
+</div>
+
 <!-- Data untuk Grafik -->
 <script type="application/json" id="data-label-bulan">{{ label_bulan | tojson }}</script>
 <script type="application/json" id="data-hadir">{{ data_hadir | tojson }}</script>
@@ -219,55 +264,220 @@
 <!-- ✅ Script untuk Update Indikator Scroll -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // SCROLL INDICATOR
+    // ==========================================
     const wrapper = document.querySelector('.stats-scroll-wrapper');
     const dots = document.querySelectorAll('.scroll-indicators .dot');
-    const cards = document.querySelectorAll('.stat-card'); // ✅ Ambil semua kartu
+    const cards = document.querySelectorAll('.stat-card');
+    
+    if (wrapper && dots.length > 0 && cards.length > 0) {
+        wrapper.addEventListener('scroll', function() {
+            const cardWidth = cards[0].offsetWidth + 
+                parseInt(getComputedStyle(cards[0]).marginLeft || 0) + 
+                parseInt(getComputedStyle(cards[0]).marginRight || 0);
+            const gap = parseInt(getComputedStyle(wrapper).gap) || 0;
+            const cardFullWidth = cardWidth + gap;
+            let index = Math.round(wrapper.scrollLeft / cardFullWidth);
+            index = Math.max(0, Math.min(index, dots.length - 1));
+            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        });
+        setTimeout(() => wrapper.dispatchEvent(new Event('scroll')), 100);
+    }
 
-    if (!wrapper || dots.length === 0 || cards.length === 0) return;
+    // ==========================================
+    // JAM DIGITAL
+    // ==========================================
+    function updateJam() {
+        const el = document.getElementById('jam-digital');
+        if (!el) return;
+        const now = new Date();
+        const jam = String(now.getHours()).padStart(2,'0');
+        const menit = String(now.getMinutes()).padStart(2,'0');
+        const detik = String(now.getSeconds()).padStart(2,'0');
+        el.textContent = `${jam}.${menit}.${detik}`;
+    }
+    updateJam();
+    setInterval(updateJam, 1000);
 
-    wrapper.addEventListener('scroll', function() {
-        // ✅ Hitung posisi berdasarkan lebar kartu sebenarnya
-        const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(cards[0]).marginLeft || 0) + parseInt(getComputedStyle(cards[0]).marginRight || 0);
-        const gap = parseInt(getComputedStyle(wrapper).gap) || 0;
-        const cardFullWidth = cardWidth + gap;
+    // ==========================================
+    // TANGGAL HIJRIAH
+    // ==========================================
+    function tampilkanTanggalHijriah() {
+        const el = document.getElementById('tanggal-hijriah');
+        if (!el) return;
+        el.textContent = '-- ------- -- H';
+    }
+    tampilkanTanggalHijriah();
 
-        // ✅ Hitung indeks kartu yang sedang terlihat
-        let index = Math.round(wrapper.scrollLeft / cardFullWidth);
+    // ==========================================
+    // 🎉 CEK ULANG TAHUN — PAKAI VARIABEL user
+    // ==========================================
+    // Susun nama lengkap dari user
+    let tampilNama = `{{ user.nama or '' }}`;
+    {% if user.gelar_depan %}
+        tampilNama = `{{ user.gelar_depan }} ` + tampilNama;
+    {% endif %}
+    {% if user.gelar_belakang %}
+        tampilNama = tampilNama + `, {{ user.gelar_belakang }}`;
+    {% endif %}
 
-        // ✅ Batasi agar tidak melebihi jumlah titik yang ada
-        index = Math.max(0, Math.min(index, dots.length - 1));
+    // Format MM-DD tanpa tahun
+    const tglLahirRaw = `{{ user.tanggal_lahir.strftime('%m-%d') if user.tanggal_lahir else '' }}`;
 
-        // ✅ Update status titik
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-    });
+    // Tanggal hari ini
+    const hariIni = new Date();
+    const hariIniFormatted = 
+        String(hariIni.getMonth() + 1).padStart(2, '0') + '-' +
+        String(hariIni.getDate()).padStart(2, '0');
 
-    // ✅ Inisialisasi saat pertama kali dimuat → titik pertama aktif
-    setTimeout(() => {
-        wrapper.dispatchEvent(new Event('scroll'));
-    }, 100);
+    // Cek: cocok & belum tampil hari ini?
+    const kunciSudahTampil = `birthday_shown_${hariIniFormatted}`;
+    const sudahTampil = localStorage.getItem(kunciSudahTampil);
+
+    // Hanya tampil jika: tanggal lahir cocok & belum pernah tampil hari ini
+    if (tglLahirRaw && tglLahirRaw === hariIniFormatted && !sudahTampil) {
+        tampilkanUcapan(tampilNama || 'Bapak/Ibu Guru');
+        localStorage.setItem(kunciSudahTampil, 'true'); // Catat sudah tampil
+    }
 });
 
-function updateJam() {
-  const el = document.getElementById('jam-digital');
-  if (!el) return;
-  const now = new Date();
-  const jam = String(now.getHours()).padStart(2,'0');
-  const menit = String(now.getMinutes()).padStart(2,'0');
-  const detik = String(now.getSeconds()).padStart(2,'0');
-  el.textContent = `${jam}.${menit}.${detik}`;
-}
-updateJam();
-setInterval(updateJam, 1000);
+// ==========================================
+// TAMPILKAN ANIMASI UCAPAN
+// ==========================================
+function tampilkanUcapan(nama) {
+    const overlay = document.getElementById('birthdayOverlay');
+    const giftWrapper = document.getElementById('giftWrapper');
+    const giftBox = document.getElementById('giftBox');
+    const birthdayCard = document.getElementById('birthdayCard');
+    const namaEl = document.getElementById('birthdayName');
+    const tutupBtn = document.getElementById('birthdayClose');
+    const konfetiContainer = document.getElementById('confettiContainer');
+    const explosionContainer = document.getElementById('explosionContainer');
 
-// Tanggal Hijriah sederhana (bisa diganti sesuai kebutuhan)
-function tampilkanTanggalHijriah() {
-  const el = document.getElementById('tanggal-hijriah');
-  if (!el) return;
-  const d = new Date();
-  // Sementara tampilkan teks statis — nanti bisa diganti hitungan asli
-  el.textContent = '-- ------- -- H';
+    if (!overlay) return;
+
+    namaEl.textContent = nama;
+    overlay.classList.add('show');
+
+    // ==========================================
+    // 🎁 KLIK KADO → BUKA + LEDAKAN
+    // ==========================================
+    let sudahDibuka = false;
+
+    giftWrapper.addEventListener('click', function() {
+        if (sudahDibuka) return;
+        sudahDibuka = true;
+        
+        // 1. Buka tutup kado
+        giftBox.classList.add('opened');
+        giftWrapper.classList.add('opened');
+        
+        // ✅ TAMBAHKAN BARIS INI → hilangkan ruang kado
+        overlay.classList.add('has-card-visible');
+        
+        // 2. Efek kilat
+        const flash = document.createElement('div');
+        flash.className = 'flash-overlay';
+        flash.style.animation = 'flashPop 0.6s ease forwards';
+        overlay.appendChild(flash);
+        setTimeout(() => flash.remove(), 600);
+        
+        // 3. Ledakan pesta! 💥
+        setTimeout(() => {
+            ledakanPesta();
+        }, 300);
+        
+        // 4. Tampilkan kartu ucapan
+        setTimeout(() => {
+            birthdayCard.classList.remove('hidden');
+            birthdayCard.classList.add('reveal');
+        }, 500);
+        
+        // 5. Mulai hujan konfeti terus-menerus
+        setTimeout(() => {
+            mulaiHujanKonfeti();
+        }, 800);
+    });
+
+    // ==========================================
+    // 💥 LEDAKAN PESTA — Saat kado dibuka
+    // ==========================================
+    function ledakanPesta() {
+        const warna = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'];
+        const bentuk = ['●', '■', '▲', '★', '♦', '❤', '✦', '✧'];
+
+        for (let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                const p = document.createElement('div');
+                p.className = 'explosion-piece';
+                p.textContent = bentuk[Math.floor(Math.random() * bentuk.length)];
+                p.style.left = '50%';
+                p.style.top = '50%';
+                p.style.color = warna[Math.floor(Math.random() * warna.length)];
+                p.style.fontSize = `${14 + Math.random() * 18}px`;
+
+                // Arah terbang acak ke segala arah
+                const sudut = Math.random() * Math.PI * 2;
+                const jarak = 150 + Math.random() * 350;
+                p.style.setProperty('--tx', `${Math.cos(sudut) * jarak}px`);
+                p.style.setProperty('--ty', `${Math.sin(sudut) * jarak}px`);
+                p.style.animation = `explodeOut ${0.6 + Math.random() * 0.8}s ease-out forwards`;
+
+                explosionContainer.appendChild(p);
+                setTimeout(() => p.remove(), 1500);
+            }, i * 10);
+        }
+    }
+
+    // ==========================================
+    // 🎉 HUJAN KONFETI TERUS-MENERUS
+    // ==========================================
+    const warnaKonfeti = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'];
+    const bentukKonfeti = ['●', '■', '▲', '★', '♦', '❤', '✦'];
+    let intervalKonfeti;
+
+    function buatKonfeti() {
+        const k = document.createElement('div');
+        k.className = 'confetti';
+        k.textContent = bentukKonfeti[Math.floor(Math.random() * bentukKonfeti.length)];
+        k.style.left = `${Math.random() * 100}%`;
+        k.style.color = warnaKonfeti[Math.floor(Math.random() * warnaKonfeti.length)];
+        k.style.fontSize = `${12 + Math.random() * 16}px`;
+        k.style.animationDuration = `${3 + Math.random() * 3}s`;
+        konfetiContainer.appendChild(k);
+        setTimeout(() => k.remove(), 6000);
+    }
+
+    function mulaiHujanKonfeti() {
+        intervalKonfeti = setInterval(() => {
+            for (let i = 0; i < 6; i++) {
+                buatKonfeti();
+            }
+        }, 250);
+    }
+
+    // ==========================================
+    // ❌ TUTUP SEMUA
+    // ==========================================
+    tutupBtn.addEventListener('click', () => {
+        if (intervalKonfeti) clearInterval(intervalKonfeti);
+        overlay.style.transition = 'opacity 0.5s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.classList.remove('show');
+            overlay.classList.remove('has-card-visible'); // ✅ Tambahkan ini
+            overlay.style.opacity = '';
+            konfetiContainer.innerHTML = '';
+            explosionContainer.innerHTML = '';
+            // Reset untuk buka lagi jika perlu
+            giftWrapper.classList.remove('opened');
+            giftBox.classList.remove('opened');
+            birthdayCard.classList.remove('reveal');
+            birthdayCard.classList.add('hidden');
+        }, 500);
+    });
 }
-tampilkanTanggalHijriah();
 </script>
 
 {% endblock %}

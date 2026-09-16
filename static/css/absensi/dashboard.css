@@ -822,3 +822,392 @@
         color: #ffe1af;
     }
 }
+
+/* ==========================================
+   🎉 UCAPAN ULANG TAHUN — DASAR & KADO
+   ========================================== */
+.birthday-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  overflow: hidden;
+  padding: 20px;
+}
+.birthday-overlay.show {
+  display: flex;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 🎈 BALON NAIK KE ATAS */
+.balloon-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.balloon {
+  position: absolute;
+  bottom: -80px;
+  font-size: 40px;
+  animation: floatUp 6s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(-6deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-50vh) rotate(6deg);
+  }
+  100% {
+    transform: translateY(-110vh) rotate(-6deg);
+    opacity: 0.8;
+  }
+}
+
+/* 🎉 KONFETI BERJATUH */
+.confetti-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti {
+  position: absolute;
+  top: -10px;
+  animation: confettiFall 5s ease-in-out forwards;
+}
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* 💥 LEDAKAN */
+.explosion-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.explosion-piece {
+  position: absolute;
+  opacity: 0;
+}
+@keyframes explodeOut {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.3) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* 🎁 KADO */
+.gift-wrapper {
+  position: relative;
+  z-index: 15;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.gift-wrapper:hover {
+  transform: scale(1.08);
+}
+.gift-wrapper.opened {
+  pointer-events: none;
+  animation: giftFadeAway 0.6s ease forwards;
+}
+@keyframes giftFadeAway {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.8; }
+  100% { transform: scale(0.5) translateY(-30px); opacity: 0; }
+}
+.gift-box {
+  position: relative;
+  width: 160px;
+  height: 140px;
+  margin: 0 auto 20px;
+  animation: giftBounce 1.5s ease-in-out infinite;
+}
+@keyframes giftBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.gift-lid {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  width: 140px;
+  height: 35px;
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  border-radius: 8px 8px 0 0;
+  z-index: 2;
+  transform-origin: center bottom;
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+}
+.gift-box.opened .gift-lid {
+  transform: rotateX(-110deg);
+}
+.gift-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 160px;
+  height: 110px;
+  background: linear-gradient(180deg, #ef4444, #b91c1c);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.gift-ribbon-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 24px;
+  background: linear-gradient(90deg, #fef08a, #facc15, #fef08a);
+  transform: translateX(-50%);
+  z-index: 3;
+}
+.gift-ribbon-h {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: linear-gradient(180deg, #fef08a, #facc15, #fef08a);
+  z-index: 3;
+}
+.gift-bow {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 42px;
+  z-index: 4;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.gift-hint {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  animation: pulse 1.5s ease-in-out infinite;
+  margin: 0;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ✨ KARTU UCAPAN */
+.birthday-card {
+  position: relative;
+  z-index: 10;
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.birthday-card.hidden {
+  display: none;
+}
+.birthday-card.reveal {
+  animation: cardReveal 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+@keyframes cardReveal {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.1) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.birthday-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+  animation: bounce 1.5s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.birthday-title {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px;
+  animation: shimmer 3s linear infinite;
+  background-size: 200% auto;
+}
+@keyframes shimmer {
+  from { background-position: 0 center; }
+  to { background-position: 200% center; }
+}
+.birthday-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 12px;
+}
+.birthday-wish {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.birthday-close-btn {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6);
+  color: #fff;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+.birthday-close-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+.birthday-close-btn:active {
+  transform: scale(0.97);
+}
+
+/* 💡 Efek kilat */
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes flashPop {
+  0% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ==========================================
+   ✅ PERBAIKAN POSISI — KADO & KARTU DI TENGAH SEMUA LAYAR
+   ========================================== */
+.birthday-overlay {
+  flex-direction: column !important;
+}
+
+
+/* Kado di tengah */
+.gift-wrapper {
+  margin: 0 auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* Kartu ucapan di tengah & lebar aman di HP */
+.birthday-card {
+  margin: 0 auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: 400px !important;
+  box-sizing: border-box !important;
+}
+
+/* Lebar aman di HP kecil */
+@media (max-width: 480px) {
+  .birthday-overlay {
+    padding: 16px !important;
+  }
+  .birthday-card {
+    padding: 30px 20px !important;
+    border-radius: 20px !important;
+  }
+  .birthday-title {
+    font-size: 24px !important;
+  }
+  .birthday-icon {
+    font-size: 52px !important;
+  }
+  .gift-box {
+    width: 140px !important;
+    height: 120px !important;
+  }
+  .gift-lid {
+    width: 120px !important;
+  }
+  .gift-body {
+    width: 140px !important;
+    height: 100px !important;
+  }
+}
+
+/* ==========================================
+   ✅ PERBAIKAN: HAPUS RUANG KADO SAAT DIBUKA
+   ========================================== */
+/* Saat kado dibuka → hilangkan sepenuhnya termasuk ruangnya */
+.gift-wrapper.opened {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Saat kartu muncul → pastikan sendirian di tengah */
+.birthday-card.reveal {
+  margin: 0 auto !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  opacity: 1 !important;
+}
+
+/* Atur ulang animasi masuk kartu agar dari tengah */
+@keyframes cardReveal {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(3deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+
+/* Saat kartu tampil → ubah tata letak jadi pusat mutlak */
+.birthday-overlay.has-card-visible {
+  flex-direction: column;
+}
+.birthday-overlay.has-card-visible > .gift-wrapper {
+  display: none !important;
+}

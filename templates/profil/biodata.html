@@ -335,18 +335,38 @@
   const viewFoto = document.getElementById('viewFoto');
   const btnTutupFoto = document.getElementById('btnTutupFoto');
 
-  function tampilkanFotoBesar(elemen) {
+  function tampilkanFotoBesar(e, elemen) {
+    // JANGAN jalankan kalau sedang buka modal crop / edit
+    if (cropModal && cropModal.classList.contains('show')) return;
+    if (editModal && editModal.classList.contains('show')) return;
+    
     const imgAvatar = elemen.querySelector('#fotoProfil') || elemen.querySelector('img');
     if (imgAvatar && imgAvatar.tagName === 'IMG' && imgAvatar.src) {
+      e.preventDefault();
+      e.stopPropagation(); // 🔗 Hentikan agar tidak ke elemen induk
       viewFoto.src = imgAvatar.src;
       viewModal.classList.add('show');
     }
   }
 
-  if (avatarWrapper) avatarWrapper.addEventListener('click', () => tampilkanFotoBesar(avatarWrapper));
-  if (avatarWrapperDesktop) avatarWrapperDesktop.addEventListener('click', () => tampilkanFotoBesar(avatarWrapperDesktop));
+  if (avatarWrapper) {
+    avatarWrapper.addEventListener('click', (e) => tampilkanFotoBesar(e, avatarWrapper));
+  }
+  if (avatarWrapperDesktop) {
+    avatarWrapperDesktop.addEventListener('click', (e) => tampilkanFotoBesar(e, avatarWrapperDesktop));
+  }
 
-  btnTutupFoto.addEventListener('click', () => viewModal.classList.remove('show'));
+  btnTutupFoto.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    viewModal.classList.remove('show');
+  });
+  // Klik latar belakang untuk tutup
+  viewModal.addEventListener('click', (e) => {
+    if (e.target === viewModal) {
+      viewModal.classList.remove('show');
+    }
+  });
 
   // ==========================================
   // GANTI FOTO
@@ -363,7 +383,8 @@
   let cropper;
 
   function bukaPilihFoto(e) {
-    e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation(); // 🔗 Kunci agar tidak ikut buka foto besar
     fileInput.click();
   }
 
@@ -397,15 +418,23 @@
     reader.readAsDataURL(file);
   });
 
-  btnBatalFoto.addEventListener('click', () => {
+  btnBatalFoto.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     cropModal.classList.remove('show');
     fileInput.value = '';
     if (cropper) { cropper.destroy(); cropper = null; }
   });
 
-  btnSimpanFoto.addEventListener('click', () => {
+  btnSimpanFoto.addEventListener('click', (e) => {
+    e.preventDefault();
     if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
+    const canvas = cropper.getCroppedCanvas({ 
+      width: 400, 
+      height: 400, 
+      imageSmoothingEnabled: true, 
+      imageSmoothingQuality: 'high' 
+    });
     fotoData.value = canvas.toDataURL('image/jpeg', 0.9);
     formUploadFoto.submit();
   });
@@ -419,6 +448,7 @@
   const btnBatalEdit = document.getElementById('btnBatalEdit');
 
   function bukaEditBiodata(e) {
+    e.preventDefault();
     e.stopPropagation();
     editModal.classList.add('show');
   }
@@ -426,6 +456,10 @@
   if (btnEdit) btnEdit.addEventListener('click', bukaEditBiodata);
   if (btnEditDesktop) btnEditDesktop.addEventListener('click', bukaEditBiodata);
 
-  btnBatalEdit.addEventListener('click', () => editModal.classList.remove('show'));
+  btnBatalEdit.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    editModal.classList.remove('show');
+  });
 </script>
 {% endblock %}
