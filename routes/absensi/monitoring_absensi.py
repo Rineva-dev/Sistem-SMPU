@@ -464,7 +464,7 @@ def rincian_kehadiran(guru_id):
     halaman_aktif = session.get('halaman_aktif', 'utama')
 
     # Ambil data guru
-    guru = Guru.query.get_or_404(guru_id)
+    guru = Guru.query.get_or_404(str(guru_id))
     hari_ini = waktu_wita().date()
 
     # Filter periode
@@ -480,7 +480,7 @@ def rincian_kehadiran(guru_id):
     tgl_mulai_tp, tgl_selesai_tp, _ = ambil_tahun_pelajaran()
 
     absensi_list = AbsensiGuru.query.filter(
-        AbsensiGuru.guru_id == guru_id,
+        AbsensiGuru.guru_id == str(guru_id),
         AbsensiGuru.tanggal >= tgl_awal,
         AbsensiGuru.tanggal <= tgl_akhir,
         AbsensiGuru.tanggal >= tgl_mulai_tp,
@@ -554,7 +554,7 @@ def export_rincian_guru(guru_id):
         else:
             return redirect(url_for('dashboard'))
 
-    guru = Guru.query.get_or_404(guru_id)
+    guru = Guru.query.get_or_404(str(guru_id))
     hari_ini = waktu_wita().date()
     filter_bulan = request.form.get('bulan', type=int) or hari_ini.month
     filter_tahun = request.form.get('tahun', type=int) or hari_ini.year
@@ -568,7 +568,7 @@ def export_rincian_guru(guru_id):
     tgl_mulai_tp, tgl_selesai_tp, _ = ambil_tahun_pelajaran()
 
     absensi_list = AbsensiGuru.query.filter(
-        AbsensiGuru.guru_id == guru_id,
+        AbsensiGuru.guru_id == str(guru_id),
         AbsensiGuru.tanggal >= tgl_awal,
         AbsensiGuru.tanggal <= tgl_akhir,
         AbsensiGuru.tanggal >= tgl_mulai_tp,
