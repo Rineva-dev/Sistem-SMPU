@@ -218,14 +218,13 @@
         {% set warna_border = 'danger' %}
     {% endif %}
 
-    {# === WARNA PERSENTASE & PROGRESS BAR: BERDASARKAN PERSENTASE BULANAN === #}
-    {% set persen = item.persen_kehadiran|default(0) %}
-    {% if persen >= 95 %}
-        {% set warna_progress = '#16a34a' %}
-    {% elif persen >= 85 %}
-        {% set warna_progress = '#d97706' %}
+    {# === WARNA BAGIAN BAWAH: IKUT STATUS HARI INI — SAMA DENGAN GARIS ATAS === #}
+    {% if status == 'hadir' %}
+        {% set warna_progress = '#16a34a' %}   {# Hijau #}
+    {% elif status == 'terlambat' %}
+        {% set warna_progress = '#d97706' %}   {# Kuning #}
     {% else %}
-        {% set warna_progress = '#dc2626' %}
+        {% set warna_progress = '#dc2626' %}   {# Merah #}
     {% endif %}
     <div class="guru-card card-border-{{ warna_border }}">
         {# Bagian Kepala Kartu — Mirip ID Card #}
@@ -267,14 +266,18 @@
             </div>
         </div>
 
-        {# Progress Bar Kehadiran #}
+        {# Indikator Kehadiran — Warna Ikut Status Hari Ini #}
         <div class="progress-section">
             <div class="progress-header">
-                <span class="progress-label">Tingkat Kehadiran</span>
-                <span class="progress-persen fw-bold" style="color: {{ warna_progress }}">{{ persen }}%</span>
+                <span class="progress-label">Status Hari Ini</span>
+                <span class="progress-persen fw-bold" style="color: {{ warna_progress }}">
+                    {% if status == 'hadir' %}Hadir
+                    {% elif status == 'terlambat' %}Terlambat
+                    {% else %}Tidak Hadir{% endif %}
+                </span>
             </div>
             <div class="progress-bar-wrapper">
-                <div class="progress-bar-fill" style="width: {{ persen }}%; background: {{ warna_progress }};"></div>
+                <div class="progress-bar-fill" style="width: 100%; background: {{ warna_progress }};"></div>
             </div>
         </div>
 

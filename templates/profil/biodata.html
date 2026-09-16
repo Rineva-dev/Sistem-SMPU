@@ -77,7 +77,7 @@
       <div class="hp-menu-item">
         <i class="fas fa-certificate hp-menu-icon"></i>
         <span class="hp-menu-label">Sertifikasi</span>
-        <span class="hp-menu-value">{% if guru.sertifikasi %}✅ Bersertifikasi{% else %}❌ Belum{% endif %}</span>
+        <span class="hp-menu-value">{% if guru.sertifikasi %}<i class="fas fa-check-circle text-success"></i> Bersertifikasi{% else %}<i class="fa fa-times-circle text-danger"></i> Belum{% endif %}</span>
       </div>
       <div class="hp-menu-item">
         <i class="fas fa-briefcase hp-menu-icon"></i>
@@ -100,8 +100,10 @@
         <span class="hp-menu-value">{{ guru.email or 'Belum diisi' }}</span>
       </div>
       <div class="hp-menu-item hp-menu-full">
-        <i class="fas fa-home hp-menu-icon"></i>
-        <span class="hp-menu-label">Alamat</span>
+        <div class="title-addres">
+          <i class="fas fa-home hp-menu-icon"></i>
+          <span class="hp-menu-label">Alamat</span>
+        </div>
         <span class="hp-menu-value">{{ guru.alamat or 'Belum diisi' }}</span>
       </div>
     </div>
@@ -265,19 +267,45 @@
           </div>
           <div class="form-group full">
             <label>NIK</label>
-            <input type="text" name="nik" value="{{ guru.nik or '' }}" placeholder="16 Digit NIK">
+            <input type="text" name="nik" value="{{ guru.nik or '' }}" placeholder="16 Digit NIK"
+                   pattern="[0-9]{16}" title="NIK harus 16 digit angka"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
           </div>
+
+          {# === PENDIDIKAN TERAKHIR — DROPDOWN === #}
           <div class="form-group">
             <label>Pendidikan Terakhir</label>
-            <input type="text" name="pendidikan_terakhir" value="{{ guru.pendidikan_terakhir or '' }}" placeholder="Contoh: S1">
+            <select name="pendidikan_terakhir">
+              <option value="">Pilih Pendidikan</option>
+              <option value="SD" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SD' else '' }}>SD / Sederajat</option>
+              <option value="SMP" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMP' else '' }}>SMP / Sederajat</option>
+              <option value="SMA" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMA' else '' }}>SMA / SMK / Sederajat</option>
+              <option value="D1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D1' else '' }}>Diploma I (D1)</option>
+              <option value="D2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D2' else '' }}>Diploma II (D2)</option>
+              <option value="D3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D3' else '' }}>Diploma III (D3)</option>
+              <option value="S1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S1' else '' }}>Sarjana / S1 / D4</option>
+              <option value="S2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S2' else '' }}>Magister / S2</option>
+              <option value="S3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S3' else '' }}>Doktor / S3</option>
+            </select>
           </div>
+
+          {# === STATUS PERNIKAHAN — DROPDOWN === #}
           <div class="form-group">
             <label>Status Pernikahan</label>
-            <input type="text" name="status_pernikahan" value="{{ guru.status_pernikahan or '' }}" placeholder="Contoh: Menikah">
+            <select name="status_pernikahan">
+              <option value="">Pilih Status</option>
+              <option value="Belum Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Belum Menikah' else '' }}>Belum Menikah</option>
+              <option value="Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Menikah' else '' }}>Menikah</option>
+              <option value="Cerai Hidup" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Hidup' else '' }}>Cerai Hidup</option>
+              <option value="Cerai Mati" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Mati' else '' }}>Cerai Mati</option>
+            </select>
           </div>
+
           <div class="form-group">
             <label>Nomor HP</label>
-            <input type="text" name="no_hp" value="{{ guru.no_hp or '' }}" placeholder="08xxxxxxxxx">
+            <input type="text" name="no_hp" value="{{ guru.no_hp or '' }}" placeholder="08xxxxxxxxx"
+                   pattern="[0-9]{8,13}" title="Hanya angka, 8-13 digit"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
           </div>
           <div class="form-group">
             <label>Email</label>
@@ -285,7 +313,7 @@
           </div>
           <div class="form-group full">
             <label>Alamat Lengkap</label>
-            <textarea name="alamat" placeholder="Masukkan alamat lengkap">{{ guru.alamat or '' }}</textarea>
+            <textarea name="alamat" placeholder="Masukkan alamat lengkap" rows="3">{{ guru.alamat or '' }}</textarea>
           </div>
         </div>
       </div>
