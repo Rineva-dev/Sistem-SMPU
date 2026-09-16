@@ -235,6 +235,8 @@ def monitoring_absensi():
         jabatan=jabatan,
         label_tp=label_tp,
         hari_ini=hari_ini.strftime('%d %B %Y'),
+        waktu_sekarang=waktu_wita().strftime('%H:%M'),
+        hari_ini_nama=hari_ini.strftime('%A'),
         filter_bulan=filter_bulan,
         filter_tahun=filter_tahun,
         nama_bulan_terpilih=nama_bulan_terpilih,
