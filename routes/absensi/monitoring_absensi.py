@@ -442,3 +442,167 @@ def ambil_pengaturan_jam():
         "jam_tutup_absensi_jumat": ke_str(pengaturan.jam_tutup_absensi_jumat, DEFAULT_JAM_TUTUP_ABSENSI_JUMAT),
         "jam_pulang_jumat": ke_str(pengaturan.jam_pulang_jumat, DEFAULT_JAM_PULANG_JUMAT),
     })
+
+# ==================================================
+# ✅ HALAMAN RINCIAN KEHADIRAN PER GURU
+# ==================================================
+@monitoring_bp.route('/rincian/<int:guru_id>')
+def rincian_kehadiran(guru_id):
+    # Cek akses sama seperti halaman utama
+    boleh, alasan = cek_akses_monitoring()
+    if not boleh:
+        if alasan == 'tolak_absensi':
+            return redirect(url_for('login.halaman_login'))
+        elif alasan == 'tolak_login':
+            return redirect(url_for('auth.login'))
+        else:
+            return redirect(url_for('dashboard'))
+
+    user_id = session.get('user_id')
+    user = User.query.get(user_id) if user_id else None
+    jabatan = session.get('jabatan', '')
+    halaman_aktif = session.get('halaman_aktif', 'utama')
+
+    # Ambil data guru
+    guru = Guru.query.get_or_404(guru_id)
+    hari_ini = waktu_wita().date()
+
+    # Filter periode
+    filter_bulan = request.args.get('bulan', type=int) or hari_ini.month
+    filter_tahun = request.args.get('tahun', type=int) or hari_ini.year
+
+    tgl_awal = date(filter_tahun, filter_bulan, 1)
+    if filter_bulan == 12:
+        tgl_akhir = date(filter_tahun, 12, 31)
+    else:
+        tgl_akhir = date(filter_tahun, filter_bulan + 1, 1) - timedelta(days=1)
+
+    tgl_mulai_tp, tgl_selesai_tp, _ = ambil_tahun_pelajaran()
+
+    absensi_list = AbsensiGuru.query.filter(
+        AbsensiGuru.guru_id == guru_id,
+        AbsensiGuru.tanggal >= tgl_awal,
+        AbsensiGuru.tanggal <= tgl_akhir,
+        AbsensiGuru.tanggal >= tgl_mulai_tp,
+        AbsensiGuru.tanggal <= tgl_selesai_tp
+    ).order_by(AbsensiGuru.tanggal.desc()).all()
+
+    hadir = terlambat = izin = sakit = alfa = 0
+    nama_bulan_list = ['Januari','Pebruari','Maret','April','Mei','Juni',
+                        'Juli','Agustus','September','Oktober','Nopember','Desember']
+
+    daftar_tahun = []
+    for thn in range(tgl_mulai_tp.year, tgl_selesai_tp.year + 2):
+        daftar_tahun.append(thn)
+
+    daftar_riwayat = []
+    for a in absensi_list:
+        if a.status == 'hadir':
+            hadir += 1
+        elif a.status == 'terlambat':
+            terlambat += 1
+        elif a.status == 'izin':
+            izin += 1
+        elif a.status == 'sakit':
+            sakit += 1
+        elif a.status == 'alfa':
+            alfa += 1
+
+        daftar_riwayat.append({
+            'tanggal': a.tanggal,
+            'nama_hari': ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'][a.tanggal.weekday()],
+            'jam_masuk': a.jam_masuk if a.jam_masuk else '-',
+            'jam_pulang': a.jam_pulang if a.jam_pulang else '-',
+            'status': a.status,
+            'keterangan': a.keterangan or ''
+        })
+
+    ringkasan = {
+        'hadir': hadir,
+        'terlambat': terlambat,
+        'izin': izin + sakit,
+        'alfa': alfa
+    }
+
+    return render_template(
+        'sections/absensi/rincian_kehadiran.html',
+        guru=guru,
+        user=user,
+        jabatan=jabatan,
+        daftar_absensi=daftar_riwayat,
+        ringkasan=ringkasan,
+        filter_bulan=filter_bulan,
+        filter_tahun=filter_tahun,
+        nama_bulan_terpilih=nama_bulan_list[filter_bulan - 1],
+        daftar_bulan=list(enumerate(nama_bulan_list, 1)),
+        daftar_tahun=daftar_tahun,
+        halaman_aktif=halaman_aktif,
+        active_page='monitoring_absensi',
+    )
+
+# ==================================================
+# ✅ EXPORT RINCIAN PER GURU
+# ==================================================
+@monitoring_bp.route('/export-rincian-guru/<int:guru_id>', methods=['POST'])
+def export_rincian_guru(guru_id):
+    boleh, alasan = cek_akses_monitoring()
+    if not boleh:
+        if alasan == 'tolak_absensi':
+            return redirect(url_for('login.halaman_login'))
+        elif alasan == 'tolak_login':
+            return redirect(url_for('auth.login'))
+        else:
+            return redirect(url_for('dashboard'))
+
+    guru = Guru.query.get_or_404(guru_id)
+    hari_ini = waktu_wita().date()
+    filter_bulan = request.form.get('bulan', type=int) or hari_ini.month
+    filter_tahun = request.form.get('tahun', type=int) or hari_ini.year
+
+    tgl_awal = date(filter_tahun, filter_bulan, 1)
+    if filter_bulan == 12:
+        tgl_akhir = date(filter_tahun, 12, 31)
+    else:
+        tgl_akhir = date(filter_tahun, filter_bulan + 1, 1) - timedelta(days=1)
+
+    tgl_mulai_tp, tgl_selesai_tp, _ = ambil_tahun_pelajaran()
+
+    absensi_list = AbsensiGuru.query.filter(
+        AbsensiGuru.guru_id == guru_id,
+        AbsensiGuru.tanggal >= tgl_awal,
+        AbsensiGuru.tanggal <= tgl_akhir,
+        AbsensiGuru.tanggal >= tgl_mulai_tp,
+        AbsensiGuru.tanggal <= tgl_selesai_tp
+    ).order_by(AbsensiGuru.tanggal.desc()).all()
+
+    nama_bulan_list = ['Januari','Pebruari','Maret','April','Mei','Juni',
+                       'Juli','Agustus','September','Oktober','Nopember','Desember']
+    nama_bulan_terpilih = nama_bulan_list[filter_bulan - 1]
+
+    rows = []
+    for a in absensi_list:
+        nama_hari = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'][a.tanggal.weekday()]
+        rows.append({
+            'Tanggal': a.tanggal.strftime('%Y-%m-%d'),
+            'Hari': nama_hari,
+            'Jam Masuk': a.jam_masuk.strftime('%H:%M') if a.jam_masuk else '-',
+            'Jam Pulang': a.jam_pulang.strftime('%H:%M') if a.jam_pulang else '-',
+            'Status': a.status,
+            'Keterangan': a.keterangan or '-'
+        })
+
+    if not rows:
+        flash('Tidak ada data absensi untuk diekspor.', 'absensi_warning')
+        return redirect(url_for('monitoring_absensi.rincian_kehadiran', guru_id=guru_id, bulan=filter_bulan, tahun=filter_tahun))
+
+    df = pd.DataFrame(rows)
+    output = BytesIO()
+    nama_file = f"Rincian_Absensi_{guru.nama}_{nama_bulan_terpilih}_{filter_tahun}.xlsx"
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Rincian Absensi')
+    output.seek(0)
+
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = f"attachment; filename={nama_file}"
+    response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    return response

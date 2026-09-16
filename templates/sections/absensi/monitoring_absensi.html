@@ -291,7 +291,7 @@
         <div class="progress-section">
             <div class="progress-header">
                 <span class="progress-label">Status Hari Ini</span>
-                <span class="progress-persen fw-bold" style="color: {{ warna_progress }}">
+                <span class="progress-persen" style="color: {{ warna_progress }}">
                     {{ teks_status }}
                 </span>
             </div>
@@ -306,7 +306,7 @@
                 <i class="fas fa-calendar-alt me-1"></i>
                 {{ item.total_hari }} hari
             </span>
-            <a href="/absensi-guru/rincian/{{ item.id }}" class="btn btn-sm btn-primary btn-rincian">
+            <a href="{{ url_for('monitoring_absensi.rincian_kehadiran', guru_id=item.id) }}" class="btn btn-sm btn-primary btn-rincian">
                 <i class="fas fa-eye"></i> Rincian
             </a>
         </div>
@@ -808,7 +808,8 @@ btnSimpan.addEventListener('click', async () => {
     color: #64748b;
 }
 .progress-persen {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 .progress-bar-wrapper {
     height: 8px;
