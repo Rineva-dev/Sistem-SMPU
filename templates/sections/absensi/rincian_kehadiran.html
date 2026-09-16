@@ -125,8 +125,8 @@
             <th class="ps-4">Tanggal</th>
             <th>Hari</th>
             <th>Jam Masuk</th>
-            <th>Status</th>
             <th>Jam Pulang</th>
+            <th>Status</th>
             <th>Keterangan</th>
           </tr>
         </thead>
@@ -138,6 +138,13 @@
             <td>
               {% if item.jam_masuk %}
                 <span class="fw-medium">{{ item.jam_masuk }}</span>
+              {% else %}
+                <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.jam_pulang %}
+                <span class="fw-medium">{{ item.jam_pulang }}</span>
               {% else %}
                 <span class="text-muted small">—</span>
               {% endif %}
@@ -159,13 +166,6 @@
                   'alfa': 'Tidak Hadir'
                 }[item.status] or item.status }}
               </span>
-            </td>
-            <td>
-              {% if item.jam_pulang %}
-                <span class="fw-medium">{{ item.jam_pulang }}</span>
-              {% else %}
-                <span class="text-muted small">—</span>
-              {% endif %}
             </td>
             <td class="text-muted small pe-4">
               {{ item.keterangan or '—' }}
