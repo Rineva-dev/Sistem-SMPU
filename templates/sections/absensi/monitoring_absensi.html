@@ -208,23 +208,44 @@
 {% if daftar_guru %}
 <div class="guru-cards-grid">
     {% for item in daftar_guru %}
-    {# === WARNA GARIS ATAS KARTU: BERDASARKAN STATUS HARI INI === #}
+    {# === Tentukan status + ambil jam batas tutup sesuai hari === #}
     {% set status = item.status_hari_ini %}
-    {% if status == 'hadir' %}
-        {% set warna_border = 'success' %}
-    {% elif status == 'terlambat' %}
-        {% set warna_border = 'warning' %}
+
+    {# Ambil jam batas tutup sesuai hari kerja #}
+    {% set hari_ini = hari_ini_nama or '' %}
+    {% if hari_ini == 'Jumat' %}
+        {% set jam_batas = jam_tutup_absensi_jumat %}
     {% else %}
-        {% set warna_border = 'danger' %}
+        {% set jam_batas = jam_tutup_absensi %}
     {% endif %}
 
-    {# === WARNA BAGIAN BAWAH: IKUT STATUS HARI INI — SAMA DENGAN GARIS ATAS === #}
+    {# Cek apakah sekarang sudah lewat jam batas tutup #}
+    {% set sudah_lewat_batas = waktu_sekarang >= jam_batas %}
+
+    {# Tentukan status tampilan #}
     {% if status == 'hadir' %}
-        {% set warna_progress = '#16a34a' %}   {# Hijau #}
+        {% set warna_border = 'success' %}
+        {% set warna_progress = '#16a34a' %}
+        {% set teks_status = 'Hadir' %}
     {% elif status == 'terlambat' %}
-        {% set warna_progress = '#d97706' %}   {# Kuning #}
+        {% set warna_border = 'warning' %}
+        {% set warna_progress = '#d97706' %}
+        {% set teks_status = 'Terlambat' %}
+    {% elif status == 'izin' or status == 'sakit' %}
+        {% set warna_border = 'info' %}
+        {% set warna_progress = '#0284c7' %}
+        {% set teks_status = 'Izin/Sakit' %}
     {% else %}
-        {% set warna_progress = '#dc2626' %}   {# Merah #}
+        {# Belum ada record absensi #}
+        {% if sudah_lewat_batas %}
+            {% set warna_border = 'danger' %}
+            {% set warna_progress = '#dc2626' %}
+            {% set teks_status = 'Tidak Hadir' %}
+        {% else %}
+            {% set warna_border = 'secondary' %}
+            {% set warna_progress = '#6b7280' %}
+            {% set teks_status = 'Belum Absen' %}
+        {% endif %}
     {% endif %}
     <div class="guru-card card-border-{{ warna_border }}">
         {# Bagian Kepala Kartu — Mirip ID Card #}
@@ -271,9 +292,7 @@
             <div class="progress-header">
                 <span class="progress-label">Status Hari Ini</span>
                 <span class="progress-persen fw-bold" style="color: {{ warna_progress }}">
-                    {% if status == 'hadir' %}Hadir
-                    {% elif status == 'terlambat' %}Terlambat
-                    {% else %}Tidak Hadir{% endif %}
+                    {{ teks_status }}
                 </span>
             </div>
             <div class="progress-bar-wrapper">
@@ -694,6 +713,8 @@ btnSimpan.addEventListener('click', async () => {
 .guru-card.card-border-success { border-top-color: #16a34a; }
 .guru-card.card-border-warning { border-top-color: #d97706; }
 .guru-card.card-border-danger  { border-top-color: #dc2626; }
+.guru-card.card-border-secondary { border-top-color: #6b7280; }
+.guru-card.card-border-info { border-top-color: #0284c7; }
 
 .guru-card:hover {
     transform: translateY(-3px);
