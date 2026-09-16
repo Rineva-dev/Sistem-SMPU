@@ -159,4 +159,29 @@ userDropdown.addEventListener('click', function(e) {
     // Selain itu → tutup dropdown
     e.stopPropagation();
 });
+
+// === KONTROL BUKA TUTUP SIDEBAR ===
+const toggleBtn = document.getElementById('toggleSidebar');
+const mainSidebar = document.getElementById('mainSidebar');
+
+if (toggleBtn && mainSidebar) {
+  // Buka / Tutup saat tombol diklik
+  toggleBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    mainSidebar.classList.toggle('active');
+  });
+
+  // Tutup jika klik di luar sidebar
+  document.addEventListener('click', function(e) {
+    // Cek: klik di luar tombol DAN di luar sidebar → tutup
+    if (!mainSidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+      mainSidebar.classList.remove('active');
+    }
+  });
+
+  // Cegah tertutup saat mengklik bagian dalam sidebar
+  mainSidebar.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+}
 </script>

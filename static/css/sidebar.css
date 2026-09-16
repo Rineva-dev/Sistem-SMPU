@@ -270,4 +270,33 @@ ul {
   .sidebar.active {
     transform: translateX(0);
   }
+  /* Tambahkan latar belakang gelap saat sidebar terbuka */
+  .sidebar.active::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+  }
+}
+
+/* Opsional: Sembunyikan/tampilkan di layar besar juga */
+@media (min-width: 1025px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+  .sidebar.hidden-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .main-content { 
+    margin-left: var(--sidebar-width); 
+    transition: margin-left 0.3s ease; 
+  } 
+  .sidebar.hidden-sidebar + .main-content { 
+    margin-left: 0; 
+  } 
 }
