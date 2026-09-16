@@ -512,7 +512,7 @@ def ajukan_izin():
             jam_pulang=None,
             jam_izin=datetime.now().strftime("%H:%M"),
             status='izin',
-            keterangan=f"Izin Terkirim — semoga urusan anda lancar. Alasan: {alasan}"
+            keterangan=alasan
         )
         db.session.add(absensi)
 

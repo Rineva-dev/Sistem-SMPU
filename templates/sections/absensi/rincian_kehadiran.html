@@ -168,7 +168,12 @@
               </span>
             </td>
             <td class="text-muted small pe-4">
-              {{ item.keterangan or '—' }}
+                {% if item.keterangan %}
+                    {% set bagian_alasan = item.keterangan.split('Alasan: ') %}
+                    {{ bagian_alasan[-1] if bagian_alasan|length > 1 else item.keterangan }}
+                {% else %}
+                    —
+                {% endif %}
             </td>
           </tr>
           {% endfor %}
