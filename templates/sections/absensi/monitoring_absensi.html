@@ -208,16 +208,23 @@
 {% if daftar_guru %}
 <div class="guru-cards-grid">
     {% for item in daftar_guru %}
-    {% set persen = item.persen_kehadiran|default(0) %}
-    {# Tentukan warna berdasarkan persentase #}
-    {% if persen >= 95 %}
+    {# === WARNA GARIS ATAS KARTU: BERDASARKAN STATUS HARI INI === #}
+    {% set status = item.status_hari_ini %}
+    {% if status == 'hadir' %}
         {% set warna_border = 'success' %}
-        {% set warna_progress = '#16a34a' %}
-    {% elif persen >= 85 %}
+    {% elif status == 'terlambat' %}
         {% set warna_border = 'warning' %}
-        {% set warna_progress = '#d97706' %}
     {% else %}
         {% set warna_border = 'danger' %}
+    {% endif %}
+
+    {# === WARNA PERSENTASE & PROGRESS BAR: BERDASARKAN PERSENTASE BULANAN === #}
+    {% set persen = item.persen_kehadiran|default(0) %}
+    {% if persen >= 95 %}
+        {% set warna_progress = '#16a34a' %}
+    {% elif persen >= 85 %}
+        {% set warna_progress = '#d97706' %}
+    {% else %}
         {% set warna_progress = '#dc2626' %}
     {% endif %}
     <div class="guru-card card-border-{{ warna_border }}">

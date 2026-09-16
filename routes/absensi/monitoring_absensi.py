@@ -154,19 +154,32 @@ def monitoring_absensi():
     daftar_monitoring = []
     total_semua_hadir = total_semua_terlambat = total_semua_izin = total_semua_alfa = 0
 
+    hari_ini = waktu_wita().date()  # Pastikan sudah didefinisikan di atas
+
     for guru in semua_guru:
         absensi_guru = AbsensiGuru.query.filter(
             AbsensiGuru.guru_id == guru.id,
             AbsensiGuru.tanggal.between(tgl_awal_filter, tgl_akhir_filter),
             AbsensiGuru.tanggal.between(tgl_mulai_tp, tgl_selesai_tp)
         )
+
         jml_hadir = absensi_guru.filter(AbsensiGuru.status == 'hadir').count()
         jml_terlambat = absensi_guru.filter(AbsensiGuru.status == 'terlambat').count()
         jml_izin = absensi_guru.filter(AbsensiGuru.status.in_(['izin','sakit'])).count()
         jml_alfa = absensi_guru.filter(AbsensiGuru.status == 'alfa').count()
-
         total_hari = jml_hadir + jml_terlambat + jml_izin + jml_alfa
         persen = round(((jml_hadir + jml_terlambat) / total_hari) * 100, 1) if total_hari > 0 else 0
+
+        # ✅ AMBIL STATUS HARI INI
+        absensi_hari_ini = AbsensiGuru.query.filter_by(
+            guru_id=guru.id,
+            tanggal=hari_ini
+        ).first()
+
+        if absensi_hari_ini:
+            status_hari_ini = absensi_hari_ini.status  # 'hadir', 'terlambat', 'izin', 'sakit', 'alfa'
+        else:
+            status_hari_ini = 'belum_absensi'  # belum ada catatan = belum absen
 
         total_semua_hadir += jml_hadir
         total_semua_terlambat += jml_terlambat
@@ -184,9 +197,9 @@ def monitoring_absensi():
             'izin': jml_izin,
             'alfa': jml_alfa,
             'total_hari': total_hari,
-            'persen_kehadiran': persen
+            'persen_kehadiran': persen,
+            'status_hari_ini': status_hari_ini  # ✅ BARU: kirim ke template
         })
-
     # === TOTAL RINGKASAN SELURUH GURU ===
     total_keseluruhan = total_semua_hadir + total_semua_terlambat + total_semua_izin + total_semua_alfa
     persen_total = round(((total_semua_hadir + total_semua_terlambat) / total_keseluruhan) * 100, 1) if total_keseluruhan > 0 else 0
