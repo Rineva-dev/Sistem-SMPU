@@ -585,8 +585,8 @@ def export_rincian_guru(guru_id):
         rows.append({
             'Tanggal': a.tanggal.strftime('%Y-%m-%d'),
             'Hari': nama_hari,
-            'Jam Masuk': a.jam_masuk.strftime('%H:%M') if a.jam_masuk else '-',
-            'Jam Pulang': a.jam_pulang.strftime('%H:%M') if a.jam_pulang else '-',
+            'Jam Masuk': a.jam_masuk if a.jam_masuk else '-',
+            'Jam Pulang': a.jam_pulang if a.jam_pulang else '-',
             'Status': a.status,
             'Keterangan': a.keterangan or '-'
         })
