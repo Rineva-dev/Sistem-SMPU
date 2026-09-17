@@ -1,31 +1,28 @@
 <style>
 /* === Gaya Modern Tambah/Ubah Mata Pelajaran === */
 :root {
-    --primary: #1a73e8;
-    --primary-dark: #0d66d0;
-    --primary-light: #eaf2fe;
-    --success: #0f9d58;
-    --success-light: #e6f7ee;
-    --gray-50: #f8fafc;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
-    --gray-600: #64748b;
-    --gray-700: #475569;
-    --gray-900: #0f172a;
+    --form-primary: #1a73e8;
+    --form-primary-dark: #0d66d0;
+    --form-primary-light: #eaf2fe;
+    --form-success: #0f9d58;
+    --form-success-light: #e6f7ee;
+    --form-gray-50: #f8fafc;
+    --form-gray-100: #f1f5f9;
+    --form-gray-200: #e2e8f0;
+    --form-gray-300: #cbd5e1;
+    --form-gray-600: #64748b;
+    --form-gray-700: #475569;
+    --form-gray-900: #0f172a;
 }
-
 body {
     background: linear-gradient(135deg, #f0f4f8 0%, #e6eef8 100%);
     min-height: 100vh;
 }
-
 .dashboard-container {
     max-width: 720px;
     margin: auto;
     padding: 0;
 }
-
 .welcome-box {
     background: white;
     border-radius: 20px;
@@ -36,13 +33,11 @@ body {
     align-items: center;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
-
 .welcome-box h2 {
     font-weight: 700;
-    color: var(--gray-900);
+    color: var(--form-gray-900);
     margin: 0;
 }
-
 .card {
     border: none;
     border-radius: 24px;
@@ -50,76 +45,63 @@ body {
     overflow: hidden;
     background: white;
 }
-
 .card-body {
     padding: 2.5rem;
 }
-
 .form-layout {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
-
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.25rem;
     margin: 0 !important;
 }
-
 .form-group {
     display: flex;
     flex-direction: column;
     margin: 0 !important
 }
-
 .form-group.half {
     grid-column: span 1;
 }
-
 .form-group.full {
     grid-column: 1 / -1;
 }
-
 .form-group label {
     font-weight: 600;
     font-size: 0.9rem;
-    color: var(--gray-700);
+    color: var(--form-gray-700);
 }
-
 .form-control {
     border-radius: 12px;
-    border: 2px solid var(--gray-200);
+    border: 2px solid var(--form-gray-200);
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
     transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    background: var(--gray-50);
+    background: var(--form-gray-50);
 }
-
 .form-control:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: var(--form-primary);
     background: white;
     box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
 }
-
 .form-control:read-only {
-    background: var(--primary-light);
+    background: var(--form-primary-light);
     border-color: #bcd4f2;
-    color: var(--primary-dark);
+    color: var(--form-primary-dark);
     font-weight: 600;
 }
-
 .input-group-kode {
     display: flex;
     gap: 0.5rem;
 }
-
 .input-group-kode input {
     flex: 1;
 }
-
 .btn-generate {
     flex-shrink: 0;
     padding: 0 1rem;
@@ -132,27 +114,23 @@ body {
     transition: all 0.3s;
     white-space: nowrap;
 }
-
 .btn-generate:hover {
     transform: scale(1.03);
     box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
 }
-
 .keterangan-hint {
     font-size: 0.8rem;
-    color: var(--gray-600);
+    color: var(--form-gray-600);
     margin-top: 0.25rem;
 }
-
 .form-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
     margin-top: 0 !important;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--gray-100);
+    border-top: 1px solid var(--form-gray-100);
 }
-
 .btn {
     padding: 0.75rem 1.75rem;
     border-radius: 12px;
@@ -162,43 +140,35 @@ body {
     cursor: pointer;
     font-size: 0.95rem;
 }
-
 .btn-cancel {
-    background: var(--gray-100);
-    color: var(--gray-700);
+    background: var(--form-gray-100);
+    color: var(--form-gray-700);
 }
-
 .btn-cancel:hover {
-    background: var(--gray-200);
-    color: var(--gray-900);
+    background: var(--form-gray-200);
+    color: var(--form-gray-900);
 }
-
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--form-primary) 0%, var(--form-primary-dark) 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(26, 115, 232, 0.25);
 }
-
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(26, 115, 232, 0.35);
 }
-
 .btn-light {
     background: white;
-    border: 1px solid var(--gray-200);
-    color: var(--gray-700);
+    border: 1px solid var(--form-gray-200);
+    color: var(--form-gray-700);
 }
-
 .btn-light:hover {
-    background: var(--gray-50);
-    border-color: var(--gray-300);
+    background: var(--form-gray-50);
+    border-color: var(--form-gray-300);
 }
-
 .text-danger {
     color: #d93025;
 }
-
 /* Responsif */
 @media (max-width: 576px) {
     .form-row {
@@ -217,16 +187,15 @@ body {
     }
 }
 </style>
-
 <div class="dashboard-container">
     <!-- Header Halaman -->
     <div class="welcome-box">
         <div>
             <h2>
                 {% if mode == 'ubah' %}
-                    <i class="fas fa-edit text-primary me-2"></i>Ubah Data Mata Pelajaran
+                    <i class="fas fa-edit" style="color: var(--form-primary);" class="me-2"></i>Ubah Data Mata Pelajaran
                 {% else %}
-                    <i class="fas fa-plus-circle text-primary me-2"></i>Tambah Mata Pelajaran
+                    <i class="fas fa-plus-circle" style="color: var(--form-primary);" class="me-2"></i>Tambah Mata Pelajaran
                 {% endif %}
             </h2>
             <p class="text-muted mb-0 mt-1">
@@ -241,7 +210,6 @@ body {
             <i class="fas fa-arrow-left me-1"></i> Kembali
         </a>
     </div>
-
     <!-- Kartu Form -->
     <div class="card">
         <div class="card-body">
@@ -253,7 +221,6 @@ body {
                            value="{{ mapel.nama_pelajaran if mapel else '' }}"
                            placeholder="Contoh: Matematika, Bahasa Jepang, Desain Grafis">
                 </div>
-
                 <!-- 2. KELOMPOK -->
                 <div class="form-row">
                     <div class="form-group half">
@@ -265,7 +232,6 @@ body {
                             {% endfor %}
                         </select>
                     </div>
-
                     <!-- 3. KODE OTOMATIS -->
                     <div class="form-group half">
                         <label>Kode Mata Pelajaran <span class="text-danger">*</span></label>
@@ -285,13 +251,11 @@ body {
                         {% endif %}
                     </div>
                 </div>
-
                 <div class="form-group full">
                     <label>Keterangan</label>
                     <textarea name="keterangan" class="form-control" rows="3" 
                               placeholder="Masukkan keterangan atau deskripsi mata pelajaran (opsional)...">{{ mapel.keterangan if mapel else '' }}</textarea>
                 </div>
-
                 <div class="form-actions">
                     <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="btn btn-cancel">
                         <i class="fas fa-times me-1"></i> Batal
@@ -305,7 +269,6 @@ body {
         </div>
     </div>
 </div>
-
 <script>
 // === GENERATE KODE OTOMATIS: NAMA + KELOMPOK ===
 document.addEventListener('DOMContentLoaded', function () {
@@ -313,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputKode = document.getElementById('inputKode');
     const inputNama = document.getElementById('inputNama');
     const inputKelompok = document.getElementById('inputKelompok');
-
     // Peta singkatan kelompok
     const singkatanKelompok = {
         'Wajib': 'WJ',
@@ -321,12 +283,10 @@ document.addEventListener('DOMContentLoaded', function () {
         'Pilihan': 'PL',
         'Kejuruan': 'KJ'
     };
-
     function buatKodeOtomatis() {
         const nama = inputNama.value.trim();
         const kelompok = inputKelompok.value;
         let kodeNama = '';
-
         // Ambil inisial dari nama
         if (nama) {
             const kata = nama.toUpperCase().split(/\s+/);
@@ -340,13 +300,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             kodeNama = 'MP';
         }
-
         // Tambah kode kelompok kalau ada
         const kodeKelompok = singkatanKelompok[kelompok] || '';
-
         // Nomor urut 3 digit acak
         const nomor = String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
-
         // Susun kode
         if (kodeKelompok) {
             return `${kodeNama}-${kodeKelompok}-${nomor}`;
@@ -354,14 +311,12 @@ document.addEventListener('DOMContentLoaded', function () {
             return `${kodeNama}-${nomor}`;
         }
     }
-
     // Isi otomatis saat nama/kelompok berubah
     function isiKode() {
         if (!inputKode.value || inputKode.value === '') {
             inputKode.value = buatKodeOtomatis();
         }
     }
-
     if (inputNama && inputKelompok && inputKode) {
         inputNama.addEventListener('blur', isiKode);
         inputKelompok.addEventListener('change', isiKode);

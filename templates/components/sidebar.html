@@ -51,7 +51,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='utama') }}" 
                class="{% if halaman_aktif == 'utama' %}aktif{% endif %}">
               <i class="fas fa-home me-2"></i>
-              Halaman Utama ({{ user.jabatan }})
+              {{ user.jabatan }}
             </a>
           </li>
           {% if "Admin Sistem" in daftar_tugas %}
@@ -59,7 +59,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='admin_sistem') }}" 
                class="{% if halaman_aktif == 'admin_sistem' %}aktif{% endif %}">
               <i class="fas fa-user-cog me-2"></i>
-              Halaman Admin Sistem
+              Admin Sistem
             </a>
           </li>
           {% endif %}
@@ -68,7 +68,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='bendahara') }}" 
                class="{% if halaman_aktif == 'bendahara' %}aktif{% endif %}">
               <i class="fas fa-wallet me-2"></i>
-              Halaman Bendahara
+              Bendahara
             </a>
           </li>
           {% endif %}
@@ -77,7 +77,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='wali_kelas') }}" 
                class="{% if halaman_aktif == 'wali_kelas' %}aktif{% endif %}">
               <i class="fas fa-chalkboard-user me-2"></i>
-              Halaman Wali Kelas
+              Wali Kelas
             </a>
           </li>
           {% endif %}
@@ -86,7 +86,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='waka_kurikulum') }}" 
                class="{% if halaman_aktif == 'waka_kurikulum' %}aktif{% endif %}">
               <i class="fas fa-book-open me-2"></i>
-              Halaman Waka Kurikulum
+              Waka Kurikulum
             </a>
           </li>
           {% endif %}
@@ -95,7 +95,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='waka_kesiswaan') }}" 
                class="{% if halaman_aktif == 'waka_kesiswaan' %}aktif{% endif %}">
               <i class="fas fa-users me-2"></i>
-              Halaman Waka Kesiswaan
+              Waka Kesiswaan
             </a>
           </li>
           {% endif %}
@@ -104,7 +104,7 @@
             <a href="{{ url_for('dashboard.pindah_halaman', nama_halaman='pembina_ekskul') }}" 
                class="{% if halaman_aktif == 'pembina_ekskul' %}aktif{% endif %}">
               <i class="fas fa-futbol me-2"></i>
-              Halaman Pembina Ekskul
+              Pembina Ekskul
             </a>
           </li>
           {% endif %}

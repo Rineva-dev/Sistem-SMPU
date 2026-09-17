@@ -1,43 +1,92 @@
 <div class="dashboard-container">
+    <!-- Header Halaman -->
     <div class="welcome-box">
-        <div>
-            <h2>Data Kelas & Rombongan Belajar</h2>
-            <p class="text-muted">Tahun Pelajaran: <strong>{{ tahun_aktif.nama if tahun_aktif else 'Belum diatur' }}</strong></p>
+        <div class="welcome-left">
+            <h2>
+                <i class="fas fa-school text-primary me-2"></i>
+                Data Kelas & Rombongan Belajar
+            </h2>
+            <p class="text-muted mb-0 mt-1">
+                Tahun Pelajaran: 
+                <span class="tahun-badge">
+                    {% if tahun_aktif %}
+                        {{ tahun_aktif.nama | replace('Tahun Pelajaran', '') | trim }}
+                    {% else %}
+                        Belum diatur
+                    {% endif %}
+                </span>
+            </p>
         </div>
         <div class="date-box">
             <i class="fas fa-building"></i>
-            <span>Total: {{ daftar_kelas | length }} Kelas</span>
+            <span>Total: <strong>{{ daftar_kelas | length }}</strong> Kelas</span>
         </div>
     </div>
 
+    <!-- Kartu Statistik -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon bg-primary">
-                <i class="fas fa-building"></i>
+            <div class="card-pola lingkaran-1"></div>
+            <div class="card-pola lingkaran-2"></div>
+            <div class="card-pola titik-pola"></div>
+            
+            <div class="stat-icon-wrapper">
+                <div class="stat-icon bg-primary">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-icon-efek"></div>
             </div>
+            
             <div class="stat-info">
-                <h3>{{ daftar_kelas | length }}</h3>
-                <p>Jumlah Kelas</p>
+                <p class="stat-label">Jumlah Kelas</p>
+                <div class="stat-angka-baris">
+                    <h3 class="stat-angka">{{ daftar_kelas | length }}</h3>
+                    <span class="stat-tren">
+                        <i class="fas fa-check-circle"></i> Terdaftar
+                    </span>
+                </div>
             </div>
         </div>
+
         <div class="stat-card">
-            <div class="stat-icon bg-success">
-                <i class="fas fa-users"></i>
+            <div class="card-pola lingkaran-1"></div>
+            <div class="card-pola lingkaran-2"></div>
+            <div class="card-pola titik-pola"></div>
+            
+            <div class="stat-icon-wrapper">
+                <div class="stat-icon bg-success">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-icon-efek"></div>
             </div>
+            
             <div class="stat-info">
-                <h3>{{ daftar_kelas | sum(attribute='jumlah_terkini') }}</h3>
-                <p>Jumlah Siswa</p>
+                <p class="stat-label">Jumlah Siswa</p>
+                <div class="stat-angka-baris">
+                    <h3 class="stat-angka">{{ daftar_kelas | sum(attribute='jumlah_terkini') }}</h3>
+                    <span class="stat-tren">
+                        <i class="fas fa-arrow-up"></i> Aktif Belajar
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Kartu Tabel -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h4><i class="fas fa-list"></i> Daftar Kelas</h4>
+            <h4>
+                <i class="fas fa-list-alt text-primary me-2"></i>
+                Daftar Kelas
+            </h4>
             <div class="d-flex gap-2">
-                <input type="text" class="form-control form-control-sm" placeholder="Cari kelas..." id="cariKelas">
-                <a href="{{ url_for('data_kelas.tambah_kelas') }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Tambah Kelas
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control form-control-sm search-input" 
+                           placeholder="Cari nama kelas..." id="cariKelas">
+                </div>
+                <a href="{{ url_for('data_kelas.tambah_kelas') }}" class="btn btn-sm btn-primary btn-tambah">
+                    <i class="fas fa-plus me-1"></i> Tambah Kelas
                 </a>
             </div>
         </div>
@@ -57,29 +106,66 @@
                     <tbody id="tabelKelas">
                         {% if daftar_kelas %}
                             {% for kelas in daftar_kelas %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td><strong>{{ kelas.nama_kelas }}</strong></td>
-                                <td><span class="badge bg-info">Kelas {{ kelas.jenjang }}</span></td>
-                                <td>{{ kelas.wali_kelas.nama if kelas.wali_kelas else '<span class="text-muted">Belum ditentukan</span>' | safe }}</td>
-                                <td>{{ kelas.jumlah_terkini }} Orang</td>
-                                <td>
-                                    <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" class="btn btn-sm btn-outline-primary" title="Lihat Siswa">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ url_for('data_kelas.ubah_kelas', id=kelas.id) }}" class="btn btn-sm btn-outline-warning" title="Ubah">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ url_for('data_kelas.hapus_kelas', id=kelas.id) }}" method="POST" style="display:inline" onsubmit="return confirm('Yakin hapus?')">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                            <tr class="baris-kelas">
+                                <td data-label="No">{{ loop.index }}</td>
+                                <td data-label="Nama Kelas">
+                                    {{ kelas.nama_kelas }}
+                                </td>
+                                <td data-label="Jenjang">
+                                    <span class="badge bg-info">Kelas {{ kelas.jenjang }}</span>
+                                </td>
+                                <td data-label="Wali Kelas">
+                                    {% if kelas.wali_kelas %}
+                                        <span class="wali-nama">
+                                            <i class="fas fa-user-check text-success me-1"></i>
+                                            {{ kelas.wali_kelas.nama }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted wali-kosong">
+                                            <i class="fas fa-user-clock me-1"></i>
+                                            Belum ditentukan
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Jumlah Siswa">
+                                    <span class="jumlah-siswa">
+                                        {{ kelas.jumlah_terkini }} <small>Orang</small>
+                                    </span>
+                                </td>
+                                <td data-label="Aksi">
+                                    <div class="tombol-aksi">
+                                        <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="Lihat Siswa">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('data_kelas.ubah_kelas', id=kelas.id) }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Ubah">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ url_for('data_kelas.hapus_kelas', id=kelas.id) }}" 
+                                              method="POST" style="display:inline" 
+                                              onsubmit="return confirm('Yakin hapus data kelas ini?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="6" class="text-center text-muted py-4">Belum ada data kelas</td></tr>
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="kosong-konten">
+                                        <i class="fas fa-folder-open kosong-ikon"></i>
+                                        <p class="kosong-teks">Belum ada data kelas</p>
+                                        <a href="{{ url_for('data_kelas.tambah_kelas') }}" 
+                                           class="btn btn-sm btn-primary mt-2">
+                                            <i class="fas fa-plus me-1"></i> Tambah Kelas Pertama
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -91,7 +177,7 @@
 <script>
 document.getElementById('cariKelas').addEventListener('input', function() {
     const kata = this.value.toLowerCase();
-    document.querySelectorAll('#tabelKelas tr').forEach(tr => {
+    document.querySelectorAll('#tabelKelas .baris-kelas').forEach(tr => {
         tr.style.display = tr.textContent.toLowerCase().includes(kata) ? '' : 'none';
     });
 });

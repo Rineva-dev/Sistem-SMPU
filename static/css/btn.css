@@ -83,7 +83,7 @@
 /* Gaya Garis / Outline */
 .btn-outline-primary {
     background-color: transparent;
-    border: 1px solid #2563eb;
+    border: 1px solid #2563eb !important;
     color: #2563eb;
 }
 .btn-outline-primary:hover {
@@ -93,7 +93,7 @@
 
 .btn-outline-secondary {
     background-color: transparent;
-    border: 1px solid #6b7280;
+    border: 1px solid #6b7280 !important;
     color: #6b7280;
 }
 .btn-outline-secondary:hover {
@@ -103,7 +103,7 @@
 
 .btn-outline-warning {
     background-color: transparent;
-    border: 1px solid #f59e0b;
+    border: 1px solid #f59e0b !important;
     color: #f59e0b;
 }
 .btn-outline-warning:hover {
@@ -113,7 +113,7 @@
 
 .btn-outline-success {
     background-color: transparent;
-    border: 1px solid #198754;
+    border: 1px solid #198754 !important;
     color: #198754;
 }
 
@@ -124,13 +124,13 @@
 
 .btn-outline-info {
     background-color: transparent;
-    border: 1px solid #0dcaf0;
+    border: 1px solid #0dcaf0 !important;
     color: #0dcaf0;
 }
 
 .btn-outline-danger {
     background-color: transparent;
-    border: 1px solid #ef4444;
+    border: 1px solid #ef4444 !important;
     color: #ef4444;
 }
 .btn-outline-danger:hover {
@@ -148,7 +148,7 @@
 .btn-cancel {
     background: #ffffff;
     color: #2563eb;
-    border: 1.5px solid #2563eb;
+    border: 1.5px solid #2563eb !important;
 }
 
 .btn-cancel:hover {
