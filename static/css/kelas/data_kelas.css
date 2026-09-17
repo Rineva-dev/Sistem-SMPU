@@ -22,7 +22,7 @@
 }
 
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -32,7 +32,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(135deg, #2563eb, #1e40af);
     padding: 1.5rem 2rem;
     border-radius: var(--kelas-radius);
     box-shadow: var(--kelas-shadow-md);
@@ -48,7 +48,7 @@
     right: -5%;
     width: 300px;
     height: 200%;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.03) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(203, 220, 255, 0) 0%, transparent 70%);
     pointer-events: none;
 }
 .welcome-left {
@@ -58,13 +58,17 @@
 .welcome-box h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--kelas-gray-900);
-    margin: 0 0 0.4rem 0;
+    color: #ffffff;
+    margin: 0;
     display: flex;
     align-items: center;
 }
+
+.welcome-box p {
+    color: #ffffff !important;
+}
 .welcome-box h2 i {
-    color: var(--kelas-primary);
+    color: #ffffff !important; 
 }
 .tahun-badge {
     display: inline-block;
@@ -81,13 +85,14 @@
     align-items: center;
     gap: 0.6rem;
     font-weight: 600;
-    color: var(--kelas-primary);
-    background: var(--kelas-primary-soft);
+    color: #ffffff;
+    background: #eff6ff21;
     padding: 0.75rem 1.25rem;
     border-radius: 12px;
     position: relative;
     z-index: 1;
     transition: all 0.3s ease;
+    border: 1px solid #ffffff33;
 }
 .date-box:hover {
     transform: scale(1.03);
