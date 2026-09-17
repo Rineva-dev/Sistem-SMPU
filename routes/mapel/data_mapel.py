@@ -51,24 +51,54 @@ def tambah_mapel():
         kelompok = request.form.get('kelompok', '').strip()
         keterangan = request.form.get('keterangan', '').strip()
 
+        # === BUAT KODE OTOMATIS DARI NAMA + KELOMPOK ===
+        if not kode and nama:
+            import random
+            
+            # Singkatan kelompok
+            singkatan = {
+                'Wajib': 'WJ',
+                'Muatan Lokal': 'ML',
+                'Pilihan': 'PL',
+                'Kejuruan': 'KJ'
+            }
+            kode_kelompok = singkatan.get(kelompok, '')
+            
+            # Ambil inisial dari nama
+            kata = nama.upper().split()
+            kode_nama = ''.join([k.replace(' ', '')[:2] for k in kata])[:4]
+            
+            # Cek kode unik
+            while True:
+                nomor = random.randint(1, 999)
+                if kode_kelompok:
+                    kode_baru = f"{kode_nama}-{kode_kelompok}-{nomor:03d}"
+                else:
+                    kode_baru = f"{kode_nama}-{nomor:03d}"
+                if not MataPelajaran.query.filter_by(kode=kode_baru).first():
+                    kode = kode_baru
+                    break
+        
         if not kode or not nama:
-            flash("Kode dan Nama Mata Pelajaran wajib diisi!", "danger")
+            flash("Nama Mata Pelajaran wajib diisi!", "danger")
             return redirect(url_for('data_mapel.tambah_mapel'))
-
+        
         cek = MataPelajaran.query.filter_by(kode=kode).first()
         if cek:
             flash(f"Kode {kode} sudah terdaftar!", "warning")
             return redirect(url_for('data_mapel.tambah_mapel'))
-
+        
         baru = MataPelajaran(
-            kode=kode, nama_pelajaran=nama,
-            kelompok=kelompok, keterangan=keterangan
+            kode=kode, 
+            nama_pelajaran=nama,
+            kelompok=kelompok, 
+            keterangan=keterangan
         )
         db.session.add(baru)
         db.session.commit()
-        flash(f"Mata pelajaran {nama} berhasil ditambahkan!", "success")
+        flash(f"Mata pelajaran {nama} berhasil ditambahkan! Kode: {kode}", "success")
         return redirect(url_for('data_mapel.halaman_daftar_mapel'))
-
+    
     return render_template(
         'index.html',
         active_page='data_mapel',

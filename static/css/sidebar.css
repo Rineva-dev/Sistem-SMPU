@@ -165,7 +165,7 @@ ul {
 }
 
 .menu-link.active {
-  background: linear-gradient(90deg, var(--primary) 0%, rgba(0, 91, 43, 0.8) 100%);
+  background: linear-gradient(90deg, var(--primary) 0%, rgba(0, 91, 43, 0.8) 100%) !important;
   color: #FFFFFF;
   box-shadow: 0 3px 8px rgba(0, 91, 43, 0.25);
   border-left: 2px solid #ffffff;

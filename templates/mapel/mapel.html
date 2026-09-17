@@ -1,58 +1,108 @@
 <div class="dashboard-container">
-
-    <!-- Header Halaman - SAMA PERSIS GAYA DATA GURU -->
+    <!-- Header Halaman -->
     <div class="welcome-box">
         <div>
-            <h2>Daftar Induk Mata Pelajaran</h2>
-            <p class="text-muted mb-0">Daftar semua mata pelajaran secara umum, akan dipilih untuk setiap kelas</p>
+            <h2><i class="fas fa-book-open"></i> Daftar Induk Mata Pelajaran</h2>
+            <p>Semua mata pelajaran yang tersedia untuk ditugaskan ke kelas & guru</p>
         </div>
+        <a href="{{ url_for('data_mapel.tambah_mapel') }}" class="btn-primary-gradient">
+            <i class="fas fa-plus"></i> Tambah Mata Pelajaran
+        </a>
     </div>
 
-    <!-- Kartu Tabel - TOMBOL TAMBAH PINDAH KE SINI -->
+    <!-- Kartu Tabel -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h4><i class="fas fa-list"></i> Daftar Mata Pelajaran</h4>
-            <div class="d-flex gap-2">
-                <a href="{{ url_for('data_mapel.tambah_mapel') }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus"></i> Tambah Mata Pelajaran
-                </a>
-            </div>
+        <div class="card-header">
+            <h4><i class="fas fa-list-ul"></i> Daftar Mata Pelajaran</h4>
+            <span class="text-muted small">Total: <strong id="totalData">{{ daftar_mapel|length }}</strong> mata pelajaran</span>
         </div>
-
-        <div class="card-body p-0">
+        <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
+                <table class="table">
+                    <thead>
                         <tr>
-                            <th width="40">No</th>
-                            <th width="100">Kode</th>
-                            <th>Nama Mata Pelajaran</th>
-                            <th width="180">Kelompok</th>
-                            <th width="220">Aksi</th>
+                            <th class="th-sortable" width="50" data-sort="no">
+                                <span class="th-content">
+                                    No
+                                    <i class="fas fa-sort sort-icon" data-dir="asc"></i>
+                                </span>
+                            </th>
+                            <th class="th-sortable" width="140" data-sort="kode">
+                                <span class="th-content">
+                                    Kode
+                                    <i class="fas fa-filter filter-icon"></i>
+                                    <i class="fas fa-sort sort-icon" data-dir="asc"></i>
+                                </span>
+                            </th>
+                            <th class="th-sortable" data-sort="nama">
+                                <span class="th-content">
+                                    Nama Mata Pelajaran
+                                    <i class="fas fa-filter filter-icon"></i>
+                                    <i class="fas fa-sort sort-icon" data-dir="asc"></i>
+                                </span>
+                            </th>
+                            <th class="th-sortable" width="180" data-sort="kelompok">
+                                <span class="th-content">
+                                    Kelompok
+                                    <i class="fas fa-filter filter-icon"></i>
+                                    <i class="fas fa-sort sort-icon" data-dir="asc"></i>
+                                </span>
+                            </th>
+                            <th width="210" class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="daftarBody">
                         {% for m in daftar_mapel %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><strong>{{ m.kode }}</strong></td>
-                            <td>{{ m.nama_pelajaran }}</td>
-                            <td>{{ m.kelompok or '-' }}</td>
+                        <tr data-kode="{{ m.kode }}" data-nama="{{ m.nama_pelajaran }}" data-kelompok="{{ m.kelompok or '' }}">
+                            <td class="text-muted fw-medium">{{ loop.index }}</td>
                             <td>
-                                <a href="{{ url_for('data_mapel.ubah_mapel', id=m.id) }}" class="btn btn-sm btn-outline-warning" title="Ubah Data">
-                                    <i class="fas fa-pen"></i> Ubah
-                                </a>
-                                <form action="{{ url_for('data_mapel.hapus_mapel', id=m.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin hapus daftar induk ini?')">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus Data">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </form>
+                                <span class="kode-badge">{{ m.kode }}</span>
+                            </td>
+                            <td class="fw-semibold text-dark">{{ m.nama_pelajaran }}</td>
+                            <td>
+                                {% set kelompok = m.kelompok or '' %}
+                                {% if kelompok == 'Wajib' %}
+                                    <span class="kelompok-badge kelompok-wajib">
+                                        <i class="fas fa-shield-alt me-1"></i> Wajib
+                                    </span>
+                                {% elif kelompok == 'Muatan Lokal' %}
+                                    <span class="kelompok-badge kelompok-ml">
+                                        <i class="fas fa-map-marker-alt me-1"></i> Muatan Lokal
+                                    </span>
+                                {% elif kelompok == 'Pilihan' %}
+                                    <span class="kelompok-badge kelompok-pilihan">
+                                        <i class="fas fa-thumbs-up me-1"></i> Pilihan
+                                    </span>
+                                {% elif kelompok == 'Kejuruan' %}
+                                    <span class="kelompok-badge kelompok-kejuruan">
+                                        <i class="fas fa-tools me-1"></i> Kejuruan
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted small fst-italic">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="aksi-grup">
+                                    <a href="{{ url_for('data_mapel.ubah_mapel', id=m.id) }}" class="btn-aksi btn-ubah">
+                                        <i class="fas fa-pen"></i> Ubah
+                                    </a>
+                                    <form action="{{ url_for('data_mapel.hapus_mapel', id=m.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin hapus mata pelajaran ini?')">
+                                        <button type="submit" class="btn-aksi btn-hapus">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
-                                Belum ada data mata pelajaran.
+                        <tr id="kosongRow">
+                            <td colspan="5" class="kosong-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h5>Belum Ada Data Mata Pelajaran</h5>
+                                <p>Mulai dengan menambahkan mata pelajaran pertama</p>
+                                <a href="{{ url_for('data_mapel.tambah_mapel') }}" class="btn-primary-gradient">
+                                    <i class="fas fa-plus"></i> Tambah Mata Pelajaran
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -60,6 +110,182 @@
                 </table>
             </div>
         </div>
-    </div>
 
+        <!-- PAGINASI -->
+        <div class="pagination-wrapper" id="paginationWrapper" style="display: none;">
+            <div class="pagination-info">
+                Menampilkan <span id="infoStart">1</span> – <span id="infoEnd">10</span> dari <span id="infoTotal" class="strong">0</span> data
+            </div>
+            <div class="pagination-controls">
+                <select id="jumlahPerHalaman" class="pagination-select">
+                    <option value="5">5 / Halaman</option>
+                    <option value="10" selected>10 / Halaman</option>
+                    <option value="15">15 / Halaman</option>
+                    <option value="20">20 / Halaman</option>
+                    <option value="0">Semua</option>
+                </select>
+                <div class="pagination-buttons" id="pageButtons">
+                    <!-- Tombol halaman diisi JS -->
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tbody = document.getElementById('daftarBody');
+    const semuaBaris = Array.from(tbody.querySelectorAll('tr:not(#kosongRow)'));
+    const kosongRow = document.getElementById('kosongRow');
+    const paginationWrapper = document.getElementById('paginationWrapper');
+    const jumlahPerHalaman = document.getElementById('jumlahPerHalaman');
+    const pageButtons = document.getElementById('pageButtons');
+    const infoStart = document.getElementById('infoStart');
+    const infoEnd = document.getElementById('infoEnd');
+    const infoTotal = document.getElementById('infoTotal');
+    const totalData = document.getElementById('totalData');
+
+    let halamanSaatIni = 1;
+    let barisPerHalaman = 10;
+    let dataTerurut = [...semuaBaris];
+
+    if (semuaBaris.length === 0) {
+        paginationWrapper.style.display = 'none';
+        return;
+    }
+    paginationWrapper.style.display = 'flex';
+    infoTotal.textContent = semuaBaris.length;
+    totalData.textContent = semuaBaris.length;
+
+    function tampilkanHalaman() {
+        const totalHalaman = barisPerHalaman === 0 ? 1 : Math.ceil(dataTerurut.length / barisPerHalaman);
+        halamanSaatIni = Math.min(halamanSaatIni, totalHalaman || 1);
+
+        let mulai, selesai;
+        if (barisPerHalaman === 0) {
+            mulai = 0;
+            selesai = dataTerurut.length;
+        } else {
+            mulai = (halamanSaatIni - 1) * barisPerHalaman;
+            selesai = Math.min(mulai + barisPerHalaman, dataTerurut.length);
+        }
+
+        semuaBaris.forEach(baris => baris.style.display = 'none');
+        dataTerurut.slice(mulai, selesai).forEach((baris, idx) => {
+            baris.style.display = '';
+            const kolomNo = baris.querySelector('td:first-child');
+            if (kolomNo) kolomNo.textContent = mulai + idx + 1;
+        });
+
+        infoStart.textContent = dataTerurut.length > 0 ? mulai + 1 : 0;
+        infoEnd.textContent = selesai;
+        infoTotal.textContent = dataTerurut.length;
+
+        renderTombolHalaman(totalHalaman);
+    }
+
+    function renderTombolHalaman(totalHalaman) {
+        pageButtons.innerHTML = '';
+
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'page-btn';
+        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        btnPrev.disabled = halamanSaatIni === 1;
+        btnPrev.addEventListener('click', () => {
+            halamanSaatIni--;
+            tampilkanHalaman();
+        });
+        pageButtons.appendChild(btnPrev);
+
+        for (let i = 1; i <= totalHalaman; i++) {
+            if (totalHalaman > 7 && i > 1 && i < totalHalaman) {
+                if (Math.abs(i - halamanSaatIni) > 2) {
+                    if (Math.abs(i - halamanSaatIni) === 3) {
+                        const dots = document.createElement('span');
+                        dots.className = 'page-btn';
+                        dots.style.border = 'none';
+                        dots.style.background = 'transparent';
+                        dots.textContent = '...';
+                        pageButtons.appendChild(dots);
+                    }
+                    continue;
+                }
+            }
+            const btn = document.createElement('button');
+            btn.className = `page-btn ${i === halamanSaatIni ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.addEventListener('click', () => {
+                halamanSaatIni = i;
+                tampilkanHalaman();
+            });
+            pageButtons.appendChild(btn);
+        }
+
+        const btnNext = document.createElement('button');
+        btnNext.className = 'page-btn';
+        btnNext.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        btnNext.disabled = halamanSaatIni === totalHalaman;
+        btnNext.addEventListener('click', () => {
+            halamanSaatIni++;
+            tampilkanHalaman();
+        });
+        pageButtons.appendChild(btnNext);
+    }
+
+    jumlahPerHalaman.addEventListener('change', function () {
+        barisPerHalaman = parseInt(this.value);
+        halamanSaatIni = 1;
+        tampilkanHalaman();
+    });
+
+    const thList = document.querySelectorAll('.th-sortable');
+    let urutanSaatIni = { kolom: null, arah: 'asc' };
+
+    thList.forEach(th => {
+        th.addEventListener('click', function () {
+            const kolom = this.dataset.sort;
+            if (dataTerurut.length === 0) return;
+
+            let arah = 'asc';
+            if (urutanSaatIni.kolom === kolom && urutanSaatIni.arah === 'asc') {
+                arah = 'desc';
+            }
+            urutanSaatIni = { kolom, arah };
+
+            document.querySelectorAll('.sort-icon').forEach(icon => {
+                icon.classList.remove('active', 'fa-sort-up', 'fa-sort-down');
+                icon.classList.add('fa-sort');
+                icon.style.opacity = '0.3';
+            });
+
+            const activeIcon = this.querySelector('.sort-icon');
+            if (activeIcon) {
+                activeIcon.classList.add('active');
+                activeIcon.style.opacity = '1';
+                activeIcon.classList.remove('fa-sort');
+                activeIcon.classList.add(arah === 'asc' ? 'fa-sort-up' : 'fa-sort-down');
+            }
+
+            dataTerurut.sort((a, b) => {
+                let valA, valB;
+                if (kolom === 'no') {
+                    valA = semuaBaris.indexOf(a);
+                    valB = semuaBaris.indexOf(b);
+                } else {
+                    valA = (a.dataset[kolom] || '').toUpperCase();
+                    valB = (b.dataset[kolom] || '').toUpperCase();
+                }
+
+                if (valA < valB) return arah === 'asc' ? -1 : 1;
+                if (valA > valB) return arah === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            halamanSaatIni = 1;
+            tampilkanHalaman();
+        });
+    });
+
+    tampilkanHalaman();
+});
+</script>
