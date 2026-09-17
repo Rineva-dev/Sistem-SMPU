@@ -876,3 +876,166 @@ class TanggalPengecualian(db.Model):
     
     def __repr__(self):
         return f"<Pengecualian {self.tanggal} Pulang={self.jam_pulang} — {self.keterangan}>"
+
+# ==========================================
+# ✅ TABEL RATA-RATA KEHADIRAN GURU (DIPERBAIKI: Senin-Jumat = Hari Kerja)
+# ==========================================
+class RataKehadiranGuru(db.Model):
+    __tablename__ = 'rata_kehadiran_guru'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
+    tahun_pelajaran = db.Column(db.String(20), nullable=False)
+    bulan = db.Column(db.Integer, nullable=False)  # 1-12
+    tahun = db.Column(db.Integer, nullable=False)
+    
+    hari_kerja_aktif = db.Column(db.Integer, default=0)  # Hanya Senin-Jumat
+    hadir = db.Column(db.Integer, default=0)
+    terlambat = db.Column(db.Integer, default=0)
+    sakit = db.Column(db.Integer, default=0)
+    izin = db.Column(db.Integer, default=0)
+    alpha = db.Column(db.Integer, default=0)
+    
+    persen_kehadiran = db.Column(db.Numeric(5, 2), default=0.00)
+    keterangan = db.Column(db.Text, nullable=True)
+    dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (
+        db.UniqueConstraint('guru_id', 'tahun_pelajaran', 'bulan', 'tahun', 
+                            name='_ratahadir_guru_periode_unik'),
+    )
+    
+    guru = db.relationship('Guru', backref=db.backref('daftar_rata_kehadiran', 
+                                                        lazy=True, 
+                                                        cascade='all, delete-orphan'))
+    
+    def hitung_persen(self):
+        """Hitung ulang persentase kehadiran"""
+        if self.hari_kerja_aktif and self.hari_kerja_aktif > 0:
+            self.persen_kehadiran = round((self.hadir / self.hari_kerja_aktif) * 100, 2)
+        else:
+            self.persen_kehadiran = 0.00
+
+    @staticmethod
+    def daftar_hari_kerja_di_bulan(bulan, tahun):
+        """
+        Menghasilkan daftar tanggal hari kerja (Senin-Jumat) dalam bulan & tahun tertentu
+        — Sabtu & Minggu DIKECUALIKAN
+        """
+        from datetime import date, timedelta
+        hari_kerja = []
+        hari = date(tahun, bulan, 1)
+        # Maju ke bulan berikutnya, lalu mundur 1 hari
+        if bulan == 12:
+            bulan_berikut, tahun_berikut = 1, tahun + 1
+        else:
+            bulan_berikut, tahun_berikut = bulan + 1, tahun
+        hari_terakhir = (date(tahun_berikut, bulan_berikut, 1) - timedelta(days=1))
+        
+        while hari <= hari_terakhir:
+            # weekday(): 0=Senin, 4=Jumat, 5=Sabtu, 6=Minggu
+            if hari.weekday() < 5:  # Hanya Senin s.d. Jumat
+                hari_kerja.append(hari)
+            hari += timedelta(days=1)
+        return hari_kerja
+
+    @staticmethod
+    def buat_atau_perbarui(guru_id, tahun_pelajaran, bulan, tahun):
+        """
+        Buat/perbarui ringkasan kehadiran — hari kerja = Senin-Jumat
+        """
+        from datetime import date
+        from sqlalchemy import extract
+        
+        # 1. Daftar hari kerja resmi bulan ini
+        daftar_hk = RataKehadiranGuru.daftar_hari_kerja_di_bulan(bulan, tahun)
+        total_hari_kerja = len(daftar_hk)
+        
+        # 2. Ambil absensi yang sudah tercatat (Senin-Jumat saja)
+        daftar_absensi = AbsensiGuru.query.filter(
+            AbsensiGuru.guru_id == guru_id,
+            extract('year', AbsensiGuru.tanggal) == tahun,
+            extract('month', AbsensiGuru.tanggal) == bulan
+        ).all()
+        
+        # 3. Susun absensi per tanggal untuk dicek
+        absensi_map = {a.tanggal: a for a in daftar_absensi}
+        
+        hadir = terlambat = sakit = izin = alpha = 0
+        
+        pengaturan = PengaturanJamKerja.ambil_atau_buat()
+        
+        for tgl in daftar_hk:
+            absen = absensi_map.get(tgl)
+            
+            if not absen:
+                # Belum ada catatan — dihitung belum diisi / alpha
+                alpha += 1
+                continue
+            
+            status = (absen.status or '').lower()
+            
+            if status == 'hadir':
+                hari_ke = tgl.weekday()  # 0=Senin, 4=Jumat
+                batas = pengaturan.batas_terlambat_jumat if hari_ke == 4 else pengaturan.batas_terlambat
+                
+                terlambat_flag = False
+                if batas and absen.jam_masuk:
+                    try:
+                        jm = datetime.strptime(absen.jam_masuk, "%H:%M").time()
+                        if jm > batas:
+                            terlambat_flag = True
+                    except (ValueError, TypeError):
+                        pass
+                
+                if terlambat_flag:
+                    terlambat += 1
+                else:
+                    hadir += 1
+            elif status == 'sakit':
+                sakit += 1
+            elif status == 'izin':
+                izin += 1
+            elif status == 'alpha':
+                alpha += 1
+        
+        # 4. Simpan / perbarui
+        rata = RataKehadiranGuru.query.filter_by(
+            guru_id=guru_id,
+            tahun_pelajaran=tahun_pelajaran,
+            bulan=bulan,
+            tahun=tahun
+        ).first()
+        
+        if not rata:
+            rata = RataKehadiranGuru(
+                guru_id=guru_id,
+                tahun_pelajaran=tahun_pelajaran,
+                bulan=bulan,
+                tahun=tahun
+            )
+            db.session.add(rata)
+        
+        rata.hari_kerja_aktif = total_hari_kerja
+        rata.hadir = hadir
+        rata.terlambat = terlambat
+        rata.sakit = sakit
+        rata.izin = izin
+        rata.alpha = alpha
+        rata.hitung_persen()
+        
+        db.session.commit()
+        return rata
+    
+    @staticmethod
+    def hitung_semua_periode(tahun_pelajaran, bulan, tahun):
+        daftar_guru = Guru.query.filter_by(status='Aktif').all()
+        hasil = []
+        for guru in daftar_guru:
+            hasil.append(RataKehadiranGuru.buat_atau_perbarui(
+                guru.id, tahun_pelajaran, bulan, tahun
+            ))
+        return hasil
+    
+    def __repr__(self):
+        return f"<RataKehadiran {self.guru.nama} {self.bulan}/{self.tahun}: {self.persen_kehadiran}%>"

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for, current_app, g  # Tambahkan g
 from datetime import datetime
 from sqlalchemy import select
-from models import db, Guru, User, AgendaKegiatan  # ✅ Tambahkan AgendaKegiatan
+from models import db, Guru, User, AgendaKegiatan, Siswa, RataKehadiranGuru
 
 # Buat Blueprint
 dashboard_kepsek_bp = Blueprint(
@@ -25,7 +25,6 @@ def index():
     # Data Khusus Kepala Sekolah
     # --------------------------
     with current_app.app_context():
-        # Hitung Guru Aktif
         total_guru = db.session.execute(
             select(db.func.count()).where(
                 Guru.status == 'Aktif',
@@ -33,7 +32,6 @@ def index():
             )
         ).scalar_one()
 
-        # Hitung Staf / TU Aktif
         total_staf = db.session.execute(
             select(db.func.count()).where(
                 Guru.status == 'Aktif',
@@ -41,43 +39,75 @@ def index():
             )
         ).scalar_one()
 
-        # ✅ AMBIL DATA AGENDA DARI DATABASE
         sekarang = datetime.now()
-        daftar_agenda_db = AgendaKegiatan.query\
-            .filter(AgendaKegiatan.tanggal_mulai >= sekarang)\
-            .order_by(AgendaKegiatan.tanggal_mulai.asc())\
-            .limit(5)\
-            .all()
+        hari_ini = sekarang.date()
 
-        # ✅ Format data agar sesuai dengan tampilan di dashboard
+        daftar_agenda_db = AgendaKegiatan.query\
+            .order_by(AgendaKegiatan.tanggal_mulai.asc())\
+            .all()
+        
         daftar_agenda = []
         for a in daftar_agenda_db:
-            # Tentukan status otomatis sama seperti di agenda.py
-            if a.status != "Dibatalkan":
+            tgl_mulai = a.tanggal_mulai.date()
+            tgl_selesai = a.tanggal_selesai.date() if a.tanggal_selesai else tgl_mulai
+
+            if tgl_selesai < hari_ini:
+                continue
+
+            if tgl_mulai < hari_ini and tgl_selesai >= hari_ini:
+
+                pass
+            elif tgl_mulai > hari_ini:
+
+                pass
+            elif tgl_mulai == hari_ini:
+
+                pass
+            else:
+
+                continue
+
+            if a.status == "Dibatalkan":
+                status = "Dibatalkan"
+            else:
                 if a.tanggal_mulai > sekarang:
                     status = "Terjadwal"
                 elif a.tanggal_selesai and a.tanggal_selesai < sekarang:
+
                     status = "Selesai"
                 else:
                     status = "Berlangsung"
-            else:
-                status = "Dibatalkan"
-
+            
             daftar_agenda.append({
                 "id": a.id,
-                "tanggal": a.tanggal_mulai,          # Tanggal mulai
+                "tanggal": a.tanggal_mulai,
                 "waktu_mulai": a.tanggal_mulai.strftime('%H:%M'),
                 "waktu_selesai": a.tanggal_selesai.strftime('%H:%M') if a.tanggal_selesai else "-",
-                "nama_kegiatan": a.judul,            # Gunakan judul sebagai nama kegiatan
+                "nama_kegiatan": a.judul,
                 "tempat": a.lokasi or "Belum ditentukan",
                 "status": status
             })
 
-    # Data sementara
-    total_siswa = 456
-    rata_kehadiran = 94.2
+        total_siswa = db.session.execute(
+            select(db.func.count()).where(
+                Siswa.status == 'Aktif'
+            )
+        ).scalar_one()
 
-    # Data grafik
+        tahun_pelajaran_aktif = g.tahun_pelajaran if hasattr(g, 'tahun_pelajaran') else '2025/2026'
+
+        sekarang = datetime.now()
+        thn = sekarang.year
+        bln = sekarang.month
+
+        daftar_rata = RataKehadiranGuru.hitung_semua_periode(tahun_pelajaran_aktif, bln, thn)
+
+        if daftar_rata:
+            total_persen = sum(float(r.persen_kehadiran) for r in daftar_rata)
+            rata_kehadiran = round(total_persen / len(daftar_rata), 1)
+        else:
+            rata_kehadiran = 0.0
+
     chart_data = {
         'bulan': ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
         'kehadiran': [92.1, 93.5, 94.2, 93.8, 95.0, 94.8],
@@ -92,8 +122,6 @@ def index():
 
     user_id = session.get('user_id')
     user_db = User.query.get(user_id) if user_id else None
-
-    # Gelar ada di tabel Guru, lewat relasi .guru
     guru_data = user_db.guru if user_db else None
 
     user = {
