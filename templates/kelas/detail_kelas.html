@@ -14,30 +14,39 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5><i class="fas fa-list"></i> Daftar Siswa</h5>
             <div class="d-flex gap-2">
+                {# Tombol ini HANYA tampil jika BUKAN Waka Kurikulum #}
+                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
                     <i class="fas fa-users-cog"></i> Kelola Siswa
                 </button>
+                {% endif %}
 
                 <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
                     <i class="fas fa-book-open me-1"></i> Pengaturan Mapel
                 </button>
-
+                
                 <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="btn btn-sm btn-warning text-dark">
                     <i class="fas fa-calendar-alt me-1"></i> Jadwal Pelajaran
                 </a>
-
+                
+                {# Lanjutkan ke Genap — HANYA tampil jika BUKAN Waka Kurikulum #}
+                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-1') or "Ganjil" in tahun_dipilih %}
                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
                     <i class="fas fa-forward me-1"></i> Lanjutkan ke Genap
                 </button>
                 {% endif %}
-
+                {% endif %}
+                
+                {# Naik Kelas — HANYA tampil jika BUKAN Waka Kurikulum #}
+                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-2') or "Genap" in tahun_dipilih %}
                 <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
                     <i class="fas fa-arrow-up me-1"></i> Naik Kelas
                 </button>
                 {% endif %}
-
+                {% endif %}
+                
                 <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn btn-sm btn-secondary">Kembali</a>
             </div>
         </div>
@@ -82,7 +91,7 @@
 
 <!-- ✅ MODAL KELOLA SISWA -->
 <div class="modal fade" id="modalKelolaSiswa" tabindex="-1" aria-labelledby="modalKelolaSiswaLabel" aria-hidden="true"
-     data-bs-backdrop="static" data-bs-keyboard="false">
+    data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">

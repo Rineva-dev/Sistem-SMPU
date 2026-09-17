@@ -348,13 +348,10 @@ class RiwayatKelas(db.Model):
     tahun_pelajaran = db.Column(db.String(20), nullable=False)
     tingkat = db.Column(db.String(1), nullable=False)  # 7, 8, 9
     kelas_id = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=True)
-
-    # Cegah siswa memiliki 2 posisi di tahun yang sama
     __table_args__ = (
         db.UniqueConstraint('siswa_id', 'tahun_pelajaran', name='_siswa_tahun_unik'),
     )
 
-    # Relasi
     siswa = db.relationship('Siswa', backref=db.backref('riwayat_kelas', lazy=True, cascade='all, delete-orphan'))
     kelas = db.relationship('Kelas', backref=db.backref('anggota_riwayat', lazy=True))
 
@@ -388,8 +385,8 @@ class JadwalPelajaran(db.Model):
     hari = db.Column(db.String(20), nullable=False)
     jam_mulai = db.Column(db.String(10), nullable=False)
     jam_selesai = db.Column(db.String(10), nullable=False)
-    mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
-    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False) # Otomatis dari PengaturanMapelKelas
+    mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'))
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint('kelas_id', 'tahun_pelajaran', 'hari', 'jam_mulai', name='_jadwal_unik'),
@@ -398,6 +395,7 @@ class JadwalPelajaran(db.Model):
     kelas = db.relationship('Kelas', backref=db.backref('jadwal', lazy=True))
     mapel = db.relationship('MataPelajaran', backref=db.backref('jadwal', lazy=True))
     guru = db.relationship('Guru', backref=db.backref('jadwal', lazy=True))
+    jenis_khusus = db.Column(db.String(20), nullable=True)
 
 # ==========================================
 # ✅ TABEL KEUANGAN UNTUK BENDAHARA

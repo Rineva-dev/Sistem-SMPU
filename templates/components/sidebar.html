@@ -1,6 +1,5 @@
 <!-- Sidebar - Gaya SaaS Modern -->
 <aside class="sidebar" id="mainSidebar">
-
   <!-- ✅ HEADER: TETAP DI ATAS, TIDAK IKUT SCROLL -->
   <div class="sidebar-header">
     <a href="/dashboard" class="sidebar-logo">
@@ -8,13 +7,11 @@
       <span>Sistem Sekolah</span>
     </a>
   </div>
-
   <!-- ✅ PEMILIH HALAMAN → HANYA DI SISTEM UTAMA -->
   {% if g.sistem_mode == 'sekolah'
         and user.jabatan != "Admin"
         and halaman_aktif not in ['absensi', 'absensi_harian', 'absensi_wali']
         and active_page not in ['absensi', 'absensi_harian', 'absensi_wali', 'absensi_rekap', 'absensi_laporan'] %}
-
     {% set daftar_tugas = [] %}
     {% if user.tugas_tambahan %}
       {% if user.tugas_tambahan is string %}
@@ -24,7 +21,6 @@
         {% set daftar_tugas = user.tugas_tambahan %}
       {% endif %}
     {% endif %}
-
     {% if daftar_tugas | length > 0 %}
     <div class="halaman-pemilih-wrapper">
       <div class="halaman-pemilih">
@@ -117,11 +113,9 @@
     </div>
     {% endif %}
   {% endif %}
-
   <!-- ✅ BAGIAN MENU: SATU-SATUNYA YANG BISA DI-SCROLL -->
   <div class="sidebar-menu-wrapper">
     <nav class="sidebar-menu">
-
       {# =============================================
           MENU ABSENSI → HANYA MUNCUL DI SISTEM ABSENSI
           ============================================= #}
@@ -156,7 +150,6 @@
         </ul>
       </div>
       {% endif %}
-
       {# =============================================
           MONITORING ABSENSI → HANYA DI SISTEM UTAMA
           MUNCUL BERDASARKAN JABATAN
@@ -177,12 +170,10 @@
         </ul>
       </div>
       {% endif %}
-
       {# =============================================
           SEMUA MENU SISTEM UTAMA → HANYA DI SISTEM SEKOLAH
           ============================================= #}
       {% if g.sistem_mode == 'sekolah' %}
-
         {# KHUSUS ADMIN (Jabatan = Admin) #}
         {% if user.jabatan == "Admin" %}
         <div class="menu-section">
@@ -260,8 +251,9 @@
 
         {# UNTUK SEMUA JABATAN SELAIN ADMIN #}
         {% if user.jabatan != "Admin" %}
-          {% if halaman_aktif == 'utama' %}
 
+          {# ========== MENU HALAMAN UTAMA ========== #}
+          {% if halaman_aktif == 'utama' %}
             {% if user.jabatan == "Guru" %}
             <div class="menu-section">
               <h5 class="menu-title">Menu Guru</h5>
@@ -279,15 +271,15 @@
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="/nilai/guru" class="menu-link {% if active_page == 'nilai_guru' %}active{% endif %}">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Input Nilai</span>
+                  <a href="{{ url_for('jurnal_mengajar.halaman_jurnal') }}" class="menu-link {% if active_page == 'jurnal_mengajar' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Jurnal Mengajar</span>
                   </a>
                 </li>
                 <li class="menu-item">
-                  <a href="/absensi/guru" class="menu-link {% if active_page == 'absensi_guru' %}active{% endif %}">
-                    <i class="fas fa-check-square"></i>
-                    <span>Absensi</span>
+                  <a href="/nilai/guru" class="menu-link {% if active_page == 'nilai_guru' %}active{% endif %}">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Input Nilai</span>
                   </a>
                 </li>
               </ul>
@@ -314,24 +306,6 @@
                     <span>Kalender Pendidikan</span>
                   </a>
                 </li>
-                <!-- <li class="menu-item">
-                  <a href="/persetujuan" class="menu-link {% if active_page == 'persetujuan' %}active{% endif %}">
-                    <i class="fas fa-check-double"></i>
-                    <span>Persetujuan</span>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="/laporan/sekolah" class="menu-link {% if active_page == 'laporan' %}active{% endif %}">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Laporan Sekolah</span>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="/profil-sekolah" class="menu-link {% if active_page == 'profil_sekolah' %}active{% endif %}">
-                    <i class="fas fa-school"></i>
-                    <span>Profil & Pengaturan</span>
-                  </a>
-                </li> -->
                 <li class="menu-item">
                   <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
                     <i class="fas fa-calendar-check"></i>
@@ -427,6 +401,52 @@
             {% endif %}
           {% endif %}
 
+          {# ========== MENU KHUSUS HALAMAN WAKA KURIKULUM ========== #}
+          {% if halaman_aktif == 'waka_kurikulum' %}
+          <div class="menu-section">
+            <h5 class="menu-title">Pengelolaan Kurikulum</h5>
+            <ul>
+              <li class="menu-item">
+                <a href="{{ url_for('dashboard_wakakur.halaman_dashboard_wakakur') }}" class="menu-link {% if active_page == 'dashboard_wakakur' %}active{% endif %}">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Dashboard Wakakur</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('umum.kelola_tahun_pelajaran') }}" class="menu-link {% if active_page == 'tahun_pelajaran' %}active{% endif %}">
+                  <i class="fas fa-calendar-check"></i>
+                  <span>Tahun Pelajaran</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('kalender.halaman_kalender') }}" class="menu-link {% if active_page == 'kalender' %}active{% endif %}">
+                  <i class="fas fa-calendar-week"></i>
+                  <span>Kalender Pendidikan</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/kelas" class="menu-link {% if active_page == 'data_kelas' %}active{% endif %}">
+                  <i class="fas fa-building"></i>
+                  <span>Data Kelas</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{{ url_for('data_mapel.halaman_daftar_mapel') }}" class="menu-link {% if active_page == 'data_mapel' %}active{% endif %}">
+                  <i class="fas fa-book"></i>
+                  <span>Mata Pelajaran</span>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="/jadwal" class="menu-link {% if active_page == 'jadwal' %}active{% endif %}">
+                  <i class="fas fa-clock"></i>
+                  <span>Jadwal Pelajaran</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
+
+          {# ========== MENU HALAMAN ADMIN SISTEM ========== #}
           {% if halaman_aktif == 'admin_sistem' %}
           <div class="menu-section">
             <h5 class="menu-title">Pengelolaan Data</h5>
@@ -489,6 +509,7 @@
           </div>
           {% endif %}
 
+          {# ========== MENU HALAMAN BENDAHARA ========== #}
           {% if halaman_aktif == 'bendahara' %}
           <div class="menu-section">
             <h5 class="menu-title">Pengelolaan Keuangan</h5>
@@ -532,11 +553,11 @@
             </ul>
           </div>
           {% endif %}
+
         {% endif %}
       {% endif %}
     </nav>
   </div>
-
   <!-- ✅ FOOTER -->
   <div class="sidebar-footer">
     <div class="logout">
@@ -547,7 +568,6 @@
     </div>
   </div>
 </aside>
-
 <script>
 const tombol = document.getElementById('tombolPilihHalaman');
 const pemilih = document.querySelector('.halaman-pemilih');
@@ -560,5 +580,4 @@ if (tombol && pemilih) {
     pemilih.classList.remove('open');
   });
 }
-
 </script>

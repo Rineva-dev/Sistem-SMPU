@@ -3,20 +3,20 @@ from sqlalchemy import inspect
 
 with app.app_context():
     # ==================================================
-    # ✅ TAMBAH KOLOM jam_izin KE TABEL absensi_guru
+    # ✅ TAMBAH KOLOM jenis_khusus KE TABEL jadwal_pelajaran
     # ==================================================
     print()
     print("="*70)
-    print("🔧 MENAMBAHKAN KOLOM: jam_izin → Tabel absensi_guru")
+    print("🔧 MENAMBAHKAN KOLOM: jenis_khusus → Tabel jadwal_pelajaran")
     print("="*70)
     print()
-
+    
     inspeksi = inspect(db.engine)
-    nama_tabel = 'absensi_guru'  # ⚠️ Nama tabel yang BENAR
+    nama_tabel = 'jadwal_pelajaran'
     kolom_semua = [c['name'] for c in inspeksi.get_columns(nama_tabel)]
-    nama_kolom = 'jam_izin'
-    tipe = 'VARCHAR(5)'  # Sesuai definisi model: format HH:MM
-
+    nama_kolom = 'jenis_khusus'
+    tipe = 'VARCHAR(20)'  # 'imtaq', 'upacara', atau NULL
+    
     if nama_kolom not in kolom_semua:
         print(f"⚠️ Kolom {nama_kolom} belum ada → sedang ditambahkan...")
         db.session.execute(db.text(f"ALTER TABLE {nama_tabel} ADD COLUMN {nama_kolom} {tipe};"))
@@ -24,7 +24,7 @@ with app.app_context():
         print(f"✅ Kolom {nama_kolom} BERHASIL ditambahkan!")
     else:
         print(f"✅ Kolom {nama_kolom} SUDAH ADA — tidak perlu ditambah lagi.")
-
+    
     print()
-    print("✅ Selesai! Silakan muat ulang halaman.")
+    print("✅ Selesai! Silakan muat ulang halaman jadwal.")
     print()

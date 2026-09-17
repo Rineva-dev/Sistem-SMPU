@@ -1,172 +1,382 @@
-/* === SUSUNAN KARD HARI: 3 KOLOM === */
+/* === VARIABEL WARNA === */
+:root {
+    --utama: #2563eb;
+    --terang: #eff6ff;
+    --gelap: #1e40af;
+    --sukses: #10b981;
+    --bahaya: #ef4444;
+    --abu: #64748b;
+    --latar: #f8fafc;
+    --kartu: #ffffff;
+    --batas: #e2e8f0;
+    --bayangan: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --bayangan-atas: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* === HEADER === */
+.page-header {
+    background: linear-gradient(135deg, var(--utama), var(--gelap));
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--bayangan-atas);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-title h2 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-title h2 i {
+    opacity: 0.9;
+}
+
+.header-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0.5rem 0 0 0;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
+.kelas-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.wali-info i {
+    margin-right: 0.3rem;
+    opacity: 0.8;
+}
+
+.header-actions .btn-outline-secondary {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.header-actions .btn-outline-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: white;
+    color: white;
+}
+
+/* === KARD UTAMA === */
+.main-card {
+    background: var(--kartu);
+    border-radius: 1rem;
+    box-shadow: var(--bayangan);
+    overflow: hidden;
+}
+
+.card-header-custom {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--batas);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #fafafa, white);
+}
+
+.card-header-custom h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header-custom h5 i {
+    color: var(--utama);
+}
+
+.card-body-custom {
+    padding: 1.5rem;
+}
+
+.info-text {
+    background: var(--terang);
+    border-left: 3px solid var(--utama);
+    padding: 0.75rem 1rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    color: #1e40af;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-text i {
+    margin-right: 0.5rem;
+}
+
+/* === GRID HARI === */
 #wadahDaftarHari {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+/* === KARD PER HARI === */
+.hari-card {
+    border: 1px solid var(--batas);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.hari-card:hover {
+    border-color: var(--utama);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+}
+
+.hari-header {
+    background: linear-gradient(to right, #f1f5f9, #f8fafc);
+    padding: 0.875rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--batas);
+}
+
+.hari-nama {
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.hari-nama i {
+    color: #f59e0b;
+}
+
+.btn-hapus-hari {
+    background: transparent;
+    border: none;
+    color: var(--abu);
+    width: 32px;
+    height: 32px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-hapus-hari:hover {
+    background: #fef2f2;
+    color: var(--bahaya);
+}
+
+.hari-body {
+    padding: 1.1rem;
 }
 
 /* === BARIS JADWAL === */
 .baris-jadwal {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
     align-items: center;
-    margin-bottom: 0.5rem;
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+    padding: 0.875rem;
+    background: #fafafa;
+    border-radius: 0.6rem;
+    transition: background 0.2s ease;
+    flex-wrap: wrap;
 }
 
-.baris-jadwal .custom-select {
-    flex: 1;
-    min-width: 180px;
+.baris-jadwal:hover {
+    background: #f0f7ff;
 }
 
-
-
-/* === PERBAIKAN AGAR TIDAK TERTUTUP KARD === */
-.card, .card-body {
-    overflow: visible !important;
-}
-
-/* ==========================================
-   CUSTOM SELECT - MENYESUAIKAN FORM JADWAL
-========================================== */
-.custom-select {
-    position: relative;
-    width: 100%;
-    font-size: 0.875rem;
-    font-family: inherit;
-}
-
-.custom-select__trigger {
-    width: 100%;
-    padding: 0.25rem 0.5rem;
-     background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    cursor: pointer;
+.jam-input-group {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.5rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    box-sizing: border-box;
-    min-height: 38px;
-    outline: none;
-}
-
-.custom-select__trigger:hover {
-    border-color: #86b7fe;
-}
-
-.custom-select.open .custom-select__trigger,
-.custom-select.focused .custom-select__trigger,
-.custom-select__trigger:focus {
-    background-color: #fff;
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    outline: none;
-}
-
-.custom-select__selected {
-    color: #212529;
-    line-height: 1.5;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-}
-
-.custom-select__arrow {
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid #6c757d;
-    border-bottom: 2px solid #6c757d;
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
-    margin-top: -2px;
     flex-shrink: 0;
 }
 
-.custom-select.open .custom-select__arrow {
-    transform: rotate(-135deg);
-    margin-top: 2px;
-}
-
-.custom-select__options {
-    position: absolute;
-    top: calc(100% + 4px); /* Beri jarak sedikit dari tombol */
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border-radius: 0.375rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    max-height: 220px;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    z-index: 9999 !important; /* SANGAT TINGGI: di atas semua elemen lain */
-}
-
-.custom-select.open .custom-select__options {
-    opacity: 1;
-    visibility: visible;
-    overflow-y: auto;
-}
-
-.custom-select__option {
-    padding: 0.375rem 0.75rem;
-    color: #212529;
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.custom-select__option:hover {
-    background-color: #e9ecef;
-    color: #1e2125;
-}
-
-.custom-select__option.selected {
-    background-color: #e2e9f3;
-    color: #0a58ca;
-    font-weight: 500;
-}
-
-.custom-select > select {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.date-box i {
-    color: #ffffff;
-    font-size: 0.8rem;
-}
-
-.baris-jadwal .custom-time {
-    flex: 0 0 92px;
-    min-width: 80px;
-}
-
-.custom-time__tombol {
-    padding: 0.25rem 0.5rem;
-    min-height: 34px;
+.jam-input {
+    width: 100px;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--batas);
+    border-radius: 0.5rem;
     font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* === RESPONSIF: KALAU LAYAR KECIL === */
+.jam-input:focus {
+    outline: none;
+    border-color: var(--utama);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.jam-pemisah {
+    color: var(--abu);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mapel-select-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.mapel-select {
+    width: 100%;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--batas);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.mapel-select:focus {
+    outline: none;
+    border-color: var(--utama);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-hapus-baris {
+    background: transparent;
+    border: none;
+    color: var(--abu);
+    width: 34px;
+    height: 34px;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-hapus-baris:hover {
+    background: #fee2e2;
+    color: var(--bahaya);
+}
+
+.btn-tambah-baris {
+    background: transparent;
+    border: 1px dashed var(--utama);
+    color: var(--utama);
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-tambah-baris:hover {
+    background: var(--terang);
+    border-style: solid;
+}
+
+/* === TOMBOL BAWAH === */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--batas);
+}
+
+.btn-cancel {
+    background: white;
+    border: 1px solid var(--batas);
+    color: var(--abu);
+    padding: 0.6rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.btn-simpan {
+    background: linear-gradient(135deg, var(--utama), var(--gelap));
+    border: none;
+    color: white;
+    padding: 0.6rem 1.75rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.btn-simpan:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* === RESPONSIF === */
 @media (max-width: 992px) {
     #wadahDaftarHari {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .page-header {
+        padding: 1.25rem;
+    }
     #wadahDaftarHari {
         grid-template-columns: 1fr;
+    }
+    .baris-jadwal {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .jam-input-group {
+        justify-content: center;
+    }
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+    .form-actions button, .form-actions a {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .jadwal-page {
+        padding: 0.75rem;
+    }
+    .card-body-custom {
+        padding: 1rem;
+    }
+    .jam-input {
+        width: 90px;
     }
 }

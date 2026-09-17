@@ -9,6 +9,8 @@ def halaman_dashboard_wakakur():
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
 
+    session['halaman_aktif'] = 'waka_kurikulum'
+
     user_id = session.get('user_id')
     user = User.query.get(user_id)
     if not user:
