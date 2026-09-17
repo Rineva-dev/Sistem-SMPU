@@ -15,7 +15,7 @@ def bisa_kelola_kelas(f):
         
         user = User.query.get(session.get('user_id'))
         if not user:
-            flash("Sesi tidak valid, silakan masuk kembali", "warning")
+            flash("<i class='fas fa-exclamation-triangle'></i> Sesi tidak valid, silakan masuk kembali", "warning")
             return redirect(url_for('login.halaman_login'))
 
         jabatan = user.jabatan or ''
@@ -39,14 +39,14 @@ def bisa_kelola_kelas(f):
         halaman_aktif = session.get('halaman_aktif', 'utama')
         
         if not punya_akses:
-            flash("Anda tidak memiliki hak akses untuk mengelola data kelas", "danger")
+            flash("<i class='fas fa-ban'></i> Anda tidak memiliki hak akses untuk mengelola data kelas", "danger")
             if halaman_aktif == 'waka_kurikulum':
                 return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
             return redirect(url_for('dashboard.index'))
         
         # Opsional: Pastikan di halaman yang sesuai
         if "Waka Kurikulum" in daftar_tugas and halaman_aktif != 'waka_kurikulum':
-            flash("Silakan pindah ke Halaman Waka Kurikulum", "info")
+            flash("<i class='fas fa-info-circle'></i> Silakan pindah ke Halaman Waka Kurikulum", "info")
             return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
         
         return f(*args, **kwargs)
@@ -163,14 +163,14 @@ def tambah_kelas():
     user = User.query.get(session.get('user_id'))
     tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
     if not tahun_aktif:
-        flash("Tentukan Tahun Pelajaran aktif terlebih dahulu!", "warning")
+        flash("<i class='fas fa-exclamation-circle'></i> Tentukan Tahun Pelajaran aktif terlebih dahulu!", "warning")
         return redirect(url_for('umum.kelola_tahun_pelajaran'))
 
     kode_tahun_dipilih = request.args.get('tahun') or tahun_aktif.kode
     dasar_tahun = get_base_tahun(kode_tahun_dipilih)
 
     if "Genap" in kode_tahun_dipilih:
-        flash("Kelas hanya dibuat di Semester Ganjil. Gunakan kelas yang sudah ada untuk Genap.", "warning")
+        flash("<i class='fas fa-info-circle'></i> Kelas hanya dibuat di Semester Ganjil. Gunakan kelas yang sudah ada untuk Genap.", "warning")
         return redirect(url_for('data_kelas.halaman_daftar_kelas', tahun=kode_tahun_dipilih))
 
     daftar_guru = Guru.query.all()
@@ -181,7 +181,7 @@ def tambah_kelas():
         wali_kelas_id = request.form.get('wali_kelas_id') or None
 
         if not nama_kelas or not jenjang:
-            flash("Nama dan jenjang kelas wajib diisi!", "danger")
+            flash("<i class='fas fa-times-circle'></i> Nama dan jenjang kelas wajib diisi!", "danger")
             return redirect(url_for('data_kelas.tambah_kelas', tahun=kode_tahun_dipilih))
 
         cek = Kelas.query.filter(
@@ -190,7 +190,7 @@ def tambah_kelas():
         ).first()
 
         if cek:
-            flash(f"Kelas {nama_kelas} sudah ada di TP {dasar_tahun}!", "warning")
+            flash(f"<i class='fas fa-exclamation-triangle'></i> Kelas {nama_kelas} sudah ada di TP {dasar_tahun}!", "warning")
             return redirect(url_for('data_kelas.tambah_kelas', tahun=kode_tahun_dipilih))
 
         kelas_baru = Kelas(
@@ -248,7 +248,7 @@ def ubah_kelas(id):
         wali_kelas_id = request.form.get('wali_kelas_id') or None
 
         if not nama_kelas or not jenjang:
-            flash("Nama dan jenjang kelas wajib diisi!", "danger")
+            flash("<i class='fas fa-times-circle'></i> Nama dan jenjang kelas wajib diisi!", "danger")
             return redirect(url_for('data_kelas.ubah_kelas', id=id, tahun=kode_tahun_dipilih))
 
         cek = Kelas.query.filter(
@@ -258,7 +258,7 @@ def ubah_kelas(id):
         ).first()
 
         if cek:
-            flash(f"Kelas {nama_kelas} sudah ada di TP {dasar_tahun}!", "warning")
+            flash(f"<i class='fas fa-exclamation-triangle'></i> Kelas {nama_kelas} sudah ada di TP {dasar_tahun}!", "warning")
             return redirect(url_for('data_kelas.ubah_kelas', id=id, tahun=kode_tahun_dipilih))
 
         kelas.nama_kelas = nama_kelas
@@ -275,7 +275,7 @@ def ubah_kelas(id):
             if guru_diedit and guru_diedit.akun and guru_diedit.akun.id == user_id_saat_ini:
                 session['tugas_tambahan'] = guru_diedit.tugas_tambahan
 
-        flash(f"Data kelas diperbarui!", "success")
+        flash(f"<i class='fas fa-save'></i> Data kelas diperbarui!", "success")
         return redirect(url_for('data_kelas.halaman_daftar_kelas', tahun=kode_tahun_dipilih))
 
     return render_template(
@@ -302,7 +302,7 @@ def hapus_kelas(id):
     kode_tahun_dipilih = request.args.get('tahun') or session.get('tahun_pelajaran')
 
     if RiwayatKelas.query.filter_by(kelas_id=kelas.id).first():
-        flash("Tidak bisa dihapus! Masih ada siswa tercatat di kelas ini.", "danger")
+        flash("<i class='fas fa-ban'></i> Tidak bisa dihapus! Masih ada siswa tercatat di kelas ini.", "danger")
         return redirect(url_for('data_kelas.halaman_daftar_kelas', tahun=kode_tahun_dipilih))
 
     perbarui_tugas_wali_kelas(kelas.wali_kelas_id, None)
@@ -310,7 +310,7 @@ def hapus_kelas(id):
     db.session.delete(kelas)
     db.session.commit()
 
-    flash(f"Kelas {kelas.nama_kelas} berhasil dihapus!", "success")
+    flash(f"<i class='fas fa-trash-alt'></i> Kelas {kelas.nama_kelas} berhasil dihapus!", "success")
     return redirect(url_for('data_kelas.halaman_daftar_kelas', tahun=kode_tahun_dipilih))
 
 # --------------------------
@@ -416,7 +416,7 @@ def daftar_siswa_di_kelas(id):
 def kelola_siswa_di_kelas(kelas_id):
     kelas = Kelas.query.with_entities(Kelas.id, Kelas.jenjang, Kelas.tahun_pelajaran).filter_by(id=kelas_id).first()
     if not kelas:
-        flash("Kelas tidak ditemukan!", "danger")
+        flash("<i class='fas fa-search-minus'></i> Kelas tidak ditemukan!", "danger")
         return redirect(url_for('data_kelas.halaman_daftar_kelas'))
 
     # ✅ Urutan prioritas: form → url → sesi → tahun aktif
@@ -427,7 +427,7 @@ def kelola_siswa_di_kelas(kelas_id):
         kode_semester = tahun_aktif.kode if tahun_aktif else None
 
     if not kode_semester:
-        flash("Pilih semester terlebih dahulu!", "danger")
+        flash("<i class='fas fa-calendar-alt'></i> Pilih semester terlebih dahulu!", "danger")
         return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id))
 
     siswa_tambah = request.form.getlist('tambah_id')
@@ -463,11 +463,11 @@ def kelola_siswa_di_kelas(kelas_id):
                 # JANGAN hapus riwayat, JANGAN ubah kelas_id di tabel Siswa untuk semester lain
 
         db.session.commit()
-        flash(f"Perubahan tersimpan untuk Semester {kode_semester}!", "success")
+        flash(f"<i class='fas fa-check-double'></i> Perubahan tersimpan untuk Semester {kode_semester}!", "success")
 
     except Exception as e:
         db.session.rollback()
-        flash(f"Gagal: {e}", "danger")
+        flash(f"<i class='fas fa-exclamation-circle'></i> Gagal: {e}", "danger")
 
     return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id, tahun=kode_semester))
 
@@ -479,7 +479,7 @@ def lanjutkan_semester_genap(kelas_id):
     siswa_dipilih = request.form.getlist('siswa_id')
 
     if not kode_genap or not siswa_dipilih:
-        flash("Pilih siswa yang akan dilanjutkan ke Genap!", "warning")
+        flash("<i class='fas fa-hand-pointer'></i> Pilih siswa yang akan dilanjutkan ke Genap!", "warning")
         return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id, tahun=kode_genap))
 
     # Pastikan format kode Genap sesuai database
@@ -520,7 +520,7 @@ def lanjutkan_semester_genap(kelas_id):
                 dibuat += 1
 
     db.session.commit()
-    pesan = f"Selesai! {dibuat} siswa baru ditambahkan ke Genap"
+    pesan = f"<i class='fas fa-forward'></i> Selesai! {dibuat} siswa baru ditambahkan ke Genap"
     if diperbarui > 0:
         pesan += f", {diperbarui} siswa sudah ada dan diperbarui kelasnya"
     flash(pesan + ". Riwayat Ganjil tetap aman!", "success")
@@ -535,7 +535,7 @@ def naik_kelas(kelas_id):
     siswa_dipilih = request.form.getlist('siswa_id')
 
     if not siswa_dipilih:
-        flash("Pilih siswa yang akan naik kelas!", "warning")
+        flash("<i class='fas fa-level-up-alt'></i> Pilih siswa yang akan naik kelas!", "warning")
         return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id, tahun=kode_sekarang))
 
     tingkat_baru = str(int(kelas.jenjang) + 1)
@@ -548,7 +548,7 @@ def naik_kelas(kelas_id):
             jumlah_berhasil += 1
 
     db.session.commit()
-    flash(f"Berhasil memproses naik kelas untuk {jumlah_berhasil} siswa ke Tingkat {tingkat_baru}! Siapkan kelas baru tahun depan.", "success")
+    flash(f"<i class='fas fa-graduation-cap'></i> Berhasil memproses naik kelas untuk {jumlah_berhasil} siswa ke Tingkat {tingkat_baru}! Siapkan kelas baru tahun depan.", "success")
     return redirect(url_for('data_kelas.halaman_daftar_kelas', tahun=kode_sekarang))
 
 @kelas_bp.route('/<int:kelas_id>/simpan-pengaturan-mapel', methods=['POST'])
@@ -581,7 +581,7 @@ def simpan_pengaturan_mapel(kelas_id):
             ))
 
     db.session.commit()
-    flash("Pengaturan mata pelajaran tersimpan! Mapel dengan JP > 0 sudah aktif.", "success")
+    flash("<i class='fas fa-book-open'></i> Pengaturan mata pelajaran tersimpan! Mapel dengan JP > 0 sudah aktif.", "success")
     return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id, tahun=kode_tahun))
 
 # --------------------------
@@ -618,7 +618,7 @@ def jadwal_kelas(id):
             mapel_id_list = request.form.getlist('mapel_id[]')
             
             if not hari_list:
-                flash("Silakan atur jadwal terlebih dahulu!", "warning")
+                flash("<i class='fas fa-calendar-week'></i> Silakan atur jadwal terlebih dahulu!", "warning")
                 return redirect(request.url)
             
             # Hapus jadwal lama
@@ -658,25 +658,22 @@ def jadwal_kelas(id):
                     
                     # Validasi: selesai harus > mulai
                     if selesai_i <= mulai_i:
-                        flash(f"❌ Hari {hari}: Jam selesai harus lebih besar dari jam mulai!", "danger")
+                        flash(f"<i class='fas fa-exclamation-circle'></i> Hari {hari}: Jam selesai harus lebih besar dari jam mulai!", "danger")
                         return redirect(request.url)
-                    
-                    # Bandingkan dengan yang berikutnya
+
                     for j in range(i + 1, len(daftar_jam_sorted)):
                         mulai_j = waktu_dtk(daftar_jam_sorted[j]['mulai'])
                         selesai_j = waktu_dtk(daftar_jam_sorted[j]['selesai'])
-                        
-                        # Cek tumpang tindih
+
                         if mulai_i < selesai_j and selesai_i > mulai_j:
                             flash(
-                                f"❌ JAM TUMPANG TINDIH di {hari}: "
+                                f"<i class='fas fa-exclamation-circle'></i> JAM TUMPANG TINDIH di {hari}: "
                                 f"{daftar_jam_sorted[i]['mulai']}–{daftar_jam_sorted[i]['selesai']} "
                                 f"bertabrakan dengan "
                                 f"{daftar_jam_sorted[j]['mulai']}–{daftar_jam_sorted[j]['selesai']}",
                                 "danger"
                             )
                             return redirect(request.url)
-            # === AKHIR VALIDASI ===
             
             # Simpan semua jika lolos validasi
             for i in range(len(hari_list)):
@@ -725,10 +722,10 @@ def jadwal_kelas(id):
                 db.session.add(jadwal_baru)
             
             db.session.commit()
-            flash(f"✅ Jadwal Pelajaran {kelas.nama_kelas} berhasil disimpan!", "success")
+            flash(f"<i class='fas fa-check-circle'></i> Jadwal Pelajaran {kelas.nama_kelas} berhasil disimpan!", "success")
         except Exception as e:
             db.session.rollback()
-            flash(f"❌ Gagal menyimpan jadwal: {str(e)}", "danger")
+            flash(f"<i class='fas fa-times-circle'></i> Gagal menyimpan jadwal: {str(e)}", "danger")
         
         return redirect(url_for('data_kelas.jadwal_kelas', id=id, tahun=kode_tahun_dipilih))
     
@@ -762,7 +759,7 @@ def jadwal_kelas(id):
         kelas=kelas,
         daftar_mapel=daftar_mapel_aktif,
         jadwal_tersimpan=jadwal_tersimpan,
-        jadwal_per_hari=dict(jadwal_per_hari),  # ← KIRIM INI KE TEMPLATE
+        jadwal_per_hari=dict(jadwal_per_hari),
         tahun_dipilih=kode_tahun_dipilih,
         user=user,
         user_name=session.get('user_name'),

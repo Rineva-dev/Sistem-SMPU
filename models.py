@@ -1037,3 +1037,39 @@ class RataKehadiranGuru(db.Model):
     
     def __repr__(self):
         return f"<RataKehadiran {self.guru.nama} {self.bulan}/{self.tahun}: {self.persen_kehadiran}%>"
+
+# ==========================================
+# ✅ TABEL JURNAL MENGAJAR GURU
+# ==========================================
+class JurnalMengajar(db.Model):
+    __tablename__ = 'jurnal_mengajar'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
+    mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
+    kelas_id = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=True)
+    tahun_pelajaran = db.Column(db.String(30), nullable=False)
+    
+    tanggal = db.Column(db.Date, nullable=False)
+    jam_pelajaran = db.Column(db.String(20), nullable=False)  # contoh: "1-2"
+    materi = db.Column(db.Text, nullable=False)
+    kegiatan = db.Column(db.Text, nullable=True)
+    metode = db.Column(db.String(100), nullable=True)
+    kehadiran = db.Column(db.String(100), nullable=True)
+    catatan = db.Column(db.Text, nullable=True)
+    
+    dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    diperbarui_pada = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relasi — cocokkan dengan struktur yang sudah ada
+    guru = db.relationship('Guru', backref=db.backref('jurnal_mengajar', lazy=True, cascade='all, delete-orphan'))
+    mata_pelajaran = db.relationship('MataPelajaran', backref=db.backref('jurnal_mengajar', lazy=True))
+    kelas = db.relationship('Kelas', backref=db.backref('jurnal_mengajar', lazy=True))
+    
+    __table_args__ = (
+        db.UniqueConstraint('guru_id', 'mata_pelajaran_id', 'kelas_id', 'tanggal',
+                            name='_jurnal_guru_mapel_kelas_tanggal_unik'),
+    )
+    
+    def __repr__(self):
+        return f"<JurnalMengajar {self.tanggal} - {self.mata_pelajaran.nama_pelajaran} - {self.kelas.nama_kelas if self.kelas else ''}>"

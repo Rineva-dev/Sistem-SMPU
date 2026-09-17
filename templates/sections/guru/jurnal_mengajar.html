@@ -1,127 +1,301 @@
 {% extends "layout.html" %}
-
 {% block title %}Jurnal Mengajar - Sistem Sekolah{% endblock %}
-
 {% block content %}
-<div class="page-header">
-    <div>
-        <h2><i class="fas fa-book"></i> Jurnal Mengajar</h2>
-        <p class="text-muted">Catatan kegiatan pembelajaran harian Anda</p>
-    </div>
-</div>
+<style>
+/* === Gaya Modern Kustom === */
+.jurnal-page .page-header {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
 
-{% if daftar_mapel %}
-<div class="row g-4">
-    {% for mapel in daftar_mapel %}
-    <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">{{ mapel.nama_mapel }}</h5>
-                <small>{{ mapel.kelas }}</small>
-            </div>
-            <div class="card-body">
-                <h6 class="text-muted mb-3">
-                    <i class="fas fa-clock me-1"></i> Jadwal Mengajar
-                </h6>
-                {% if mapel.jadwal %}
-                <ul class="list-unstyled mb-3">
-                    {% for j in mapel.jadwal %}
-                    <li class="py-2 border-bottom">
-                        <span class="d-block fw-medium">{{ j.hari }}</span>
-                        <span class="text-muted small">{{ j.waktu_mulai }} - {{ j.waktu_selesai }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-muted small fst-italic">Belum ada jadwal terdaftar</p>
-                {% endif %}
+.jurnal-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    background: white;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+}
 
-                <div class="d-grid gap-2 mt-3">
-                    <button class="btn btn-primary btn-sm tombol-buat-jurnal"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalJurnal"
-                            data-mapel-id="{{ mapel.id }}"
-                            data-mapel-nama="{{ mapel.nama_mapel }}"
-                            data-kelas="{{ mapel.kelas }}">
-                        <i class="fas fa-pen-alt me-1"></i> Buat Jurnal Mengajar
-                    </button>
-                    <a href="{{ url_for('jurnal_mengajar.daftar_jurnal', mapel_id=mapel.id) }}"
-                       class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-list me-1"></i> Lihat Riwayat Jurnal
-                    </a>
-                </div>
+.jurnal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(26, 115, 232, 0.15);
+}
+
+.jurnal-card-header {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
+    padding: 1.25rem 1.5rem;
+    border: none;
+}
+
+.jadwal-item {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: #f8fafc;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s;
+}
+
+.jadwal-item:hover {
+    background: #eaf2fe;
+}
+
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-primary { background: #eaf2fe; color: #1a73e8; }
+.badge-success { background: #e6f7ee; color: #0f9d58; }
+.badge-info { background: #e8f0fe; color: #1a73e8; }
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn-primary-gradient:hover {
+    background: linear-gradient(135deg, #1557b0 0%, #0b4f9e 100%);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+.btn-outline-modern {
+    border-color: #cbd5e1;
+    color: #4b5563;
+    transition: all 0.3s;
+}
+
+.btn-outline-modern:hover {
+    border-color: #1a73e8;
+    color: #1a73e8;
+    background: #f0f7ff;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
+    border: none;
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 0.6rem 1rem;
+    transition: all 0.25s;
+}
+
+.form-control:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+}
+
+.empty-state {
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+}
+</style>
+
+<div class="jurnal-page">
+    <div class="page-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold" style="color:#1f2937;">
+                    <i class="fas fa-book text-primary me-2"></i> Jurnal Mengajar
+                </h2>
+                <p class="text-muted mb-0">Catatan kegiatan pembelajaran harian & riwayat per mata pelajaran</p>
             </div>
         </div>
     </div>
-    {% endfor %}
-</div>
-{% else %}
-<div class="card shadow-sm">
-    <div class="card-body text-center py-5">
-        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-        <h5>Belum Ada Mata Pelajaran yang Diampu</h5>
-        <p class="text-muted">Anda belum ditugaskan mengajar mata pelajaran apa pun.</p>
+
+    {% if daftar_mapel %}
+    <div class="row g-4">
+        {% for mapel in daftar_mapel %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card jurnal-card h-100">
+                <!-- Header Card -->
+                <div class="jurnal-card-header text-white">
+                    <h5 class="mb-1 fw-bold">{{ mapel.nama_mapel }}</h5>
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="badge bg-white bg-opacity-25 rounded-pill px-2 py-1">
+                            <i class="fas fa-building me-1"></i> {{ mapel.kelas }}
+                        </span>
+                        {% if mapel.total_jurnal %}
+                        <span class="badge bg-white bg-opacity-25 rounded-pill px-2 py-1">
+                            <i class="fas fa-clipboard-check me-1"></i> {{ mapel.total_jurnal }} Jurnal
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Isi Card -->
+                <div class="card-body">
+                    <!-- Informasi Singkat -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <p class="info-label mb-1">Kode Mapel</p>
+                            <p class="info-value mb-0">{{ mapel.kode_mapel or '-' }}</p>
+                        </div>
+                        <div class="col-6">
+                            <p class="info-label mb-1">Kelompok</p>
+                            <p class="info-value mb-0">{{ mapel.kelompok or '-' }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Jadwal -->
+                    <h6 class="text-muted mb-2 small fw-semibold">
+                        <i class="fas fa-calendar-alt me-1"></i> Jadwal Mengajar
+                    </h6>
+                    {% if mapel.jadwal %}
+                    <div class="mb-3">
+                        {% for j in mapel.jadwal %}
+                        <div class="jadwal-item d-flex justify-content-between align-items-center">
+                            <span class="fw-medium text-dark">{{ j.hari }}</span>
+                            <span class="text-muted small">
+                                <i class="far fa-clock me-1"></i> {{ j.waktu_mulai }} – {{ j.waktu_selesai }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted small fst-italic mb-3">Belum ada jadwal terdaftar</p>
+                    {% endif %}
+
+                    <!-- Info Terakhir -->
+                    {% if mapel.jurnal_terakhir %}
+                    <div class="p-2 rounded-3 mb-3" style="background:#f0fdf4;">
+                        <p class="small mb-1" style="color:#065f46;">
+                            <i class="fas fa-check-circle me-1"></i> Terakhir dicatat
+                        </p>
+                        <p class="small fw-medium mb-0 text-dark">
+                            {{ mapel.jurnal_terakhir.tanggal }} &mdash; {{ mapel.jurnal_terakhir.materi[:30] }}...
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Tombol Aksi -->
+                    <div class="d-grid gap-2 mt-auto pt-2">
+                        <button class="btn btn-primary-gradient text-white tombol-buat-jurnal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalJurnal"
+                                data-mapel-id="{{ mapel.id }}"
+                                data-mapel-nama="{{ mapel.nama_mapel }}"
+                                data-kelas="{{ mapel.kelas }}">
+                            <i class="fas fa-pen-alt me-1"></i> Buat Jurnal Baru
+                        </button>
+                        <a href="{{ url_for('jurnal_mengajar.daftar_jurnal', mapel_id=mapel.id) }}"
+                           class="btn btn-outline-modern">
+                            <i class="fas fa-history me-1"></i> Lihat Riwayat Lengkap
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="empty-state p-5 text-center">
+        <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+        <h5 class="fw-bold text-dark mb-2">Belum Ada Mata Pelajaran yang Diampu</h5>
+        <p class="text-muted mb-0">Anda belum ditugaskan mengajar mata pelajaran apa pun.<br>
+        Silakan hubungi admin untuk penugasan mata pelajaran.</p>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
 
 <!-- Modal Form Jurnal Mengajar -->
 <div class="modal fade" id="modalJurnal" tabindex="-1" aria-labelledby="modalJurnalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}" method="POST">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="modalJurnalLabel">Buat Jurnal Mengajar</h5>
+                <div class="modal-header text-white">
+                    <h5 class="modal-title fw-bold" id="modalJurnalLabel">
+                        <i class="fas fa-pen-alt me-2"></i> Buat Jurnal Mengajar
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" name="mapel_id" id="inputMapelId">
+                    
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Mata Pelajaran</label>
+                            <label class="form-label fw-semibold">Mata Pelajaran</label>
                             <input type="text" id="inputNamaMapel" class="form-control" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Kelas</label>
+                            <label class="form-label fw-semibold">Kelas / Rombel</label>
                             <input type="text" id="inputKelas" class="form-control" readonly>
                         </div>
                     </div>
+                    
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Tanggal <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
                             <input type="date" name="tanggal" class="form-control" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Jam Pelajaran <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">Jam Pelajaran <span class="text-danger">*</span></label>
                             <input type="text" name="jam_pelajaran" class="form-control" placeholder="Contoh: 1-2" required>
                         </div>
                     </div>
+                    
                     <div class="mb-3">
-                        <label class="form-label fw-medium">Materi / Topik Pembelajaran <span class="text-danger">*</span></label>
-                        <input type="text" name="materi" class="form-control" placeholder="Masukkan materi yang disampaikan" required>
+                        <label class="form-label fw-semibold">Materi / Topik Pembelajaran <span class="text-danger">*</span></label>
+                        <input type="text" name="materi" class="form-control" placeholder="Misal: Sistem Peredaran Darah" required>
                     </div>
+                    
                     <div class="mb-3">
-                        <label class="form-label fw-medium">Kegiatan Pembelajaran</label>
-                        <textarea name="kegiatan" class="form-control" rows="4" placeholder="Uraikan kegiatan yang dilakukan..."></textarea>
+                        <label class="form-label fw-semibold">Kegiatan Pembelajaran</label>
+                        <textarea name="kegiatan" class="form-control" rows="3" placeholder="Uraikan langkah-langkah kegiatan pembelajaran..."></textarea>
                     </div>
+                    
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Metode Pembelajaran</label>
-                            <input type="text" name="metode" class="form-control" placeholder="Ceramah, Diskusi, Praktik, dll.">
+                            <label class="form-label fw-semibold">Metode Pembelajaran</label>
+                            <input type="text" name="metode" class="form-control" placeholder="Ceramah, Diskusi, Praktik, Tugas Kelompok, dll.">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-medium">Kehadiran Siswa</label>
+                            <label class="form-label fw-semibold">Kehadiran Siswa</label>
                             <input type="text" name="kehadiran" class="form-control" placeholder="35 Hadir, 2 Sakit, 1 Izin, 1 Alfa">
                         </div>
                     </div>
+                    
                     <div class="mb-3">
-                        <label class="form-label fw-medium">Catatan / Kendala</label>
-                        <textarea name="catatan" class="form-control" rows="2" placeholder="Kendala atau hal khusus yang perlu dicatat..."></textarea>
+                        <label class="form-label fw-semibold">Catatan / Kendala Pembelajaran</label>
+                        <textarea name="catatan" class="form-control" rows="2" placeholder="Kendala, hambatan, atau catatan khusus..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary-gradient text-white px-4">
                         <i class="fas fa-save me-1"></i> Simpan Jurnal
                     </button>
                 </div>
@@ -131,7 +305,6 @@
 </div>
 
 <script>
-// Isi data ke modal saat tombol diklik
 document.addEventListener('DOMContentLoaded', function () {
     const tombolBuat = document.querySelectorAll('.tombol-buat-jurnal');
     tombolBuat.forEach(btn => {
@@ -139,9 +312,9 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('inputMapelId').value = this.dataset.mapelId;
             document.getElementById('inputNamaMapel').value = this.dataset.mapelNama;
             document.getElementById('inputKelas').value = this.dataset.kelas;
-            // Isi default tanggal hari ini
             const hariIni = new Date().toISOString().split('T')[0];
-            document.querySelector('input[name="tanggal"]').value = hariIni;
+            const inputTanggal = document.querySelector('input[name="tanggal"]');
+            if (inputTanggal) inputTanggal.value = hariIni;
         });
     });
 });

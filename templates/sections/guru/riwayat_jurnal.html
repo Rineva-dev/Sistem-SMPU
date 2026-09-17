@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block title %}Riwayat Jurnal - {{ mapel.nama }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2><i class="fas fa-history"></i> Riwayat Jurnal: {{ mapel.nama }}</h2>
+        <p class="text-muted">Tahun Pelajaran: {{ tahun_ajaran }}</p>
+    </div>
+    <a href="{{ url_for('jurnal_mengajar.halaman_jurnal') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Kembali
+    </a>
+</div>
+
+{% if daftar_jurnal %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>Materi</th>
+                        <th>Kehadiran</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for j in daftar_jurnal %}
+                    <tr>
+                        <td>{{ j.tanggal.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ j.jam_pelajaran }}</td>
+                        <td>{{ j.materi }}</td>
+                        <td>{{ j.kehadiran or '-' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detail{{ j.id }}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+        <h5>Belum Ada Jurnal</h5>
+        <p class="text-muted">Belum ada catatan pembelajaran untuk mata pelajaran ini.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
