@@ -75,6 +75,20 @@ def get_base_tahun(kode_tp):
         kode_tp = kode_tp.split(' ')[0]
     return kode_tp.strip()
 
+def format_tahun_pelajaran(kode_tp):
+    """Ubah '2026/2027-1' → '2026/2027-Ganjil', '2026/2027-2' → '2026/2027-Genap'"""
+    if not kode_tp:
+        return ""
+    bagian = kode_tp.split('-')
+    if len(bagian) == 2:
+        tahun = bagian[0]
+        angka = bagian[1]
+        if angka == '1':
+            return f"{tahun}-Ganjil"
+        elif angka == '2':
+            return f"{tahun}-Genap"
+    return kode_tp  # fallback jika format lain
+
 # ======================================
 # RUTE: Halaman Daftar Siswa ✅ SUDAH DIPERBAIKI TOTAL
 # ======================================
@@ -86,6 +100,8 @@ def halaman_daftar_siswa():
     if not bisa_lihat():
         flash("Anda tidak memiliki hak akses ke halaman ini", "danger")
         return redirect(url_for('dashboard.index'))
+
+    today_date = datetime.now().strftime('%d %B %Y')
 
     # ✅ Ambil tahun yang dipilih
     kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
@@ -157,6 +173,7 @@ def halaman_daftar_siswa():
         'active_page': 'data_siswa',
         'sub_page': 'daftar',
         'halaman_aktif': session.get('halaman_aktif', 'utama'),
+        'today_date': today_date,
         'user': {
             'jabatan': session.get('jabatan', ''),
             'tugas_tambahan': session.get('tugas_tambahan', '')
@@ -671,16 +688,52 @@ def hapus_siswa(id):
 def detail_siswa(id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
-
     if not bisa_lihat():
         flash("Anda tidak berhak melihat data ini!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
-
+    
     siswa = Siswa.query.get_or_404(id)
-    riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=id).order_by(RiwayatKelas.tahun_pelajaran.desc()).all()
+
+    kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
+    if not kode_tahun:
+        tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+        kode_tahun = tahun_aktif.kode if tahun_aktif else None
+
+    tahun_dipilih_formatted = format_tahun_pelajaran(kode_tahun) if kode_tahun else None
+
+    riwayat_tahun_ini = None
+    if kode_tahun:
+        riwayat_tahun_ini = RiwayatKelas.query.filter_by(
+            siswa_id=id,
+            tahun_pelajaran=kode_tahun
+        ).first()
+
+    kelas_sekarang = None
+    kelas_tahun_formatted = None
+    
+    if riwayat_tahun_ini and riwayat_tahun_ini.kelas:
+        kelas_sekarang = riwayat_tahun_ini.kelas
+        kelas_sekarang.jenjang = riwayat_tahun_ini.tingkat
+        kelas_tahun_formatted = tahun_dipilih_formatted
+    else:
+        riwayat_terakhir = RiwayatKelas.query.filter_by(siswa_id=id)\
+            .order_by(RiwayatKelas.tahun_pelajaran.desc())\
+            .first()
+        if riwayat_terakhir and riwayat_terakhir.kelas:
+            kelas_sekarang = riwayat_terakhir.kelas
+            kelas_sekarang.jenjang = riwayat_terakhir.tingkat
+            kelas_tahun_formatted = format_tahun_pelajaran(riwayat_terakhir.tahun_pelajaran)
+    
+    riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=id)\
+        .order_by(RiwayatKelas.tahun_pelajaran.desc()).all()
+    
     return render_template('index.html',
         siswa=siswa,
         riwayat_kelas=riwayat_kelas,
+        kelas_sekarang=kelas_sekarang,
+        tahun_dipilih_formatted=tahun_dipilih_formatted,
+        kelas_sekarang_tahun_formatted=kelas_tahun_formatted,
+        tahun_dipilih=kode_tahun,
         active_page='data_siswa',
         sub_page='detail',
         halaman_aktif=session.get('halaman_aktif', 'utama'),

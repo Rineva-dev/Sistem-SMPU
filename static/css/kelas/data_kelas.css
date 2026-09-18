@@ -436,6 +436,10 @@
 .table tbody tr:hover {
     background: var(--kelas-primary-soft);
 }
+
+.kelola-siswa {
+    padding: 25px !important;
+}
 .nama-kelas {
     color: var(--kelas-gray-900);
     font-size: 1rem;

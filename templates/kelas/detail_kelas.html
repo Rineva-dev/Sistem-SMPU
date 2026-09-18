@@ -103,7 +103,7 @@
 
             <form method="POST" action="{{ url_for('data_kelas.kelola_siswa_di_kelas', kelas_id=kelas.id) }}" id="formKelolaSiswa">
                 <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
-                <div class="modal-body" style="min-height: 68vh; overflow-y: auto;">
+                <div class="modal-body kelola-siswa" style="min-height: 68vh; overflow-y: auto;">
                     <div class="row g-4">
                         <!-- Bagian Kiri: Siswa Belum Masuk Kelas -->
                         <div class="col-md-6 border-end">

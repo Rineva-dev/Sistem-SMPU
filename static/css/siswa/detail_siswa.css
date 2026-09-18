@@ -1,56 +1,421 @@
 /* ==========================================
-   HALAMAN DETAIL SISWA
-   ========================================== */
-
-.card-header {
-    background-color: #f8fafc !important;
+   HALAMAN DETAIL SISWA — MODERN KLASIK KEKINIAN
+========================================== */
+:root {
+    --detail-utama: #2563eb;
+    --detail-soft: #eff6ff;
+    --detail-abu-terang: #f8fafc;
+    --detail-abu: #e2e8f0;
+    --detail-abu-teks: #64748b;
+    --detail-hitam-lembut: #1e293b;
+    --radius-xl: 20px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --bayangan-lembut: 0 10px 30px -10px rgba(37, 99, 235, 0.1);
 }
 
-.card-header h5 {
-    font-size: 1.15rem;
+/* ------------------------------
+   HEADER HALAMAN
+------------------------------ */
+.page-header-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    padding: 1.75rem 2rem;
+    border-radius: var(--radius-xl);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--bayangan-lembut);
+}
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.page-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #fff;
+}
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+}
+.page-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0.2rem 0 0 0;
+}
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.btn-kembali {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.25s ease;
+}
+.btn-kembali:hover {
+    background: #fff;
+    color: #1d4ed8;
+    border-color: #fff;
+}
+.btn-ubah-data {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    background: #fff;
+    color: #1d4ed8;
+    border-radius: 10px;
+    text-decoration: none;
     font-weight: 600;
-    color: #2d3748;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.25s ease;
+}
+.btn-ubah-data:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    color: #1e40af;
 }
 
-.row.g-4 {
+/* ------------------------------
+   KARTU UTAMA PROFIL
+------------------------------ */
+.profile-main-card {
+    background: #fff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--bayangan-lembut);
+    overflow: hidden;
+    border: 1px solid #eff6ff;
+}
+
+/* Bagian Hero: Avatar + Nama */
+.profile-hero-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(to right, #f8fafc, #eff6ff);
+    border-bottom: 1px solid #dbeafe;
+}
+.profile-avatar-wrap {
+    position: relative;
+}
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+}
+.profile-avatar.male {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+.profile-avatar.female {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+}
+.avatar-badge-status {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+}
+.dot {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+.dot.aktif { background: #22c55e; }
+.dot.lulus { background: #0ea5e9; }
+.dot.pindah { background: #f59e0b; }
+.dot.berhenti { background: #ef4444; }
+.dot.nonaktif { background: #94a3b8; }
+
+.profile-basic-info {
+    flex: 1;
+}
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--detail-hitam-lembut);
+    margin: 0 0 0.5rem 0;
+}
+.profile-identitas {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+.identitas-item {
+    font-size: 0.9rem;
+    color: var(--detail-abu-teks);
+}
+.identitas-item strong {
+    color: var(--detail-hitam-lembut);
+    font-weight: 600;
+}
+.profile-status-line {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.status-pill-main span {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.pill-aktif { background: #dcfce7; color: #166534; }
+.pill-lulus { background: #cffafe; color: #0e7490; }
+.pill-pindah { background: #fef3c7; color: #b45309; }
+.pill-berhenti { background: #fee2e2; color: #b91c1c; }
+.pill-nonaktif { background: #e5e7eb; color: #4b5563; }
+.kelas-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 1rem;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.kelas-tag.kosong {
+    background: #f1f5f9;
+    color: #64748b;
+}
+.kelas-tag small {
+    opacity: 0.7;
+}
+
+/* ------------------------------
+   GRID KONTEN 2 KOLOM
+------------------------------ */
+.profile-content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 2rem;
+}
+.profile-col {
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
-/* Pemisah Data */
-.col-md-6 h6 {
+/* Bagian Kartu Info */
+.info-section-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+.info-section-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.06);
+}
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+.section-icon {
+    color: var(--detail-utama);
+    font-size: 1rem;
+}
+.section-heading h4 {
     font-size: 1rem;
     font-weight: 600;
-    color: #2d3748;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 1rem;
+    color: var(--detail-hitam-lembut);
+    margin: 0;
 }
 
-/* Informasi Data */
-.col-md-6 p {
-    font-size: 0.98rem;
-    line-height: 1.6;
-    color: #2d3748;
-    margin-bottom: 0.8rem;
+/* Grid Data */
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
 }
-
-.col-md-6 p strong {
-    color: #1a202c;
-    width: 160px;
-    display: inline-block;
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px dashed #e2e8f0;
+    gap: 0.75rem;
 }
-
-/* Badge Status */
-.badge {
+.info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.info-row.pemisah {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1rem;
+    margin-top: 0.25rem;
+}
+.info-row.sub-bagian {
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #cbd5e1;
+}
+.info-row.tujuan-pindah {
+    background: #fef3c7;
+    margin: -0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border-bottom: none;
+}
+.info-row.orang-tua {
+    padding-top: 0.5rem;
+}
+.info-label {
+    font-size: 0.85rem;
+    color: var(--detail-abu-teks);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.info-val {
     font-size: 0.9rem;
-    padding: 0.45rem 0.8rem;
+    color: var(--detail-hitam-lembut);
+    font-weight: 500;
+    text-align: right;
+    line-height: 1.5;
 }
+.info-val small {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 400;
+}
+.alamat-panjang .info-val {
+    text-align: right;
+    max-width: 65%;
+}
+.link-hp, .link-email {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.link-hp:hover, .link-email:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+.badge-info-tag {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.badge-info-tag.baru { background: #dbeafe; color: #1d4ed8; }
+.badge-info-tag.pindahan { background: #fef3c7; color: #b45309; }
+.text-blue-500 { color: #3b82f6; }
+.text-pink-500 { color: #ec4899; }
 
-/* Responsif */
+/* ------------------------------
+   RESPONSIF — HP & TABLET
+------------------------------ */
+@media (max-width: 992px) {
+    .profile-content-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+    .alamat-panjang .info-val {
+        max-width: 75%;
+    }
+}
 @media (max-width: 768px) {
-    .col-md-6 p strong {
-        width: auto;
-        display: block;
-        margin-bottom: 0.2rem;
+    .page-header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.25rem;
+    }
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .profile-hero-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+    .profile-basic-info {
+        width: 100%;
+    }
+    .profile-identitas,
+    .profile-status-line {
+        justify-content: center;
+    }
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+    }
+    .info-val {
+        text-align: left;
+        width: 100%;
+    }
+    .alamat-panjang .info-val {
+        max-width: 100%;
+    }
+    .profile-content-grid {
+        padding: 1.25rem;
+    }
+    .info-section-card {
+        padding: 1.25rem;
+    }
+}
+@media (max-width: 576px) {
+    .profile-avatar {
+        width: 75px;
+        height: 75px;
+        font-size: 1.8rem;
+    }
+    .profile-name {
+        font-size: 1.2rem;
+    }
+    .btn-kembali span,
+    .btn-ubah-data span {
+        display: none;
+    }
+    .btn-kembali, .btn-ubah-data {
+        padding: 0.65rem;
     }
 }
