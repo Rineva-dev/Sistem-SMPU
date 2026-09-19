@@ -11,7 +11,7 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" class="form-layout" id="formSiswa">
+        <form method="POST" action="{{ url_for('data_siswa.tambah_siswa') }}" class="form-layout" id="formSiswa" novalidate>
 
             <input type="hidden" id="tahunPelajaranAktif" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
 
@@ -173,26 +173,29 @@
                 <div class="form-row">
                     <div class="form-group half">
                         <label>Tingkat / Jenjang <span class="text-danger">*</span></label>
-                        
-                        <!-- ✅ DISINI SATU-SATUNYA TEMPAT PILIH TINGKAT -->
+
+                        <!-- ✅ SATU input utama yang SELALU ada -->
+                        <input type="hidden" name="tingkat" id="inputTingkatUtama" value="7">
+
                         <div id="tampilanTingkatBaru">
                             <input type="text" class="form-input" readonly
-                                   style="background-color: #f8f9fa; cursor: not-allowed;"
-                                   value="Tingkat 7">
+                                style="background-color: #f8f9fa; cursor: not-allowed;"
+                                value="Tingkat 7">
+                            <!-- ❌ HAPUS baris <input type="hidden" name="tingkat" value="7"> yang ada di sini -->
                         </div>
 
                         <div id="pilihTingkatPindahan" style="display: none;">
                             <div class="custom-select">
-                                <select name="tingkat" id="nilaiTingkat" required>
-                                    <option value="">-- Pilih Tingkat --</option>
-                                    <option value="7" {{ 'selected' if siswa and siswa.tingkat == '7' else '' }}>Tingkat 7</option>
-                                    <option value="8" {{ 'selected' if siswa and siswa.tingkat == '8' else '' }}>Tingkat 8</option>
-                                    <option value="9" {{ 'selected' if siswa and siswa.tingkat == '9' else '' }}>Tingkat 9</option>
-                                </select>
+                            <select id="nilaiTingkat">
+                                <!-- ❌ HAPUS name="tingkat" dari select ini -->
+                                <option value="">-- Pilih Tingkat --</option>
+                                <option value="7">Tingkat 7</option>
+                                <option value="8">Tingkat 8</option>
+                                <option value="9">Tingkat 9</option>
+                            </select>
                             </div>
                         </div>
 
-                        <input type="hidden" id="nilaiTingkatSembunyi" value="{{ '7' if (siswa and siswa.jenis_pendaftaran == 'baru') else (siswa.tingkat if siswa else '') }}">
                         <small class="form-note">
                             * Siswa Baru otomatis Tingkat 7. Pindahan silakan pilih di atas.
                         </small>
@@ -474,6 +477,8 @@ function terapkanFilterKelas(selectElement, tingkatDipilih) {
 // ==============================================
 function aturBerdasarkanJenis() {
     const jenis = jenisPendaftaran.value;
+    const inputTingkatUtama = document.getElementById('inputTingkatUtama');
+    
     kolomKelasTerima.style.display = 'none';
     infoKelasOtomatis.style.display = 'none';
     dataPindahan.style.display = 'none';
@@ -482,29 +487,69 @@ function aturBerdasarkanJenis() {
     if (jenis === 'baru') {
         tampilanTingkatBaru.style.display = 'block';
         pilihTingkatPindahan.style.display = 'none';
-        infoKelasOtomatis.style.display = 'none';
+        dataPindahan.style.display = 'none';
+        
+        // ✅ Pasti isi 7
+        inputTingkatUtama.value = '7';
+        
         setTimeout(() => {
             terapkanFilterKelas(kelasSaatIni, '7');
         }, 30);
-    } else if (jenis === 'pindahan') {
+    } 
+    else if (jenis === 'pindahan') {
         tampilanTingkatBaru.style.display = 'none';
         pilihTingkatPindahan.style.display = 'block';
         dataPindahan.style.display = 'flex';
-        terapkanFilterKelas(diterimaDiKelas, '');
-        terapkanFilterKelas(kelasSaatIni, '');
+        
+        // Ambil dari select, jika belum pilih biarkan kosong
+        const nilai = nilaiTingkat.value;
+        inputTingkatUtama.value = nilai;
+        
+        if (nilai) {
+            terapkanFilterKelas(diterimaDiKelas, nilai);
+            terapkanFilterKelas(kelasSaatIni, nilai);
+        } else {
+            terapkanFilterKelas(diterimaDiKelas, '');
+            terapkanFilterKelas(kelasSaatIni, '');
+        }
     }
 }
 
 nilaiTingkat?.addEventListener('change', function(){
+    const inputTingkatUtama = document.getElementById('inputTingkatUtama');
+    inputTingkatUtama.value = this.value; // ✅ kirim ke input utama
     terapkanFilterKelas(diterimaDiKelas, this.value);
     terapkanFilterKelas(kelasSaatIni, this.value);
 });
 
 formSiswa.addEventListener('submit', e => {
+    console.log('👉 Form diklik submit');
+    
+    // Cek validasi manual
     if (jenisPendaftaran.value === 'pindahan' && !nilaiTingkat.value) {
         alert('Pilih tingkat dulu!');
         e.preventDefault();
+        return;
     }
+
+    // Cek semua kolom wajib
+    const wajib = formSiswa.querySelectorAll('[required]');
+    let adaKosong = false;
+    wajib.forEach(input => {
+        if (!input.value.trim()) {
+            console.log('❌ Kolom kosong:', input.name || input.id);
+            adaKosong = true;
+        }
+    });
+    
+    if (adaKosong) {
+        alert('Ada kolom wajib yang belum diisi — lihat Console (F12) untuk detail');
+        e.preventDefault();
+        return;
+    }
+
+    console.log('✅ Form lolos cek, siap dikirim');
+    // JANGAN panggil e.preventDefault() di sini!
 });
 
 // ==============================================

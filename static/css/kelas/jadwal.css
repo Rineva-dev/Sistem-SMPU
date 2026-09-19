@@ -67,8 +67,9 @@
 }
 
 .header-actions .btn-outline-secondary {
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: rgb(255 255 255 / 30%) !important;
     color: white;
+    background: #ffffff17;
 }
 
 .header-actions .btn-outline-secondary:hover {

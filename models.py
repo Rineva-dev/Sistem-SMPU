@@ -263,10 +263,8 @@ class PengaturanMapelKelas(db.Model):
 # ==========================================
 # ✅ TAMBAHKAN FUNGSI posisi_di_tahun() KE CLASS SISWA
 # ==========================================
-
 class Siswa(db.Model):
     __tablename__ = 'siswa'
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nis = db.Column(db.String(20), unique=True, nullable=False)
     nisn = db.Column(db.String(20), unique=True, nullable=True)
@@ -277,10 +275,7 @@ class Siswa(db.Model):
     tempat_lahir = db.Column(db.String(100))
     tanggal_lahir = db.Column(db.Date)
     
-    # ✅ Tingkat siswa: hanya berisi '7', '8', atau '9'
     tingkat = db.Column(db.String(1), nullable=True, index=True)
-
-    # ✅ Kelas/rombel yang sedang ditempati saat ini
     kelas_id = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=True, index=True)
     
     alamat = db.Column(db.Text)
@@ -288,20 +283,17 @@ class Siswa(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=True)
     tahun_masuk = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(20), default='Aktif')
-
     nama_ayah = db.Column(db.String(100), nullable=True)
     nama_ibu = db.Column(db.String(100), nullable=True)
     no_hp_ortu = db.Column(db.String(20), nullable=True)
     pekerjaan_ayah = db.Column(db.String(50), nullable=True)
     pekerjaan_ibu = db.Column(db.String(50), nullable=True)
-
-    # ✅ Kolom untuk sistem pendaftaran
-    jenis_pendaftaran = db.Column(db.String(20), nullable=True)  # 'baru' / 'pindahan'
+    
+    jenis_pendaftaran = db.Column(db.String(20), nullable=True)
     tanggal_diterima = db.Column(db.Date, nullable=True)
     tahun_diterima = db.Column(db.Integer, nullable=True)
     diterima_di_kelas = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=True)
     
-    # ✅ Data sekolah asal
     sekolah_sd = db.Column(db.String(255), nullable=True)
     tahun_lulus_sd = db.Column(db.Integer, nullable=True)
     alamat_sekolah_sd = db.Column(db.Text, nullable=True)
@@ -309,31 +301,34 @@ class Siswa(db.Model):
     sekolah_asal_pindah = db.Column(db.String(255), nullable=True)
     tahun_pindah = db.Column(db.Integer, nullable=True)
     alamat_sekolah_pindah = db.Column(db.Text, nullable=True)
-
     dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # ✅ Relasi yang sudah diperbaiki dan tidak bentrok
+    
+    tanggal_non_aktif = db.Column(db.Date, nullable=True)
+    alasan_non_aktif = db.Column(db.String(255), nullable=True)
+    jenis_non_aktif = db.Column(db.String(20), nullable=True)
+    sekolah_tujuan = db.Column(db.String(100), nullable=True)
+    
+    # ✅ TULIS SATU KALI SAJA
     akun = db.relationship('User', backref='siswa', uselist=False)
     kelas_sekarang = db.relationship('Kelas', back_populates='daftar_siswa', foreign_keys=[kelas_id])
     kelas_awal = db.relationship('Kelas', foreign_keys=[diterima_di_kelas])
-
-    tanggal_non_aktif = db.Column(db.Date, nullable=True)
-    alasan_non_aktif = db.Column(db.String(255), nullable=True)
-    jenis_non_aktif = db.Column(db.String(20), nullable=True)  # 'Berhenti' atau 'Pindah'
-    sekolah_tujuan = db.Column(db.String(100), nullable=True)
-
-    # ✅ FUNGSI BARU: Ambil posisi siswa di tahun pelajaran tertentu
+    
+    riwayat_semester = db.relationship(
+        'RiwayatSemester',
+        back_populates='siswa',
+        lazy=True,
+        cascade='all, delete-orphan',
+        order_by='RiwayatSemester.tahun_pelajaran'
+    )
+    
     def posisi_di_tahun(self, kode_tahun):
-        """
-        Mengembalikan data tingkat dan kelas siswa pada tahun pelajaran yang dipilih
-        """
         if not kode_tahun:
             return None
         return RiwayatKelas.query.filter_by(
             siswa_id=self.id,
             tahun_pelajaran=kode_tahun
         ).first()
-
+    
     def __repr__(self):
         return f"<Siswa {self.nama} - Tingkat {self.tingkat}>"
     
@@ -1073,3 +1068,36 @@ class JurnalMengajar(db.Model):
     
     def __repr__(self):
         return f"<JurnalMengajar {self.tanggal} - {self.mata_pelajaran.nama_pelajaran} - {self.kelas.nama_kelas if self.kelas else ''}>"
+
+# ==========================================
+# ✅ TABEL RIWAYAT SEMESTER
+# ==========================================
+class RiwayatSemester(db.Model):
+    __tablename__ = 'riwayat_semester'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    siswa_id = db.Column(db.Integer, db.ForeignKey('siswa.id'), nullable=False)
+    tahun_pelajaran = db.Column(db.String(20), nullable=False)
+    semester = db.Column(db.Integer, nullable=False)  # 1 = Ganjil, 2 = Genap
+    status_awal = db.Column(db.String(50), nullable=True)
+    status_akhir = db.Column(db.String(50), nullable=True)
+    keaktifan = db.Column(db.String(20), nullable=False)
+    tingkat_saat_itu = db.Column(db.String(10), nullable=True)
+    kelas_nama = db.Column(db.String(100), nullable=True)
+    dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (
+        db.UniqueConstraint('siswa_id', 'tahun_pelajaran', 'semester', 
+                            name='_riwayat_semester_unik'),
+    )
+    
+    siswa = db.relationship('Siswa', back_populates='riwayat_semester', 
+                                lazy=True )
+    
+    # Fungsi simpan() yang dipakai di naik_kelas.py
+    def simpan(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def __repr__(self):
+        return f"<RiwayatSemester Siswa:{self.siswa_id} {self.tahun_pelajaran}-{self.semester}>"

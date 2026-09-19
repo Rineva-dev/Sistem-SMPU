@@ -59,4 +59,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    const tombol = document.querySelectorAll('.tab-btn');
+    tombol.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Hapus status aktif semua tombol
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('aktif'));
+            // Sembunyikan semua konten
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('aktif'));
+            // Tampilkan yang dipilih
+            this.classList.add('aktif');
+            document.getElementById('tab-' + this.dataset.tab).classList.add('aktif');
+        });
+    });
 });

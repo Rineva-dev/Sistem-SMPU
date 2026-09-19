@@ -105,6 +105,7 @@ def halaman_daftar_siswa():
 
     # ✅ Ambil tahun yang dipilih
     kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
+    print(f"[DEBUG] kode_tahun yang dicari: '{kode_tahun}'")
     if not kode_tahun:
         tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
         kode_tahun = tahun_aktif.kode if tahun_aktif else None
@@ -195,32 +196,44 @@ def halaman_daftar_siswa():
 # ======================================
 # ✅ SISA KODE DI BAWAH INI TETAP SAMA PENUH DENGAN MILIK ANDA
 # ======================================
-
 @data_siswa_bp.route('/tambah-siswa', methods=['GET', 'POST'])
 def tambah_siswa():
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
-
     if not bisa_kelola():
         flash("Anda tidak berhak menambah data siswa", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    kode_tahun = request.form.get('tahun') or request.form.get('tahun_pelajaran') or session.get('tahun_pelajaran')
+    # Ambil tahun pelajaran — dari form atau dari sesi
+    kode_tahun = request.form.get('tahun_pelajaran') or session.get('tahun_pelajaran')
+    print(f"[DEBUG] kode_tahun diterima dari form: '{kode_tahun}'")
+
     if not kode_tahun:
         tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
-        kode_tahun = tahun_aktif.kode if tahun_aktif else None
-
-    tahun_pilihan = TahunPelajaran.query.filter_by(kode=kode_tahun).first()
-    if not tahun_pilihan or not tahun_pilihan.aktif:
-        flash("❌ Tidak dapat menambah siswa: Tahun pelajaran ini tidak aktif!", "danger")
-        return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
+        if not tahun_aktif:
+            flash("Tidak ada Tahun Pelajaran yang aktif!", "danger")
+            return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+        kode_tahun = tahun_aktif.kode
 
     dasar_tahun = get_base_tahun(kode_tahun)
+    print(f"[DEBUG] dasar_tahun dipakai untuk kelas: '{dasar_tahun}'")
+
+    tahun_pilihan = TahunPelajaran.query.filter_by(kode=kode_tahun).first()
+    if not tahun_pilihan:
+        flash("Tahun pelajaran tidak ditemukan!", "danger")
+        return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+
+    if not tahun_pilihan.aktif:
+        flash("Tahun pelajaran ini TIDAK AKTIF — tidak boleh menambah siswa!", "danger")
+        return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+
     daftar_kelas = Kelas.query.filter_by(
         tahun_pelajaran=dasar_tahun
     ).order_by(Kelas.jenjang, Kelas.nama_kelas).all()
+    print(f"[DEBUG] Jumlah kelas ditemukan: {len(daftar_kelas)}")
 
     if request.method == 'POST':
+        # Baca SEMUA field dari form
         nis = request.form.get('nis', '').strip()
         nisn = request.form.get('nisn', '').strip()
         nama = request.form.get('nama', '').strip()
@@ -232,14 +245,12 @@ def tambah_siswa():
         alamat = request.form.get('alamat', '').strip()
         no_hp = request.form.get('no_hp', '').strip()
         email = request.form.get('email', '').strip().lower()
-        tahun_masuk = request.form.get('tahun_masuk') or None
         status = request.form.get('status', 'Aktif').strip()
         nama_ayah = request.form.get('nama_ayah', '').strip()
         nama_ibu = request.form.get('nama_ibu', '').strip()
         no_hp_ortu = request.form.get('no_hp_ortu', '').strip()
         pekerjaan_ayah = request.form.get('pekerjaan_ayah', '').strip()
         pekerjaan_ibu = request.form.get('pekerjaan_ibu', '').strip()
-
         jenis_pendaftaran = request.form.get('jenis_pendaftaran', '').strip()
         tanggal_diterima = request.form.get('tanggal_diterima')
         tahun_diterima = request.form.get('tahun_diterima') or None
@@ -251,120 +262,203 @@ def tambah_siswa():
         tahun_pindah = request.form.get('tahun_pindah') or None
         alamat_sekolah_pindah = request.form.get('alamat_sekolah_pindah', '').strip()
 
+        print(f"[DEBUG] Jenis: {jenis_pendaftaran} | NIS: {nis} | Nama: {nama}")
+
         tingkat = None
         diterima_di_kelas = None
         kelas_id = None
 
+        tingkat = request.form.get('tingkat', '').strip()
+        
         if jenis_pendaftaran == 'baru':
             tingkat = '7'
-            if not kode_tahun:
-                flash("Tahun pelajaran belum ditentukan!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
-
+            # Cari kelas tingkat 7 secara eksplisit
             kelas_tingkat_7 = Kelas.query.filter_by(
                 jenjang='7',
                 tahun_pelajaran=dasar_tahun
             ).first()
-
             if kelas_tingkat_7:
                 diterima_di_kelas = kelas_tingkat_7.id
                 kelas_id = kelas_tingkat_7.id
+                print(f"[DEBUG] Kelas Tingkat 7 ditemukan: {kelas_tingkat_7.nama_kelas}")
+            else:
+                flash("Kelas Tingkat 7 belum dibuat untuk Tahun Pelajaran ini!", "danger")
+                return render_template('index.html',
+                    daftar_kelas=daftar_kelas,
+                    active_page='data_siswa',
+                    sub_page='form_tambah',
+                    halaman_aktif=session.get('halaman_aktif', 'utama'),
+                    tahun_dipilih=kode_tahun,
+                    dasar_tahun=dasar_tahun,
+                    mode='tambah',
+                    user={
+                        'jabatan': session.get('jabatan', ''),
+                        'tugas_tambahan': session.get('tugas_tambahan', '')
+                    }
+                )
 
         elif jenis_pendaftaran == 'pindahan':
             if not diterima_di_kelas_id:
                 flash("Pilih kelas tempat diterima siswa pindahan!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
-
+                return render_template('index.html',
+                    daftar_kelas=daftar_kelas,
+                    active_page='data_siswa',
+                    sub_page='form_tambah',
+                    halaman_aktif=session.get('halaman_aktif', 'utama'),
+                    tahun_dipilih=kode_tahun,
+                    dasar_tahun=dasar_tahun,
+                    mode='tambah',
+                    user={
+                        'jabatan': session.get('jabatan', ''),
+                        'tugas_tambahan': session.get('tugas_tambahan', '')
+                    }
+                )
             kelas_diterima = Kelas.query.get(diterima_di_kelas_id)
             if not kelas_diterima:
-                flash("Kelas yang dipilih tidak valid!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
-            if kelas_diterima.tahun_pelajaran != kode_tahun:
-                flash("Kelas yang dipilih tidak sesuai dengan tahun pelajaran aktif!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
-
+                flash("Kelas yang dipilih tidak ditemukan!", "danger")
+                return render_template('index.html',
+                    daftar_kelas=daftar_kelas,
+                    active_page='data_siswa',
+                    sub_page='form_tambah',
+                    halaman_aktif=session.get('halaman_aktif', 'utama'),
+                    tahun_dipilih=kode_tahun,
+                    dasar_tahun=dasar_tahun,
+                    mode='tambah',
+                    user={
+                        'jabatan': session.get('jabatan', ''),
+                        'tugas_tambahan': session.get('tugas_tambahan', '')
+                    }
+                )
             tingkat = kelas_diterima.jenjang
             diterima_di_kelas = kelas_diterima.id
             kelas_id = kelas_diterima.id
 
-        if tingkat not in ['7', '8', '9']:
-            flash("Tingkat siswa harus 7, 8, atau 9!", "danger")
-            return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
-
+        # Validasi wajib
         if not nis or not nama or not jenis_kelamin or not jenis_pendaftaran or not tanggal_diterima:
             flash("NIS, Nama, Jenis Kelamin, Jenis Pendaftaran, dan Tanggal Diterima wajib diisi!", "danger")
-            return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
+            return render_template('index.html',
+                daftar_kelas=daftar_kelas,
+                active_page='data_siswa',
+                sub_page='form_tambah',
+                halaman_aktif=session.get('halaman_aktif', 'utama'),
+                tahun_dipilih=kode_tahun,
+                dasar_tahun=dasar_tahun,
+                mode='tambah',
+                user={
+                    'jabatan': session.get('jabatan', ''),
+                    'tugas_tambahan': session.get('tugas_tambahan', '')
+                }
+            )
 
         if Siswa.query.filter_by(nis=nis).first():
-            flash("NIS sudah terdaftar!", "danger")
-            return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
+            flash(f"NIS '{nis}' sudah terdaftar!", "danger")
+            return render_template('index.html',
+                daftar_kelas=daftar_kelas,
+                active_page='data_siswa',
+                sub_page='form_tambah',
+                halaman_aktif=session.get('halaman_aktif', 'utama'),
+                tahun_dipilih=kode_tahun,
+                dasar_tahun=dasar_tahun,
+                mode='tambah',
+                user={
+                    'jabatan': session.get('jabatan', ''),
+                    'tugas_tambahan': session.get('tugas_tambahan', '')
+                }
+            )
 
         if nisn and Siswa.query.filter_by(nisn=nisn).first():
-            flash("NISN sudah terdaftar!", "danger")
-            return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
+            flash(f"NISN '{nisn}' sudah terdaftar!", "danger")
+            return render_template('index.html',
+                daftar_kelas=daftar_kelas,
+                active_page='data_siswa',
+                sub_page='form_tambah',
+                halaman_aktif=session.get('halaman_aktif', 'utama'),
+                tahun_dipilih=kode_tahun,
+                dasar_tahun=dasar_tahun,
+                mode='tambah',
+                user={
+                    'jabatan': session.get('jabatan', ''),
+                    'tugas_tambahan': session.get('tugas_tambahan', '')
+                }
+            )
 
         if not email:
             email = f"siswa-{nis}@sekolah.sch.id"
         else:
             if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
                 flash("Format email tidak valid!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
+                return render_template('index.html',
+                    daftar_kelas=daftar_kelas,
+                    active_page='data_siswa',
+                    sub_page='form_tambah',
+                    halaman_aktif=session.get('halaman_aktif', 'utama'),
+                    tahun_dipilih=kode_tahun,
+                    dasar_tahun=dasar_tahun,
+                    mode='tambah',
+                    user={
+                        'jabatan': session.get('jabatan', ''),
+                        'tugas_tambahan': session.get('tugas_tambahan', '')
+                    }
+                )
             if Siswa.query.filter_by(email=email).first():
                 flash("Email sudah digunakan!", "danger")
-                return redirect(url_for('data_siswa.tambah_siswa', tahun=kode_tahun))
+                return render_template('index.html',
+                    daftar_kelas=daftar_kelas,
+                    active_page='data_siswa',
+                    sub_page='form_tambah',
+                    halaman_aktif=session.get('halaman_aktif', 'utama'),
+                    tahun_dipilih=kode_tahun,
+                    dasar_tahun=dasar_tahun,
+                    mode='tambah',
+                    user={
+                        'jabatan': session.get('jabatan', ''),
+                        'tugas_tambahan': session.get('tugas_tambahan', '')
+                    }
+                )
 
-        siswa_baru = Siswa(
-            nis=nis,
-            nisn=nisn,
-            nama=nama,
-            nik=nik,
-            jenis_kelamin=jenis_kelamin,
-            tempat_lahir=tempat_lahir,
-            tanggal_lahir=datetime.strptime(tanggal_lahir, '%Y-%m-%d') if tanggal_lahir else None,
-            agama=agama,
-            tingkat=tingkat,
-            kelas_id=kelas_id,
-            alamat=alamat,
-            no_hp=no_hp,
-            email=email,
-            tahun_masuk=int(tahun_masuk) if tahun_masuk else None,
-            status=status,
-            nama_ayah=nama_ayah,
-            nama_ibu=nama_ibu,
-            no_hp_ortu=no_hp_ortu,
-            pekerjaan_ayah=pekerjaan_ayah,
-            pekerjaan_ibu=pekerjaan_ibu,
-            jenis_pendaftaran=jenis_pendaftaran,
-            tanggal_diterima=datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None,
-            tahun_diterima=int(tahun_diterima) if tahun_diterima else (int(kode_tahun.split('/')[0]) if kode_tahun else None),
-            diterima_di_kelas=diterima_di_kelas,
-            sekolah_sd=sekolah_sd,
-            tahun_lulus_sd=int(tahun_lulus_sd) if tahun_lulus_sd else None,
-            alamat_sekolah_sd=alamat_sekolah_sd,
-            sekolah_asal_pindah=sekolah_asal_pindah,
-            tahun_pindah=int(tahun_pindah) if tahun_pindah else None,
-            alamat_sekolah_pindah=alamat_sekolah_pindah
-        )
+        # Buat objek siswa baru
+        try:
+            siswa_baru = Siswa(
+                nis=nis,
+                nisn=nisn,
+                nama=nama,
+                nik=nik,
+                jenis_kelamin=jenis_kelamin,
+                tempat_lahir=tempat_lahir,
+                tanggal_lahir=datetime.strptime(tanggal_lahir, '%Y-%m-%d') if tanggal_lahir else None,
+                agama=agama,
+                tingkat=tingkat,
+                kelas_id=kelas_id,
+                alamat=alamat,
+                no_hp=no_hp,
+                email=email,
+                status=status,
+                nama_ayah=nama_ayah,
+                nama_ibu=nama_ibu,
+                no_hp_ortu=no_hp_ortu,
+                pekerjaan_ayah=pekerjaan_ayah,
+                pekerjaan_ibu=pekerjaan_ibu,
+                jenis_pendaftaran=jenis_pendaftaran,
+                tanggal_diterima=datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None,
+                tahun_diterima=int(tahun_diterima) if tahun_diterima else (int(dasar_tahun.split('/')[0]) if dasar_tahun else None),
+                diterima_di_kelas=diterima_di_kelas,
+                sekolah_sd=sekolah_sd,
+                tahun_lulus_sd=int(tahun_lulus_sd) if tahun_lulus_sd else None,
+                alamat_sekolah_sd=alamat_sekolah_sd,
+                sekolah_asal_pindah=sekolah_asal_pindah,
+                tahun_pindah=int(tahun_pindah) if tahun_pindah else None,
+                alamat_sekolah_pindah=alamat_sekolah_pindah
+            )
 
-        db.session.add(siswa_baru)
-        db.session.flush()
+            db.session.add(siswa_baru)
+            db.session.flush()  # Dapatkan ID siswa
 
-        if kode_tahun:
-            # Hapus dulu riwayat tahun yang lebih kecil dari tahun masuk siswa (jika ada sisa)
-            if siswa_baru.tahun_diterima:
-                tahun_awal = int(kode_tahun.split('/')[0])
-                if siswa_baru.tahun_diterima > tahun_awal:
-                    RiwayatKelas.query.filter_by(
-                        siswa_id=siswa_baru.id,
-                        tahun_pelajaran=kode_tahun
-                    ).delete()
-            
-            # Tambahkan riwayat yang benar saja
+            # Tambahkan riwayat kelas
             sudah_ada = RiwayatKelas.query.filter_by(
                 siswa_id=siswa_baru.id,
                 tahun_pelajaran=kode_tahun
             ).first()
-            
+
             if not sudah_ada:
                 riwayat_baru = RiwayatKelas(
                     siswa_id=siswa_baru.id,
@@ -373,11 +467,32 @@ def tambah_siswa():
                     kelas_id=kelas_id
                 )
                 db.session.add(riwayat_baru)
+                print(f"[DEBUG] Riwayat dibuat: TP={kode_tahun}, Tingkat={tingkat}")
 
-        db.session.commit()
-        flash(f"✅ Data siswa {nama} berhasil ditambahkan.", "success")
-        return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
+            db.session.commit()
+            print(f"[DEBUG] ✅ Siswa tersimpan! ID={siswa_baru.id}")
+            flash(f"✅ Data siswa {nama} berhasil ditambahkan.", "success")
+            return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
 
+        except Exception as e:
+            db.session.rollback()
+            print(f"[DEBUG] ❌ ERROR saat simpan: {str(e)}")
+            flash(f"Gagal menyimpan: {str(e)}", "danger")
+            return render_template('index.html',
+                daftar_kelas=daftar_kelas,
+                active_page='data_siswa',
+                sub_page='form_tambah',
+                halaman_aktif=session.get('halaman_aktif', 'utama'),
+                tahun_dipilih=kode_tahun,
+                dasar_tahun=dasar_tahun,
+                mode='tambah',
+                user={
+                    'jabatan': session.get('jabatan', ''),
+                    'tugas_tambahan': session.get('tugas_tambahan', '')
+                }
+            )
+
+    # GET request — tampilkan form
     return render_template('index.html',
         daftar_kelas=daftar_kelas,
         active_page='data_siswa',
@@ -694,23 +809,50 @@ def detail_siswa(id):
     
     siswa = Siswa.query.get_or_404(id)
 
-    kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
-    if not kode_tahun:
-        tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
-        kode_tahun = tahun_aktif.kode if tahun_aktif else None
+    # ========== DEBUG: CEK RIWAYAT SISWA ==========
+    print("=" * 50)
+    print(f"[DETAIL SISWA] ID: {id} | Nama: {siswa.nama}")  # ← diperbaiki: nama, bukan nama_lengkap
+    # ==============================================
 
-    tahun_dipilih_formatted = format_tahun_pelajaran(kode_tahun) if kode_tahun else None
+    # === AMBIL & NORMALISASI KODE TAHUN ===
+    kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
+    
+    def normalisasi_tahun(kode):
+        if not kode:
+            return None
+        kode = kode.strip()
+        if ' Ganjil' in kode:
+            return kode.replace(' Ganjil', '-1')
+        if ' Genap' in kode:
+            return kode.replace(' Genap', '-2')
+        return kode
+    
+    kode_cari = normalisasi_tahun(kode_tahun)
+
+    # ========== DEBUG ==========
+    print(f"[DETAIL SISWA] kode_tahun mentah: {kode_tahun}")
+    print(f"[DETAIL SISWA] kode_cari dinormalisasi: {kode_cari}")
+    # ===========================
+
+    if not kode_cari:
+        tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+        kode_cari = tahun_aktif.kode if tahun_aktif else None
+    
+    tahun_dipilih_formatted = format_tahun_pelajaran(kode_cari) if kode_cari else None
 
     riwayat_tahun_ini = None
-    if kode_tahun:
+    if kode_cari:
         riwayat_tahun_ini = RiwayatKelas.query.filter_by(
             siswa_id=id,
-            tahun_pelajaran=kode_tahun
+            tahun_pelajaran=kode_cari
         ).first()
+
+    # ========== DEBUG ==========
+    print(f"[DETAIL SISWA] riwayat_tahun_ini ditemukan: {riwayat_tahun_ini is not None}")
+    # ===========================
 
     kelas_sekarang = None
     kelas_tahun_formatted = None
-    
     if riwayat_tahun_ini and riwayat_tahun_ini.kelas:
         kelas_sekarang = riwayat_tahun_ini.kelas
         kelas_sekarang.jenjang = riwayat_tahun_ini.tingkat
@@ -724,16 +866,60 @@ def detail_siswa(id):
             kelas_sekarang.jenjang = riwayat_terakhir.tingkat
             kelas_tahun_formatted = format_tahun_pelajaran(riwayat_terakhir.tahun_pelajaran)
     
+    # Ambil SEMUA riwayat kelas siswa
     riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=id)\
-        .order_by(RiwayatKelas.tahun_pelajaran.desc()).all()
-    
+        .order_by(RiwayatKelas.tahun_pelajaran.asc()).all()
+
+    # ========== DEBUG ==========
+    print(f"[DETAIL SISWA] Jumlah riwayat_kelas dari DB: {len(riwayat_kelas)}")
+    for r in riwayat_kelas:
+        print(f"   -> TP: {r.tahun_pelajaran} | Kelas: {r.kelas.nama_kelas if r.kelas else 'TIDAK ADA/NULL'} | Tingkat: {r.tingkat}")
+    # ===========================
+
+    riwayat_semester = []
+    for rw in riwayat_kelas:
+        if siswa.jenis_pendaftaran == 'baru' and rw.tahun_pelajaran == f"{siswa.tahun_diterima}/{siswa.tahun_diterima+1}-1":
+            status_awal = "Siswa Baru"
+        elif siswa.jenis_pendaftaran == 'pindahan' and rw.tahun_pelajaran == kode_cari:
+            status_awal = "Siswa Pindahan"
+        else:
+            status_awal = "Lanjutan"
+        
+        if rw.tingkat == "9":
+            status_akhir = "Lulus"
+        elif rw.tahun_pelajaran == kode_cari:
+            status_akhir = ""
+        else:
+            status_akhir = "Naik"
+        
+        if siswa.status == "Aktif":
+            keaktifan = "Aktif"
+        elif siswa.status == "Lulus":
+            keaktifan = "Lulus"
+        else:
+            keaktifan = siswa.jenis_non_aktif or "Tidak Aktif"
+        
+        riwayat_semester.append({
+            "tahun_pelajaran": rw.tahun_pelajaran,
+            "status_awal": status_awal,
+            "status_akhir": status_akhir,
+            "tingkat_saat_itu": rw.tingkat,
+            "kelas_nama": rw.kelas.nama_kelas if rw.kelas else None,
+            "keaktifan": keaktifan
+        })
+
+    # ========== DEBUG ==========
+    print(f"[DETAIL SISWA] Jumlah riwayat_semester dikirim ke template: {len(riwayat_semester)}")
+    print("=" * 50)
+    # ===========================
+
     return render_template('index.html',
         siswa=siswa,
-        riwayat_kelas=riwayat_kelas,
+        riwayat_semester=riwayat_semester,
         kelas_sekarang=kelas_sekarang,
         tahun_dipilih_formatted=tahun_dipilih_formatted,
         kelas_sekarang_tahun_formatted=kelas_tahun_formatted,
-        tahun_dipilih=kode_tahun,
+        tahun_dipilih=kode_cari,
         active_page='data_siswa',
         sub_page='detail',
         halaman_aktif=session.get('halaman_aktif', 'utama'),
@@ -907,3 +1093,45 @@ def perbaiki_data_lama():
 
     db.session.commit()
     return f"✅ Selesai! Diperbaiki {diperbaiki} siswa. Kolom tingkat sudah terisi semua."
+
+@data_siswa_bp.route('/isi-riwayat-lama')
+def isi_riwayat_lama():
+    semua_siswa = Siswa.query.all()
+    semua_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.asc()).all()
+    
+    for siswa in semua_siswa:
+        if not siswa.tahun_diterima:
+            continue
+        for tp in semua_tahun:
+            tahun_awal_tp = int(tp.kode.split('/')[0])
+            if tahun_awal_tp < siswa.tahun_diterima:
+                continue
+            sudah_ada = RiwayatKelas.query.filter_by(
+                siswa_id=siswa.id,
+                tahun_pelajaran=tp.kode
+            ).first()
+            if sudah_ada:
+                continue
+            # Ambil tingkat terakhir atau tingkat awal
+            riwayat_sebelumnya = RiwayatKelas.query.filter(
+                RiwayatKelas.siswa_id==siswa.id,
+                RiwayatKelas.tahun_pelajaran < tp.kode
+            ).order_by(RiwayatKelas.tahun_pelajaran.desc()).first()
+            
+            tingkat = riwayat_sebelumnya.tingkat if riwayat_sebelumnya else siswa.tingkat
+            # Naikkan tingkat jika sudah ada sebelumnya
+            if riwayat_sebelumnya:
+                if tingkat == '7': tingkat = '8'
+                elif tingkat == '8': tingkat = '9'
+                elif tingkat == '9': continue  # sudah lulus
+            
+            RiwayatKelas.query.filter_by(siswa_id=siswa.id, tingkat=tingkat).first()
+            baris = RiwayatKelas(
+                siswa_id=siswa.id,
+                tahun_pelajaran=tp.kode,
+                tingkat=tingkat,
+                kelas_id=siswa.kelas_id
+            )
+            db.session.add(baris)
+    db.session.commit()
+    return "Selesai mengisi riwayat lama"

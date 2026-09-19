@@ -31,34 +31,37 @@ body {
 
 /* Header Halaman */
 .welcome-box {
-    background: white;
-    border-radius: 20px;
-    padding: 1.75rem 2rem;
-    margin-bottom: 1.5rem;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    box-shadow: var(--kelas-shadow-md);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    position: relative;
+    overflow: hidden;
 }
 
 .welcome-box h2 {
+    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--mapel-gray-900);
-    margin: 0;
+    color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 10px;
+    margin: 0;
 }
 
 .welcome-box h2 i {
-    color: var(--mapel-primary);
+    color: #ffffff;
 }
 
 .welcome-box p {
     margin: 0.25rem 0 0 0;
-    color: var(--mapel-gray-600);
+    color: #ffffff;
 }
 
 .card {
@@ -100,12 +103,13 @@ body {
 
 /* Tombol Utama */
 .btn-primary-gradient {
-    background: linear-gradient(135deg, var(--mapel-primary) 0%, var(--mapel-primary-dark) 100%);
+    background: rgba(255, 255, 255, 0.093);
+    border: 1px solid #ffffff2b !important;
     border: none;
     color: white;
     padding: 0.6rem 1.25rem;
     border-radius: 12px;
-    font-weight: 600;
+    font-weight: 500;
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;

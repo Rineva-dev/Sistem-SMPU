@@ -295,6 +295,7 @@ from routes.mapel.data_mapel import mapel_bp
 from routes.sections.tu.laporan_administrasi import laporan_admin_bp
 from routes.sections.admin.dashboard_admin import dashboard_admin_bp
 from routes.sections.bendahara.bendahara import bendahara_bp
+from routes.siswa.naik_kelas import naik_kelas_bp
 
 # --- ✅ BLUEPRINT SISTEM ABSENSI GURU ---
 from routes.absensi.absensi import absensi_bp
@@ -320,6 +321,7 @@ app.register_blueprint(umum_bp)
 app.register_blueprint(kalender_bp)
 app.register_blueprint(dashboard_wakakur_bp)
 app.register_blueprint(data_siswa_bp)
+app.register_blueprint(naik_kelas_bp)
 app.register_blueprint(kelas_bp)
 app.register_blueprint(mapel_bp)
 app.register_blueprint(laporan_admin_bp)

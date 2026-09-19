@@ -419,3 +419,18 @@
         padding: 0.65rem;
     }
 }
+
+.tab-nav-wrapper {
+    display: flex; gap: 0.5rem; margin: 1.5rem 0; border-bottom: 1px solid #e5e7eb;
+}
+.tab-btn {
+    padding: 0.6rem 1.2rem; border: none; background: transparent; cursor: pointer;
+    font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+}
+.tab-btn.aktif {
+    color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600;
+}
+.tab-btn:hover:not(.aktif) { color: #374151; border-bottom-color: #d1d5db; }
+.tab-content { display: none; }
+.tab-content.aktif { display: block; }

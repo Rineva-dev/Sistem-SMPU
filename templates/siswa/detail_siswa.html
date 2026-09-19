@@ -87,191 +87,258 @@
             </div>
         </div>
 
+        <div class="tab-nav-wrapper">
+            <button class="tab-btn aktif" data-tab="biodata">
+                <i class="fas fa-user"></i> Biodata Siswa
+            </button>
+            <button class="tab-btn" data-tab="riwayat">
+                <i class="fas fa-history"></i> Riwayat Keaktifan
+            </button>
+        </div>
+
+        <div class="tab-content-wrapper">
+
+            <!-- TAB 1: Biodata Siswa (seluruh isi kolom kiri & kanan tetap ada di sini) -->
+            <div class="tab-content aktif" id="tab-biodata">
         <!-- Konten: 2 Kolom -->
-        <div class="profile-content-grid">
-            <!-- Kolom Kiri: Data Pribadi & Sekolah -->
-            <div class="profile-col">
-                <!-- Bagian: Data Pribadi -->
-                <div class="info-section-card">
-                    <div class="section-heading">
-                        <i class="fas fa-id-card section-icon"></i>
-                        <h4>Data Pribadi</h4>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-row">
-                            <span class="info-label">NIK</span>
-                            <span class="info-val">{{ siswa.nik or '-' }}</span>
+                <div class="profile-content-grid">
+                    <!-- Kolom Kiri: Data Pribadi & Sekolah -->
+                    <div class="profile-col">
+                        <!-- Bagian: Data Pribadi -->
+                        <div class="info-section-card">
+                            <div class="section-heading">
+                                <i class="fas fa-id-card section-icon"></i>
+                                <h4>Data Pribadi</h4>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-row">
+                                    <span class="info-label">NIK</span>
+                                    <span class="info-val">{{ siswa.nik or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Jenis Kelamin</span>
+                                    <span class="info-val">
+                                        {% if siswa.jenis_kelamin == 'Perempuan' %}
+                                        <i class="fas fa-venus text-pink-500"></i> Perempuan
+                                        {% elif siswa.jenis_kelamin == 'Laki-laki' %}
+                                        <i class="fas fa-mars text-blue-500"></i> Laki-laki
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Agama</span>
+                                    <span class="info-val">{{ siswa.agama or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tempat, Tgl Lahir</span>
+                                    <span class="info-val">
+                                        {{ siswa.tempat_lahir or '-' }},
+                                        {{ siswa.tanggal_lahir.strftime('%d %B %Y') if siswa.tanggal_lahir else '-' }}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Jenis Pendaftaran</span>
+                                    <span class="info-val">
+                                        {% if siswa.jenis_pendaftaran == 'baru' %}
+                                        <span class="badge-info-tag baru">Siswa Baru</span>
+                                        {% elif siswa.jenis_pendaftaran == 'pindahan' %}
+                                        <span class="badge-info-tag pindahan">Siswa Pindahan</span>
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tanggal Diterima</span>
+                                    <span class="info-val">{{ siswa.tanggal_diterima.strftime('%d %B %Y') if siswa.tanggal_diterima else '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tahun Diterima</span>
+                                    <span class="info-val">
+                                        {% if siswa.tahun_diterima %}{{ siswa.tahun_diterima }}
+                                        {% elif siswa.tanggal_diterima %}{{ siswa.tanggal_diterima.year }} <small class="text-muted">(otomatis)</small>
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tingkat / Kelas Diterima</span>
+                                    <span class="info-val">
+                                        {% if siswa.diterima_di_kelas_rel %}{{ siswa.diterima_di_kelas_rel.nama_kelas }}
+                                        {% elif siswa.jenis_pendaftaran == 'baru' %}Tingkat 7 <small class="text-muted">(otomatis)</small>
+                                        {% elif siswa.tingkat %}Tingkat {{ siswa.tingkat }}
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                {% if siswa.status == 'Non Aktif' or siswa.status == 'Lulus' %}
+                                <div class="info-row pemisah">
+                                    <span class="info-label">Tgl Keluar / Tamat</span>
+                                    <span class="info-val">{{ siswa.tanggal_non_aktif.strftime('%d %B %Y') if siswa.tanggal_non_aktif else '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Keterangan</span>
+                                    <span class="info-val">{{ siswa.alasan_non_aktif or '-' }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Jenis Kelamin</span>
-                            <span class="info-val">
-                                {% if siswa.jenis_kelamin == 'Perempuan' %}
-                                <i class="fas fa-venus text-pink-500"></i> Perempuan
-                                {% elif siswa.jenis_kelamin == 'Laki-laki' %}
-                                <i class="fas fa-mars text-blue-500"></i> Laki-laki
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Agama</span>
-                            <span class="info-val">{{ siswa.agama or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tempat, Tgl Lahir</span>
-                            <span class="info-val">
-                                {{ siswa.tempat_lahir or '-' }},
-                                {{ siswa.tanggal_lahir.strftime('%d %B %Y') if siswa.tanggal_lahir else '-' }}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Jenis Pendaftaran</span>
-                            <span class="info-val">
-                                {% if siswa.jenis_pendaftaran == 'baru' %}
-                                <span class="badge-info-tag baru">Siswa Baru</span>
-                                {% elif siswa.jenis_pendaftaran == 'pindahan' %}
-                                <span class="badge-info-tag pindahan">Siswa Pindahan</span>
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tanggal Diterima</span>
-                            <span class="info-val">{{ siswa.tanggal_diterima.strftime('%d %B %Y') if siswa.tanggal_diterima else '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tahun Diterima</span>
-                            <span class="info-val">
-                                {% if siswa.tahun_diterima %}{{ siswa.tahun_diterima }}
-                                {% elif siswa.tanggal_diterima %}{{ siswa.tanggal_diterima.year }} <small class="text-muted">(otomatis)</small>
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tingkat / Kelas Diterima</span>
-                            <span class="info-val">
-                                {% if siswa.diterima_di_kelas_rel %}{{ siswa.diterima_di_kelas_rel.nama_kelas }}
-                                {% elif siswa.jenis_pendaftaran == 'baru' %}Tingkat 7 <small class="text-muted">(otomatis)</small>
-                                {% elif siswa.tingkat %}Tingkat {{ siswa.tingkat }}
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        {% if siswa.status == 'Non Aktif' or siswa.status == 'Lulus' %}
-                        <div class="info-row pemisah">
-                            <span class="info-label">Tgl Keluar / Tamat</span>
-                            <span class="info-val">{{ siswa.tanggal_non_aktif.strftime('%d %B %Y') if siswa.tanggal_non_aktif else '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Keterangan</span>
-                            <span class="info-val">{{ siswa.alasan_non_aktif or '-' }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
 
-                <!-- Bagian: Riwayat Sekolah -->
-                <div class="info-section-card">
-                    <div class="section-heading">
-                        <i class="fas fa-school section-icon"></i>
-                        <h4>Riwayat Sekolah</h4>
+                        <!-- Bagian: Riwayat Sekolah -->
+                        <div class="info-section-card">
+                            <div class="section-heading">
+                                <i class="fas fa-school section-icon"></i>
+                                <h4>Riwayat Sekolah</h4>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-row">
+                                    <span class="info-label">Sekolah Dasar Asal</span>
+                                    <span class="info-val">{{ siswa.sekolah_sd or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tahun Lulus SD</span>
+                                    <span class="info-val">{{ siswa.tahun_lulus_sd or '-' }}</span>
+                                </div>
+                                {% if siswa.jenis_pendaftaran == 'pindahan' %}
+                                <div class="info-row sub-bagian">
+                                    <span class="info-label">Sekolah Asal Pindahan</span>
+                                    <span class="info-val">{{ siswa.sekolah_asal_pindah or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Tahun Pindah Masuk</span>
+                                    <span class="info-val">{{ siswa.tahun_pindah or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Alamat Sekolah Asal</span>
+                                    <span class="info-val">{{ siswa.alamat_sekolah_pindah or '-' }}</span>
+                                </div>
+                                {% endif %}
+                                {% if siswa.jenis_non_aktif == 'Pindah' and siswa.sekolah_tujuan %}
+                                <div class="info-row tujuan-pindah">
+                                    <span class="info-label">Sekolah Tujuan</span>
+                                    <span class="info-val">{{ siswa.sekolah_tujuan }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-grid">
-                        <div class="info-row">
-                            <span class="info-label">Sekolah Dasar Asal</span>
-                            <span class="info-val">{{ siswa.sekolah_sd or '-' }}</span>
+
+                    <!-- Kolom Kanan: Kontak & Orang Tua -->
+                    <div class="profile-col">
+                        <!-- Bagian: Kontak & Alamat -->
+                        <div class="info-section-card">
+                            <div class="section-heading">
+                                <i class="fas fa-map-marker-alt section-icon"></i>
+                                <h4>Kontak & Alamat</h4>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-row">
+                                    <span class="info-label">No. HP Siswa</span>
+                                    <span class="info-val">
+                                        {% if siswa.no_hp %}
+                                        <a href="tel:{{ siswa.no_hp }}" class="link-hp">{{ siswa.no_hp }} <i class="fas fa-phone fa-xs"></i></a>
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Email</span>
+                                    <span class="info-val">
+                                        {% if siswa.email %}
+                                        <a href="mailto:{{ siswa.email }}" class="link-email">{{ siswa.email }} <i class="fas fa-envelope fa-xs"></i></a>
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                                <div class="info-row alamat-panjang">
+                                    <span class="info-label">Alamat Lengkap</span>
+                                    <span class="info-val">{{ siswa.alamat or '-' }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="info-row">
-                            <span class="info-label">Tahun Lulus SD</span>
-                            <span class="info-val">{{ siswa.tahun_lulus_sd or '-' }}</span>
+
+                        <!-- Bagian: Orang Tua / Wali -->
+                        <div class="info-section-card">
+                            <div class="section-heading">
+                                <i class="fas fa-users section-icon"></i>
+                                <h4>Data Orang Tua / Wali</h4>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-row orang-tua">
+                                    <span class="info-label">Nama Ayah</span>
+                                    <span class="info-val">{{ siswa.nama_ayah or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Pekerjaan Ayah</span>
+                                    <span class="info-val">{{ siswa.pekerjaan_ayah or '-' }}</span>
+                                </div>
+                                <div class="info-row orang-tua">
+                                    <span class="info-label">Nama Ibu</span>
+                                    <span class="info-val">{{ siswa.nama_ibu or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Pekerjaan Ibu</span>
+                                    <span class="info-val">{{ siswa.pekerjaan_ibu or '-' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">No. HP Orang Tua</span>
+                                    <span class="info-val">
+                                        {% if siswa.no_hp_ortu %}
+                                        <a href="tel:{{ siswa.no_hp_ortu }}" class="link-hp">{{ siswa.no_hp_ortu }} <i class="fas fa-phone fa-xs"></i></a>
+                                        {% else %}-{% endif %}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        {% if siswa.jenis_pendaftaran == 'pindahan' %}
-                        <div class="info-row sub-bagian">
-                            <span class="info-label">Sekolah Asal Pindahan</span>
-                            <span class="info-val">{{ siswa.sekolah_asal_pindah or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Tahun Pindah Masuk</span>
-                            <span class="info-val">{{ siswa.tahun_pindah or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Alamat Sekolah Asal</span>
-                            <span class="info-val">{{ siswa.alamat_sekolah_pindah or '-' }}</span>
-                        </div>
-                        {% endif %}
-                        {% if siswa.jenis_non_aktif == 'Pindah' and siswa.sekolah_tujuan %}
-                        <div class="info-row tujuan-pindah">
-                            <span class="info-label">Sekolah Tujuan</span>
-                            <span class="info-val">{{ siswa.sekolah_tujuan }}</span>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- Kolom Kanan: Kontak & Orang Tua -->
-            <div class="profile-col">
-                <!-- Bagian: Kontak & Alamat -->
-                <div class="info-section-card">
-                    <div class="section-heading">
-                        <i class="fas fa-map-marker-alt section-icon"></i>
-                        <h4>Kontak & Alamat</h4>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-row">
-                            <span class="info-label">No. HP Siswa</span>
-                            <span class="info-val">
-                                {% if siswa.no_hp %}
-                                <a href="tel:{{ siswa.no_hp }}" class="link-hp">{{ siswa.no_hp }} <i class="fas fa-phone fa-xs"></i></a>
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Email</span>
-                            <span class="info-val">
-                                {% if siswa.email %}
-                                <a href="mailto:{{ siswa.email }}" class="link-email">{{ siswa.email }} <i class="fas fa-envelope fa-xs"></i></a>
-                                {% else %}-{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row alamat-panjang">
-                            <span class="info-label">Alamat Lengkap</span>
-                            <span class="info-val">{{ siswa.alamat or '-' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bagian: Orang Tua / Wali -->
-                <div class="info-section-card">
-                    <div class="section-heading">
-                        <i class="fas fa-users section-icon"></i>
-                        <h4>Data Orang Tua / Wali</h4>
-                    </div>
-                    <div class="info-grid">
-                        <div class="info-row orang-tua">
-                            <span class="info-label">Nama Ayah</span>
-                            <span class="info-val">{{ siswa.nama_ayah or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Pekerjaan Ayah</span>
-                            <span class="info-val">{{ siswa.pekerjaan_ayah or '-' }}</span>
-                        </div>
-                        <div class="info-row orang-tua">
-                            <span class="info-label">Nama Ibu</span>
-                            <span class="info-val">{{ siswa.nama_ibu or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Pekerjaan Ibu</span>
-                            <span class="info-val">{{ siswa.pekerjaan_ibu or '-' }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">No. HP Orang Tua</span>
-                            <span class="info-val">
-                                {% if siswa.no_hp_ortu %}
-                                <a href="tel:{{ siswa.no_hp_ortu }}" class="link-hp">{{ siswa.no_hp_ortu }} <i class="fas fa-phone fa-xs"></i></a>
-                                {% else %}-{% endif %}
-                            </span>
+            <!-- TAB 2: Riwayat Keaktifan & Semester -->
+            <div class="tab-content" id="tab-riwayat">
+                <div class="profile-content-riwayat">
+                    <div class="profile-col" style="width: 100%;">
+                        <div class="info-section-card">
+                            <div class="section-heading">
+                                <i class="fas fa-history section-icon"></i>
+                                <h4>Riwayat Keaktifan & Semester</h4>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table riwayat-tabel">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Tahun Pelajaran</th>
+                                            <th>Status Awal</th>
+                                            <th>Status Akhir</th>
+                                            <th>Tingkat</th>
+                                            <th>Kelas</th>
+                                            <th>Keaktifan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for rw in riwayat_semester|sort(attribute='tahun_pelajaran') %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{ rw.tahun_pelajaran }}</td>
+                                            <td><span class="badge-awal">{{ rw.status_awal }}</span></td>
+                                            <td><span class="badge-akhir">{{ rw.status_akhir or '—' }}</span></td>
+                                            <td>Tingkat {{ rw.tingkat_saat_itu }}</td>
+                                            <td>{{ rw.kelas_nama or 'Belum ditempatkan' }}</td>
+                                            <td>
+                                                <span class="keaktifan {{ rw.keaktifan.lower().replace(' ', '-') }}">
+                                                    {{ rw.keaktifan }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">
+                                                Belum ada riwayat keaktifan
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>    
         </div>
     </div>
 </div>

@@ -14,40 +14,38 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5><i class="fas fa-list"></i> Daftar Siswa</h5>
             <div class="d-flex gap-2">
-                {# Tombol ini HANYA tampil jika BUKAN Waka Kurikulum #}
                 {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
+                <button type="button" class="btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
                     <i class="fas fa-users-cog"></i> Kelola Siswa
                 </button>
                 {% endif %}
-
-                <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
+                <button type="button" class="btn-header-info" data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
                     <i class="fas fa-book-open me-1"></i> Pengaturan Mapel
                 </button>
                 
-                <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="btn btn-sm btn-warning text-dark">
+                <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="btn-header-warning">
                     <i class="fas fa-calendar-alt me-1"></i> Jadwal Pelajaran
                 </a>
                 
-                {# Lanjutkan ke Genap — HANYA tampil jika BUKAN Waka Kurikulum #}
                 {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-1') or "Ganjil" in tahun_dipilih %}
-                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
+                <button type="button" class="btn-header-success" data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
                     <i class="fas fa-forward me-1"></i> Lanjutkan ke Genap
                 </button>
                 {% endif %}
                 {% endif %}
                 
-                {# Naik Kelas — HANYA tampil jika BUKAN Waka Kurikulum #}
                 {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-2') or "Genap" in tahun_dipilih %}
-                <button type="button" class="btn btn-sm btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
+                <button type="button" class="btn-header-accent" data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
                     <i class="fas fa-arrow-up me-1"></i> Naik Kelas
                 </button>
                 {% endif %}
                 {% endif %}
                 
-                <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn btn-sm btn-secondary">Kembali</a>
+                <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn-header-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali
+                </a>
             </div>
         </div>
         <div class="card-body p-0">
@@ -229,6 +227,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('data_kelas.naik_kelas', kelas_id=kelas.id) }}">
+                <input type="hidden" name="kode_sekarang" value="{{ tahun_dipilih }}">
                 <div class="modal-body">
                     <p class="text-muted">Pilih siswa yang akan naik ke tingkat berikutnya. Data tahun ini <strong>tetap tersimpan sebagai arsip</strong>.</p>
                     <hr>
@@ -261,42 +260,56 @@
 <div class="modal fade" id="modalPengaturanMapel" tabindex="-1" aria-labelledby="modalPengaturanMapelLabel" aria-hidden="true"
      data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <!-- ✅ HEADER: DILUAR FORM -->
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="modalPengaturanMapelLabel">
-                    <i class="fas fa-book-open me-2"></i>Pengaturan Mata Pelajaran - {{ kelas.nama_kelas }}
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-content modern-modal-content">
+            <!-- ✅ HEADER — DI LUAR FORM, TETAP DI ATAS -->
+            <div class="modal-header modern-modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modal-icon-box">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0" id="modalPengaturanMapelLabel">
+                            Pengaturan Mata Pelajaran
+                        </h5>
+                        <p class="modal-subtitle mb-0">{{ kelas.nama_kelas }} • Tahun Pelajaran {{ tahun_dipilih }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-
-            <!-- ✅ FORM: HANYA MULAI SETELAH HEADER -->
-            <form method="POST" action="{{ url_for('data_kelas.simpan_pengaturan_mapel', kelas_id=kelas.id) }}">
+            
+            <!-- ✅ FORM — HANYA BODY + FOOTER DI DALAMNYA -->
+            <form method="POST" action="{{ url_for('data_kelas.simpan_pengaturan_mapel', kelas_id=kelas.id) }}" style="display:flex; flex-direction:column; flex:1; min-height:0;">
                 <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
                 
-                <!-- ✅ BODY: BAGIAN YANG AKAN SCROLL -->
-                <div class="modal-body">
-                    <p class="text-muted mb-3">Masukkan Jumlah Jam Pelajaran (JP). Mapel dengan JP <strong>lebih dari 0</strong> akan aktif dan muncul di jadwal.</p>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle">
-                            <thead class="table-light">
+                <!-- ✅ BODY — SCROLL DI SINI SAJA -->
+                <div class="modal-body modern-modal-body">
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Masukkan Jumlah Jam Pelajaran (JP). Mapel dengan JP <strong>lebih dari 0</strong> akan aktif dan muncul di jadwal.
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="table modern-table align-middle">
+                            <thead>
                                 <tr>
-                                    <th width="40">No</th>
-                                    <th width="100">Kode Mapel</th>
-                                    <th>Mata Pelajaran</th>
-                                    <th width="220">Guru Pengampu</th>
-                                    <th width="100" class="text-center">Jumlah JP</th>
+                                    <th class="col-no">No</th>
+                                    <th class="col-kode">Kode</th>
+                                    <th class="col-nama">Mata Pelajaran</th>
+                                    <th class="col-guru">Guru Pengampu</th>
+                                    <th class="col-jp text-center">Jumlah JP</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if daftar_mapel %}
                                     {% for mapel in daftar_mapel %}
-                                    <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td><code>{{ mapel.kode }}</code></td>
-                                        <td>{{ mapel.nama_pelajaran }}</td>
-                                        <td>
-                                            <select class="form-select form-select-sm" name="guru_id_{{ mapel.id }}">
+                                    <tr class="mapel-row">
+                                        <td class="col-no fw-medium">{{ loop.index }}</td>
+                                        <td class="col-kode">
+                                            <span class="kode-badge">{{ mapel.kode }}</span>
+                                        </td>
+                                        <td class="col-nama fw-semibold">{{ mapel.nama_pelajaran }}</td>
+                                        <td class="col-guru">
+                                            <select class="form-select form-select-sm modern-select" name="guru_id_{{ mapel.id }}">
                                                 <option value="">-- Pilih Guru --</option>
                                                 {% for guru in daftar_guru %}
                                                 <option value="{{ guru.id }}" {% if mapel.guru_terpilih == guru.id %}selected{% endif %}>
@@ -305,24 +318,33 @@
                                                 {% endfor %}
                                             </select>
                                         </td>
-                                        <td>
-                                            <input type="number" name="jp_{{ mapel.id }}" class="form-control form-control-sm text-center"
+                                        <td class="col-jp">
+                                            <input type="number" name="jp_{{ mapel.id }}" 
+                                                   class="form-control form-control-sm modern-jp-input text-center"
                                                    min="0" value="{{ mapel.jumlah_jp or 0 }}">
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
-                                    <tr><td colspan="5" class="text-center text-muted py-4">Belum ada data mata pelajaran</td></tr>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <div class="empty-state">
+                                                <i class="fas fa-book-open empty-icon"></i>
+                                                <p class="empty-text">Belum ada data mata pelajaran</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- ✅ FOOTER: DALAM FORM, DI BAWAH BODY -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
+                <!-- ✅ FOOTER — TETAP DI BAWAH, TIDAK SCROLL -->
+                <div class="modal-footer modern-modal-footer">
+                    <button type="button" class="btn btn-cancel-modern" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-save-modern">
                         <i class="fas fa-save me-1"></i> Simpan Pengaturan
                     </button>
                 </div>
