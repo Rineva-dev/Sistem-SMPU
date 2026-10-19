@@ -1131,16 +1131,12 @@
     .absensi-dashboard-wrapper .sidebar {
         display: none !important;
     }
-
+    
+    .aside#mainSidebar,
+    .header.header,
     .absensi-dashboard-wrapper .header {
         display: none !important;
     }
-
-    /*
-      Sidebar dan app-container milik layout.html tidak disentuh.
-      Jika layout utama sudah memiliki aturan mobile sendiri,
-      aturan global layout tetap menjadi tanggung jawab layout.html.
-    */
 }
 
 /* =====================================================
@@ -1594,8 +1590,8 @@
 
 
 /* =========================================================
-   BESTONE EDUCATION — PREMIUM ANALYTICS
-   Clean White · Navy · Indigo
+    PREMIUM ANALYTICS
+    Clean White · Navy · Indigo
    ========================================================= */
 
 .chart-card {
@@ -1680,3 +1676,4 @@
         border-radius: 18px;
     }
 }
+
