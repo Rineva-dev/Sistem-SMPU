@@ -52,13 +52,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const commonLine = {
         type: "line",
         borderWidth: 2.5,
-        tension: 0.38,
+        tension: 0.35,
         cubicInterpolationMode: "monotone",
         fill: true,
+
+        // Titik muncul saat grafik disentuh atau diarahkan kursor
         pointRadius: 0,
         pointHoverRadius: 5,
         pointHitRadius: 14,
         pointHoverBorderWidth: 3,
+
         spanGaps: true
     };
 
@@ -130,23 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             plugins: {
                 legend: {
-                    display: true,
-                    position: "bottom",
-                    align: "start",
-
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: "circle",
-                        boxWidth: 7,
-                        boxHeight: 7,
-                        padding: 22,
-                        color: "#657189",
-                        font: {
-                            family: "Inter, sans-serif",
-                            size: 12,
-                            weight: "500"
-                        }
-                    }
+                    display: false
                 },
 
                 tooltip: {

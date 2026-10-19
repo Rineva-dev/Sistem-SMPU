@@ -290,40 +290,131 @@
         </div>
     </div>
 
-    <!-- GRAFIK + AKTIVITAS -->
-    <div class="content-grid">
-        <!-- GRAFIK -->
-        <div class="chart-card">
-            <h5 class="card-title">
-                <i class="fas fa-chart-bar"></i> Grafik Kehadiran
-                <span class="d-block fw-semibold">{{ label_tp }}</span>
-            </h5>
-            <div style="height: 280px;">
-                <canvas id="grafikAbsensi"></canvas>
+    <!-- GRAFIK + AKTIVITAS — PREMIUM ANALYTICS -->
+    <section class="content-grid analytics-grid" aria-label="Analitik kehadiran guru">
+
+        <!-- KARTU GRAFIK KEHADIRAN -->
+        <article class="chart-card analytics-card">
+
+            <div class="analytics-card-header">
+                <div class="analytics-heading-group">
+                    <div class="analytics-icon analytics-icon-chart">
+                        <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="analytics-heading-text">
+                        <h5 class="card-title">Grafik Kehadiran</h5>
+                        <p class="analytics-subtitle">
+                            Ringkasan kehadiran guru berdasarkan periode
+                        </p>
+                    </div>
+                </div>
+
+                <span class="analytics-period-badge">
+                    <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                    {{ label_tp }}
+                </span>
             </div>
-        </div>
-        <!-- AKTIVITAS TERBARU -->
-        <div class="activity-card">
-            <h5 class="card-title"><i class="fas fa-history"></i> Aktivitas Terbaru</h5>
+
+            <div class="analytics-divider"></div>
+
+            
+            <div class="chart-content">
+                <div class="chart-canvas-wrap">
+                    <canvas
+                        id="grafikAbsensi"
+                        role="img"
+                        aria-label="Grafik statistik kehadiran, keterlambatan, dan izin guru">
+                    </canvas>
+                </div>
+
+                <!-- LEGENDA GRAFIK CUSTOM -->
+                <div class="custom-chart-legend" aria-label="Keterangan grafik">
+
+                    <div class="chart-legend-item legend-hadir">
+                        <span class="chart-legend-dot"></span>
+                        <span class="chart-legend-text">Hadir</span>
+                    </div>
+
+                    <div class="chart-legend-item legend-terlambat">
+                        <span class="chart-legend-dot"></span>
+                        <span class="chart-legend-text">Terlambat</span>
+                    </div>
+
+                    <div class="chart-legend-item legend-izin">
+                        <span class="chart-legend-dot"></span>
+                        <span class="chart-legend-text">Izin / Sakit</span>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="chart-footer">
+                <span>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    Data rekapitulasi absensi
+                </span>
+                <span class="chart-footer-period">{{ label_tp }}</span>
+            </div>
+
+        </article>
+
+        <!-- KARTU AKTIVITAS TERBARU -->
+        <article class="activity-card analytics-card">
+
+            <div class="analytics-card-header">
+                <div class="analytics-heading-group">
+                    <div class="analytics-icon analytics-icon-activity">
+                        <i class="fas fa-history" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="analytics-heading-text">
+                        <h5 class="card-title">Aktivitas Terbaru</h5>
+                        <p class="analytics-subtitle">
+                            Riwayat pencatatan kehadiran
+                        </p>
+                    </div>
+                </div>
+
+                <span class="activity-count-badge">
+                    <span class="activity-count-dot"></span>
+                    {{ riwayat_terbaru|length if riwayat_terbaru else 0 }} aktivitas
+                </span>
+            </div>
+
+            <div class="analytics-divider"></div>
+
             <div class="activity-list">
                 {% if riwayat_terbaru and riwayat_terbaru|length > 0 %}
+
                     {% for item in riwayat_terbaru %}
                         <div class="activity-item">
+
                             {% if item.status == 'hadir' %}
-                                <div class="activity-icon hadir"><i class="fas fa-check"></i></div>
+                                <div class="activity-icon hadir">
+                                    <i class="fas fa-check" aria-hidden="true"></i>
+                                </div>
                             {% elif item.status == 'terlambat' %}
-                                <div class="activity-icon terlambat"><i class="fas fa-clock"></i></div>
+                                <div class="activity-icon terlambat">
+                                    <i class="fas fa-clock" aria-hidden="true"></i>
+                                </div>
                             {% elif item.status in ['izin', 'sakit'] %}
-                                <div class="activity-icon izin"><i class="fas fa-file-alt"></i></div>
+                                <div class="activity-icon izin">
+                                    <i class="fas fa-file-alt" aria-hidden="true"></i>
+                                </div>
                             {% else %}
-                                <div class="activity-icon alfa"><i class="fas fa-times"></i></div>
+                                <div class="activity-icon alfa">
+                                    <i class="fas fa-times" aria-hidden="true"></i>
+                                </div>
                             {% endif %}
+
                             <div class="activity-body">
                                 <div class="activity-title">
                                     {% if item.status == 'hadir' %}
                                         Hadir tepat waktu
                                     {% elif item.status == 'terlambat' %}
-                                        Terlambat ({{ item.jam_masuk or '-' }})
+                                        Terlambat
                                     {% elif item.status == 'izin' %}
                                         Izin
                                     {% elif item.status == 'sakit' %}
@@ -332,19 +423,60 @@
                                         Tidak hadir
                                     {% endif %}
                                 </div>
-                                <div class="activity-date">{{ item.tanggal.strftime('%d %B %Y') }}</div>
+
+                                <div class="activity-meta">
+                                    <span class="activity-date">
+                                        <i class="far fa-calendar" aria-hidden="true"></i>
+                                        {{ item.tanggal.strftime('%d %B %Y') }}
+                                    </span>
+
+                                    {% if item.status == 'terlambat' and item.jam_masuk %}
+                                        <span class="activity-time">
+                                            <i class="far fa-clock" aria-hidden="true"></i>
+                                            {{ item.jam_masuk }}
+                                        </span>
+                                    {% endif %}
+                                </div>
                             </div>
+
+                            <div class="activity-status status-{{ item.status }}">
+                                {% if item.status == 'hadir' %}
+                                    Hadir
+                                {% elif item.status == 'terlambat' %}
+                                    Terlambat
+                                {% elif item.status == 'izin' %}
+                                    Izin
+                                {% elif item.status == 'sakit' %}
+                                    Sakit
+                                {% else %}
+                                    Alfa
+                                {% endif %}
+                            </div>
+
                         </div>
                     {% endfor %}
+
                 {% else %}
+
                     <div class="empty-state">
-                        <i class="fas fa-inbox fa-2x" style="color:#cbd5e1; margin-bottom:10px;"></i>
-                        <p>Belum ada riwayat aktivitas absensi.</p>
+                        <div class="empty-state-icon">
+                            <i class="fas fa-inbox" aria-hidden="true"></i>
+                        </div>
+                        <h6>Belum ada aktivitas</h6>
+                        <p>Riwayat absensi akan muncul di sini setelah tersedia.</p>
                     </div>
+
                 {% endif %}
             </div>
-        </div>
-    </div>
+
+            <div class="activity-card-footer">
+                <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                <span>Informasi aktivitas absensi</span>
+            </div>
+
+        </article>
+
+    </section>
 
 </div>
 

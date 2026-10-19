@@ -1033,7 +1033,7 @@
 
     .absensi-dashboard-wrapper .stat-card {
         gap: 16px;
-        min-height: 172px;
+        min-height: 90px;
         padding: 20px 17px 18px;
         border-radius: 19px;
     }
@@ -1106,9 +1106,9 @@
         flex: 0 0 clamp(230px, 72vw, 270px);
         width: clamp(230px, 72vw, 270px);
         min-width: 0;
-        min-height: 166px;
+        min-height: 80px;
 
-        gap: 15px;
+        gap: 4px;
         padding: 20px 19px 18px;
         border-radius: 20px;
 
@@ -1216,9 +1216,9 @@
     .absensi-dashboard-wrapper .stat-card {
         flex-basis: 218px;
         width: 218px;
-        min-height: 155px;
+        min-height: 80px;
         padding: 18px 15px 17px;
-        gap: 13px;
+        gap: 4px;
     }
 
     .absensi-dashboard-wrapper .stat-icon {
@@ -1248,190 +1248,7 @@
 }
 
 
-/* =====================================================
-   CHART + ACTIVITY
-===================================================== */
 
-.content-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(285px, 1fr);
-    align-items: start;
-    gap: 22px;
-    min-width: 0;
-}
-
-.chart-card,
-.activity-card {
-    min-width: 0;
-    padding: 25px;
-    border: 1px solid var(--saas-border);
-    border-radius: var(--saas-radius);
-    background: var(--saas-surface);
-    box-shadow: var(--saas-shadow);
-}
-
-.card-title {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 23px;
-    color: var(--saas-ink);
-    font-size: 16px;
-    font-weight: 750;
-    line-height: 1.5;
-    letter-spacing: -.25px;
-}
-
-.card-title > i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    flex: 0 0 35px;
-    border-radius: 11px;
-    color: var(--saas-primary);
-    background: var(--saas-primary-soft);
-    font-size: 15px;
-}
-
-.card-title .d-block {
-    flex-basis: 100%;
-    margin-left: 45px;
-    margin-top: -8px;
-    color: var(--saas-muted);
-    font-size: 11px;
-    font-weight: 500 !important;
-    letter-spacing: 0;
-}
-
-.chart-card > div {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-}
-
-.chart-card canvas {
-    display: block;
-    max-width: 100%;
-}
-
-.chart-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 280px;
-    border: 1px dashed var(--saas-border);
-    border-radius: 16px;
-    color: var(--saas-muted);
-    background: #fafbff;
-    font-size: 13px;
-}
-
-/* =====================================================
-   RECENT ACTIVITY
-===================================================== */
-
-.activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-    min-width: 0;
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    min-width: 0;
-    padding: 14px;
-    border: 1px solid #edf0f7;
-    border-radius: 16px;
-    background: #fbfcff;
-    transition:
-        background .2s ease,
-        border-color .2s ease,
-        transform .2s ease;
-}
-
-.activity-item:hover {
-    transform: translateX(2px);
-    border-color: #e0e4fa;
-    background: #f7f8ff;
-}
-
-.activity-icon {
-    display: flex;
-    flex: 0 0 42px;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    font-size: 16px;
-}
-
-.activity-icon.hadir {
-    color: #10865e;
-    background: #e5f7ef;
-}
-
-.activity-icon.terlambat {
-    color: #b66b13;
-    background: #fff2df;
-}
-
-.activity-icon.izin {
-    color: #3867df;
-    background: #eaf0ff;
-}
-
-.activity-icon.alfa {
-    color: #6b7280;
-    background: #eef0f5;
-}
-
-.activity-body {
-    flex: 1;
-    min-width: 0;
-}
-
-.activity-title {
-    color: #27324b;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.6;
-    overflow-wrap: anywhere;
-}
-
-.activity-date {
-    margin-top: 4px;
-    color: var(--saas-muted);
-    font-size: 11px;
-    line-height: 1.5;
-}
-
-.empty-state {
-    padding: 38px 18px;
-    border: 1px dashed var(--saas-border);
-    border-radius: 16px;
-    color: var(--saas-muted);
-    text-align: center;
-    background: #fafbff;
-    font-size: 13px;
-}
-
-.empty-state i {
-    display: block;
-    margin-bottom: 12px;
-    color: #b6bfd2 !important;
-}
-
-.empty-state p {
-    margin: 0;
-    line-height: 1.7;
-}
 
 /* =====================================================
    MOBILE MENU
@@ -1761,7 +1578,7 @@
 
     .aturan-mini-col {
         min-width: 0;
-        text-align: left;
+        text-align: center;
     }
 
     .aturan-label {
@@ -1947,10 +1764,6 @@
         margin-left: 42px;
         margin-top: -6px;
         font-size: 10px;
-    }
-
-    .chart-card > div {
-        height: 230px !important;
     }
 
     .activity-list {
@@ -2533,3 +2346,786 @@
     }
 }
 
+/* =========================================================
+   PREMIUM ANALYTICS — GRAFIK & AKTIVITAS
+   Desktop / Laptop / Tablet / Mobile
+   ========================================================= */
+
+.absensi-dashboard-wrapper {
+    --analytics-ink: #18233b;
+    --analytics-muted: #8590a5;
+    --analytics-border: #e9edf5;
+    --analytics-indigo: #5146e5;
+    --analytics-indigo-soft: #f0efff;
+}
+
+/* LAYOUT UTAMA */
+.absensi-dashboard-wrapper .analytics-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.85fr);
+    align-items: stretch;
+    gap: 22px;
+    width: 100%;
+    min-width: 0;
+    margin: 28px 0 10px;
+}
+
+/* KARTU DASAR */
+.absensi-dashboard-wrapper .analytics-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 390px;
+    padding: 25px;
+    overflow: hidden;
+    border: 1px solid var(--analytics-border);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow:
+        0 4px 10px rgba(27, 39, 74, 0.025),
+        0 12px 34px rgba(27, 39, 74, 0.045);
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+/* GARIS AKSEN DI ATAS KARTU */
+.absensi-dashboard-wrapper .analytics-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 0 8px 8px;
+    background: linear-gradient(90deg, #5146e5, #818cf8, #67e8f9);
+    content: "";
+    opacity: 0.85;
+}
+
+/* HEADER KARTU */
+.absensi-dashboard-wrapper .analytics-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 0;
+    margin-bottom: 19px;
+}
+
+.absensi-dashboard-wrapper .analytics-heading-group {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+}
+
+.absensi-dashboard-wrapper .analytics-icon {
+    display: flex;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-size: 18px;
+}
+
+.absensi-dashboard-wrapper .analytics-icon-chart {
+    color: #5146e5;
+    border-color: #e5e3ff;
+    background: linear-gradient(145deg, #f5f4ff, #eceaff);
+}
+
+.absensi-dashboard-wrapper .analytics-icon-activity {
+    color: #087f8c;
+    border-color: #d6f3f2;
+    background: linear-gradient(145deg, #effdfb, #dcf8f4);
+}
+
+.absensi-dashboard-wrapper .analytics-heading-text {
+    min-width: 0;
+}
+
+.absensi-dashboard-wrapper .analytics-heading-text .card-title {
+    margin: 0;
+    color: var(--analytics-ink);
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.45;
+    letter-spacing: -0.35px;
+}
+
+.absensi-dashboard-wrapper .analytics-subtitle {
+    margin: 4px 0 0;
+    color: var(--analytics-muted);
+    font-size: 11px;
+    font-weight: 450;
+    line-height: 1.6;
+}
+
+/* BADGE PERIODE */
+.absensi-dashboard-wrapper .analytics-period-badge,
+.absensi-dashboard-wrapper .activity-count-badge {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 31px;
+    padding: 7px 11px;
+    border: 1px solid #e6e8fb;
+    border-radius: 10px;
+    color: #5146c9;
+    background: #f7f6ff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+.absensi-dashboard-wrapper .analytics-period-badge i {
+    font-size: 11px;
+}
+
+.absensi-dashboard-wrapper .activity-count-badge {
+    border-color: #dcefe9;
+    color: #12805f;
+    background: #f0fbf6;
+}
+
+.absensi-dashboard-wrapper .activity-count-dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: #18a874;
+    box-shadow: 0 0 0 3px rgba(24, 168, 116, 0.10);
+}
+
+/* PEMISAH HEADER */
+.absensi-dashboard-wrapper .analytics-divider {
+    width: 100%;
+    height: 1px;
+    flex: 0 0 1px;
+    margin-bottom: 18px;
+    background: linear-gradient(
+        90deg,
+        #e5e7f4 0%,
+        #eef0f7 70%,
+        rgba(238, 240, 247, 0) 100%
+    );
+}
+
+/* AREA GRAFIK */
+.absensi-dashboard-wrapper .chart-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+.absensi-dashboard-wrapper .chart-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 270px;
+    min-width: 0;
+}
+
+.absensi-dashboard-wrapper .chart-canvas-wrap canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+}
+
+/* FOOTER GRAFIK */
+.absensi-dashboard-wrapper .chart-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 17px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f2f7;
+    color: #8a94a8;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.absensi-dashboard-wrapper .chart-footer > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.absensi-dashboard-wrapper .chart-footer > span:first-child i {
+    color: #7b76e9;
+}
+
+.absensi-dashboard-wrapper .chart-footer-period {
+    color: #6d6bb0;
+    font-weight: 650;
+}
+
+/* =========================================================
+   AKTIVITAS TERBARU
+   ========================================================= */
+
+.absensi-dashboard-wrapper .activity-card {
+    padding-bottom: 0;
+}
+
+.absensi-dashboard-wrapper .activity-card .analytics-card-header {
+    margin-bottom: 19px;
+}
+
+.absensi-dashboard-wrapper .activity-card .analytics-divider {
+    margin-bottom: 5px;
+}
+
+.absensi-dashboard-wrapper .activity-list {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* SATU ITEM AKTIVITAS */
+.absensi-dashboard-wrapper .activity-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f2f7;
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+.absensi-dashboard-wrapper .activity-item:last-child {
+    border-bottom: 0;
+}
+
+/* IKON STATUS */
+.absensi-dashboard-wrapper .activity-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 0 0 39px;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 39px;
+    border: 1px solid transparent;
+    border-radius: 13px;
+    font-size: 13px;
+}
+
+.absensi-dashboard-wrapper .activity-icon.hadir {
+    color: #15966b;
+    border-color: #d6f3e6;
+    background: #edfbf4;
+}
+
+.absensi-dashboard-wrapper .activity-icon.terlambat {
+    color: #d97706;
+    border-color: #fbe8c9;
+    background: #fff8e9;
+}
+
+.absensi-dashboard-wrapper .activity-icon.izin {
+    color: #3976e8;
+    border-color: #dbe8ff;
+    background: #f0f6ff;
+}
+
+.absensi-dashboard-wrapper .activity-icon.alfa {
+    color: #dc4c64;
+    border-color: #f8dce2;
+    background: #fff1f3;
+}
+
+/* TEKS AKTIVITAS */
+.absensi-dashboard-wrapper .activity-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.absensi-dashboard-wrapper .activity-title {
+    margin: 0;
+    color: #27334c;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.absensi-dashboard-wrapper .activity-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 11px;
+    margin-top: 5px;
+}
+
+.absensi-dashboard-wrapper .activity-date,
+.absensi-dashboard-wrapper .activity-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #929bae;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.absensi-dashboard-wrapper .activity-date i,
+.absensi-dashboard-wrapper .activity-time i {
+    color: #a5adbd;
+    font-size: 10px;
+}
+
+/* LABEL STATUS DI SISI KANAN */
+.absensi-dashboard-wrapper .activity-status {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    max-width: 100px;
+    padding: 6px 9px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 750;
+    line-height: 1.3;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.absensi-dashboard-wrapper .activity-status.status-hadir {
+    color: #12805f;
+    border-color: #d7f1e4;
+    background: #effbf5;
+}
+
+.absensi-dashboard-wrapper .activity-status.status-terlambat {
+    color: #b66a09;
+    border-color: #f7e6c9;
+    background: #fff8ed;
+}
+
+.absensi-dashboard-wrapper .activity-status.status-izin,
+.absensi-dashboard-wrapper .activity-status.status-sakit {
+    color: #356bd0;
+    border-color: #dce7ff;
+    background: #f1f6ff;
+}
+
+.absensi-dashboard-wrapper .activity-status.status-alfa {
+    color: #c83e57;
+    border-color: #f6dce2;
+    background: #fff2f4;
+}
+
+/* FOOTER AKTIVITAS */
+.absensi-dashboard-wrapper .activity-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 -25px;
+    padding: 14px 25px;
+    border-top: 1px solid #edf0f6;
+    color: #8993a7;
+    background: #fafbfe;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.absensi-dashboard-wrapper .activity-card-footer i {
+    color: #6e75ce;
+    font-size: 11px;
+}
+
+/* KEADAAN KOSONG */
+.absensi-dashboard-wrapper .activity-card .empty-state {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 25px 15px;
+    text-align: center;
+}
+
+.absensi-dashboard-wrapper .empty-state-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: 14px;
+    border: 1px solid #e7e8fc;
+    border-radius: 19px;
+    color: #7774df;
+    background: #f4f3ff;
+    font-size: 22px;
+}
+
+.absensi-dashboard-wrapper .activity-card .empty-state h6 {
+    margin: 0 0 6px;
+    color: #39445d;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.absensi-dashboard-wrapper .activity-card .empty-state p {
+    max-width: 240px;
+    margin: 0;
+    color: #9099ac;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+/* HOVER HALUS UNTUK LAPTOP/DESKTOP */
+@media (hover: hover) and (pointer: fine) {
+    .absensi-dashboard-wrapper .analytics-card:hover {
+        transform: translateY(-3px);
+        border-color: #dfe3f5;
+        box-shadow:
+            0 8px 18px rgba(27, 39, 74, 0.035),
+            0 20px 42px rgba(27, 39, 74, 0.065);
+    }
+
+    .absensi-dashboard-wrapper .activity-item:hover {
+        background: #fafbff;
+    }
+
+    .absensi-dashboard-wrapper .activity-item:hover .activity-icon {
+        transform: scale(1.04);
+    }
+}
+
+.absensi-dashboard-wrapper .activity-icon {
+    transition: transform 0.2s ease;
+}
+
+/* =========================================================
+   RESPONSIVE — LAPTOP KECIL & TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .absensi-dashboard-wrapper .analytics-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(290px, 0.9fr);
+        gap: 16px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-card {
+        padding: 21px;
+    }
+
+    .absensi-dashboard-wrapper .activity-card-footer {
+        margin-right: -21px;
+        margin-left: -21px;
+        padding-right: 21px;
+        padding-left: 21px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-period-badge {
+        max-width: 135px;
+        font-size: 9px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+    .absensi-dashboard-wrapper .analytics-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        margin-top: 22px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-card {
+        min-height: 0;
+        padding: 19px;
+        border-radius: 19px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-card-header {
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 15px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-heading-group {
+        gap: 10px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-icon {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+        border-radius: 12px;
+        font-size: 15px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-heading-text .card-title {
+        font-size: 13px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-subtitle {
+        font-size: 10px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-period-badge,
+    .absensi-dashboard-wrapper .activity-count-badge {
+        gap: 5px;
+        min-height: 28px;
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .absensi-dashboard-wrapper .chart-canvas-wrap {
+        height: 235px;
+    }
+
+    .absensi-dashboard-wrapper .chart-footer {
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+
+    .absensi-dashboard-wrapper .activity-item {
+        gap: 10px;
+        padding: 13px 0;
+    }
+
+    .absensi-dashboard-wrapper .activity-icon {
+        width: 35px;
+        height: 35px;
+        flex-basis: 35px;
+        border-radius: 11px;
+        font-size: 12px;
+    }
+
+    .absensi-dashboard-wrapper .activity-title {
+        font-size: 11px;
+    }
+
+    .absensi-dashboard-wrapper .activity-date,
+    .absensi-dashboard-wrapper .activity-time {
+        font-size: 9px;
+    }
+
+    .absensi-dashboard-wrapper .activity-status {
+        max-width: 76px;
+        padding: 5px 7px;
+        font-size: 8px;
+    }
+
+    .absensi-dashboard-wrapper .activity-card-footer {
+        margin-right: -19px;
+        margin-left: -19px;
+        padding: 12px 19px;
+    }
+}
+
+/* HP DENGAN LAYAR SANGAT KECIL */
+@media (max-width: 380px) {
+    .absensi-dashboard-wrapper .analytics-card {
+        padding: 15px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-heading-group {
+        gap: 8px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-icon {
+        width: 35px;
+        height: 35px;
+        flex-basis: 35px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-heading-text .card-title {
+        font-size: 12px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-subtitle {
+        font-size: 9px;
+    }
+
+    .absensi-dashboard-wrapper .analytics-period-badge,
+    .absensi-dashboard-wrapper .activity-count-badge {
+        padding: 5px 6px;
+        font-size: 8px;
+    }
+
+    .absensi-dashboard-wrapper .activity-item {
+        gap: 8px;
+    }
+
+    .absensi-dashboard-wrapper .activity-status {
+        max-width: 65px;
+        padding: 5px 6px;
+        white-space: normal;
+    }
+
+    .absensi-dashboard-wrapper .activity-card-footer {
+        margin-right: -15px;
+        margin-left: -15px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+}
+
+/* AKSESIBILITAS: HORMATI PENGATURAN REDUKSI ANIMASI */
+@media (prefers-reduced-motion: reduce) {
+    .absensi-dashboard-wrapper .analytics-card,
+    .absensi-dashboard-wrapper .activity-item,
+    .absensi-dashboard-wrapper .activity-icon {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+
+/* ==================================================
+   CUSTOM CHART LEGEND — PREMIUM SAAS
+   ================================================== */
+
+.absensi-dashboard-wrapper .custom-chart-legend {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 16px;
+    min-width: 0;
+}
+
+.absensi-dashboard-wrapper .chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.3;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.absensi-dashboard-wrapper .chart-legend-dot {
+    display: inline-block;
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.absensi-dashboard-wrapper .chart-legend-text {
+    overflow-wrap: anywhere;
+}
+
+/* HADIR — HIJAU */
+.absensi-dashboard-wrapper .legend-hadir {
+    color: #166747;
+    border-color: #d9f0e3;
+    background: #effaf3;
+}
+
+.absensi-dashboard-wrapper .legend-hadir .chart-legend-dot {
+    background: #16865b;
+    box-shadow: 0 0 0 3px rgba(22, 134, 91, 0.10);
+}
+
+/* TERLAMBAT — ORANYE */
+.absensi-dashboard-wrapper .legend-terlambat {
+    color: #985b0a;
+    border-color: #f5e5c8;
+    background: #fff8eb;
+}
+
+.absensi-dashboard-wrapper .legend-terlambat .chart-legend-dot {
+    background: #e9a23b;
+    box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.12);
+}
+
+/* IZIN / SAKIT — UNGU */
+.absensi-dashboard-wrapper .legend-izin {
+    color: #5146b5;
+    border-color: #e3dfff;
+    background: #f5f3ff;
+}
+
+.absensi-dashboard-wrapper .legend-izin .chart-legend-dot {
+    background: #6558d9;
+    box-shadow: 0 0 0 3px rgba(101, 88, 217, 0.10);
+}
+
+/* LAPTOP DAN DESKTOP */
+@media (min-width: 768px) {
+    .absensi-dashboard-wrapper .custom-chart-legend {
+        gap: 10px;
+    }
+
+    .absensi-dashboard-wrapper .chart-legend-item {
+        flex: 0 0 auto;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .absensi-dashboard-wrapper .custom-chart-legend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 13px;
+    }
+
+    .absensi-dashboard-wrapper .chart-legend-item {
+        justify-content: center;
+        min-width: 0;
+        min-height: 35px;
+        gap: 7px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        font-size: 10px;
+    }
+
+    /* Indikator ketiga menggunakan ruang penuh */
+    .absensi-dashboard-wrapper .chart-legend-item:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* HP SANGAT KECIL */
+@media (max-width: 360px) {
+    .absensi-dashboard-wrapper .custom-chart-legend {
+        gap: 6px;
+    }
+
+    .absensi-dashboard-wrapper .chart-legend-item {
+        gap: 6px;
+        padding: 8px;
+        font-size: 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .absensi-dashboard-wrapper .chart-legend-item {
+        transition: none;
+    }
+}
