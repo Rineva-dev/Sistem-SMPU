@@ -1,50 +1,246 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const ctxEl = document.getElementById('grafikAbsensi');
-    if (!ctxEl) return;
 
-    // Ambil data dari elemen tersembunyi yang disiapkan di HTML
-    const labelBulan = JSON.parse(document.getElementById('data-label-bulan').textContent);
-    const dataHadir = JSON.parse(document.getElementById('data-hadir').textContent);
-    const dataTerlambat = JSON.parse(document.getElementById('data-terlambat').textContent);
-    const dataIzin = JSON.parse(document.getElementById('data-izin').textContent);
+document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("grafikAbsensi");
 
-    const ctx = ctxEl.getContext('2d');
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    // Hindari membuat grafik ganda apabila script dipanggil kembali.
+    const existingChart = Chart.getChart(canvas);
+
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+    // Ambil data asli dari template Flask/Jinja.
+    function readJSON(id, fallback = []) {
+        const element = document.getElementById(id);
+
+        if (!element) return fallback;
+
+        try {
+            const parsed = JSON.parse(element.textContent);
+            return Array.isArray(parsed) ? parsed : fallback;
+        } catch (error) {
+            console.error("Data grafik tidak valid:", id, error);
+            return fallback;
+        }
+    }
+
+    const labels = readJSON("data-label-bulan");
+    const hadir = readJSON("data-hadir");
+    const terlambat = readJSON("data-terlambat");
+    const izin = readJSON("data-izin");
+
+    const ctx = canvas.getContext("2d");
+
+    // Gradasi transparan supaya grafik terlihat elegan,
+    // tanpa memenuhi area grafik dengan warna pekat.
+    const gradientHadir = ctx.createLinearGradient(0, 0, 0, 340);
+    gradientHadir.addColorStop(0, "rgba(22, 163, 104, 0.22)");
+    gradientHadir.addColorStop(1, "rgba(22, 163, 104, 0.00)");
+
+    const gradientTerlambat = ctx.createLinearGradient(0, 0, 0, 340);
+    gradientTerlambat.addColorStop(0, "rgba(233, 162, 59, 0.13)");
+    gradientTerlambat.addColorStop(1, "rgba(233, 162, 59, 0.00)");
+
+    const gradientIzin = ctx.createLinearGradient(0, 0, 0, 340);
+    gradientIzin.addColorStop(0, "rgba(101, 88, 217, 0.13)");
+    gradientIzin.addColorStop(1, "rgba(101, 88, 217, 0.00)");
+
+    const commonLine = {
+        type: "line",
+        borderWidth: 2.5,
+        tension: 0.38,
+        cubicInterpolationMode: "monotone",
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHitRadius: 14,
+        pointHoverBorderWidth: 3,
+        spanGaps: true
+    };
+
     new Chart(ctx, {
-        type: 'bar',
+        type: "line",
+
         data: {
-            labels: labelBulan,
+            labels: labels,
+
             datasets: [
                 {
-                    label: 'Hadir',
-                    data: dataHadir,
-                    backgroundColor: '#22c55e',
-                    borderRadius: 6
+                    ...commonLine,
+                    label: "Hadir",
+                    data: hadir,
+                    borderColor: "#16865b",
+                    backgroundColor: gradientHadir,
+                    pointBackgroundColor: "#16865b",
+                    pointBorderColor: "#ffffff",
+                    pointHoverBackgroundColor: "#16865b",
+                    pointHoverBorderColor: "#ffffff"
                 },
                 {
-                    label: 'Terlambat',
-                    data: dataTerlambat,
-                    backgroundColor: '#f97316',
-                    borderRadius: 6
+                    ...commonLine,
+                    label: "Terlambat",
+                    data: terlambat,
+                    borderColor: "#e9a23b",
+                    backgroundColor: gradientTerlambat,
+                    pointBackgroundColor: "#e9a23b",
+                    pointBorderColor: "#ffffff",
+                    pointHoverBackgroundColor: "#e9a23b",
+                    pointHoverBorderColor: "#ffffff"
                 },
                 {
-                    label: 'Izin/Sakit',
-                    data: dataIzin,
-                    backgroundColor: '#3b82f6',
-                    borderRadius: 6
+                    ...commonLine,
+                    label: "Izin / Sakit",
+                    data: izin,
+                    borderColor: "#6558d9",
+                    backgroundColor: gradientIzin,
+                    pointBackgroundColor: "#6558d9",
+                    pointBorderColor: "#ffffff",
+                    pointHoverBackgroundColor: "#6558d9",
+                    pointHoverBorderColor: "#ffffff"
                 }
             ]
         },
+
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { usePointStyle: true, padding: 16 }
+
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+
+            layout: {
+                padding: {
+                    top: 12,
+                    right: 8,
+                    bottom: 2,
+                    left: 2
                 }
             },
+
+            animation: {
+                duration: 850,
+                easing: "easeOutQuart"
+            },
+
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom",
+                    align: "start",
+
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                        boxWidth: 7,
+                        boxHeight: 7,
+                        padding: 22,
+                        color: "#657189",
+                        font: {
+                            family: "Inter, sans-serif",
+                            size: 12,
+                            weight: "500"
+                        }
+                    }
+                },
+
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: "#17243a",
+                    titleColor: "#ffffff",
+                    bodyColor: "#e3e9f3",
+                    footerColor: "#aebbd0",
+                    padding: 14,
+                    cornerRadius: 12,
+                    boxPadding: 5,
+                    usePointStyle: true,
+                    displayColors: true,
+
+                    titleFont: {
+                        family: "Inter, sans-serif",
+                        size: 13,
+                        weight: "700"
+                    },
+
+                    bodyFont: {
+                        family: "Inter, sans-serif",
+                        size: 12,
+                        weight: "500"
+                    },
+
+                    callbacks: {
+                        label: function (context) {
+                            const value = context.parsed.y;
+                            const formatted = Number.isFinite(value)
+                                ? value.toLocaleString("id-ID")
+                                : "—";
+
+                            return " " + context.dataset.label + ": " + formatted;
+                        }
+                    }
+                }
+            },
+
             scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                x: {
+                    border: {
+                        display: false
+                    },
+
+                    grid: {
+                        display: false,
+                        drawTicks: false
+                    },
+
+                    ticks: {
+                        color: "#8994a7",
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        padding: 12,
+
+                        font: {
+                            family: "Inter, sans-serif",
+                            size: 11,
+                            weight: "500"
+                        }
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    border: {
+                        display: false,
+                        dash: [4, 4]
+                    },
+
+                    grid: {
+                        color: "rgba(148, 163, 184, 0.16)",
+                        drawTicks: false,
+                        lineWidth: 1
+                    },
+
+                    ticks: {
+                        color: "#8994a7",
+                        padding: 12,
+                        precision: 0,
+
+                        font: {
+                            family: "Inter, sans-serif",
+                            size: 11
+                        },
+
+                        callback: function (value) {
+                            return Number(value).toLocaleString("id-ID");
+                        }
+                    }
+                }
             }
         }
     });

@@ -1591,3 +1591,92 @@
         height: 100px;
     }
 }
+
+
+/* =========================================================
+   BESTONE EDUCATION — PREMIUM ANALYTICS
+   Clean White · Navy · Indigo
+   ========================================================= */
+
+.chart-card {
+    position: relative;
+    overflow: hidden;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 22px;
+    box-shadow:
+        0 2px 4px rgba(15, 23, 42, 0.02),
+        0 12px 36px rgba(15, 23, 42, 0.045);
+    transition:
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.chart-card:hover {
+    border-color: #dce4f1;
+    box-shadow: 0 16px 42px rgba(15, 23, 42, 0.07);
+}
+
+/* Judul grafik */
+.chart-card h2,
+.chart-card h3 {
+    color: #17243a;
+    font-family: "Inter", sans-serif;
+    font-size: 19px;
+    font-weight: 750;
+    letter-spacing: -0.55px;
+    line-height: 1.4;
+}
+
+/* Deskripsi dan informasi pendamping */
+.chart-card p {
+    color: #8792a5;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+/* Area grafik */
+.chart-card canvas#grafikAbsensi {
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+}
+
+/* Legenda Chart.js */
+.chart-card .chartjs-legend,
+.chart-card .legend {
+    color: #657189;
+    font-size: 12px;
+}
+
+/* Panel aktivitas agar selaras dengan grafik */
+.activity-card {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 22px;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.035);
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .chart-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 767px) {
+    .chart-card {
+        padding: 19px 15px;
+        border-radius: 18px;
+    }
+
+    .chart-card h2,
+    .chart-card h3 {
+        font-size: 17px;
+    }
+
+    .activity-card {
+        border-radius: 18px;
+    }
+}
