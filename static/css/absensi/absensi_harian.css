@@ -2837,6 +2837,8 @@
         border: 1px dashed #d8e4dd;
         border-radius: 15px;
         background: #f9fcfa;
+        justify-content: center;
+        flex-direction: column;
     }
 
     .absensi-harian-wrapper .info-empty-icon {
@@ -3190,7 +3192,9 @@
   /* Kondisi belum ada absensi */
   .info-empty {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
     gap: 12px;
     padding: 15px 12px;
     border: 1px dashed #dce8df;
