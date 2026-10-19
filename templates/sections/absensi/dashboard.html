@@ -88,53 +88,185 @@
     </div>
 
     <div class="welcome-box-desktop desktop-only">
-        <div class="garis-1"></div>
-        <div class="garis-2"></div>
-        <div class="titik titik-1"></div>
-        <div class="titik titik-2"></div>
-        <div class="titik titik-3"></div>
-        <div>
-            <h2>Selamat Datang, {{ tampil_nama if tampil_nama else 'Bapak/Ibu Guru' }}!</h2>
-            <p class="text-muted">Absensi & Kehadiran Guru</p>
+
+        <!-- Background effects -->
+        <div class="welcome-ambient" aria-hidden="true">
+            <div class="welcome-orb welcome-orb-one"></div>
+            <div class="welcome-orb welcome-orb-two"></div>
+            <div class="welcome-grid"></div>
+            <div class="welcome-ring welcome-ring-one"></div>
+            <div class="welcome-ring welcome-ring-two"></div>
+            <div class="welcome-stars">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
+
+        <!-- Welcome content -->
+        <div class="welcome-content">
+
+            <div class="welcome-eyebrow">
+                <span class="welcome-status-dot"></span>
+                <span>TEACHER ATTENDANCE SYSTEM</span>
+            </div>
+
+            <h2 class="welcome-heading">
+                Welcome,
+                <span class="welcome-name">
+                    {{ tampil_nama if tampil_nama else 'Bapak/Ibu Guru' }}
+                </span>
+                <span class="welcome-greeting-mark">✦</span>
+            </h2>
+
+            <p class="welcome-description">
+                <span class="welcome-description-icon">
+                    <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                </span>
+                <span>
+                    Absensi & Kehadiran Guru
+                    <span class="welcome-description-divider">/</span>
+                    <span class="welcome-description-sub">
+                        Kelola kehadiran dengan lebih mudah
+                    </span>
+                </span>
+            </p>
+
+            <div class="welcome-bottom-line">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+        </div>
+
+        <!-- Date card -->
         <div class="date-box-absensi">
-            <i class="far fa-calendar-alt"></i>
-            <span>{{ hari_ini | default('Tanggal tidak tersedia') }}</span>
+
+            <div class="date-icon-wrap">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+            </div>
+
+            <div class="date-content">
+                <span class="date-label">HARI INI</span>
+                <span class="date-value">
+                    {{ hari_ini | default('Tanggal tidak tersedia') }}
+                </span>
+                <span class="date-caption">
+                    <span class="date-live-dot"></span>
+                    Informasi tanggal
+                </span>
+            </div>
+
+            <div class="date-card-decoration" aria-hidden="true">
+                <i class="fas fa-sparkles"></i>
+            </div>
+
+        </div>
+
+        <div class="welcome-edge-light" aria-hidden="true"></div>
+
+    </div>
+    
+    
+    <!-- PREMIUM SAAS STATISTICS -->
+    <div class="stats-scroll-wrapper" aria-label="Statistik kehadiran guru">
+        <div class="stats-row">
+
+            <!-- TEPAT WAKTU -->
+            <article class="stat-card stat-hadir" aria-label="Tepat waktu">
+                <div class="stat-card-top">
+                    <div class="stat-label">Tepat Waktu</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check" aria-hidden="true"></i>
+                    </div>
+                </div>
+
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.hadir or 0 }}</div>
+
+                    <div class="stat-meta">
+                        <span class="stat-meta-dot"></span>
+                        <span>Kehadiran tercatat</span>
+                    </div>
+                </div>
+
+                <div class="stat-card-decoration" aria-hidden="true">
+                    <i class="fas fa-check"></i>
+                </div>
+
+                <div class="stat-card-accent" aria-hidden="true"></div>
+            </article>
+
+            <!-- TERLAMBAT -->
+            <article class="stat-card stat-terlambat" aria-label="Terlambat">
+                <div class="stat-card-top">
+                    <div class="stat-label">Terlambat</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock" aria-hidden="true"></i>
+                    </div>
+                </div>
+
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.terlambat or 0 }}</div>
+
+                    <div class="stat-meta">
+                        <span class="stat-meta-dot"></span>
+                        <span>Rekap keterlambatan</span>
+                    </div>
+                </div>
+
+                <div class="stat-card-decoration" aria-hidden="true">
+                    <i class="fas fa-clock"></i>
+                </div>
+
+                <div class="stat-card-accent" aria-hidden="true"></div>
+            </article>
+
+            <!-- IZIN / SAKIT -->
+            <article class="stat-card stat-izin" aria-label="Izin atau sakit">
+                <div class="stat-card-top">
+                    <div class="stat-label">Izin / Sakit</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt" aria-hidden="true"></i>
+                    </div>
+                </div>
+
+                <div class="stat-info">
+                    <div class="stat-value">{{ statistik.izin or 0 }}</div>
+
+                    <div class="stat-meta">
+                        <span class="stat-meta-dot"></span>
+                        <span>Rekap izin dan sakit</span>
+                    </div>
+                </div>
+
+                <div class="stat-card-decoration" aria-hidden="true">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+
+                <div class="stat-card-accent" aria-hidden="true"></div>
+            </article>
+
         </div>
     </div>
 
-    <!-- ✅ KARTU STATISTIK BISA DI-SCROLL -->
-    <div class="stats-scroll-wrapper">
-        <div class="stats-row">
-            <div class="stat-card stat-hadir">
-                <div class="stat-icon"><i class="fas fa-check"></i></div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ statistik.hadir or 0 }}</div>
-                    <div class="stat-label">Tepat Waktu</div>
-                </div>
-            </div>
-            <div class="stat-card stat-terlambat">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ statistik.terlambat or 0 }}</div>
-                    <div class="stat-label">Terlambat</div>
-                </div>
-            </div>
-            <div class="stat-card stat-izin">
-                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ statistik.izin or 0 }}</div>
-                    <div class="stat-label">Izin / Sakit</div>
-                </div>
-            </div>
-        </div>
+    <!-- INDIKATOR SCROLL HP -->
+    <div class="scroll-indicators" aria-label="Posisi kartu statistik">
+        <button class="dot active" type="button"
+                aria-label="Lihat kartu tepat waktu"
+                aria-current="true" data-stat-index="0"></button>
+        <button class="dot" type="button"
+                aria-label="Lihat kartu terlambat"
+                data-stat-index="1"></button>
+        <button class="dot" type="button"
+                aria-label="Lihat kartu izin atau sakit"
+                data-stat-index="2"></button>
     </div>
-    <!-- ✅ Indikator titik-titik scroll -->
-    <div class="scroll-indicators">
-        <span class="dot active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-    </div>
+
+
 
     <!-- ✅ MENU NAVIGASI KHUSUS HP -->
     <div class="mobile-menu-section">
@@ -274,26 +406,72 @@
 <!-- ✅ Script untuk Update Indikator Scroll -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ==========================================
-    // SCROLL INDICATOR
-    // ==========================================
-    const wrapper = document.querySelector('.stats-scroll-wrapper');
-    const dots = document.querySelectorAll('.scroll-indicators .dot');
-    const cards = document.querySelectorAll('.stat-card');
-    
-    if (wrapper && dots.length > 0 && cards.length > 0) {
-        wrapper.addEventListener('scroll', function() {
-            const cardWidth = cards[0].offsetWidth + 
-                parseInt(getComputedStyle(cards[0]).marginLeft || 0) + 
-                parseInt(getComputedStyle(cards[0]).marginRight || 0);
-            const gap = parseInt(getComputedStyle(wrapper).gap) || 0;
-            const cardFullWidth = cardWidth + gap;
-            let index = Math.round(wrapper.scrollLeft / cardFullWidth);
-            index = Math.max(0, Math.min(index, dots.length - 1));
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    document.querySelectorAll(".absensi-dashboard-wrapper").forEach(function (dashboard) {
+        const scroller = dashboard.querySelector(".stats-scroll-wrapper");
+        const cards = dashboard.querySelectorAll(".stats-row .stat-card");
+        const dots = dashboard.querySelectorAll(".scroll-indicators .dot");
+
+        if (!scroller || !cards.length || !dots.length) return;
+
+        let ticking = false;
+
+        function updateActiveDot() {
+            const scrollCenter =
+                scroller.getBoundingClientRect().left +
+                scroller.clientWidth / 2;
+
+            let closestIndex = 0;
+            let closestDistance = Infinity;
+
+            cards.forEach(function (card, index) {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.left + rect.width / 2;
+                const distance = Math.abs(scrollCenter - cardCenter);
+
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+
+            dots.forEach(function (dot, index) {
+                const active = index === closestIndex;
+
+                dot.classList.toggle("active", active);
+
+                if (active) {
+                    dot.setAttribute("aria-current", "true");
+                } else {
+                    dot.removeAttribute("aria-current");
+                }
+            });
+
+            ticking = false;
+        }
+
+        scroller.addEventListener("scroll", function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateActiveDot);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        dots.forEach(function (dot, index) {
+            dot.addEventListener("click", function () {
+                const card = cards[index];
+                if (!card) return;
+
+                scroller.scrollTo({
+                    left: card.offsetLeft - cards[0].offsetLeft,
+                    behavior: "smooth"
+                });
+            });
         });
-        setTimeout(() => wrapper.dispatchEvent(new Event('scroll')), 100);
-    }
+
+        window.addEventListener("resize", updateActiveDot);
+        updateActiveDot();
+    });
+
 
     // ==========================================
     // JAM DIGITAL
