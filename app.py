@@ -41,6 +41,8 @@ class SesuaiSubdomainSessionInterface(SecureCookieSessionInterface):
             return 'sesi_absensi'
         elif host.startswith('school.'):
             return 'sesi_sekolah'
+        elif host.startswith('payment.'):
+            return 'sesi_payment'
         return 'sesi_umum'
 
 app.session_interface = SesuaiSubdomainSessionInterface()
@@ -175,10 +177,13 @@ def sebelum_permintaan():
     # ✅ TENTUKAN SISTEM DARI SUBDOMAIN
     # =========================================================
     host = request.host.lower()
+
     if host.startswith('absensi.'):
         g.sistem_mode = 'absensi'
     elif host.startswith('school.'):
         g.sistem_mode = 'sekolah'
+    elif host.startswith('payment.'):
+        g.sistem_mode = 'payment'
     else:
         # Fallback: deteksi dari path jika bukan subdomain
         if (
@@ -189,6 +194,9 @@ def sebelum_permintaan():
             g.sistem_mode = 'absensi'
         else:
             g.sistem_mode = 'sekolah'
+
+    if g.sistem_mode == 'payment':
+        return
 
     # =========================================================
     # HALAMAN LOGIN / LOGOUT — TIDAK PERLU CEK LOGIN
@@ -306,6 +314,8 @@ from routes.profil import profil_bp
 # --- HALAMAN GURU --- #
 from routes.sections.guru.jurnal_mengajar import jurnal_mengajar_bp
 
+from routes.payment.payment_public import payment_public_bp
+
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
@@ -334,6 +344,7 @@ app.register_blueprint(absensi_guru_bp, url_prefix='/absensi-guru')
 app.register_blueprint(monitoring_bp)
 app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)
+app.register_blueprint(payment_public_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
 from routes.profil import profil_bp as absensi_profil_bp

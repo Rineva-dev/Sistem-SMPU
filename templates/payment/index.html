@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Portal Pembayaran Siswa | SMP Unggulan Hamzanwadi</title>
+    <meta
+        name="description"
+        content="Portal resmi untuk mengecek informasi pembayaran siswa SMP Unggulan Hamzanwadi."
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/payment/public.css') }}"
+    >
+</head>
+
+<body>
+    <div class="page-shell">
+        <header class="topbar">
+            <a href="/" class="brand">
+                <div class="brand-logo">SH</div>
+                <div class="brand-copy">
+                    <strong>SMP Unggulan Hamzanwadi</strong>
+                    <span>PORTAL PEMBAYARAN SISWA</span>
+                </div>
+            </a>
+
+            <div class="secure-label">
+                <span class="secure-dot"></span>
+                Portal Resmi Sekolah
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-copy">
+                    <div class="eyebrow">
+                        <span class="eyebrow-icon">✦</span>
+                        LAYANAN PEMBAYARAN DIGITAL
+                    </div>
+
+                    <h1>
+                        Urusan pembayaran sekolah,
+                        <span>jadi lebih mudah.</span>
+                    </h1>
+
+                    <p>
+                        Cek informasi tagihan dan pembayaran putra-putri
+                        Anda melalui satu portal yang praktis dan mudah
+                        digunakan.
+                    </p>
+
+                    <div class="hero-points">
+                        <div>
+                            <span class="check-icon">✓</span>
+                            Informasi lebih praktis
+                        </div>
+                        <div>
+                            <span class="check-icon">✓</span>
+                            Akses kapan saja
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-decoration" aria-hidden="true">
+                    <div class="decoration-circle circle-one"></div>
+                    <div class="decoration-circle circle-two"></div>
+                    <div class="decoration-card">
+                        <div class="decoration-icon">↗</div>
+                        <div class="decoration-line long"></div>
+                        <div class="decoration-line short"></div>
+                        <div class="decoration-status">
+                            <span></span> Sistem pembayaran sekolah
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="lookup-section">
+                <div class="lookup-card">
+                    <div class="section-heading">
+                        <div class="heading-icon">⌕</div>
+                        <div>
+                            <h2>Cek pembayaran siswa</h2>
+                            <p>
+                                Masukkan NISN untuk mencari data siswa.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('payment_public.index') }}">
+                        <label for="nisn">
+                            Nomor Induk Siswa Nasional (NISN)
+                        </label>
+
+                        <div class="input-wrap">
+                            <span class="input-icon">◎</span>
+                            <input
+                                type="text"
+                                id="nisn"
+                                name="nisn"
+                                inputmode="numeric"
+                                pattern="[0-9]{10}"
+                                minlength="10"
+                                maxlength="10"
+                                placeholder="Masukkan 10 digit NISN"
+                                value="{{ nisn }}"
+                                autocomplete="off"
+                                required
+                            >
+                        </div>
+
+                        <button class="search-button" type="submit">
+                            <span>Cari Data Siswa</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+
+                    {% if pesan %}
+                        <div
+                            class="notice notice-{{ status_pencarian }}"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <span class="notice-icon">
+                                {% if status_pencarian == 'found' %}
+                                    ✓
+                                {% else %}
+                                    !
+                                {% endif %}
+                            </span>
+                            <span>{{ pesan }}</span>
+                        </div>
+                    {% endif %}
+
+                    {% if status_pencarian == 'found' and siswa %}
+                        <div class="student-result">
+                            <div class="result-heading">
+                                <div>
+                                    <span class="result-eyebrow">
+                                        DATA SISWA DITEMUKAN
+                                    </span>
+                                    <h3>Konfirmasi data siswa</h3>
+                                </div>
+                                <span class="active-status">
+                                    Aktif
+                                </span>
+                            </div>
+
+                            <div class="student-identity">
+                                <div class="student-avatar">
+                                    {{ siswa.nama[0] | upper }}
+                                </div>
+                                <div class="student-info">
+                                    <h4>{{ siswa.nama }}</h4>
+                                    <p>NISN: {{ siswa.nisn }}</p>
+                                </div>
+                            </div>
+
+                            <div class="student-details">
+                                <div class="detail-item">
+                                    <span>Kelas</span>
+                                    <strong>
+                                        {{ siswa.kelas_sekarang.nama_kelas
+                                           if siswa.kelas_sekarang
+                                           and siswa.kelas_sekarang.nama_kelas
+                                           else (siswa.tingkat or 'Belum ditentukan') }}
+                                    </strong>
+                                </div>
+
+                                <div class="detail-item">
+                                    <span>Tahun masuk</span>
+                                    <strong>
+                                        {{ siswa.tahun_masuk or '-' }}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="result-note">
+                                Pastikan nama dan data siswa di atas
+                                sesuai sebelum melanjutkan.
+                            </div>
+
+                            <button
+                                class="continue-button"
+                                type="button"
+                                disabled
+                                title="Aktif setelah integrasi data tagihan"
+                            >
+                                Informasi tagihan segera tersedia
+                                <span>→</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <aside class="help-card">
+                    <div class="help-icon">i</div>
+                    <div>
+                        <h3>Butuh bantuan?</h3>
+                        <p>
+                            Jika NISN tidak ditemukan atau data siswa
+                            tidak sesuai, silakan hubungi bagian
+                            administrasi sekolah.
+                        </p>
+                    </div>
+                </aside>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>© {{ 2026 }} SMP Unggulan Hamzanwadi</span>
+            <span>Portal Pembayaran Siswa</span>
+        </footer>
+    </div>
+</body>
+</html>
