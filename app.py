@@ -173,6 +173,29 @@ def sebelum_permintaan():
     if request.path.startswith("/static"):
         return
 
+    
+    # =========================================================
+    # ARAHKAN HALAMAN UTAMA SESUAI DOMAIN
+    # HARUS DILETAKKAN SEBELUM DETEKSI SISTEM DAN CEK LOGIN
+    # =========================================================
+    host = request.host.split(":")[0].lower()
+
+    if request.path == "/":
+        if host in (
+            "payment.localhost",
+            "payment.smpuhamzanwadi.sch.id"
+        ):
+            return redirect("/payment/")
+
+        elif host == "school.smpuhamzanwadi.sch.id":
+            return redirect("/login")
+
+        elif host == "absensi.smpuhamzanwadi.sch.id":
+            return redirect("/login-absensi")
+
+        elif host in ("localhost", "127.0.0.1"):
+            return redirect("/login")
+
     # =========================================================
     # ✅ TENTUKAN SISTEM DARI SUBDOMAIN
     # =========================================================
@@ -315,7 +338,6 @@ from routes.profil import profil_bp
 from routes.sections.guru.jurnal_mengajar import jurnal_mengajar_bp
 
 from routes.payment.payment_public import payment_public_bp
-app.register_blueprint(payment_public_bp)
 
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
@@ -345,6 +367,7 @@ app.register_blueprint(absensi_guru_bp, url_prefix='/absensi-guru')
 app.register_blueprint(monitoring_bp)
 app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)
+app.register_blueprint(payment_public_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
 from routes.profil import profil_bp as absensi_profil_bp
@@ -365,6 +388,33 @@ def tampilkan_foto_profil(filename):
         filename,
         as_attachment=False
     )
+
+
+# =========================================================
+# 🏠 HALAMAN UTAMA BERDASARKAN SUBDOMAIN
+# =========================================================
+@app.route('/')
+def halaman_utama_subdomain():
+    host = request.host.split(':')[0].lower()
+
+    # Portal pembayaran publik
+    if host == 'payment.smpuhamzanwadi.sch.id' or host == 'payment.localhost':
+        return redirect(url_for('payment_public.index'))
+
+    # Sistem sekolah
+    if host == 'school.smpuhamzanwadi.sch.id':
+        return redirect(url_for('login.halaman_login'))
+
+    # Sistem absensi
+    if host == 'absensi.smpuhamzanwadi.sch.id':
+        return redirect(url_for('absensi.login_absensi'))
+
+    # Akses lokal biasa
+    if host in ('localhost', '127.0.0.1'):
+        return redirect(url_for('login.halaman_login'))
+
+    return redirect(url_for('login.halaman_login'))
+
 
 with app.app_context():
     db.create_all()

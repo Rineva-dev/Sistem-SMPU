@@ -5,7 +5,7 @@ from models import Siswa
 payment_public_bp = Blueprint(
     "payment_public",
     __name__,
-    url_prefix="/"
+    url_prefix="/payment-public"
 )
 
 
