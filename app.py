@@ -185,7 +185,7 @@ def sebelum_permintaan():
             "payment.localhost",
             "payment.smpuhamzanwadi.sch.id"
         ):
-            return redirect("/payment/")
+            return redirect("/payment-public/")
 
         elif host == "school.smpuhamzanwadi.sch.id":
             return redirect("/login")
