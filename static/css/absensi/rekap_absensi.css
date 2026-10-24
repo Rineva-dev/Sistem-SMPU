@@ -746,6 +746,8 @@
         margin-right: 0 !important;
         border-radius: 6px;
         gap: 1.5rem;
+        min-height: 10px !important;
+        border-radius: 6px !important;
     }
 
     .stat-card::before {
@@ -935,3 +937,922 @@ main {
         padding: 0.22rem 0.5rem !important;
     }
 }
+
+
+/* =========================================================
+   REKAP ABSENSI — PREMIUM SAAS UI OVERRIDES
+   Tempelkan di bagian paling bawah rekap_absensi.css
+   ========================================================= */
+
+.rekapitulasi-absensi-wrapper {
+    --rekap-primary: #087653;
+    --rekap-primary-dark: #064e3b;
+    --rekap-text: #172b22;
+    --rekap-muted: #718078;
+    --rekap-border: #e6ede8;
+    --rekap-surface: #ffffff;
+    color: var(--rekap-text);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-bottom: 32px;
+}
+
+.rekapitulasi-absensi-wrapper > * {
+    min-width: 0;
+}
+
+.rekapitulasi-absensi-wrapper .row {
+    --bs-gutter-x: 1.25rem;
+    --bs-gutter-y: 1.25rem;
+}
+
+/* ===== HEADER DESKTOP ===== */
+
+.rekapitulasi-absensi-wrapper .page-header {
+    display: block;
+    margin: 0 0 25px;
+    padding: 8px 0 22px;
+    border-bottom: 1px solid var(--rekap-border);
+    animation: fadeInUp .45s ease both;
+}
+
+.rekap-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 23px;
+    color: #87948b;
+    font-size: 12px;
+}
+
+.rekap-breadcrumb span,
+.rekap-breadcrumb strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.rekap-breadcrumb > i {
+    font-size: 9px;
+    color: #b2beb6;
+}
+
+.rekap-breadcrumb strong {
+    color: var(--rekap-primary);
+    font-weight: 700;
+}
+
+.rekap-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+}
+
+.rekap-heading-content {
+    min-width: 0;
+}
+
+.rekap-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--rekap-primary);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+}
+
+.rekap-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #17a875;
+    box-shadow: 0 0 0 4px #e4f5ec;
+}
+
+.rekapitulasi-absensi-wrapper .page-header h3 {
+    margin: 0;
+    color: #173629;
+    font-size: clamp(24px, 2.3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.25;
+}
+
+.rekapitulasi-absensi-wrapper .page-header h3 i {
+    color: var(--rekap-primary);
+}
+
+.rekapitulasi-absensi-wrapper .page-header p {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: var(--rekap-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.rekap-period-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    flex-shrink: 0;
+    min-width: 230px;
+    padding: 16px 18px;
+    border: 1px solid #dfece3;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #ffffff, #f3faf5);
+    box-shadow: 0 5px 18px rgba(25, 75, 48, .045);
+}
+
+.rekap-period-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #e1f4e8;
+    color: var(--rekap-primary);
+    font-size: 18px;
+}
+
+.rekap-period-card > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rekap-period-card span {
+    color: var(--rekap-muted);
+    font-size: 10px;
+}
+
+.rekap-period-card strong {
+    color: #174b34;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.rekap-period-card small {
+    color: #87948b;
+    font-size: 10px;
+}
+
+/* ===== FILTER PERIODE ===== */
+
+.rekapitulasi-absensi-wrapper .filter-card {
+    padding: 19px 23px;
+    border: 1px solid var(--rekap-border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 5px 22px rgba(22, 57, 37, .045);
+}
+
+.rekapitulasi-absensi-wrapper .filter-body {
+    width: 100%;
+}
+
+.rekapitulasi-absensi-wrapper .filter-label {
+    gap: 7px;
+    color: #53665a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.rekapitulasi-absensi-wrapper .filter-label i {
+    color: var(--rekap-primary);
+}
+
+.rekapitulasi-absensi-wrapper .filter-select {
+    min-width: 145px;
+    min-height: 43px;
+    padding: 10px 35px 10px 13px;
+    border: 1px solid #dfe8e1;
+    border-radius: 11px;
+    background-color: #fbfdfb;
+    color: #254333;
+    font-size: 13px;
+    font-weight: 600;
+    appearance: auto;
+    -webkit-appearance: auto;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.rekapitulasi-absensi-wrapper .filter-select:focus {
+    border-color: #26956b;
+    box-shadow: 0 0 0 3px rgba(8, 118, 83, .1);
+}
+
+/* ===== KARTU STATISTIK ===== */
+
+.rekapitulasi-absensi-wrapper .stat-card {
+    min-height: 150px;
+    height: 100%;
+    padding: 23px;
+    gap: 17px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 22px rgba(20, 55, 37, .09);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.rekapitulasi-absensi-wrapper .stat-card::before {
+    top: -45px;
+    right: -25px;
+    width: 145px;
+    height: 145px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.07);
+}
+
+.rekapitulasi-absensi-wrapper .stat-card::after {
+    content: "";
+    position: absolute;
+    right: 23px;
+    bottom: -48px;
+    width: 105px;
+    height: 105px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.rekapitulasi-absensi-wrapper .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(20, 55, 37, .14);
+}
+
+.rekapitulasi-absensi-wrapper .stat-icon {
+    position: relative;
+    z-index: 1;
+    width: 54px;
+    height: 54px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 16px;
+    background: rgba(255,255,255,.18);
+    font-size: 23px;
+}
+
+.rekapitulasi-absensi-wrapper .stat-content {
+    position: relative;
+    z-index: 1;
+}
+
+.rekapitulasi-absensi-wrapper .stat-label {
+    margin-bottom: 10px;
+    color: rgba(255,255,255,.9);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.rekapitulasi-absensi-wrapper .stat-value {
+    color: #fff;
+    font-size: clamp(29px, 2.5vw, 37px);
+    font-weight: 800;
+    letter-spacing: -1.2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.rekapitulasi-absensi-wrapper .stat-value-big {
+    color: #fff;
+    font-size: clamp(29px, 2.5vw, 37px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.rekapitulasi-absensi-wrapper .stat-unit {
+    margin-top: 8px;
+    color: rgba(255,255,255,.83);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* ===== KARTU TABEL ===== */
+
+.rekapitulasi-absensi-wrapper .table-card {
+    margin-bottom: 25px;
+    border: 1px solid var(--rekap-border);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 5px 22px rgba(22, 57, 37, .045);
+}
+
+.rekapitulasi-absensi-wrapper .table-header {
+    gap: 12px;
+    padding: 21px 24px;
+    border-bottom: 1px solid var(--rekap-border);
+    background: #fff;
+}
+
+.rekapitulasi-absensi-wrapper .table-title {
+    color: #203d2d;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.6;
+}
+
+.rekapitulasi-absensi-wrapper .table-title i {
+    color: var(--rekap-primary);
+}
+
+.rekapitulasi-absensi-wrapper .table-badge {
+    padding: 7px 11px;
+    border: 1px solid #dceee2;
+    border-radius: 10px;
+    background: #eef8f1;
+    color: #16744b;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.rekapitulasi-absensi-wrapper .table-responsive {
+    max-width: 100%;
+    border-radius: 0 0 20px 20px;
+    overscroll-behavior-x: contain;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table {
+    min-width: 760px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table thead {
+    background: #f7faf8;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table th {
+    padding: 15px 18px;
+    border-bottom: 1px solid #e5ece7;
+    background: #f7faf8;
+    color: #64756a;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .25px;
+    white-space: nowrap;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table th i {
+    color: #16815a;
+    font-size: 11px;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid #eff3f0;
+    color: #405448;
+    font-size: 12px;
+    line-height: 1.7;
+    vertical-align: middle;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.rekapitulasi-absensi-wrapper .custom-table tbody tr:hover {
+    background: #f8fcf9;
+}
+
+.rekapitulasi-absensi-wrapper .td-tanggal {
+    color: #294936;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.rekapitulasi-absensi-wrapper .td-jam {
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.rekapitulasi-absensi-wrapper .td-keterangan {
+    min-width: 180px;
+    color: #738078;
+    overflow-wrap: anywhere;
+}
+
+.rekapitulasi-absensi-wrapper .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    white-space: nowrap;
+}
+
+.rekapitulasi-absensi-wrapper .badge-hadir {
+    border-color: #d2efdf;
+    background: #eaf8ef;
+    color: #137447;
+}
+
+.rekapitulasi-absensi-wrapper .badge-terlambat {
+    border-color: #f5e3b8;
+    background: #fff7e5;
+    color: #99600a;
+}
+
+.rekapitulasi-absensi-wrapper .badge-izin {
+    border-color: #d5e7fb;
+    background: #edf6ff;
+    color: #245e9b;
+}
+
+.rekapitulasi-absensi-wrapper .badge-sakit {
+    border-color: #dfdcfb;
+    background: #f1efff;
+    color: #5b4aa0;
+}
+
+.rekapitulasi-absensi-wrapper .badge-alfa {
+    border-color: #f5d8d8;
+    background: #fff0f0;
+    color: #b33e3e;
+}
+
+.rekapitulasi-absensi-wrapper .td-empty {
+    padding: 45px 20px !important;
+    color: #819087 !important;
+    font-size: 13px !important;
+    font-style: normal;
+}
+
+/* ===== EXPORT EXCEL ===== */
+
+.rekapitulasi-absensi-wrapper .export-card {
+    padding: 27px;
+    border: 1px solid #dcece1;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #ffffff 0%, #f5fbf6 100%);
+    box-shadow: 0 7px 25px rgba(20, 80, 46, .055);
+}
+
+.rekapitulasi-absensi-wrapper .export-card-decoration {
+    top: -65px;
+    right: -45px;
+    width: 230px;
+    height: 230px;
+    background: radial-gradient(circle, rgba(16,185,129,.1), transparent 70%);
+}
+
+.rekapitulasi-absensi-wrapper .export-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border: 1px solid rgba(255,255,255,.4);
+    border-radius: 17px;
+    background: linear-gradient(145deg, #159b68, #08734d);
+    box-shadow: 0 7px 17px rgba(8, 118, 83, .2);
+}
+
+.rekapitulasi-absensi-wrapper .export-icon-wrap i {
+    font-size: 25px;
+}
+
+.rekapitulasi-absensi-wrapper .export-title {
+    color: #174b34;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.rekapitulasi-absensi-wrapper .export-subtitle {
+    margin-top: 4px;
+    color: #728178;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.rekapitulasi-absensi-wrapper .export-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 19px 16px;
+}
+
+.rekapitulasi-absensi-wrapper .export-form-grid > .form-group-wrap {
+    width: 100%;
+    min-width: 0;
+}
+
+.rekapitulasi-absensi-wrapper .form-label-export {
+    margin-bottom: 8px;
+    color: #486454;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.rekapitulasi-absensi-wrapper .form-select-export,
+.rekapitulasi-absensi-wrapper .custom-select-trigger {
+    min-height: 47px;
+    padding: 11px 14px;
+    border: 1px solid #dce8df;
+    border-radius: 12px;
+    background-color: #fff;
+    color: #294c38;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.rekapitulasi-absensi-wrapper .form-select-export {
+    padding-right: 38px;
+    background-position: right 13px center;
+}
+
+.rekapitulasi-absensi-wrapper .form-select-export:hover,
+.rekapitulasi-absensi-wrapper .custom-select-trigger:hover {
+    border-color: #91c9a7;
+    box-shadow: 0 0 0 3px rgba(8, 118, 83, .055);
+}
+
+.rekapitulasi-absensi-wrapper .form-select-export:focus {
+    border-color: #16815a;
+    box-shadow: 0 0 0 3px rgba(8, 118, 83, .1);
+}
+
+.rekapitulasi-absensi-wrapper .trigger-icon {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    background: #e6f5eb;
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .trigger-arrow {
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .custom-select-trigger.open {
+    border-color: #16815a;
+    box-shadow: 0 0 0 3px rgba(8, 118, 83, .09);
+}
+
+.rekapitulasi-absensi-wrapper .custom-select-dropdown {
+    border: 1px solid #e0eae3;
+    border-radius: 13px;
+    box-shadow: 0 15px 35px rgba(22, 57, 37, .15);
+}
+
+.rekapitulasi-absensi-wrapper .custom-select-dropdown.open {
+    border-top: 1px solid #d7e9dd;
+}
+
+.rekapitulasi-absensi-wrapper .custom-option {
+    min-height: 43px;
+    padding: 11px 14px;
+    font-size: 12px;
+}
+
+.rekapitulasi-absensi-wrapper .custom-option:hover {
+    padding-left: 17px;
+    background: #f2faf4;
+}
+
+.rekapitulasi-absensi-wrapper .custom-option.active {
+    background: #e6f5eb;
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .option-icon {
+    color: #16815a;
+}
+
+.rekapitulasi-absensi-wrapper .btn-export-xl {
+    min-height: 47px;
+    height: auto;
+    padding: 10px 15px;
+    border: 1px solid #08734d;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #159b68, #08734d);
+    box-shadow: 0 6px 15px rgba(8, 118, 83, .17);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.rekapitulasi-absensi-wrapper .btn-export-xl:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(8, 118, 83, .24);
+}
+
+.rekapitulasi-absensi-wrapper .btn-export-xl .btn-icon {
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+}
+
+/* ===== TANGGAL MOBILE ===== */
+
+.rekapitulasi-absensi-wrapper .hp-fixed-header {
+    border-bottom: 1px solid rgba(223, 234, 226, .9);
+    box-shadow: 0 3px 15px rgba(20, 55, 37, .045);
+}
+
+.rekapitulasi-absensi-wrapper .header-kembali-btn,
+.rekapitulasi-absensi-wrapper .header-keluar-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    text-decoration: none;
+}
+
+.rekapitulasi-absensi-wrapper .header-kembali-btn {
+    background: #edf7f0;
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .header-keluar-btn {
+    background: #fff1f1;
+    color: #c34c4c;
+}
+
+.rekapitulasi-absensi-wrapper .hp-date-text {
+    color: #234632;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.rekapitulasi-absensi-wrapper .hp-calendar-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: #eaf6ee;
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .kalender-bulan-tahun-popup {
+    width: min(280px, calc(100vw - 32px));
+    border: 1px solid #e0eae3;
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(20, 55, 37, .18);
+}
+
+.rekapitulasi-absensi-wrapper .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.rekapitulasi-absensi-wrapper .calendar-title {
+    color: #214832;
+    font-weight: 800;
+}
+
+.rekapitulasi-absensi-wrapper .calendar-nav {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e1ebe3;
+    border-radius: 9px;
+    background: #f6faf7;
+    color: #087653;
+}
+
+.rekapitulasi-absensi-wrapper .calendar-months,
+.rekapitulasi-absensi-wrapper .calendar-years {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.rekapitulasi-absensi-wrapper .month-item,
+.rekapitulasi-absensi-wrapper .year-item {
+    padding: 10px 4px;
+    border-radius: 9px;
+    color: #506357;
+    text-align: center;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.rekapitulasi-absensi-wrapper .month-item.active,
+.rekapitulasi-absensi-wrapper .year-item.active {
+    background: #e4f5e9;
+    color: #087653;
+    font-weight: 800;
+}
+
+/* ===== TABLET ===== */
+
+@media (max-width: 1100px) {
+    .rekap-heading-row {
+        align-items: flex-start;
+    }
+
+    .rekap-period-card {
+        min-width: 205px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-icon {
+        width: 47px;
+        height: 47px;
+        font-size: 20px;
+    }
+}
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 768px) {
+    /* Header desktop digantikan header HP */
+    .rekapitulasi-absensi-wrapper .page-header,
+    .rekapitulasi-absensi-wrapper .filter-card {
+        display: none !important;
+    }
+
+    .rekapitulasi-absensi-wrapper .hp-fixed-header {
+        display: flex;
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-card:hover {
+        transform: none;
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        font-size: 17px;
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-label {
+        margin-bottom: 7px;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-value,
+    .rekapitulasi-absensi-wrapper .stat-value-big {
+        font-size: clamp(25px, 7vw, 32px);
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-unit {
+        display: block;
+        margin-top: 5px;
+        font-size: 10px;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-card {
+        margin-bottom: 18px;
+        border-radius: 17px;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-header {
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px 13px;
+        text-align: left;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-title {
+        align-items: center;
+        font-size: 12px;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-badge {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    i.fas.fa-list-alt.me-2 {
+        margin-top: 1px;
+    }
+
+    .rekapitulasi-absensi-wrapper .custom-table {
+        min-width: 700px;
+    }
+
+    .rekapitulasi-absensi-wrapper .custom-table th {
+        padding: 13px 12px !important;
+        font-size: 10px !important;
+    }
+
+    .rekapitulasi-absensi-wrapper .custom-table td {
+        padding: 13px 12px !important;
+        font-size: 11px !important;
+    }
+
+    .rekapitulasi-absensi-wrapper .status-badge {
+        padding: 5px 8px !important;
+        font-size: 9px !important;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-card {
+        padding: 19px 15px;
+        margin-bottom: 20px !important;
+        border-radius: 19px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-header {
+        gap: 12px;
+        margin-bottom: 21px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-icon-wrap {
+        width: 45px;
+        height: 45px;
+        border-radius: 13px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-icon-wrap i {
+        font-size: 20px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-title {
+        font-size: 15px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-subtitle {
+        font-size: 11px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 17px;
+    }
+
+    .rekapitulasi-absensi-wrapper .export-form-grid > .form-group-wrap {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .rekapitulasi-absensi-wrapper .form-label-export {
+        font-size: 11px;
+    }
+
+    .rekapitulasi-absensi-wrapper .form-select-export,
+    .rekapitulasi-absensi-wrapper .custom-select-trigger {
+        width: 100%;
+        min-height: 47px;
+        padding: 11px 13px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .rekapitulasi-absensi-wrapper .form-select-export {
+        padding-right: 38px;
+    }
+
+    .rekapitulasi-absensi-wrapper .custom-select-dropdown {
+        max-width: 100%;
+    }
+
+    .rekapitulasi-absensi-wrapper .btn-export-xl {
+        width: 100%;
+        min-height: 49px;
+        border-radius: 12px;
+        font-size: 13px;
+    }
+}
+
+/* ===== HP SANGAT KECIL ===== */
+
+@media (max-width: 380px) {
+    .rekapitulasi-absensi-wrapper .stat-label {
+        font-size: 10px;
+    }
+
+    .rekapitulasi-absensi-wrapper .stat-value,
+    .rekapitulasi-absensi-wrapper .stat-value-big {
+        font-size: 25px;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-header {
+        gap: 7px;
+        padding: 14px 10px;
+    }
+
+    .rekapitulasi-absensi-wrapper .table-title {
+        font-size: 11px;
+    }
+}
+
+/* ===== AKSESIBILITAS & ANIMASI ===== */
+
+@media (prefers-reduced-motion: reduce) {
+    .rekapitulasi-absensi-wrapper *,
+    .rekapitulasi-absensi-wrapper *::before,
+    .rekapitulasi-absensi-wrapper *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+

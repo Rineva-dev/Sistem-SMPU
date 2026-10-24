@@ -14,11 +14,43 @@
             <i class="fas fa-sign-out-alt"></i>
         </a>
     </header>
-    <!-- === JUDUL HALAMAN === -->
+    
+    <!-- HEADER HALAMAN PREMIUM -->
     <div class="page-header">
-        <h3><i class="fas fa-chart-pie me-2"></i>Rekapitulasi Absensi Guru</h3>
-        <p class="page-subtitle">Periode: {{nama_bulan_terpilih}} {{filter_tahun}} &nbsp;|&nbsp; Tahun Pelajaran: {{label_tp}}</p>
+        <div class="rekap-breadcrumb">
+            <span><i class="fas fa-th-large"></i> Workspace</span>
+            <i class="fas fa-chevron-right"></i>
+            <span>Absensi</span>
+            <i class="fas fa-chevron-right"></i>
+            <strong>Rekapitulasi</strong>
+        </div>
+
+        <div class="rekap-heading-row">
+            <div class="rekap-heading-content">
+                <span class="rekap-eyebrow">
+                    <span class="rekap-eyebrow-dot"></span>
+                    TEACHER ATTENDANCE ANALYTICS
+                </span>
+                <h3>Rekapitulasi Absensi Guru</h3>
+                <p>
+                    Pantau statistik kehadiran dan kelola laporan absensi
+                    berdasarkan periode yang dipilih.
+                </p>
+            </div>
+
+            <div class="rekap-period-card">
+                <div class="rekap-period-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <span>Periode Rekapitulasi</span>
+                    <strong>{{ nama_bulan_terpilih }} {{ filter_tahun }}</strong>
+                    <small>Tahun Pelajaran {{ label_tp }}</small>
+                </div>
+            </div>
+        </div>
     </div>
+
     <!-- === FILTER BULAN & TAHUN === -->
     <div class="filter-card mb-4">
         <div class="filter-body">
