@@ -315,6 +315,7 @@ from routes.profil import profil_bp
 from routes.sections.guru.jurnal_mengajar import jurnal_mengajar_bp
 
 from routes.payment.payment_public import payment_public_bp
+app.register_blueprint(payment_public_bp)
 
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
@@ -344,7 +345,6 @@ app.register_blueprint(absensi_guru_bp, url_prefix='/absensi-guru')
 app.register_blueprint(monitoring_bp)
 app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)
-app.register_blueprint(payment_public_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
 from routes.profil import profil_bp as absensi_profil_bp
