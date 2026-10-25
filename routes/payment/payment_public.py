@@ -1,5 +1,4 @@
-
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from models import Siswa
 
 payment_public_bp = Blueprint(
@@ -8,48 +7,54 @@ payment_public_bp = Blueprint(
     url_prefix="/payment-public"
 )
 
-
 @payment_public_bp.route("/", methods=["GET", "POST"])
 def index():
-    siswa = None
-    nisn = ""
-    pesan = None
-    status_pencarian = None
+    # Halaman utama — tidak perlu perubahan besar
+    return render_template("payment/index.html")
 
-    if request.method == "POST":
-        nisn = request.form.get("nisn", "").strip()
-
-        if not nisn:
-            pesan = "Silakan masukkan NISN siswa."
-            status_pencarian = "error"
-
-        elif not nisn.isdigit() or len(nisn) != 10:
-            pesan = "NISN harus terdiri dari 10 digit angka."
-            status_pencarian = "error"
-
-        else:
-            siswa = Siswa.query.filter_by(nisn=nisn).first()
-
-            if siswa is None:
-                pesan = "NISN tidak terdaftar."
-                status_pencarian = "not_found"
-
-            else:
-                # Hanya siswa aktif yang dapat melanjutkan
-                # ke proses pembayaran publik.
-                if (siswa.status or "").strip().lower() != "aktif":
-                    pesan = (
-                        "Data siswa ditemukan, tetapi status "
-                        "siswa perlu dikonfirmasi ke pihak sekolah."
-                    )
-                    status_pencarian = "inactive"
-                else:
-                    status_pencarian = "found"
-
-    return render_template(
-        "payment/index.html",
-        siswa=siswa,
-        nisn=nisn,
-        pesan=pesan,
-        status_pencarian=status_pencarian
+@payment_public_bp.route("/cari_siswa", methods=["POST"])
+def cari_siswa():
+    nisn = request.form.get("nisn", "").strip()
+    
+    if not nisn:
+        return jsonify({
+            "status": "error",
+            "pesan": "Silakan masukkan NISN siswa."
+        })
+    
+    if not nisn.isdigit() or len(nisn) != 10:
+        return jsonify({
+            "status": "error",
+            "pesan": "NISN harus terdiri dari 10 digit angka."
+        })
+    
+    siswa = Siswa.query.filter_by(nisn=nisn).first()
+    
+    if not siswa:
+        return jsonify({
+            "status": "not_found",
+            "pesan": "NISN tidak terdaftar."
+        })
+    
+    if (siswa.status or "").strip().lower() != "aktif":
+        return jsonify({
+            "status": "inactive",
+            "pesan": "Data siswa ditemukan, tetapi status siswa perlu dikonfirmasi ke pihak sekolah."
+        })
+    
+    nama_kelas = (
+        siswa.kelas_sekarang.nama_kelas
+        if hasattr(siswa, 'kelas_sekarang') and siswa.kelas_sekarang
+        else (siswa.tingkat or "Belum ditentukan")
     )
+    
+    return jsonify({
+        "status": "found",
+        "pesan": "Data siswa berhasil ditemukan.",
+        "siswa": {
+            "nama": siswa.nama or "Nama tidak tersedia",
+            "nisn": siswa.nisn,
+            "kelas": nama_kelas,
+            "tahun_masuk": siswa.tahun_masuk or "-"
+        }
+    })

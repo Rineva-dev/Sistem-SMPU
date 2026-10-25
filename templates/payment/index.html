@@ -3,225 +3,546 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#103d30">
 
-    <title>Portal Pembayaran Siswa | SMP Unggulan Hamzanwadi</title>
-    <meta
-        name="description"
-        content="Portal resmi untuk mengecek informasi pembayaran siswa SMP Unggulan Hamzanwadi."
-    >
+    <title>Portal Pembayaran — SMP Unggulan Hamzanwadi</title>
+    <meta name="description" content="Portal pembayaran resmi SMP Unggulan Hamzanwadi. Cari data siswa untuk mengakses informasi pembayaran sekolah.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/payment/public.css') }}"
-    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/payment/public.css') }}">
 </head>
 
 <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
     <div class="page-shell">
+
+        <!-- HEADER -->
         <header class="topbar">
-            <a href="/" class="brand">
-                <div class="brand-logo">SH</div>
+            <a href="{{ url_for('payment_public.index') }}" class="brand">
+                <div class="brand-symbol">
+                    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                        <path d="M20 4 35 12v16L20 36 5 28V12L20 4Z"
+                              stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M11 16.5 20 11l9 5.5v10l-9 5-9-5v-10Z"
+                              stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M15 19h10M20 15v12"
+                              stroke="currentColor" stroke-width="1.8"
+                              stroke-linecap="round"/>
+                    </svg>
+                </div>
+
                 <div class="brand-copy">
-                    <strong>SMP Unggulan Hamzanwadi</strong>
-                    <span>PORTAL PEMBAYARAN SISWA</span>
+                    <strong>SMPU<span>.</span></strong>
+                    <small>HAMZANWADI</small>
                 </div>
             </a>
 
-            <div class="secure-label">
+            <div class="header-right">
                 <span class="secure-dot"></span>
-                Portal Resmi Sekolah
+                <span>Portal Pembayaran Resmi</span>
             </div>
         </header>
 
-        <main>
-            <section class="hero">
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <section class="hero-grid">
+
+                <!-- LEFT: INTRO -->
                 <div class="hero-copy">
+
                     <div class="eyebrow">
-                        <span class="eyebrow-icon">✦</span>
-                        LAYANAN PEMBAYARAN DIGITAL
+                        <span class="eyebrow-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="m12 3 2.3 5.7L20 11l-5.7 2.3L12 19l-2.3-5.7L4 11l5.7-2.3L12 3Z"
+                                      stroke="currentColor" stroke-width="1.5"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        LAYANAN DIGITAL SEKOLAH
                     </div>
 
                     <h1>
-                        Urusan pembayaran sekolah,
-                        <span>jadi lebih mudah.</span>
+                        Urusan sekolah,
+                        <span class="headline-accent">
+                            lebih mudah.
+                            <svg class="headline-underline" viewBox="0 0 250 13" fill="none" aria-hidden="true">
+                                <path d="M4 9C65 2 166 1 246 7"
+                                      stroke="currentColor" stroke-width="4"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </span>
                     </h1>
 
-                    <p>
-                        Cek informasi tagihan dan pembayaran putra-putri
-                        Anda melalui satu portal yang praktis dan mudah
-                        digunakan.
+                    <p class="hero-description">
+                        Satu langkah sederhana untuk mengakses informasi
+                        pembayaran sekolah. Praktis, jelas, dan nyaman
+                        dari mana saja.
                     </p>
 
                     <div class="hero-points">
-                        <div>
-                            <span class="check-icon">✓</span>
-                            Informasi lebih praktis
+                        <div class="hero-point">
+                            <span class="point-check">✓</span>
+                            Akses praktis
                         </div>
-                        <div>
-                            <span class="check-icon">✓</span>
-                            Akses kapan saja
+                        <div class="hero-point">
+                            <span class="point-check">✓</span>
+                            Informasi transparan
                         </div>
                     </div>
+
+                    <!-- DECORATIVE INFO -->
+                    <div class="mini-note">
+                        <div class="note-icon">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 3 20 6v5c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6l8-3Z"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linejoin="round"/>
+                                <path d="m8.5 12 2.2 2.2 4.8-5"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <strong>Dirancang untuk kemudahan Anda</strong>
+                            <span>Portal pembayaran SMP Unggulan Hamzanwadi</span>
+                        </div>
+
+                        <div class="note-sparkle">✳</div>
+                    </div>
+
                 </div>
 
-                <div class="hero-decoration" aria-hidden="true">
-                    <div class="decoration-circle circle-one"></div>
-                    <div class="decoration-circle circle-two"></div>
-                    <div class="decoration-card">
-                        <div class="decoration-icon">↗</div>
-                        <div class="decoration-line long"></div>
-                        <div class="decoration-line short"></div>
-                        <div class="decoration-status">
-                            <span></span> Sistem pembayaran sekolah
-                        </div>
-                    </div>
-                </div>
-            </section>
+                <!-- RIGHT: SEARCH CARD -->
+                <div class="search-stage">
 
-            <section class="lookup-section">
-                <div class="lookup-card">
-                    <div class="section-heading">
-                        <div class="heading-icon">⌕</div>
-                        <div>
-                            <h2>Cek pembayaran siswa</h2>
-                            <p>
-                                Masukkan NISN untuk mencari data siswa.
-                            </p>
-                        </div>
-                    </div>
+                    <div class="orbit orbit-one"></div>
+                    <div class="orbit orbit-two"></div>
 
-                    <form method="POST" action="{{ url_for('payment_public.index') }}">
-                        <label for="nisn">
-                            Nomor Induk Siswa Nasional (NISN)
-                        </label>
+                    <div class="float-decoration float-star">✳</div>
+                    <div class="float-decoration float-plus">+</div>
+                    <div class="float-decoration float-dot"></div>
 
-                        <div class="input-wrap">
-                            <span class="input-icon">◎</span>
-                            <input
-                                type="text"
-                                id="nisn"
-                                name="nisn"
-                                inputmode="numeric"
-                                pattern="[0-9]{10}"
-                                minlength="10"
-                                maxlength="10"
-                                placeholder="Masukkan 10 digit NISN"
-                                value="{{ nisn }}"
-                                autocomplete="off"
-                                required
-                            >
+                    <div class="search-card">
+
+                        <div class="card-top">
+                            <div class="card-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="10.8" cy="10.8" r="6.8"
+                                            stroke="currentColor" stroke-width="1.7"/>
+                                    <path d="m16 16 4.2 4.2"
+                                          stroke="currentColor" stroke-width="1.7"
+                                          stroke-linecap="round"/>
+                                    <path d="M8 10.8h5.6M10.8 8v5.6"
+                                          stroke="currentColor" stroke-width="1.3"
+                                          stroke-linecap="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="card-label">
+                                <span>LANGKAH PERTAMA</span>
+                                <h2>Temukan data siswa</h2>
+                            </div>
+
+                            <div class="card-index">01</div>
                         </div>
 
-                        <button class="search-button" type="submit">
-                            <span>Cari Data Siswa</span>
-                            <span aria-hidden="true">→</span>
-                        </button>
-                    </form>
+                        <p class="card-description">
+                            Masukkan NISN siswa untuk memulai proses
+                            pengecekan informasi pembayaran.
+                        </p>
 
-                    {% if pesan %}
-                        <div
-                            class="notice notice-{{ status_pencarian }}"
+                        <form action="{{ url_for('payment_public.index') }}"
+                              method="POST"
+                              class="search-form">
+
+                            <label for="nisn">Nomor Induk Siswa Nasional</label>
+
+                            <div class="input-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <rect x="3.5" y="5" width="17" height="14"
+                                          rx="3" stroke="currentColor"
+                                          stroke-width="1.5"/>
+                                    <circle cx="9" cy="10" r="2"
+                                            stroke="currentColor" stroke-width="1.4"/>
+                                    <path d="M6.5 15c.5-1.5 1.4-2.2 2.5-2.2s2 .7 2.5 2.2M14 10h3.5M14 14h3.5"
+                                          stroke="currentColor" stroke-width="1.4"
+                                          stroke-linecap="round"/>
+                                </svg>
+
+                                <input
+                                    type="text"
+                                    id="nisn"
+                                    name="nisn"
+                                    inputmode="numeric"
+                                    pattern="[0-9]{10}"
+                                    minlength="10"
+                                    maxlength="10"
+                                    placeholder="Masukkan 10 digit NISN"
+                                    value="{{ nisn or '' }}"
+                                    autocomplete="off"
+                                    required
+                                >
+
+                                <span class="input-count">10 DIGIT</span>
+                            </div>
+
+                            <div class="input-hint">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9"
+                                            stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M12 11v5M12 8h.01"
+                                          stroke="currentColor" stroke-width="1.7"
+                                          stroke-linecap="round"/>
+                                </svg>
+                                Gunakan NISN yang terdaftar di sekolah.
+                            </div>
+
+                            <button type="submit" class="search-button">
+                                <span>Cari Data Siswa</span>
+                                <span class="button-arrow">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M5 12h14m-6-6 6 6-6 6"
+                                              stroke="currentColor"
+                                              stroke-width="1.8"
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </button>
+
+                        </form>
+
+                        <!-- PESAN HASIL PENCARIAN -->
+                        <div id="searchNotice"
+                            class="notice"
                             role="status"
                             aria-live="polite"
-                        >
-                            <span class="notice-icon">
-                                {% if status_pencarian == 'found' %}
-                                    ✓
-                                {% else %}
-                                    !
-                                {% endif %}
+                            hidden>
+                            <span class="notice-icon" id="noticeIcon">!</span>
+                            <span id="noticeMessage"></span>
+                        </div>
+
+                        <div class="card-bottom">
+                            <span class="bottom-shield">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="m12 3 8 3v5c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6l8-3Z"
+                                          stroke="currentColor" stroke-width="1.5"
+                                          stroke-linejoin="round"/>
+                                    <path d="m9 12 2 2 4-4"
+                                          stroke="currentColor" stroke-width="1.5"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"/>
+                                </svg>
                             </span>
-                            <span>{{ pesan }}</span>
+                            Data digunakan untuk keperluan layanan sekolah.
+                            <span class="card-bottom-dot"></span>
                         </div>
-                    {% endif %}
 
-                    {% if status_pencarian == 'found' and siswa %}
-                        <div class="student-result">
-                            <div class="result-heading">
-                                <div>
-                                    <span class="result-eyebrow">
-                                        DATA SISWA DITEMUKAN
-                                    </span>
-                                    <h3>Konfirmasi data siswa</h3>
-                                </div>
-                                <span class="active-status">
-                                    Aktif
-                                </span>
-                            </div>
+                    </div>
 
-                            <div class="student-identity">
-                                <div class="student-avatar">
-                                    {{ siswa.nama[0] | upper }}
-                                </div>
-                                <div class="student-info">
-                                    <h4>{{ siswa.nama }}</h4>
-                                    <p>NISN: {{ siswa.nisn }}</p>
-                                </div>
-                            </div>
-
-                            <div class="student-details">
-                                <div class="detail-item">
-                                    <span>Kelas</span>
-                                    <strong>
-                                        {{ siswa.kelas_sekarang.nama_kelas
-                                           if siswa.kelas_sekarang
-                                           and siswa.kelas_sekarang.nama_kelas
-                                           else (siswa.tingkat or 'Belum ditentukan') }}
-                                    </strong>
-                                </div>
-
-                                <div class="detail-item">
-                                    <span>Tahun masuk</span>
-                                    <strong>
-                                        {{ siswa.tahun_masuk or '-' }}
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div class="result-note">
-                                Pastikan nama dan data siswa di atas
-                                sesuai sebelum melanjutkan.
-                            </div>
-
-                            <button
-                                class="continue-button"
-                                type="button"
-                                disabled
-                                title="Aktif setelah integrasi data tagihan"
-                            >
-                                Informasi tagihan segera tersedia
-                                <span>→</span>
-                            </button>
+                    <div class="floating-tag tag-top">
+                        <span class="tag-symbol">✦</span>
+                        <div>
+                            <strong>Simple &amp; Easy</strong>
+                            <small>Lebih praktis</small>
                         </div>
-                    {% endif %}
+                    </div>
+
+                    <div class="floating-tag tag-bottom">
+                        <span class="tag-live"></span>
+                        <div>
+                            <strong>Digital Service</strong>
+                            <small>Layanan sekolah</small>
+                        </div>
+                    </div>
+
                 </div>
 
-                <aside class="help-card">
-                    <div class="help-icon">i</div>
-                    <div>
-                        <h3>Butuh bantuan?</h3>
-                        <p>
-                            Jika NISN tidak ditemukan atau data siswa
-                            tidak sesuai, silakan hubungi bagian
-                            administrasi sekolah.
-                        </p>
-                    </div>
-                </aside>
             </section>
+
+            <!-- STUDENT RESULT -->
+            <section id="studentResult"
+                    class="student-result"
+                    aria-live="polite"
+                    hidden>
+
+                <div class="result-heading">
+                    <div>
+                        <span class="section-kicker">HASIL PENCARIAN</span>
+                        <h2>Data siswa ditemukan</h2>
+                    </div>
+
+                    <span class="result-badge">
+                        <span></span> Terdaftar
+                    </span>
+                </div>
+
+                <div class="student-panel">
+                    <div class="student-identity">
+                        <div class="student-avatar" id="studentAvatar">
+                            S
+                            <span class="avatar-sparkle">✦</span>
+                        </div>
+
+                        <div class="student-name">
+                            <span>IDENTITAS SISWA</span>
+                            <h3 id="studentName"></h3>
+                            <p id="studentNisn"></p>
+                        </div>
+                    </div>
+
+                    <div class="student-divider"></div>
+
+                    <div class="student-meta">
+                        <div class="meta-item">
+                            <span>Kelas</span>
+                            <strong id="studentClass"></strong>
+                        </div>
+
+                        <div class="meta-item">
+                            <span>Tahun Masuk</span>
+                            <strong id="studentYear"></strong>
+                        </div>
+                    </div>
+
+                    <div class="student-message">
+                        <span class="message-icon">i</span>
+                        <p>Pastikan identitas siswa sudah benar sebelum melanjutkan ke informasi pembayaran.</p>
+                    </div>
+
+                    <button type="button" class="coming-soon-button" disabled>
+                        <span class="coming-soon-icon">✦</span>
+                        Informasi tagihan segera tersedia
+                    </button>
+                </div>
+            </section>
+
+            <!-- BOTTOM FEATURES -->
+            <section class="features-section">
+
+                <div class="features-intro">
+                    <span class="section-kicker">DIBUAT UNTUK ANDA</span>
+                    <h2>Lebih simpel. Lebih nyaman.</h2>
+                </div>
+
+                <div class="feature-list">
+
+                    <article class="feature-item">
+                        <div class="feature-icon feature-green">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="m12 3 8 3v5c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10V6l8-3Z"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linejoin="round"/>
+                                <path d="m9 12 2 2 4-4"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Data terjaga</h3>
+                            <p>Informasi siswa untuk layanan yang lebih tertata.</p>
+                        </div>
+                    </article>
+
+                    <article class="feature-item">
+                        <div class="feature-icon feature-gold">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="9"
+                                        stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M12 7v5l3 2"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Hemat waktu</h3>
+                            <p>Mulai pencarian tanpa proses yang berbelit.</p>
+                        </div>
+                    </article>
+
+                    <article class="feature-item">
+                        <div class="feature-icon feature-dark">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="5" width="18" height="14"
+                                      rx="3" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M3 10h18M7 15h4"
+                                      stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Informasi jelas</h3>
+                            <p>Identitas siswa menjadi awal layanan pembayaran.</p>
+                        </div>
+                    </article>
+
+                </div>
+
+            </section>
+
         </main>
 
-        <footer class="footer">
-            <span>© {{ 2026 }} SMP Unggulan Hamzanwadi</span>
-            <span>Portal Pembayaran Siswa</span>
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <div class="footer-brand">
+                <span class="footer-mark">S.</span>
+                <span>SMP Unggulan Hamzanwadi</span>
+            </div>
+
+            <span class="footer-copy">
+                © {{ now_wita().year if now_wita is defined else 2026 }}
+                SMP Unggulan Hamzanwadi
+            </span>
+
+            <span class="footer-status">
+                <span></span> Portal Resmi Sekolah
+            </span>
         </footer>
+
     </div>
+
+    
+    
+    <script>
+    (() => {
+        const form = document.querySelector('.search-form');
+        const input = document.getElementById('nisn');
+        const button = document.querySelector('.search-button');
+        const buttonText = button?.querySelector('span:first-child');
+        const notice = document.getElementById('searchNotice');
+        const noticeIcon = document.getElementById('noticeIcon');
+        const noticeMessage = document.getElementById('noticeMessage');
+        const result = document.getElementById('studentResult');
+
+        if (!form || !input || !button || !notice || !result) {
+            console.error('Elemen pencarian tidak ditemukan.');
+            return;
+        }
+
+        let controller = null;
+        let requestId = 0;
+
+        // Hanya izinkan angka di input
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+        function showNotice(message, status) {
+            notice.className = 'notice';
+            notice.classList.remove('notice-success', 'notice-error');
+            if (status === 'found') {
+                notice.classList.add('notice-success');
+                noticeIcon.textContent = '✓';
+            } else {
+                notice.classList.add('notice-error');
+                noticeIcon.textContent = '!';
+            }
+            noticeMessage.textContent = message;
+            notice.hidden = false;
+        }
+
+        function hideNotice() {
+            notice.hidden = true;
+            noticeMessage.textContent = '';
+        }
+
+        function showResult(student) {
+            document.getElementById('studentName').textContent = student.nama || 'Nama tidak tersedia';
+            document.getElementById('studentNisn').textContent = 'NISN ' + student.nisn;
+            document.getElementById('studentClass').textContent = student.kelas || 'Belum ditentukan';
+            document.getElementById('studentYear').textContent = student.tahun_masuk || '-';
+            result.hidden = false;
+        }
+
+        function hideResult() {
+            result.hidden = true;
+        }
+
+        // Proses pencarian — inti dari tanpa reload
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Cegah pengiriman form biasa = reload
+            event.stopPropagation();
+
+            if (button.disabled) return;
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const nisn = input.value.trim();
+            if (!/^\d{10}$/.test(nisn)) {
+                showNotice('NISN harus terdiri dari 10 digit angka.', 'error');
+                return;
+            }
+
+            const currentRequest = ++requestId;
+            if (controller) controller.abort();
+            controller = new AbortController();
+
+            // Simpan posisi scroll agar tidak berubah
+            const scrollY = window.scrollY;
+
+            // Tampilkan status memuat
+            button.disabled = true;
+            button.classList.add('is-loading');
+            button.setAttribute('aria-busy', 'true');
+            if (buttonText) buttonText.textContent = 'Mencari data...';
+            hideNotice();
+
+            try {
+                const response = await fetch("{{ url_for('payment_public.cari_siswa') }}", {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+
+                const data = await response.json();
+                if (currentRequest !== requestId) return;
+
+                if (data.status === 'found' && data.siswa) {
+                    showResult(data.siswa);
+                    showNotice(data.pesan || 'Data siswa berhasil ditemukan.', 'found');
+                } else {
+                    hideResult();
+                    showNotice(data.pesan || 'Data siswa tidak dapat ditemukan.', data.status);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                if (currentRequest === requestId) {
+                    showNotice('Terjadi kendala koneksi. Silakan coba kembali.', 'error');
+                    console.error('Kesalahan pencarian:', error);
+                }
+            } finally {
+                if (currentRequest === requestId) {
+                    button.disabled = false;
+                    button.classList.remove('is-loading');
+                    button.removeAttribute('aria-busy');
+                    if (buttonText) buttonText.textContent = 'Cari Data Siswa';
+                    controller = null;
+
+                    // Kunci posisi scroll agar tidak berkedip/berpindah
+                    if (window.scrollY !== scrollY) {
+                        window.scrollTo({ top: scrollY, behavior: 'instant' });
+                    }
+                }
+            }
+        });
+    })();
+    </script>
+
 </body>
 </html>
+
