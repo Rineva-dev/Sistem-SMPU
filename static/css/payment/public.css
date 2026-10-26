@@ -1895,3 +1895,52 @@ input:focus-visible {
     display: none !important;
 }
 
+
+/* Tombol menuju detail pembayaran siswa */
+.detail-payment-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 54px;
+    margin-top: 16px;
+    padding: 14px 18px;
+    border: 1px solid #245b47;
+    border-radius: 14px;
+    color: #ffffff;
+    background: linear-gradient(120deg, #164b38, #103d30);
+    box-shadow: 0 8px 20px rgba(16, 61, 48, .14);
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.detail-payment-button:not([hidden]) {
+    display: flex;
+}
+
+.detail-payment-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(16, 61, 48, .2);
+}
+
+.detail-button-icon {
+    color: #e5c77e;
+}
+
+.detail-button-arrow {
+    margin-left: auto;
+    font-size: 20px;
+    transition: transform .2s ease;
+}
+
+.detail-payment-button:hover .detail-button-arrow {
+    transform: translateX(4px);
+}
+
+.detail-payment-button[hidden] {
+    display: none !important;
+}

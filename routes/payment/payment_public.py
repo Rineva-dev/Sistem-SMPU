@@ -1,5 +1,12 @@
-from flask import Blueprint, render_template, request, jsonify
-from models import Siswa
+from flask import Blueprint, render_template, request, jsonify, abort
+from models import (
+    Siswa,
+    TagihanSiswa,
+    JenisPembayaran,
+    RiwayatPembayaran
+)
+from datetime import date
+from models import db
 
 payment_public_bp = Blueprint(
     "payment_public",
@@ -58,3 +65,130 @@ def cari_siswa():
             "tahun_masuk": siswa.tahun_masuk or "-"
         }
     })
+
+@payment_public_bp.route("/detail/<string:nisn>")
+def detail_pembayaran(nisn):
+    # 1. Validasi NISN dan status siswa
+    if not nisn.isdigit() or len(nisn) != 10:
+        abort(404)
+
+    siswa = Siswa.query.filter_by(nisn=nisn).first()
+
+    if not siswa or (siswa.status or "").strip().lower() != "aktif":
+        abort(404)
+
+    # 2. Ambil tagihan siswa yang sudah tercatat di database
+    semua_tagihan = TagihanSiswa.query.filter_by(
+        siswa_id=siswa.id
+    ).all()
+
+    daftar_tagihan = []
+    daftar_riwayat = []
+
+    for tagihan in semua_tagihan:
+        jenis = None
+
+        if tagihan.jenis_pembayaran_id:
+            jenis = db.session.get(
+                JenisPembayaran,
+                tagihan.jenis_pembayaran_id
+            )
+
+        nominal = max(0, int(tagihan.nominal_tagihan or 0))
+        sudah_dibayar = max(0, int(tagihan.sudah_dibayar or 0))
+
+        # Cegah sisa tagihan bernilai negatif
+        sisa = max(0, nominal - sudah_dibayar)
+
+        # Tentukan status berdasarkan nominal dan pembayaran aktual
+        if nominal > 0 and sisa == 0:
+            status_tampilan = "Lunas"
+        elif sudah_dibayar > 0:
+            status_tampilan = "Sebagian"
+        else:
+            status_tampilan = "Belum Dibayar"
+
+        periode = (
+            tagihan.bulan
+            or (
+                f"Semester {tagihan.semester}"
+                if tagihan.semester
+                else "-"
+            )
+        )
+
+        item = {
+            "id": tagihan.id,
+            "nama": jenis.nama if jenis else "Tagihan Sekolah",
+            "periode": periode,
+            "tahun_pelajaran": tagihan.tahun_pelajaran or "-",
+            "nominal": nominal,
+            "sudah_dibayar": min(sudah_dibayar, nominal),
+            "sisa": sisa,
+            "status": status_tampilan,
+        }
+
+        daftar_tagihan.append(item)
+
+        # 3. Ambil riwayat pembayaran untuk setiap tagihan
+        riwayat = RiwayatPembayaran.query.filter_by(
+            tagihan_id=tagihan.id
+        ).all()
+
+        for bayar in riwayat:
+            daftar_riwayat.append({
+                "nama": item["nama"],
+                "periode": periode,
+                "jumlah": int(bayar.jumlah_bayar or 0),
+                "tanggal": bayar.tanggal_bayar,
+                "metode": bayar.metode or "-",
+                "keterangan": bayar.keterangan or "",
+            })
+
+    # 4. Urutkan tagihan dan riwayat
+    daftar_tagihan.sort(
+        key=lambda x: (
+            x["tahun_pelajaran"],
+            x["periode"],
+            x["id"]
+        ),
+        reverse=True
+    )
+
+    daftar_riwayat.sort(
+        key=lambda x: x["tanggal"] or date.min,
+        reverse=True
+    )
+
+    # 5. Hitung ringkasan keuangan
+    total_tagihan = sum(x["nominal"] for x in daftar_tagihan)
+    total_dibayar = sum(x["sudah_dibayar"] for x in daftar_tagihan)
+    total_sisa = sum(x["sisa"] for x in daftar_tagihan)
+
+    progres = (
+        round(total_dibayar / total_tagihan * 100)
+        if total_tagihan > 0
+        else 0
+    )
+
+    kelas = (
+        siswa.kelas_sekarang.nama_kelas
+        if getattr(siswa, "kelas_sekarang", None)
+        else (siswa.tingkat or "Belum ditentukan")
+    )
+
+    return render_template(
+        "payment/detail.html",
+        siswa=siswa,
+        kelas=kelas,
+        daftar_tagihan=daftar_tagihan,
+        daftar_riwayat=daftar_riwayat,
+        tagihan_belum_lunas=[
+            x for x in daftar_tagihan if x["sisa"] > 0
+        ],
+        total_tagihan=total_tagihan,
+        total_dibayar=total_dibayar,
+        total_sisa=total_sisa,
+        progres=progres,
+        tahun_sekarang=date.today().year,
+    )

@@ -319,10 +319,14 @@
                         <p>Pastikan identitas siswa sudah benar sebelum melanjutkan ke informasi pembayaran.</p>
                     </div>
 
-                    <button type="button" class="coming-soon-button" disabled>
-                        <span class="coming-soon-icon">✦</span>
-                        Informasi tagihan segera tersedia
-                    </button>
+                    <a id="detailPaymentButton"
+                        href="#"
+                        class="detail-payment-button"
+                        hidden>
+                        <span class="detail-button-icon">✦</span>
+                        <span>Lihat Detail Pembayaran</span>
+                        <span class="detail-button-arrow">→</span>
+                    </a>
                 </div>
             </section>
 
@@ -424,6 +428,15 @@
         const noticeIcon = document.getElementById('noticeIcon');
         const noticeMessage = document.getElementById('noticeMessage');
         const result = document.getElementById('studentResult');
+        const detailPaymentButton =
+            document.getElementById('detailPaymentButton');
+
+        const detailUrlTemplate = {{
+            url_for(
+                'payment_public.detail_pembayaran',
+                nisn='__NISN__'
+            ) | tojson
+        }};
 
         if (!form || !input || !button || !notice || !result) {
             console.error('Elemen pencarian tidak ditemukan.');
@@ -463,10 +476,17 @@
             document.getElementById('studentClass').textContent = student.kelas || 'Belum ditentukan';
             document.getElementById('studentYear').textContent = student.tahun_masuk || '-';
             result.hidden = false;
+            detailPaymentButton.href = detailUrlTemplate.replace(
+                '__NISN__',
+                encodeURIComponent(student.nisn)
+            );
+
+            detailPaymentButton.hidden = false;
         }
 
         function hideResult() {
             result.hidden = true;
+            detailPaymentButton.hidden = true;
         }
 
         // Proses pencarian — inti dari tanpa reload

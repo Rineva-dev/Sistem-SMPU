@@ -218,8 +218,71 @@ def sebelum_permintaan():
         else:
             g.sistem_mode = 'sekolah'
 
+    
+    
+    # =========================================================
+    # 🔒 PEMBATASAN AKSES BERDASARKAN SUBDOMAIN
+    # =========================================================
+
+    # ---------------------------------------------------------
+    # 💳 SUBDOMAIN PAYMENT
+    # Hanya untuk portal pembayaran publik
+    # ---------------------------------------------------------
     if g.sistem_mode == 'payment':
-        return
+        if (
+            request.path == '/payment-public'
+            or request.path.startswith('/payment-public/')
+        ):
+            return
+
+        return redirect(url_for('payment_public.index'))
+
+    # ---------------------------------------------------------
+    # 🏫 SUBDOMAIN SCHOOL
+    # Hanya untuk sistem sekolah
+    # ---------------------------------------------------------
+    if g.sistem_mode == 'sekolah':
+        # Tolak halaman khusus absensi
+        if (
+            request.path == '/login-absensi'
+            or request.path.startswith('/absensi-guru')
+            or request.path.startswith('/logout-absensi')
+        ):
+            return redirect(url_for('login.halaman_login'))
+
+        # Tolak portal pembayaran
+        if (
+            request.path == '/payment-public'
+            or request.path.startswith('/payment-public/')
+        ):
+            return redirect(url_for('login.halaman_login'))
+
+    # ---------------------------------------------------------
+    # 🕘 SUBDOMAIN ABSENSI
+    # Hanya untuk sistem absensi guru
+    # ---------------------------------------------------------
+    if g.sistem_mode == 'absensi':
+        # Tolak halaman login sistem sekolah
+        if request.path in ('/login', '/proses-login'):
+            return redirect(url_for('absensi.login_absensi'))
+
+        # Tolak portal pembayaran
+        if (
+            request.path == '/payment-public'
+            or request.path.startswith('/payment-public/')
+        ):
+            return redirect(url_for('absensi.login_absensi'))
+
+        # Tolak halaman sistem sekolah selain absensi guru
+        if (
+            request.path.startswith('/dashboard')
+            or request.path.startswith('/siswa')
+            or request.path.startswith('/kelas')
+            or request.path.startswith('/guru')
+        ):
+            return redirect(url_for('absensi.login_absensi'))
+
+
 
     # =========================================================
     # HALAMAN LOGIN / LOGOUT — TIDAK PERLU CEK LOGIN

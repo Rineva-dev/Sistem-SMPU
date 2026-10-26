@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071f19">
+
+    <title>Detail Pembayaran | SMP Unggulan Hamzanwadi</title>
+    <meta name="description" content="Portal resmi informasi tagihan dan riwayat pembayaran siswa SMP Unggulan Hamzanwadi.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/payment/detail.css') }}">
+</head>
+
+<body>
+{% set progress_value = [[progres|float, 0]|max, 100]|min %}
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+
+<div class="detail-shell">
+
+    <!-- TOP NAVIGATION -->
+    <header class="topbar">
+        <a href="{{ url_for('payment_public.index') }}" class="brand">
+            <span class="brand-symbol">
+                <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                    <path d="M20 3.5 35 11.8v16.4L20 36.5 5 28.2V11.8L20 3.5Z" stroke="currentColor" stroke-width="1.4"/>
+                    <path d="m12 25 8-14 8 14M15.5 19h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+
+            <span class="brand-text">
+                <strong>SMPU<span>.</span></strong>
+                <small>HAMZANWADI</small>
+            </span>
+        </a>
+
+        <div class="topbar-right">
+            <span class="secure-pill">
+                <span class="secure-pulse"></span>
+                Portal Resmi Sekolah
+            </span>
+
+            <a href="{{ url_for('payment_public.index') }}" class="back-button">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M19 12H5m7 7-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>Kembali</span>
+            </a>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- PREMIUM STUDENT HERO -->
+        <section class="student-hero reveal">
+            <div class="hero-grid-pattern"></div>
+            <div class="hero-glow hero-glow-one"></div>
+            <div class="hero-glow hero-glow-two"></div>
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+
+            <div class="hero-content">
+                <div class="hero-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    STUDENT FINANCIAL PROFILE
+                </div>
+
+                <div class="hero-profile">
+                    <div class="hero-avatar">
+                        <span>{{ (siswa.nama or 'S')[0]|upper }}</span>
+                        <i class="avatar-status"></i>
+                    </div>
+
+                    <div class="hero-identity">
+                        <div class="hero-name-row">
+                            <h1>{{ siswa.nama }}</h1>
+                            <span class="active-badge">
+                                <span></span> Aktif
+                            </span>
+                        </div>
+
+                        <p class="hero-subtitle">Informasi pembayaran siswa</p>
+
+                        <div class="hero-meta">
+                            <span>
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <rect x="4" y="5" width="16" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/>
+                                    <path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                </svg>
+                                NISN {{ siswa.nisn }}
+                            </span>
+
+                            <span class="hero-meta-divider"></span>
+
+                            <span>
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M3.5 20h17M5.5 20V8l6.5-4 6.5 4v12M9 10h1m4 0h1m-6 4h1m4 0h1m-5 6v-3h4v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Kelas {{ kelas or '-' }}
+                            </span>
+
+                            <span class="hero-meta-divider"></span>
+
+                            <span>
+                                Angkatan {{ siswa.tahun_masuk or '-' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-bottom">
+                    <div class="hero-note">
+                        <span class="hero-note-icon">✦</span>
+                        <span>Semua informasi pembayaran dalam satu tempat.</span>
+                    </div>
+                    <span class="hero-id">SMPU / FINANCE PORTAL</span>
+                </div>
+            </div>
+
+            <div class="hero-decoration" aria-hidden="true">
+                <div class="deco-ring deco-ring-one"></div>
+                <div class="deco-ring deco-ring-two"></div>
+                <div class="deco-center">
+                    <svg viewBox="0 0 80 80" fill="none">
+                        <path d="M40 9 66 23.5v33L40 71 14 56.5v-33L40 9Z" stroke="currentColor" stroke-width="1.3"/>
+                        <path d="M25 49 40 24l15 25M30 40h20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="deco-spark spark-one">✦</span>
+                <span class="deco-spark spark-two">✧</span>
+                <span class="deco-spark spark-three">·</span>
+            </div>
+        </section>
+
+        <!-- SECTION TITLE -->
+        <section class="overview-heading reveal">
+            <div>
+                <div class="section-eyebrow">FINANCIAL OVERVIEW <span></span></div>
+                <h2>Ringkasan keuangan<span class="title-period">.</span></h2>
+                <p>Berikut gambaran status keuangan pembayaran siswa.</p>
+            </div>
+
+            <div class="overview-chip">
+                <span class="overview-chip-dot"></span>
+                Ringkasan tagihan
+            </div>
+        </section>
+
+        <!-- FINANCIAL DASHBOARD -->
+        <section class="finance-dashboard reveal">
+
+            <!-- MAIN BALANCE -->
+            <article class="balance-card">
+                <div class="balance-decoration balance-decoration-one"></div>
+                <div class="balance-decoration balance-decoration-two"></div>
+                <div class="balance-noise"></div>
+
+                <div class="balance-top">
+                    <div class="balance-label">
+                        <span class="balance-label-icon">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <rect x="3.5" y="5" width="17" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M3.5 10h17M7.5 15h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        <span>Total tagihan</span>
+                    </div>
+
+                    <span class="balance-tag">FINANCIAL SUMMARY</span>
+                </div>
+
+                <div class="balance-amount">
+                    <span class="currency">Rp</span>
+                    <strong>{{ "{:,.0f}".format(total_tagihan or 0).replace(",", ".") }}</strong>
+                </div>
+
+                <p class="balance-description">Akumulasi seluruh tagihan pembayaran siswa.</p>
+
+                <div class="balance-divider"></div>
+
+                <div class="balance-bottom">
+                    <div>
+                        <span class="balance-bottom-label">Sudah dibayarkan</span>
+                        <strong>Rp {{ "{:,.0f}".format(total_dibayar or 0).replace(",", ".") }}</strong>
+                    </div>
+
+                    <div class="balance-bottom-right">
+                        <span class="balance-bottom-label">Sisa tagihan</span>
+                        <strong>Rp {{ "{:,.0f}".format(total_sisa or 0).replace(",", ".") }}</strong>
+                    </div>
+                </div>
+
+                <span class="balance-watermark" aria-hidden="true">S</span>
+            </article>
+
+            <!-- PROGRESS CARD -->
+            <article class="completion-card">
+                <div class="completion-top">
+                    <div>
+                        <span class="mini-label">PAYMENT STATUS</span>
+                        <h3>Progres pembayaran</h3>
+                    </div>
+
+                    <span class="completion-icon">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="m5 12 4.5 4.5L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="completion-visual">
+                    <div class="progress-ring" style="--progress: {{ progress_value }}%;">
+                        <div class="progress-ring-inner">
+                            <strong>{{ progres or 0 }}<span>%</span></strong>
+                            <small>Terbayar</small>
+                        </div>
+                    </div>
+
+                    <div class="completion-caption">
+                        <span class="caption-status">
+                            <span class="caption-dot"></span>
+                            <strong>{{ progres or 0 }}%</strong> selesai
+                        </span>
+                        <p>Persentase tagihan yang telah dibayarkan.</p>
+                    </div>
+                </div>
+
+                <div class="completion-bottom">
+                    <span><i class="dot-paid"></i> Dibayar</span>
+                    <span><i class="dot-unpaid"></i> Belum dibayar</span>
+                </div>
+            </article>
+
+            <!-- SUPPORTING METRICS -->
+            <article class="metric-card metric-paid">
+                <div class="metric-top">
+                    <span class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 12.5 9.5 17 19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="metric-overline">TOTAL PAID</span>
+                    <span class="metric-arrow">↗</span>
+                </div>
+
+                <p>Total pembayaran</p>
+                <strong class="metric-value">Rp {{ "{:,.0f}".format(total_dibayar or 0).replace(",", ".") }}</strong>
+                <div class="metric-footnote"><span></span> Pembayaran tercatat</div>
+            </article>
+
+            <article class="metric-card metric-due">
+                <div class="metric-top">
+                    <span class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/>
+                            <path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="metric-overline">OUTSTANDING</span>
+                    <span class="metric-arrow">↗</span>
+                </div>
+
+                <p>Sisa pembayaran</p>
+                <strong class="metric-value">Rp {{ "{:,.0f}".format(total_sisa or 0).replace(",", ".") }}</strong>
+                <div class="metric-footnote"><span></span> Belum dilunasi</div>
+            </article>
+        </section>
+
+        <!-- BILLS -->
+        <section class="bills-section reveal">
+            <div class="section-header">
+                <div class="section-heading-copy">
+                    <div class="section-eyebrow">YOUR INVOICES <span></span></div>
+                    <h2>Tagihan pembayaran<span class="title-period">.</span></h2>
+                    <p>Kelola informasi tagihan yang masih perlu diselesaikan.</p>
+                </div>
+
+                <div class="section-count">
+                    <span class="count-number">{{ tagihan_belum_lunas|length }}</span>
+                    <span>Tagihan aktif</span>
+                </div>
+            </div>
+
+            {% if tagihan_belum_lunas %}
+                <div class="invoice-list">
+                    {% for item in tagihan_belum_lunas %}
+                        <article class="invoice-card">
+                            <div class="invoice-main">
+                                <div class="invoice-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                                        <path d="M14 3.75v4h4M8.5 12h6M8.5 15.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+
+                                <div class="invoice-description">
+                                    <div class="invoice-title-row">
+                                        <h3>{{ item.nama }}</h3>
+                                        <span class="invoice-status"><i></i> Belum lunas</span>
+                                    </div>
+
+                                    <p class="invoice-period">
+                                        {{ item.periode or '-' }}
+                                        {% if item.tahun_pelajaran and item.tahun_pelajaran != '-' %}
+                                            <span>·</span> Tahun Pelajaran {{ item.tahun_pelajaran }}
+                                        {% endif %}
+                                    </p>
+
+                                    <div class="invoice-progress">
+                                        <div class="invoice-progress-track">
+                                            {% if item.nominal and item.nominal > 0 %}
+                                                <span style="width: {{ [[(item.sudah_dibayar / item.nominal * 100), 0]|max, 100]|min }}%;"></span>
+                                            {% else %}
+                                                <span style="width: 0%;"></span>
+                                            {% endif %}
+                                        </div>
+                                        <span>
+                                            {% if item.nominal and item.nominal > 0 %}
+                                                {{ ((item.sudah_dibayar / item.nominal * 100)|round|int) }}% dibayar
+                                            {% else %}
+                                                Belum ada nominal
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="invoice-finance">
+                                <div class="invoice-total">
+                                    <span>Total tagihan</span>
+                                    <strong>Rp {{ "{:,.0f}".format(item.nominal or 0).replace(",", ".") }}</strong>
+                                </div>
+
+                                <div class="invoice-total">
+                                    <span>Sudah dibayar</span>
+                                    <strong class="invoice-paid-amount">Rp {{ "{:,.0f}".format(item.sudah_dibayar or 0).replace(",", ".") }}</strong>
+                                </div>
+
+                                <div class="invoice-due">
+                                    <span>Sisa pembayaran</span>
+                                    <strong>Rp {{ "{:,.0f}".format(item.sisa or 0).replace(",", ".") }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="invoice-edge" aria-hidden="true"></div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-panel">
+                    <div class="empty-illustration">
+                        <span class="empty-circle empty-circle-one"></span>
+                        <span class="empty-circle empty-circle-two"></span>
+                        <div class="empty-check">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <span class="empty-overline">ALL CLEAR</span>
+                    <h3>Semua tagihan telah lunas!</h3>
+                    <p>Tidak ada sisa tagihan yang perlu diselesaikan. Terima kasih telah memenuhi kewajiban pembayaran.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- PAYMENT HISTORY -->
+        <section class="history-section reveal">
+            <div class="section-header">
+                <div class="section-heading-copy">
+                    <div class="section-eyebrow">TRANSACTION LOG <span></span></div>
+                    <h2>Riwayat transaksi<span class="title-period">.</span></h2>
+                    <p>Rekam jejak pembayaran yang telah tercatat pada sistem.</p>
+                </div>
+
+                <div class="history-count">
+                    <span class="history-count-icon">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.5M4 4.5v4h4M12 7v5l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span>{{ daftar_riwayat|length }} transaksi</span>
+                </div>
+            </div>
+
+            {% if daftar_riwayat %}
+                <div class="timeline">
+                    {% for item in daftar_riwayat %}
+                        <article class="timeline-item">
+                            <div class="timeline-rail">
+                                <span class="timeline-node">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="m6 12.5 4 4L18 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <div class="transaction-card">
+                                <div class="transaction-main">
+                                    <div class="transaction-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <rect x="3.5" y="5" width="17" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/>
+                                            <path d="M3.5 10h17M7.5 15h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                        </svg>
+                                    </div>
+
+                                    <div class="transaction-description">
+                                        <h3>{{ item.nama }}</h3>
+                                        <p>
+                                            {{ item.periode or '-' }}
+                                            {% if item.tanggal %}
+                                                <span>·</span>
+                                                {{ item.tanggal.strftime('%d/%m/%Y') if item.tanggal.strftime is defined else item.tanggal }}
+                                            {% endif %}
+                                        </p>
+
+                                        <div class="transaction-tags">
+                                            <span class="transaction-method">{{ item.metode or 'Metode tidak dicantumkan' }}</span>
+                                            {% if item.keterangan %}
+                                                <span class="transaction-note">{{ item.keterangan }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="transaction-right">
+                                    <strong>+ Rp {{ "{:,.0f}".format(item.jumlah or 0).replace(",", ".") }}</strong>
+                                    <span class="transaction-success"><i></i> Tercatat</span>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-panel history-empty">
+                    <div class="empty-illustration">
+                        <div class="empty-check empty-check-muted">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3>Belum ada transaksi</h3>
+                    <p>Riwayat pembayaran akan muncul di sini setelah transaksi tercatat.</p>
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- SUPPORT / INFO -->
+        <section class="support-banner reveal">
+            <div class="support-decoration"></div>
+
+            <div class="support-icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M12 11v5m0-8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <div class="support-copy">
+                <h3>Butuh bantuan terkait pembayaran?</h3>
+                <p>Jika terdapat perbedaan nominal atau informasi yang kurang sesuai, silakan hubungi bagian administrasi sekolah untuk melakukan pengecekan.</p>
+            </div>
+
+            <span class="support-spark" aria-hidden="true">✦</span>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="page-footer">
+        <a href="{{ url_for('payment_public.index') }}" class="footer-brand">
+            <span class="footer-brand-symbol">S</span>
+            <span>SMPU<span class="footer-gold">.</span> HAMZANWADI</span>
+        </a>
+
+        <p>© {{ tahun_sekarang or 2026 }} SMP Unggulan Hamzanwadi</p>
+
+        <span class="footer-secure">
+            <span></span> Official Payment Portal
+        </span>
+    </footer>
+
+</div>
+</body>
+</html>
