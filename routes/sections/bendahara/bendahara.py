@@ -8,39 +8,50 @@ from models import (
 
 # === FUNGSI BANTU DIPERBAIKI ===
 def daftar_bulan_semester(kode_tahun_dasar, pola_waktu, sampai_tanggal=None):
+    # Tagihan satu kali pada semester atau awal tahun
     if pola_waktu == 'semester_1':
         return [(1, "Pembayaran 1", 1)]
+
     elif pola_waktu == 'semester_2':
         return [(2, "Pembayaran 2", 2)]
+
     elif pola_waktu == 'awal_tahun':
         return [(1, "Pembayaran Awal Tahun", 1)]
 
+    # Tagihan bulanan
     semua_semester = TahunPelajaran.query.filter(
         TahunPelajaran.kode.like(f"{kode_tahun_dasar}%")
     ).order_by(TahunPelajaran.tanggal_mulai.asc()).all()
 
-    nama_bulan =   ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    nama_bulan = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ]
 
-    if semua_semester and len(semua_semester) >= 1:
+    if semua_semester:
         sekarang = semua_semester[0].tanggal_mulai
     else:
         try:
             tahun = int(str(kode_tahun_dasar)[:4])
             sekarang = date(tahun, 8, 1)
-        except:
+        except (ValueError, TypeError):
             return []
 
     akhir = sampai_tanggal if sampai_tanggal is not None else date.today()
-    
     bulan_list = []
+
     while sekarang <= akhir:
-        bulan_list.append((sekarang.month, nama_bulan[sekarang.month - 1], sekarang.year))
-        if sekarang.month < 12:
-            sekarang = sekarang.replace(month=sekarang.month + 1)
-        else:
+        bulan_list.append((
+            sekarang.month,
+            nama_bulan[sekarang.month - 1],
+            sekarang.year
+        ))
+
+        if sekarang.month == 12:
             sekarang = sekarang.replace(year=sekarang.year + 1, month=1)
-    
+        else:
+            sekarang = sekarang.replace(month=sekarang.month + 1)
+
     return bulan_list
 
 def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
@@ -77,12 +88,45 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
         riwayat_pertama = RiwayatKelas.query.filter_by(siswa_id=id_siswa).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
         tp_lengkap = riwayat_pertama.tahun_pelajaran.strip() if riwayat_pertama else f"{angkatan_masuk}-1"
 
-        tagihan_db = TagihanSiswa.query.filter_by(
-            siswa_id=id_siswa,
-            jenis_pembayaran_id=jenis.id,
-            bulan=waktu_tagihan,
-            tahun_pelajaran=tp_lengkap  # ✅ Pakai format lengkap agar ketemu
-        ).first()
+        
+        if waktu_tagihan == "Pembayaran 1":
+            tagihan_db = TagihanSiswa.query.filter_by(
+                siswa_id=id_siswa,
+                jenis_pembayaran_id=jenis.id,
+                semester=1,
+                tahun_pelajaran=tp_lengkap
+            ).filter(
+                TagihanSiswa.bulan.is_(None)
+            ).first()
+
+        elif waktu_tagihan == "Pembayaran 2":
+            tagihan_db = TagihanSiswa.query.filter_by(
+                siswa_id=id_siswa,
+                jenis_pembayaran_id=jenis.id,
+                semester=2,
+                tahun_pelajaran=tp_lengkap
+            ).filter(
+                TagihanSiswa.bulan.is_(None)
+            ).first()
+
+        elif waktu_tagihan == "Pembayaran Awal Tahun":
+            tagihan_db = TagihanSiswa.query.filter_by(
+                siswa_id=id_siswa,
+                jenis_pembayaran_id=jenis.id,
+                semester=1,
+                tahun_pelajaran=tp_lengkap
+            ).filter(
+                TagihanSiswa.bulan.is_(None)
+            ).first()
+
+        else:
+            tagihan_db = TagihanSiswa.query.filter_by(
+                siswa_id=id_siswa,
+                jenis_pembayaran_id=jenis.id,
+                bulan=waktu_tagihan,
+                tahun_pelajaran=tp_lengkap
+            ).first()
+
 
         if tagihan_db:
             sudah = tagihan_db.sudah_dibayar or 0
@@ -254,21 +298,44 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
         if not jenis:
             continue
 
+        
         bulan_tagihan = None
         semester_tagihan = None
-        if item.get('waktu'):
-            daftar_bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']
-            if any(b in item['waktu'] for b in daftar_bulan):
-                bulan_tagihan = item['waktu']
-            else:
-                semester_tagihan = idx + 1
+        waktu = (item.get('waktu') or '').strip()
 
-        tagihan = TagihanSiswa.query.filter_by(
-            siswa_id=id_siswa,
-            jenis_pembayaran_id=jenis.id,
-            bulan=bulan_tagihan or "",
-            tahun_pelajaran=tahun_pelajaran_kode
-        ).first()
+        daftar_bulan = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ]
+
+        # Tagihan bulanan: contoh Januari 2026
+        if any(waktu.startswith(b + ' ') for b in daftar_bulan):
+            bulan_tagihan = waktu
+
+            tagihan = TagihanSiswa.query.filter_by(
+                siswa_id=id_siswa,
+                jenis_pembayaran_id=jenis.id,
+                bulan=bulan_tagihan,
+                tahun_pelajaran=tahun_pelajaran_kode
+            ).first()
+
+        # Tagihan semester atau awal tahun
+        else:
+            if waktu == 'Pembayaran 1':
+                semester_tagihan = 1
+            elif waktu == 'Pembayaran 2':
+                semester_tagihan = 2
+            elif waktu == 'Pembayaran Awal Tahun':
+                semester_tagihan = 1
+
+            tagihan = TagihanSiswa.query.filter(
+                TagihanSiswa.siswa_id == id_siswa,
+                TagihanSiswa.jenis_pembayaran_id == jenis.id,
+                TagihanSiswa.bulan.is_(None),
+                TagihanSiswa.semester == semester_tagihan,
+                TagihanSiswa.tahun_pelajaran == tahun_pelajaran_kode
+            ).first()
+
 
         if not tagihan:
             tagihan = TagihanSiswa(
