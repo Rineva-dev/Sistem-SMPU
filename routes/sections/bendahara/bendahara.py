@@ -76,66 +76,54 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
     ).order_by(JenisPembayaran.pola_waktu, JenisPembayaran.nama).all()
 
     # === FUNGSI BANTU: Cek status lunas dari database ===
-    def cek_status_tagihan(nama_tagihan, waktu_tagihan):
-        jenis = JenisPembayaran.query.filter(
-            JenisPembayaran.nama == nama_tagihan,
-            JenisPembayaran.tahun_pelajaran.like(f"{angkatan_masuk}%")
-        ).first()
-        if not jenis:
-            return 'Belum Lunas', 0, None
+    
+    def cek_status_tagihan(tarif, waktu_tagihan, tp_tagihan):
+        jenis_id = tarif.id
 
-        # ✅ Cari tahun_pelajaran lengkap dari riwayat siswa
-        riwayat_pertama = RiwayatKelas.query.filter_by(siswa_id=id_siswa).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
-        tp_lengkap = riwayat_pertama.tahun_pelajaran.strip() if riwayat_pertama else f"{angkatan_masuk}-1"
+        query = TagihanSiswa.query.filter_by(
+            siswa_id=id_siswa,
+            jenis_pembayaran_id=jenis_id,
+            tahun_pelajaran=tp_tagihan
+        )
 
-        
-        if waktu_tagihan == "Pembayaran 1":
-            tagihan_db = TagihanSiswa.query.filter_by(
-                siswa_id=id_siswa,
-                jenis_pembayaran_id=jenis.id,
-                semester=1,
-                tahun_pelajaran=tp_lengkap
-            ).filter(
-                TagihanSiswa.bulan.is_(None)
-            ).first()
+        if tarif.pola_waktu == 'semester_1':
+            query = query.filter(
+                TagihanSiswa.bulan.is_(None),
+                TagihanSiswa.semester == 1
+            )
 
-        elif waktu_tagihan == "Pembayaran 2":
-            tagihan_db = TagihanSiswa.query.filter_by(
-                siswa_id=id_siswa,
-                jenis_pembayaran_id=jenis.id,
-                semester=2,
-                tahun_pelajaran=tp_lengkap
-            ).filter(
-                TagihanSiswa.bulan.is_(None)
-            ).first()
+        elif tarif.pola_waktu == 'semester_2':
+            query = query.filter(
+                TagihanSiswa.bulan.is_(None),
+                TagihanSiswa.semester == 2
+            )
 
-        elif waktu_tagihan == "Pembayaran Awal Tahun":
-            tagihan_db = TagihanSiswa.query.filter_by(
-                siswa_id=id_siswa,
-                jenis_pembayaran_id=jenis.id,
-                semester=1,
-                tahun_pelajaran=tp_lengkap
-            ).filter(
-                TagihanSiswa.bulan.is_(None)
-            ).first()
+        elif tarif.pola_waktu == 'awal_tahun':
+            query = query.filter(
+                TagihanSiswa.bulan.is_(None),
+                TagihanSiswa.semester == 1
+            )
 
         else:
-            tagihan_db = TagihanSiswa.query.filter_by(
-                siswa_id=id_siswa,
-                jenis_pembayaran_id=jenis.id,
-                bulan=waktu_tagihan,
-                tahun_pelajaran=tp_lengkap
-            ).first()
+            query = query.filter(
+                TagihanSiswa.bulan == waktu_tagihan
+            )
 
+        tagihan_db = query.order_by(TagihanSiswa.id.asc()).first()
 
-        if tagihan_db:
-            sudah = tagihan_db.sudah_dibayar or 0
-            if tagihan_db.status in ['Sudah Lunas', 'Lunas']:
-                return 'Lunas', sudah, tagihan_db
-            if tagihan_db.status == 'Sebagian':
-                return 'Sebagian', sudah, tagihan_db
-        
-        return 'Belum Lunas', 0, None
+        if not tagihan_db:
+            return 'Belum Lunas', 0, None
+
+        sudah = tagihan_db.sudah_dibayar or 0
+
+        if tagihan_db.status in ['Sudah Lunas', 'Lunas']:
+            status = 'Lunas'
+        elif tagihan_db.status == 'Sebagian':
+            status = 'Sebagian'
+        else:
+            status = 'Belum Lunas'
+
+        return status, sudah, tagihan_db
 
     # === LANJUT LOGIKA UTAMA ===
     if semua_versi_tarif:
@@ -145,7 +133,13 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                 tarif_terpilih[vt.kode] = vt
 
         for tarif in tarif_terpilih.values():
-            daftar_bulan_semua = daftar_bulan_semester(angkatan_masuk, tarif.pola_waktu, batas_akhir)
+            tp_tagihan = kode_tp_tagihan(tarif, tahun_pelajaran_kode)
+
+            daftar_bulan_semua = daftar_bulan_semester(
+                angkatan_masuk,
+                tarif.pola_waktu,
+                batas_akhir
+            )
 
             # ======================================
             # BIAYA UMUM
@@ -155,9 +149,11 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                     or tarif.nama.startswith('Kelas Peminatan - ')):
                 if tarif.pola_waktu != 'bulanan':
                     for kode_bayar, nama_bayar, urut in daftar_bulan_semua:
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif.nama, nama_bayar)
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, nama_bayar, tp_tagihan)
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
+                            'jenis_pembayaran_id': tarif.id,
+                            'tahun_pelajaran_tagihan': tp_tagihan,
                             'nama': tarif.nama,
                             'waktu': nama_bayar,
                             'nominal': tarif.nominal,
@@ -168,16 +164,19 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                 else:
                     for bulan_angka, nama_bulan, tahun_bulan in daftar_bulan_semua:
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif.nama, waktu_lengkap)
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
+                            'jenis_pembayaran_id': tarif.id,
+                            'tahun_pelajaran_tagihan': tp_tagihan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
                             'sudah_dibayar': sudah_dibayar,
-                            'sisa_tagihan': tarif.nominal - sudah_dibayar,
+                            'sisa_tagihan': max(0, tarif.nominal - sudah_dibayar),
                             'status': status_sekarang
                         })
+
                 continue
 
             # ======================================
@@ -209,14 +208,16 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                         if libur:
                             continue
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif.nama, waktu_lengkap)
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
+                            'jenis_pembayaran_id': tarif.id,
+                            'tahun_pelajaran_tagihan': tp_tagihan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
                             'sudah_dibayar': sudah_dibayar,
-                            'sisa_tagihan': tarif.nominal - sudah_dibayar,
+                            'sisa_tagihan': max(0, tarif.nominal - sudah_dibayar),
                             'status': status_sekarang
                         })
                 continue
@@ -255,14 +256,16 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                         if libur:
                             continue
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif.nama, waktu_lengkap)
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
+                            'jenis_pembayaran_id': tarif.id,
+                            'tahun_pelajaran_tagihan': tp_tagihan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
                             'sudah_dibayar': sudah_dibayar,
-                            'sisa_tagihan': tarif.nominal - sudah_dibayar,
+                            'sisa_tagihan': max(0, tarif.nominal - sudah_dibayar),
                             'status': status_sekarang
                         })
 
@@ -290,17 +293,22 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
     # === AMBIL BAGIAN DASAR TAHUN untuk pencarian ===
     dasar_tahun = tahun_pelajaran_kode.split('-')[0] if '-' in tahun_pelajaran_kode else tahun_pelajaran_kode
 
-    for idx, item in enumerate(daftar_sementara):
-        jenis = JenisPembayaran.query.filter(
-            JenisPembayaran.nama == item['nama'],
-            JenisPembayaran.tahun_pelajaran.like(f"{dasar_tahun}%")
-        ).first()
+    
+    for item in daftar_sementara:
+        jenis_id = item.get('jenis_pembayaran_id')
+
+        if not jenis_id:
+            continue
+
+        jenis = db.session.get(JenisPembayaran, jenis_id)
         if not jenis:
             continue
 
-        
-        bulan_tagihan = None
-        semester_tagihan = None
+        tahun_item = (
+            item.get('tahun_pelajaran_tagihan')
+            or tahun_pelajaran_kode
+        )
+
         waktu = (item.get('waktu') or '').strip()
 
         daftar_bulan = [
@@ -308,7 +316,9 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
         ]
 
-        # Tagihan bulanan: contoh Januari 2026
+        bulan_tagihan = None
+        semester_tagihan = None
+
         if any(waktu.startswith(b + ' ') for b in daftar_bulan):
             bulan_tagihan = waktu
 
@@ -316,26 +326,26 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
                 siswa_id=id_siswa,
                 jenis_pembayaran_id=jenis.id,
                 bulan=bulan_tagihan,
-                tahun_pelajaran=tahun_pelajaran_kode
-            ).first()
+                tahun_pelajaran=tahun_item
+            ).order_by(TagihanSiswa.id.asc()).first()
 
-        # Tagihan semester atau awal tahun
         else:
-            if waktu == 'Pembayaran 1':
+            if jenis.pola_waktu == 'semester_1':
                 semester_tagihan = 1
-            elif waktu == 'Pembayaran 2':
+            elif jenis.pola_waktu == 'semester_2':
                 semester_tagihan = 2
-            elif waktu == 'Pembayaran Awal Tahun':
+            elif jenis.pola_waktu == 'awal_tahun':
                 semester_tagihan = 1
+            else:
+                continue
 
             tagihan = TagihanSiswa.query.filter(
                 TagihanSiswa.siswa_id == id_siswa,
                 TagihanSiswa.jenis_pembayaran_id == jenis.id,
                 TagihanSiswa.bulan.is_(None),
                 TagihanSiswa.semester == semester_tagihan,
-                TagihanSiswa.tahun_pelajaran == tahun_pelajaran_kode
-            ).first()
-
+                TagihanSiswa.tahun_pelajaran == tahun_item
+            ).order_by(TagihanSiswa.id.asc()).first()
 
         if not tagihan:
             tagihan = TagihanSiswa(
@@ -343,7 +353,7 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
                 jenis_pembayaran_id=jenis.id,
                 bulan=bulan_tagihan,
                 semester=semester_tagihan,
-                tahun_pelajaran=tahun_pelajaran_kode,
+                tahun_pelajaran=tahun_item,
                 nominal_tagihan=item['nominal'],
                 sudah_dibayar=0,
                 status='Belum Lunas'
@@ -355,9 +365,12 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
             "objek": tagihan,
             "nominal_asli": item['nominal'],
             "nama": item['nama'],
-            "waktu": item.get('waktu',''),
+            "waktu": waktu,
             "sudah_dibayar": tagihan.sudah_dibayar or 0,
-            "sisa_tagihan": max(0, item['nominal'] - (tagihan.sudah_dibayar or 0)),
+            "sisa_tagihan": max(
+                0,
+                item['nominal'] - (tagihan.sudah_dibayar or 0)
+            ),
             "status": tagihan.status
         })
 
@@ -370,6 +383,26 @@ def get_base_tahun(kode_tp):
     if not kode_tp: return ""
     kode_tp = kode_tp.split('-')[0] if '-' in kode_tp else kode_tp
     return kode_tp.split(' ')[0].strip() if ' ' in kode_tp else kode_tp.strip()
+
+
+def kode_tp_tagihan(tarif, tahun_siswa):
+    """
+    Menentukan tahun pelajaran untuk tagihan.
+    Semester 1 menggunakan akhiran -1.
+    Semester 2 menggunakan akhiran -2.
+    Tagihan bulanan tetap mengikuti kode tahun siswa.
+    """
+    if tarif.pola_waktu == 'bulanan':
+        return tahun_siswa
+
+    dasar = (tarif.tahun_pelajaran or tahun_siswa or '').strip()
+    dasar = dasar.rsplit('-', 1)[0] if '-' in dasar else dasar
+
+    if tarif.pola_waktu == 'semester_2':
+        return f"{dasar}-2"
+
+    return f"{dasar}-1"
+
 
 def format_rupiah(angka):
     return "Rp " + "{:,.0f}".format(angka).replace(",", ".")
@@ -682,7 +715,17 @@ def pengaturan_pembayaran():
                 pola_waktu=request.form['pola_waktu'],
                 nominal=int(request.form['nominal']),
                 keterangan=request.form.get('keterangan',''), 
-                tahun_pelajaran=f"{kode_angkatan}-1"
+                tahun_pelajaran=kode_tp_tagihan(
+                    type(
+                        'TarifSementara',
+                        (),
+                        {
+                            'pola_waktu': request.form['pola_waktu'],
+                            'tahun_pelajaran': kode_angkatan
+                        }
+                    )(),
+                    f"{kode_angkatan}-1"
+                )
             ))
             db.session.commit()
             flash(f"Jenis biaya '{nama_final}' ditambahkan!", "success")

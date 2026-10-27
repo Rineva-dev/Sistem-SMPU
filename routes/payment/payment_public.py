@@ -223,6 +223,12 @@ def detail_pembayaran(nisn):
             **info_periode,
         }
 
+        if (
+            jenis
+            and (jenis.nama or "").strip().lower() == "pembangunan"
+        ):
+            item["kelompok_bulan"] = "pembangunan"
+            item["label_periode"] = "Pembangunan"
 
         daftar_tagihan.append(item)
 
@@ -244,11 +250,13 @@ def detail_pembayaran(nisn):
     # 4. Urutkan tagihan dan riwayat
     daftar_tagihan.sort(
         key=lambda x: (
+            0 if x["kelompok_bulan"] == "pembangunan" else 1,
             x["tahun_kalender"],
             x["bulan_urut"],
             x["id"]
         )
     )
+
 
     daftar_riwayat.sort(
         key=lambda x: x["tanggal"] or date.min,

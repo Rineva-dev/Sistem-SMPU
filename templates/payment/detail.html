@@ -289,7 +289,7 @@
 
             {% if tagihan_belum_lunas %}
                 <div class="invoice-month-list">
-                    {% for bulan, items_bulan in tagihan_belum_lunas|groupby('kelompok_bulan') %}
+                    {% for bulan, items_bulan in tagihan_belum_lunas|groupby('kelompok_bulan')|sort(attribute='0', reverse=true) %}
                     <section class="month-group">
 
                         <!-- HEADER BULAN: MENYATU DENGAN CARD -->
@@ -340,15 +340,24 @@
 
                                     <div class="invoice-description">
                                         <div class="invoice-title-row">
-                                            <h3>{{ item.nama }}</h3>
+                                            <h3>
+                                                {% if item.nama|lower == 'pembangunan' %}
+                                                    Pembayaran {{ item.periode }}
+                                                {% else %}
+                                                    {{ item.nama }}
+                                                {% endif %}
+                                            </h3>
+
                                             <span class="invoice-status">
                                                 <i></i>Belum Lunas
                                             </span>
                                         </div>
 
                                         <p class="invoice-period">
-                                            {{ item.periode }}
-                                            <span>•</span>
+                                            {% if item.nama|lower != 'pembangunan' %}
+                                                {{ item.periode }}
+                                                <span>•</span>
+                                            {% endif %}
                                             Tahun Pelajaran {{ item.tahun_pelajaran }}
                                         </p>
 
