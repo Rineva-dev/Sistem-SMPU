@@ -288,70 +288,127 @@
             </div>
 
             {% if tagihan_belum_lunas %}
-                <div class="invoice-list">
-                    {% for item in tagihan_belum_lunas %}
-                        <article class="invoice-card">
-                            <div class="invoice-main">
-                                <div class="invoice-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                        <path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                                        <path d="M14 3.75v4h4M8.5 12h6M8.5 15.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                
+                <div class="invoice-month-list">
+
+                    {% for bulan, items_bulan in tagihan_belum_lunas|groupby('periode') %}
+
+                    <section class="month-group">
+
+                        <!-- HEADER PEMBATAS BULAN -->
+                        <div class="month-heading">
+                            <div class="month-heading-main">
+                                <div class="month-calendar-icon">
+                                    <svg viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="1.7"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        aria-hidden="true">
+                                        <rect x="3" y="5" width="18" height="16" rx="3"/>
+                                        <path d="M16 3v4M8 3v4M3 10h18"/>
+                                        <path d="m9 15 2 2 4-4"/>
                                     </svg>
                                 </div>
 
-                                <div class="invoice-description">
-                                    <div class="invoice-title-row">
-                                        <h3>{{ item.nama }}</h3>
-                                        <span class="invoice-status"><i></i> Belum lunas</span>
+                                <div class="month-heading-text">
+                                    <span class="month-eyebrow">PERIODE TAGIHAN</span>
+                                    <h3>{{ bulan }}</h3>
+                                    <p>{{ items_bulan|length }} jenis tagihan belum lunas</p>
+                                </div>
+                            </div>
+
+                            <div class="month-total">
+                                <span>Total sisa bulan ini</span>
+                                <strong>
+                                    Rp {{ "{:,.0f}".format(items_bulan|sum(attribute='sisa')).replace(',', '.') }}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- DAFTAR TAGIHAN DALAM BULAN -->
+                        <div class="invoice-list">
+
+                            {% for item in items_bulan %}
+
+                            {% set persen = (
+                                (item.sudah_dibayar / item.nominal * 100)
+                                if item.nominal and item.nominal > 0
+                                else 0
+                            ) %}
+
+                            <article class="invoice-card">
+                                <span class="invoice-edge"></span>
+
+                                <div class="invoice-main">
+                                    <div class="invoice-icon">
+                                        <svg viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.7"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
+                                            <path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
+                                            <path d="M14 3v5h5M9 13h6M9 17h6"/>
+                                        </svg>
                                     </div>
 
-                                    <p class="invoice-period">
-                                        {{ item.periode or '-' }}
-                                        {% if item.tahun_pelajaran and item.tahun_pelajaran != '-' %}
-                                            <span>·</span> Tahun Pelajaran {{ item.tahun_pelajaran }}
-                                        {% endif %}
-                                    </p>
+                                    <div class="invoice-description">
+                                        <div class="invoice-title-row">
+                                            <h3>{{ item.nama }}</h3>
 
-                                    <div class="invoice-progress">
-                                        <div class="invoice-progress-track">
-                                            {% if item.nominal and item.nominal > 0 %}
-                                                <span style="width: {{ [[(item.sudah_dibayar / item.nominal * 100), 0]|max, 100]|min }}%;"></span>
-                                            {% else %}
-                                                <span style="width: 0%;"></span>
-                                            {% endif %}
+                                            <span class="invoice-status">
+                                                <i></i>
+                                                Belum Lunas
+                                            </span>
                                         </div>
-                                        <span>
-                                            {% if item.nominal and item.nominal > 0 %}
-                                                {{ ((item.sudah_dibayar / item.nominal * 100)|round|int) }}% dibayar
-                                            {% else %}
-                                                Belum ada nominal
-                                            {% endif %}
-                                        </span>
+
+                                        <p class="invoice-period">
+                                            {{ item.periode }}
+                                            <span>•</span>
+                                            Tahun Pelajaran {{ item.tahun_pelajaran }}
+                                        </p>
+
+                                        <div class="invoice-progress">
+                                            <div class="invoice-progress-track">
+                                                <span style="width: {{ [persen, 100]|min }}%;"></span>
+                                            </div>
+                                            <span>
+                                                {{ "%.0f"|format(persen) }}% terbayar
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="invoice-finance">
-                                <div class="invoice-total">
-                                    <span>Total tagihan</span>
-                                    <strong>Rp {{ "{:,.0f}".format(item.nominal or 0).replace(",", ".") }}</strong>
+                                <div class="invoice-finance">
+                                    <div class="invoice-total">
+                                        <span>Total tagihan</span>
+                                        <strong>
+                                            Rp {{ "{:,.0f}".format(item.nominal).replace(',', '.') }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="invoice-total">
+                                        <span>Sudah dibayar</span>
+                                        <strong class="invoice-paid-amount">
+                                            Rp {{ "{:,.0f}".format(item.sudah_dibayar).replace(',', '.') }}
+                                        </strong>
+                                    </div>
+
+                                    <div class="invoice-due">
+                                        <span>Sisa pembayaran</span>
+                                        <strong>
+                                            Rp {{ "{:,.0f}".format(item.sisa).replace(',', '.') }}
+                                        </strong>
+                                    </div>
                                 </div>
+                            </article>
 
-                                <div class="invoice-total">
-                                    <span>Sudah dibayar</span>
-                                    <strong class="invoice-paid-amount">Rp {{ "{:,.0f}".format(item.sudah_dibayar or 0).replace(",", ".") }}</strong>
-                                </div>
+                            {% endfor %}
 
-                                <div class="invoice-due">
-                                    <span>Sisa pembayaran</span>
-                                    <strong>Rp {{ "{:,.0f}".format(item.sisa or 0).replace(",", ".") }}</strong>
-                                </div>
-                            </div>
+                        </div>
+                    </section>
 
-                            <div class="invoice-edge" aria-hidden="true"></div>
-                        </article>
                     {% endfor %}
+
                 </div>
+
             {% else %}
                 <div class="empty-panel">
                     <div class="empty-illustration">
