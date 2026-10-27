@@ -7,12 +7,99 @@ from models import (
 )
 from datetime import date
 from models import db
+import re
 
 payment_public_bp = Blueprint(
     "payment_public",
     __name__,
     url_prefix="/payment-public"
 )
+
+
+# Urutan bulan kalender
+URUTAN_BULAN = {
+    "januari": 1,
+    "februari": 2,
+    "maret": 3,
+    "april": 4,
+    "mei": 5,
+    "juni": 6,
+    "juli": 7,
+    "agustus": 8,
+    "september": 9,
+    "oktober": 10,
+    "november": 11,
+    "desember": 12,
+}
+
+
+def informasi_periode(bulan, tahun_pelajaran):
+    teks_bulan = str(bulan or "").strip()
+    teks_tp = str(tahun_pelajaran or "").strip()
+
+    nama_bulan = teks_bulan.lower()
+    tahun_dari_bulan = None
+
+    # Jika periode sudah mengandung tahun, misalnya "Januari 2025"
+    for nama in URUTAN_BULAN:
+        if nama in nama_bulan:
+            nama_bulan = nama
+            angka_bulan = URUTAN_BULAN[nama]
+
+            angka_tahun = re.search(
+                r"\b(20\d{2})\b",
+                teks_bulan
+            )
+
+            if angka_tahun:
+                tahun_dari_bulan = int(angka_tahun.group(1))
+
+            break
+    else:
+        angka_bulan = None
+
+    # Ambil tahun dari tahun pelajaran, misalnya 2025/2026
+    daftar_tahun = re.findall(r"\b(20\d{2})\b", teks_tp)
+
+    if tahun_dari_bulan:
+        tahun_kalender = tahun_dari_bulan
+
+    elif angka_bulan and len(daftar_tahun) >= 2:
+        tahun_awal = int(daftar_tahun[0])
+        tahun_akhir = int(daftar_tahun[1])
+
+        # Asumsi tahun pelajaran dimulai pada Juli:
+        # Januari-Juni masuk tahun kedua.
+        # Juli-Desember masuk tahun pertama.
+        tahun_kalender = (
+            tahun_akhir if angka_bulan <= 6 else tahun_awal
+        )
+
+    elif angka_bulan and daftar_tahun:
+        tahun_kalender = int(daftar_tahun[0])
+
+    else:
+        tahun_kalender = None
+
+    if angka_bulan and tahun_kalender:
+        kunci = f"{tahun_kalender:04d}-{angka_bulan:02d}"
+        label = f"{nama_bulan.capitalize()} {tahun_kalender}"
+        urutan = (tahun_kalender, angka_bulan)
+
+    else:
+        # Untuk periode non-bulanan seperti Semester 1
+        kunci = f"9999-{teks_tp}-{teks_bulan}"
+        label = teks_bulan or "-"
+        urutan = (9999, 99)
+
+    return {
+        "bulan_urut": angka_bulan or 99,
+        "tahun_kalender": tahun_kalender or 9999,
+        "kelompok_bulan": kunci,
+        "label_periode": label,
+        "urutan_periode": urutan,
+    }
+
 
 @payment_public_bp.route("/", methods=["GET", "POST"])
 def index():
@@ -116,6 +203,11 @@ def detail_pembayaran(nisn):
                 else "-"
             )
         )
+        
+        info_periode = informasi_periode(
+            periode,
+            tagihan.tahun_pelajaran
+        )
 
         item = {
             "id": tagihan.id,
@@ -126,7 +218,11 @@ def detail_pembayaran(nisn):
             "sudah_dibayar": min(sudah_dibayar, nominal),
             "sisa": sisa,
             "status": status_tampilan,
+
+            # Data untuk pengurutan dan pengelompokan card
+            **info_periode,
         }
+
 
         daftar_tagihan.append(item)
 
@@ -148,11 +244,10 @@ def detail_pembayaran(nisn):
     # 4. Urutkan tagihan dan riwayat
     daftar_tagihan.sort(
         key=lambda x: (
-            x["tahun_pelajaran"],
-            x["periode"],
+            x["tahun_kalender"],
+            x["bulan_urut"],
             x["id"]
-        ),
-        reverse=True
+        )
     )
 
     daftar_riwayat.sort(

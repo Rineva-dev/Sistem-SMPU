@@ -2779,50 +2779,57 @@ a:focus-visible {
 }
 
 
-/* =========================================================
-   MONTHLY INVOICE GROUPS — PREMIUM PERIOD SEPARATORS
-   ========================================================= */
-
+/* Satu card besar untuk setiap bulan */
 .invoice-month-list {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 22px;
 }
 
 .month-group {
-    position: relative;
-    padding: 0 0 24px;
-    border-bottom: 1px solid #dfe7dc;
-    animation: revealUp 0.55s ease both;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #dce6dc;
+    border-radius: 19px;
+    background: #ffffff;
+    box-shadow: 0 8px 26px rgba(16, 61, 45, 0.055);
+    animation: revealUp 0.45s ease both;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.month-group:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
+.month-group:hover {
+    border-color: #c6d7c6;
+    box-shadow: 0 12px 32px rgba(16, 61, 45, 0.09);
 }
 
+/* Header menjadi bagian dari card bulan */
 .month-heading {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 18px;
-    margin-bottom: 15px;
-    padding: 19px 21px;
-    border: 1px solid #dfe8dc;
-    border-radius: 17px;
+    margin: 0;
+    padding: 22px;
+    border: 0;
+    border-bottom: 1px solid #dce7dc;
+    border-radius: 0;
     background:
-        radial-gradient(ellipse at 0% 0%, rgba(216, 231, 211, .55), transparent 58%),
-        linear-gradient(120deg, #fff 0%, #f8faf5 100%);
-    box-shadow: 0 5px 18px rgba(20, 43, 34, .035);
+        radial-gradient(
+            ellipse at 0% 0%,
+            rgba(216, 231, 211, 0.30),
+            transparent 58%
+        ),
+        linear-gradient(120deg, #f5f8f2 0%, #ffffff 100%);
+    box-shadow: none;
 }
 
 .month-heading::before {
     position: absolute;
-    top: 15px;
-    bottom: 15px;
+    top: 17px;
+    bottom: 17px;
     left: 0;
-    width: 3px;
+    width: 4px;
     border-radius: 0 4px 4px 0;
     background: linear-gradient(180deg, #b79a5d, #e6d5ad);
     content: "";
@@ -2832,54 +2839,49 @@ a:focus-visible {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-width: 0;
 }
 
 .month-calendar-icon {
     display: grid;
-    flex: 0 0 auto;
-    width: 45px;
-    height: 45px;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
     padding: 11px;
     place-items: center;
     border: 1px solid #dce8d9;
     border-radius: 13px;
     background: #edf5eb;
     color: #286b43;
-    transition: transform .25s ease, background .25s ease;
-}
-
-.month-group:hover .month-calendar-icon {
-    transform: translateY(-2px);
-    background: #e5f0e2;
 }
 
 .month-heading-text {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 .month-eyebrow {
     color: #a38a55;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
-    letter-spacing: 1.7px;
+    letter-spacing: 1.6px;
 }
 
 .month-heading-text h3 {
-    margin: 1px 0;
+    margin: 0;
     color: #153c2b;
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 800;
     line-height: 1.4;
-    letter-spacing: -.5px;
+    letter-spacing: -0.4px;
 }
 
 .month-heading-text p {
     margin: 0;
     color: #879389;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .month-total {
@@ -2887,54 +2889,83 @@ a:focus-visible {
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    padding-left: 15px;
-    border-left: 1px solid #e1e8dd;
+    padding-left: 18px;
+    border-left: 1px solid #dfe7dc;
     text-align: right;
 }
 
 .month-total span {
-    color: #879389;
-    font-size: 9px;
+    color: #7d8a7f;
+    font-size: 10px;
 }
 
 .month-total strong {
     color: #a17b39;
     font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 800;
-    line-height: 1.5;
     overflow-wrap: anywhere;
     font-variant-numeric: tabular-nums;
 }
 
-.month-group .invoice-list {
-    gap: 11px;
+/* Rincian tidak lagi berupa card terpisah */
+.month-invoice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 20px;
 }
 
-.month-group .invoice-card {
-    box-shadow: 0 4px 15px rgba(20, 43, 34, .025);
+.month-invoice-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 21px 2px;
+    border: 0;
+    border-bottom: 1px solid #edf1eb;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transition: background 0.2s ease;
 }
 
-.month-group .invoice-card:hover {
-    box-shadow: 0 12px 28px rgba(20, 43, 34, .075);
+.month-invoice-item:last-child {
+    border-bottom: 0;
 }
 
-/* Mobile */
-@media (max-width: 520px) {
+.month-invoice-item:hover {
+    background: #fbfcf9;
+}
+
+.month-invoice-item .invoice-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.month-invoice-item .invoice-finance {
+    flex: 0 0 auto;
+}
+
+/* Pastikan dekorasi card lama tidak muncul */
+.month-invoice-item .invoice-edge {
+    display: none;
+}
+
+@media (max-width: 650px) {
     .invoice-month-list {
-        gap: 22px;
+        gap: 17px;
     }
 
     .month-group {
-        padding-bottom: 19px;
+        border-radius: 15px;
     }
 
     .month-heading {
         align-items: flex-start;
         flex-direction: column;
-        gap: 13px;
-        padding: 16px 14px;
-        border-radius: 15px;
+        gap: 15px;
+        padding: 18px 15px;
     }
 
     .month-heading-main {
@@ -2942,35 +2973,42 @@ a:focus-visible {
     }
 
     .month-calendar-icon {
+        flex-basis: 39px;
         width: 39px;
         height: 39px;
         padding: 9px;
-        border-radius: 11px;
     }
 
     .month-heading-text h3 {
-        font-size: 16px;
-    }
-
-    .month-heading-text p {
-        font-size: 9px;
+        font-size: 17px;
     }
 
     .month-total {
         align-items: flex-start;
-        gap: 2px;
         width: 100%;
-        padding: 10px 0 0;
-        border-top: 1px solid #e4e9df;
+        gap: 3px;
+        padding: 12px 0 0;
+        border-top: 1px solid #e1e8dd;
         border-left: 0;
         text-align: left;
     }
 
-    .month-total span {
-        font-size: 9px;
+    .month-total strong {
+        font-size: 16px;
     }
 
-    .month-total strong {
-        font-size: 15px;
+    .month-invoice-list {
+        padding: 0 14px;
+    }
+
+    .month-invoice-item {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 15px;
+        padding: 18px 0;
+    }
+
+    .month-invoice-item .invoice-finance {
+        width: 100%;
     }
 }
