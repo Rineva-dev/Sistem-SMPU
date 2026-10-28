@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify, abort, redirect, url_for, flash
 from models import (
     Siswa,
     TagihanSiswa,
@@ -294,4 +294,32 @@ def detail_pembayaran(nisn):
         total_sisa=total_sisa,
         progres=progres,
         tahun_sekarang=date.today().year,
+    )
+
+@payment_public_bp.route(
+    "/proses-pembayaran/<string:nisn>",
+    methods=["GET"],
+    endpoint="proses_pembayaran"
+)
+def proses_pembayaran(nisn):
+    # Validasi NISN
+    if not nisn.isdigit() or len(nisn) != 10:
+        flash("NISN tidak valid.", "error")
+        return redirect(url_for("payment_public.index"))
+
+    # Cari siswa
+    siswa = Siswa.query.filter_by(
+        nisn=nisn,
+        status="aktif"
+    ).first()
+
+    if not siswa:
+        flash("Data siswa tidak ditemukan atau tidak aktif.", "error")
+        return redirect(url_for("payment_public.index"))
+
+    # Sementara tampilkan halaman informasi proses pembayaran.
+    # Form pemilihan tagihan akan dibuat pada tahap berikutnya.
+    return render_template(
+        "payment/proses.html",
+        siswa=siswa
     )
