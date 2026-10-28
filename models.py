@@ -1101,3 +1101,84 @@ class RiwayatSemester(db.Model):
     
     def __repr__(self):
         return f"<RiwayatSemester Siswa:{self.siswa_id} {self.tahun_pelajaran}-{self.semester}>"
+    
+
+class PengajuanPembayaran(db.Model):
+    __tablename__ = 'pengajuan_pembayaran'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    kode_transaksi = db.Column(db.String(50), unique=True, nullable=False)
+
+    siswa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    metode = db.Column(db.String(30), nullable=False)
+    total_diajukan = db.Column(db.BigInteger, nullable=False)
+
+    # menunggu_verifikasi, disetujui, ditolak, dibatalkan
+    status = db.Column(
+        db.String(30),
+        nullable=False,
+        default='menunggu_verifikasi',
+        index=True
+    )
+
+    bukti_pembayaran = db.Column(db.String(255), nullable=True)
+    catatan_orangtua = db.Column(db.Text, nullable=True)
+    catatan_admin = db.Column(db.Text, nullable=True)
+
+    diajukan_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diverifikasi_oleh = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id'),
+        nullable=True
+    )
+
+    diverifikasi_pada = db.Column(db.DateTime, nullable=True)
+
+    siswa = db.relationship('Siswa')
+    pemeriksa = db.relationship('User')
+
+    detail_tagihan = db.relationship(
+        'DetailPengajuanPembayaran',
+        back_populates='pengajuan',
+        cascade='all, delete-orphan'
+    )
+
+
+class DetailPengajuanPembayaran(db.Model):
+    __tablename__ = 'detail_pengajuan_pembayaran'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    pengajuan_id = db.Column(
+        db.Integer,
+        db.ForeignKey('pengajuan_pembayaran.id'),
+        nullable=False,
+        index=True
+    )
+
+    tagihan_id = db.Column(
+        db.Integer,
+        db.ForeignKey('tagihan_siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    nominal_dibayar = db.Column(db.BigInteger, nullable=False)
+
+    pengajuan = db.relationship(
+        'PengajuanPembayaran',
+        back_populates='detail_tagihan'
+    )
+
+    tagihan = db.relationship('TagihanSiswa')

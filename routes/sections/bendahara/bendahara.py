@@ -54,6 +54,56 @@ def daftar_bulan_semester(kode_tahun_dasar, pola_waktu, sampai_tanggal=None):
 
     return bulan_list
 
+
+def cari_kode_tp_per_bulan(bulan, tahun):
+    """
+    Menentukan kode tahun pelajaran berdasarkan periode bulan.
+    Memprioritaskan data semester yang memiliki akhiran -1 atau -2.
+    """
+    from datetime import date
+    import re
+
+    # Tanggal tengah bulan untuk menghindari benturan
+    # ketika tanggal mulai/selesai berada di tengah bulan.
+    tanggal_acuan = date(tahun, bulan, 15)
+
+    daftar_tp = TahunPelajaran.query.filter(
+        TahunPelajaran.tanggal_mulai <= tanggal_acuan,
+        TahunPelajaran.tanggal_selesai >= tanggal_acuan
+    ).all()
+
+    # Utamakan data semester yang kodenya berakhiran -1 atau -2.
+    daftar_semester = [
+        tp for tp in daftar_tp
+        if re.search(r"-[12]$", tp.kode or "")
+    ]
+
+    if len(daftar_semester) == 1:
+        return daftar_semester[0].kode
+
+    if len(daftar_semester) > 1:
+        raise ValueError(
+            f"Lebih dari satu data semester cocok untuk "
+            f"{bulan:02d}/{tahun}: "
+            f"{[tp.kode for tp in daftar_semester]}"
+        )
+
+    # Jika tidak ada data semester yang cocok,
+    # gunakan kode yang rentang tanggalnya sesuai.
+    if len(daftar_tp) == 1:
+        return daftar_tp[0].kode
+
+    if len(daftar_tp) > 1:
+        raise ValueError(
+            f"Data tahun pelajaran bertumpang tindih untuk "
+            f"{bulan:02d}/{tahun}: "
+            f"{[tp.kode for tp in daftar_tp]}"
+        )
+
+    # Jika tidak ada periode yang cocok, jangan menebak kode.
+    return None
+
+
 def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
     print(f"  -> Masuk Fungsi: id={id_siswa} angkatan={angkatan_masuk}")
     """
@@ -162,13 +212,29 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                             'status': status_sekarang
                         })
                 else:
+                    
                     for bulan_angka, nama_bulan, tahun_bulan in daftar_bulan_semua:
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
+
+                        tp_bulan = cari_kode_tp_per_bulan(
+                            bulan_angka, tahun_bulan
+                        )
+
+                        if not tp_bulan:
+                            print(
+                                f"[PERINGATAN] Kode tahun pelajaran tidak ditemukan "
+                                f"untuk {waktu_lengkap}"
+                            )
+                            continue
+
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(
+                            tarif, waktu_lengkap, tp_bulan
+                        )
+
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
                             'jenis_pembayaran_id': tarif.id,
-                            'tahun_pelajaran_tagihan': tp_tagihan,
+                            'tahun_pelajaran_tagihan': tp_bulan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
@@ -208,11 +274,22 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                         if libur:
                             continue
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
+
+                        tp_bulan = cari_kode_tp_per_bulan(
+                            bulan_angka, tahun_bulan
+                        )
+
+                        if not tp_bulan:
+                            print(f"[PERINGATAN] Kode TP tidak ditemukan: {waktu_lengkap}")
+                            continue
+
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(
+                            tarif, waktu_lengkap, tp_bulan
+                        )
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
                             'jenis_pembayaran_id': tarif.id,
-                            'tahun_pelajaran_tagihan': tp_tagihan,
+                            'tahun_pelajaran_tagihan': tp_bulan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
@@ -256,11 +333,22 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                         if libur:
                             continue
                         waktu_lengkap = f"{nama_bulan} {tahun_bulan}"
-                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(tarif, waktu_lengkap, tp_tagihan)
+
+                        tp_bulan = cari_kode_tp_per_bulan(
+                            bulan_angka, tahun_bulan
+                        )
+
+                        if not tp_bulan:
+                            print(f"[PERINGATAN] Kode TP tidak ditemukan: {waktu_lengkap}")
+                            continue
+
+                        status_sekarang, sudah_dibayar, tagihan_db = cek_status_tagihan(
+                            tarif, waktu_lengkap, tp_bulan
+                        )
                         daftar_tagihan_terperinci.append({
                             'id': tagihan_db.id if tagihan_db else None,
                             'jenis_pembayaran_id': tarif.id,
-                            'tahun_pelajaran_tagihan': tp_tagihan,
+                            'tahun_pelajaran_tagihan': tp_bulan,
                             'nama': tarif.nama,
                             'waktu': waktu_lengkap,
                             'nominal': tarif.nominal,
@@ -379,6 +467,10 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
 
 bendahara_bp = Blueprint('bendahara', __name__, url_prefix='/bendahara')
 
+@bendahara_bp.app_template_filter('label_tp')
+def label_tp_filter(kode):
+    return format_tahun_pelajaran(kode)
+
 def get_base_tahun(kode_tp):
     if not kode_tp: return ""
     kode_tp = kode_tp.split('-')[0] if '-' in kode_tp else kode_tp
@@ -406,6 +498,24 @@ def kode_tp_tagihan(tarif, tahun_siswa):
 
 def format_rupiah(angka):
     return "Rp " + "{:,.0f}".format(angka).replace(",", ".")
+
+
+def format_tahun_pelajaran(kode):
+    if not kode:
+        return "-"
+
+    kode = str(kode).strip()
+
+    import re
+    cocok = re.fullmatch(r"(\d{4}/\d{4})-([12])", kode)
+
+    if not cocok:
+        return kode
+
+    tahun = cocok.group(1)
+    semester = "Ganjil" if cocok.group(2) == "1" else "Genap"
+
+    return f"{tahun} - {semester}"
 
 def get_daftar_tahun_unik():
     daftar_unik = {}

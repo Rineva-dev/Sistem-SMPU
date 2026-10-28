@@ -3012,3 +3012,441 @@ a:focus-visible {
         width: 100%;
     }
 }
+
+/* ============================================================
+   PAYMENT SELECTION — PILIH TAGIHAN & NOMINAL
+   Tambahkan di bagian paling bawah detail.css
+   ============================================================ */
+
+/* Area pemilihan tagihan */
+.payment-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 0 0 205px;
+    width: 205px;
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #e1e9df;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #f8fbf6 0%, #ffffff 100%);
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* Label checkbox */
+.payment-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #284a37;
+    font-family: "DM Sans", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+/* Checkbox custom */
+.pilih-tagihan {
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    flex: 0 0 19px;
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    place-items: center;
+    border: 1.5px solid #c7d5c5;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.pilih-tagihan::before {
+    width: 5px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    content: "";
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.18s ease;
+}
+
+.pilih-tagihan:checked {
+    border-color: #176b45;
+    background: #176b45;
+    box-shadow: 0 3px 8px rgba(23, 107, 69, 0.18);
+}
+
+.pilih-tagihan:checked::before {
+    transform: rotate(45deg) scale(1);
+}
+
+.pilih-tagihan:focus-visible,
+.nominal-pembayaran:focus-visible {
+    outline: 3px solid rgba(44, 132, 82, 0.2);
+    outline-offset: 3px;
+}
+
+/* Label nominal */
+.payment-nominal-label {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    color: #748176;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+/* Input nominal rupiah */
+.payment-nominal-input {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    padding: 0 10px;
+    border: 1px solid #dce6d9;
+    border-radius: 10px;
+    background: #ffffff;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.payment-nominal-input:focus-within {
+    border-color: #6ba77a;
+    box-shadow: 0 0 0 3px rgba(67, 139, 85, 0.09);
+}
+
+.payment-nominal-input > span {
+    flex: 0 0 auto;
+    color: #9b895e;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.nominal-pembayaran {
+    width: 100%;
+    min-width: 0;
+    height: 39px;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #174b32;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Hilangkan spinner bawaan input number */
+.nominal-pembayaran::-webkit-inner-spin-button,
+.nominal-pembayaran::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+.nominal-pembayaran {
+    -moz-appearance: textfield;
+}
+
+.nominal-pembayaran:disabled {
+    color: #a0aaa0;
+    cursor: not-allowed;
+}
+
+.payment-nominal-input:has(.nominal-pembayaran:disabled) {
+    background: #f0f3ee;
+    border-color: #e5eae2;
+}
+
+.payment-nominal-label > small {
+    color: #8a958a;
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+/* Tampilan saat tagihan dipilih */
+.month-invoice-item:has(.pilih-tagihan:checked) {
+    background: linear-gradient(
+        90deg,
+        rgba(236, 246, 235, 0.8),
+        rgba(255, 255, 255, 0.3)
+    );
+}
+
+.month-invoice-item:has(.pilih-tagihan:checked) .payment-selection {
+    border-color: #b8d4b7;
+    background: #f2f8ef;
+    box-shadow: 0 4px 14px rgba(29, 91, 52, 0.06);
+}
+
+/* ============================================================
+   PAYMENT SUMMARY — RINGKASAN TOTAL PENGAJUAN
+   ============================================================ */
+
+.payment-summary-panel {
+    position: sticky;
+    bottom: 16px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 30px 0 45px;
+    padding: 23px 26px;
+    overflow: hidden;
+    border: 1px solid rgba(190, 209, 184, 0.8);
+    border-radius: 20px;
+    background:
+        radial-gradient(
+            ellipse at 0% 0%,
+            rgba(224, 239, 218, 0.6),
+            transparent 55%
+        ),
+        rgba(255, 255, 255, 0.97);
+    box-shadow:
+        0 14px 38px rgba(15, 55, 37, 0.10),
+        0 2px 7px rgba(15, 55, 37, 0.035);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.payment-summary-panel > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+}
+
+.payment-summary-label {
+    color: #8b7950;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    line-height: 1.6;
+}
+
+.payment-summary-panel #total-pengajuan {
+    color: #124b31;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.payment-summary-panel #jumlah-tagihan-dipilih {
+    margin: 0;
+    color: #7b897c;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Tombol lanjutkan pembayaran */
+#btn-ajukan-pembayaran {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 49px;
+    padding: 0 22px;
+    border: 1px solid #176b45;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #176b45 0%, #0c4a31 100%);
+    box-shadow: 0 6px 15px rgba(16, 91, 55, 0.17);
+    color: #ffffff;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease,
+        background 0.2s ease;
+}
+
+#btn-ajukan-pembayaran::after {
+    content: "→";
+    font-size: 17px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+#btn-ajukan-pembayaran:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(16, 91, 55, 0.23);
+}
+
+#btn-ajukan-pembayaran:not(:disabled):hover::after {
+    transform: translateX(3px);
+}
+
+#btn-ajukan-pembayaran:focus-visible {
+    outline: 3px solid rgba(49, 150, 106, 0.4);
+    outline-offset: 4px;
+}
+
+#btn-ajukan-pembayaran:disabled {
+    border-color: #d9e1d6;
+    background: #e8ede5;
+    box-shadow: none;
+    color: #9aa59a;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   RESPONSIVE — TABLET
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .payment-selection {
+        flex-basis: 185px;
+        width: 185px;
+        padding: 13px;
+    }
+
+    .month-invoice-item {
+        gap: 15px;
+    }
+
+    .payment-summary-panel {
+        padding: 21px;
+        gap: 18px;
+    }
+
+    #btn-ajukan-pembayaran {
+        padding: 0 17px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+   ============================================================ */
+
+@media (max-width: 650px) {
+    .payment-selection {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        flex: none;
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+    }
+
+    .payment-checkbox-label {
+        gap: 9px;
+        font-size: 11px;
+    }
+
+    .pilih-tagihan {
+        width: 20px;
+        height: 20px;
+        flex-basis: 20px;
+    }
+
+    .payment-nominal-label {
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .payment-nominal-input {
+        padding: 0 12px;
+    }
+
+    .nominal-pembayaran {
+        height: 42px;
+        font-size: 13px;
+    }
+
+    .payment-nominal-label > small {
+        font-size: 10px;
+    }
+
+    .payment-summary-panel {
+        position: sticky;
+        bottom: 8px;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 15px;
+        margin: 23px 0 30px;
+        padding: 18px;
+        border-radius: 17px;
+        box-shadow: 0 8px 30px rgba(15, 55, 37, 0.13);
+    }
+
+    .payment-summary-panel > div {
+        gap: 5px;
+    }
+
+    .payment-summary-label {
+        font-size: 8px;
+        letter-spacing: 1.2px;
+    }
+
+    .payment-summary-panel #total-pengajuan {
+        font-size: 27px;
+    }
+
+    .payment-summary-panel #jumlah-tagihan-dipilih {
+        font-size: 10px;
+    }
+
+    #btn-ajukan-pembayaran {
+        width: 100%;
+        min-height: 47px;
+        padding: 0 15px;
+        border-radius: 11px;
+        font-size: 12px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 360px) {
+    .payment-selection {
+        padding: 11px;
+    }
+
+    .payment-summary-panel {
+        padding: 15px;
+    }
+
+    .payment-summary-panel #total-pengajuan {
+        font-size: 24px;
+        letter-spacing: -0.6px;
+    }
+
+    #btn-ajukan-pembayaran {
+        font-size: 11px;
+    }
+}
+
+/* Hormati preferensi pengurangan animasi */
+@media (prefers-reduced-motion: reduce) {
+    .payment-selection,
+    .pilih-tagihan,
+    .payment-nominal-input,
+    #btn-ajukan-pembayaran {
+        transition: none;
+    }
+}

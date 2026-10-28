@@ -328,6 +328,55 @@
                             ) %}
 
                             <article class="month-invoice-item">
+                                
+                                {% if item.sisa > 0 %}
+                                {% set boleh_cicil = 'pembangunan' in (item.nama|lower) %}
+
+                                <div class="payment-selection">
+
+                                    <label class="payment-checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            class="pilih-tagihan"
+                                            name="tagihan_id"
+                                            value="{{ item.id }}"
+                                            data-sisa="{{ item.sisa }}"
+                                            data-bisa-cicil="{{ 'true' if boleh_cicil else 'false' }}"
+                                        >
+                                        <span>Pilih tagihan ini</span>
+                                    </label>
+
+                                    <label class="payment-nominal-label">
+                                        Nominal pembayaran
+
+                                        <div class="payment-nominal-input">
+                                            <span>Rp</span>
+
+                                            <input
+                                                type="number"
+                                                class="nominal-pembayaran"
+                                                min="1"
+                                                max="{{ item.sisa }}"
+                                                step="1"
+                                                value="{{ item.sisa }}"
+                                                data-tagihan-id="{{ item.id }}"
+                                                {% if not boleh_cicil %}readonly{% endif %}
+                                                disabled
+                                            >
+                                        </div>
+
+                                        <small>
+                                            {% if boleh_cicil %}
+                                                Bisa dicicil. Maksimal Rp {{ "{:,.0f}".format(item.sisa).replace(",", ".") }}
+                                            {% else %}
+                                                Wajib dibayar penuh: Rp {{ "{:,.0f}".format(item.sisa).replace(",", ".") }}
+                                            {% endif %}
+                                        </small>
+                                    </label>
+
+                                </div>
+                                {% endif %}
+
                                 <div class="invoice-main">
                                     <div class="invoice-icon">
                                         <svg viewBox="0 0 24 24" fill="none"
@@ -358,7 +407,7 @@
                                                 {{ item.periode }}
                                                 <span>•</span>
                                             {% endif %}
-                                            Tahun Pelajaran {{ item.tahun_pelajaran }}
+                                            Tahun Pelajaran {{ item.tahun_pelajaran | label_tp }}
                                         </p>
 
                                         <div class="invoice-progress">
@@ -416,6 +465,27 @@
                 </div>
             {% endif %}
         </section>
+
+        
+        <!-- RINGKASAN PENGAJUAN PEMBAYARAN -->
+        <section class="payment-summary-panel">
+            <div>
+                <span class="payment-summary-label">TOTAL YANG AKAN DIAJUKAN</span>
+                <strong id="total-pengajuan">Rp 0</strong>
+                <p id="jumlah-tagihan-dipilih">
+                    Belum ada tagihan yang dipilih.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="btn-ajukan-pembayaran"
+                disabled
+            >
+                Lanjutkan Pembayaran
+            </button>
+        </section>
+
 
         <!-- PAYMENT HISTORY -->
         <section class="history-section reveal">
@@ -536,5 +606,92 @@
     </footer>
 
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".pilih-tagihan");
+    const totalElement = document.getElementById("total-pengajuan");
+    const jumlahElement = document.getElementById("jumlah-tagihan-dipilih");
+    const tombol = document.getElementById("btn-ajukan-pembayaran");
+
+    const formatRupiah = (angka) =>
+        "Rp " + angka.toLocaleString("id-ID");
+
+    function hitungTotal() {
+        let total = 0;
+        let jumlah = 0;
+        let valid = true;
+
+        checkboxes.forEach((checkbox) => {
+            const input = document.querySelector(
+                `.nominal-pembayaran[data-tagihan-id="${checkbox.value}"]`
+            );
+
+            if (!input) return;
+
+            const sisa = Number(checkbox.dataset.sisa || 0);
+            const bolehCicil = checkbox.dataset.bisaCicil === "true";
+
+            input.disabled = !checkbox.checked;
+            input.max = sisa;
+
+            if (!checkbox.checked) return;
+
+            jumlah++;
+
+            let nominal = Number(input.value);
+
+            if (!bolehCicil) {
+                // SPP dan Peminatan wajib dibayar penuh.
+                nominal = sisa;
+                input.value = sisa;
+            } else {
+                // Pembangunan boleh dicicil.
+                if (input.value.trim() === "") {
+                    nominal = 0;
+                } else {
+                    nominal = Math.floor(nominal);
+                    nominal = Math.min(nominal, sisa);
+                    nominal = Math.max(nominal, 0);
+                    input.value = nominal;
+                }
+            }
+
+            if (
+                !Number.isFinite(nominal) ||
+                nominal <= 0 ||
+                nominal > sisa ||
+                (!bolehCicil && nominal !== sisa)
+            ) {
+                valid = false;
+                return;
+            }
+
+            total += nominal;
+        });
+
+        totalElement.textContent = formatRupiah(total);
+
+        jumlahElement.textContent = jumlah > 0
+            ? `${jumlah} tagihan dipilih`
+            : "Belum ada tagihan yang dipilih.";
+
+        tombol.disabled = jumlah === 0 || total <= 0 || !valid;
+    }
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", hitungTotal);
+    });
+
+    document.querySelectorAll(".nominal-pembayaran").forEach((input) => {
+        input.addEventListener("input", hitungTotal);
+        input.addEventListener("change", hitungTotal);
+    });
+
+    hitungTotal();
+});
+</script>
+
 </body>
 </html>

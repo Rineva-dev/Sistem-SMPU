@@ -1,136 +1,176 @@
 
-import os
-import sqlite3
-from datetime import datetime
-
 from app import app
-from models import db, Siswa, JenisPembayaran, TagihanSiswa
+from collections import defaultdict
+from datetime import date
+from sqlalchemy import func
+import re
+
+# Sesuaikan import ini dengan lokasi model yang digunakan proyekmu.
+from models import TahunPelajaran, TagihanSiswa, RiwayatPembayaran
 
 
-NISN_TARGET = "0123456789"
-ID_TARIF_SEMESTER_1 = 5
-ID_TARIF_SEMESTER_2 = 6
+NAMA_BULAN = {
+    "januari": 1, "februari": 2, "maret": 3,
+    "april": 4, "mei": 5, "juni": 6,
+    "juli": 7, "agustus": 8, "september": 9,
+    "oktober": 10, "november": 11, "desember": 12,
+}
 
-with app.app_context():
-    # 1. Pastikan database menggunakan SQLite.
-    driver = db.engine.url.drivername
+# Tetap False untuk pemeriksaan pertama.
+# Jangan ubah menjadi True sebelum laporan diverifikasi.
+TERAPKAN_PERUBAHAN = True
 
-    if not driver.startswith("sqlite"):
-        raise RuntimeError(
-            f"Database menggunakan {driver}, bukan SQLite. "
-            "Hentikan proses dan buat backup sesuai jenis database."
-        )
 
-    # 2. Buat backup database sebelum perubahan.
-    nama_backup = (
-        "backup_sebelum_perbaikan_"
-        + datetime.now().strftime("%Y%m%d_%H%M%S")
-        + ".db"
+def baca_periode(teks):
+    if not teks:
+        return None
+
+    cocok = re.fullmatch(
+        r"\s*([A-Za-z]+)\s+(\d{4})\s*",
+        teks
     )
+    if not cocok:
+        return None
 
-    koneksi_asal = db.engine.raw_connection()
+    bulan = NAMA_BULAN.get(cocok.group(1).lower())
+    tahun = int(cocok.group(2))
 
-    try:
-        with sqlite3.connect(nama_backup) as koneksi_backup:
-            koneksi_asal.backup(koneksi_backup)
-    finally:
-        koneksi_asal.close()
+    if bulan is None:
+        return None
 
-    print(f"Backup dibuat: {os.path.abspath(nama_backup)}")
+    return bulan, tahun
 
-    # 3. Cari siswa yang akan diperbaiki.
-    siswa = Siswa.query.filter_by(nisn=NISN_TARGET).first()
 
-    if not siswa:
-        raise RuntimeError("Siswa target tidak ditemukan.")
+def cari_kode_tp(bulan, tahun):
+    tanggal_acuan = date(tahun, bulan, 15)
 
-    # 4. Pastikan tarif sesuai dengan yang diperiksa.
-    tarif1 = db.session.get(
-        JenisPembayaran, ID_TARIF_SEMESTER_1
-    )
-    tarif2 = db.session.get(
-        JenisPembayaran, ID_TARIF_SEMESTER_2
-    )
-
-    if (
-        not tarif1
-        or tarif1.kode != "bangunan_s1"
-        or tarif1.pola_waktu != "semester_1"
-    ):
-        raise RuntimeError("Tarif semester 1 tidak sesuai.")
-
-    if (
-        not tarif2
-        or tarif2.kode != "bangunan_s2"
-        or tarif2.pola_waktu != "semester_2"
-    ):
-        raise RuntimeError("Tarif semester 2 tidak sesuai.")
-
-    # 5. Pastikan kedua tagihan baru sudah benar.
-    tagihan1 = TagihanSiswa.query.filter_by(
-        siswa_id=siswa.id,
-        jenis_pembayaran_id=ID_TARIF_SEMESTER_1,
-        bulan=None,
-        semester=1,
-        tahun_pelajaran="2025/2026-1",
+    data = TahunPelajaran.query.filter(
+        TahunPelajaran.tanggal_mulai <= tanggal_acuan,
+        TahunPelajaran.tanggal_selesai >= tanggal_acuan,
     ).all()
 
-    tagihan2 = TagihanSiswa.query.filter_by(
-        siswa_id=siswa.id,
-        jenis_pembayaran_id=ID_TARIF_SEMESTER_2,
-        bulan=None,
-        semester=2,
-        tahun_pelajaran="2025/2026-2",
-    ).all()
+    semester = [
+        tp for tp in data
+        if re.search(r"-[12]$", tp.kode or "")
+    ]
 
-    if len(tagihan1) != 1 or len(tagihan2) != 1:
-        raise RuntimeError(
-            "Dibatalkan: tagihan yang benar harus masing-masing "
-            "tepat satu untuk semester 1 dan semester 2."
-        )
+    if len(semester) == 1:
+        return semester[0].kode
 
-    # 6. Cari hanya tagihan lama dengan semester 17 atau 18.
-    tagihan_lama = TagihanSiswa.query.filter(
-        TagihanSiswa.siswa_id == siswa.id,
-        TagihanSiswa.jenis_pembayaran_id == ID_TARIF_SEMESTER_1,
-        TagihanSiswa.bulan.is_(None),
-        TagihanSiswa.semester.in_([17, 18]),
-        TagihanSiswa.tahun_pelajaran == "2025/2026-1",
-    ).all()
+    if len(semester) > 1:
+        return None
 
-    if not tagihan_lama:
-        raise RuntimeError("Tidak ditemukan tagihan lama yang cocok.")
+    if len(data) == 1:
+        return data[0].kode
 
-    # 7. Batalkan semuanya jika ada pembayaran/riwayat terkait.
-    for t in tagihan_lama:
-        if (t.sudah_dibayar or 0) != 0 or len(t.riwayat) != 0:
-            raise RuntimeError(
-                f"Dibatalkan: tagihan ID {t.id} memiliki pembayaran "
-                "atau riwayat. Perlu pemeriksaan manual."
+    return None
+
+
+def jalankan():
+    with app.app_context():
+        perubahan = []
+        masalah = []
+        grup_target = defaultdict(list)
+
+        tagihan_bulanan = TagihanSiswa.query.filter(
+            TagihanSiswa.bulan.isnot(None)
+        ).order_by(TagihanSiswa.id.asc()).all()
+
+        for tagihan in tagihan_bulanan:
+            periode = baca_periode(tagihan.bulan)
+
+            if not periode:
+                continue
+
+            bulan, tahun = periode
+            kode_benar = cari_kode_tp(bulan, tahun)
+
+            # Abaikan tagihan yang sudah sesuai.
+            if kode_benar == tagihan.tahun_pelajaran:
+                continue
+
+            if not kode_benar:
+                masalah.append(
+                    f"ID {tagihan.id}: kode TP tidak dapat ditentukan "
+                    f"secara unik untuk {tagihan.bulan}"
+                )
+                continue
+
+            # Periksa apakah sudah ada tagihan lain dengan
+            # siswa, jenis pembayaran, bulan, dan kode tujuan sama.
+            bentrok = TagihanSiswa.query.filter(
+                TagihanSiswa.id != tagihan.id,
+                TagihanSiswa.siswa_id == tagihan.siswa_id,
+                TagihanSiswa.jenis_pembayaran_id
+                    == tagihan.jenis_pembayaran_id,
+                TagihanSiswa.bulan == tagihan.bulan,
+                TagihanSiswa.tahun_pelajaran == kode_benar,
+            ).first()
+
+            if bentrok:
+                masalah.append(
+                    f"ID {tagihan.id}: bentrok dengan ID {bentrok.id}; "
+                    f"keduanya untuk {tagihan.bulan} dan kode {kode_benar}"
+                )
+                continue
+
+            # Jangan otomatis mengoreksi tagihan yang sudah memiliki
+            # pembayaran. Periksa manual terlebih dahulu.
+            jumlah_riwayat = RiwayatPembayaran.query.filter_by(
+                tagihan_id=tagihan.id
+            ).count()
+
+            if jumlah_riwayat > 0 or (tagihan.sudah_dibayar or 0) > 0:
+                masalah.append(
+                    f"ID {tagihan.id}: memiliki riwayat pembayaran "
+                    f"atau nominal pembayaran; perlu pemeriksaan manual"
+                )
+                continue
+
+            perubahan.append(
+                (tagihan, tagihan.tahun_pelajaran, kode_benar)
             )
 
-    print("\nTagihan lama yang akan dihapus:")
-    for t in tagihan_lama:
+        print("=" * 100)
+        print("LAPORAN KOREKSI KODE TAHUN PELAJARAN")
         print(
-            f"ID={t.id} | Semester={t.semester} | "
-            f"Nominal={t.nominal_tagihan}"
+            "MODE:",
+            "TERAPKAN PERUBAHAN" if TERAPKAN_PERUBAHAN
+            else "SIMULASI — DATABASE TIDAK DIUBAH"
         )
+        print("=" * 100)
 
-    # 8. Hapus hanya baris lama yang sudah diperiksa.
-    try:
-        for t in tagihan_lama:
-            db.session.delete(t)
+        for tagihan, kode_lama, kode_baru in perubahan:
+            print(
+                f"ID={tagihan.id} | Siswa={tagihan.siswa_id} | "
+                f"Bulan={tagihan.bulan} | "
+                f"{kode_lama} -> {kode_baru} | "
+                f"Nominal={tagihan.nominal_tagihan} | "
+                f"Sudah dibayar={tagihan.sudah_dibayar}"
+            )
 
-        # Perbaiki tahun tarif semester 2.
-        tarif2.tahun_pelajaran = "2025/2026-2"
+        print("\nTAGIHAN YANG PERLU PEMERIKSAAN MANUAL")
+        for pesan in masalah:
+            print("-", pesan)
 
-        db.session.commit()
+        print("\nRINGKASAN")
+        print("Tagihan aman untuk dikoreksi:", len(perubahan))
+        print("Kasus yang perlu diperiksa:", len(masalah))
 
-    except Exception:
-        db.session.rollback()
-        raise
+        if TERAPKAN_PERUBAHAN:
+            try:
+                for tagihan, kode_lama, kode_baru in perubahan:
+                    tagihan.tahun_pelajaran = kode_baru
 
-    print("\nPerbaikan selesai.")
-    print(f"Jumlah tagihan lama dihapus: {len(tagihan_lama)}")
-    print("Tarif bangunan_s2 sekarang: 2025/2026-2")
-    print("Tagihan lain tidak diubah.")
+                db.session.commit()
+                print("Perubahan berhasil disimpan.")
+            except Exception:
+                db.session.rollback()
+                raise
+        else:
+            print("Belum ada perubahan yang disimpan.")
+
+
+if __name__ == "__main__":
+    from app import db
+    jalankan()
