@@ -274,12 +274,31 @@ def detail_pembayaran(nisn):
         else 0
     )
 
-    kelas = (
-        siswa.kelas_sekarang.nama_kelas
-        if getattr(siswa, "kelas_sekarang", None)
-        else (siswa.tingkat or "Belum ditentukan")
+    # Informasi tingkat dan rombel siswa
+    rombel = (
+        (siswa.kelas_sekarang.nama_kelas or "").strip()
+        if siswa.kelas_sekarang
+        else ""
     )
 
+    tingkat = str(siswa.tingkat or "").strip()
+
+    if tingkat and rombel:
+        kelas = f"Kelas {tingkat} · {rombel}"
+    elif rombel:
+        kelas = rombel
+    elif tingkat:
+        kelas = f"Kelas {tingkat}"
+    else:
+        kelas = "Belum ditentukan"
+
+    print("========== DEBUG PROFIL SISWA ==========")
+    print("Nama:", siswa.nama)
+    print("NISN:", siswa.nisn)
+    print("Tahun Masuk:", siswa.tahun_masuk)
+    print("Tahun Diterima:", siswa.tahun_diterima)
+    print("=========================================")
+    
     return render_template(
         "payment/detail.html",
         siswa=siswa,

@@ -140,39 +140,112 @@
     </section>
 
     <!-- STUDENT PROFILE -->
-    <section class="student-card reveal">
-        <div class="student-avatar">
-            <span>{{ (siswa.nama or 'S')[0]|upper }}</span>
-            <span class="avatar-status" title="Profil siswa"></span>
-        </div>
+    <section class="student-profile-card reveal">
 
-        <div class="student-information">
-            <span class="section-kicker">PROFIL SISWA</span>
-            <h2>{{ siswa.nama or 'Nama siswa belum tersedia' }}</h2>
+        <div class="student-profile-top">
+            <div class="student-profile-identity">
+                <div class="student-profile-avatar">
+                    <span>{{ (siswa.nama or 'S')[0]|upper }}</span>
+                    <span class="student-avatar-check">✓</span>
+                </div>
 
-            <div class="student-details">
-                <span class="detail-item">
-                    <span class="detail-label">NISN</span>
-                    <strong>{{ siswa.nisn or '—' }}</strong>
-                </span>
-                <span class="detail-separator"></span>
-                <span class="detail-item">
-                    <span class="detail-label">Kelas</span>
-                    <strong>{{ kelas or 'Belum ditentukan' }}</strong>
-                </span>
-                <span class="detail-separator"></span>
-                <span class="detail-item">
-                    <span class="detail-label">Angkatan</span>
-                    <strong>{{ siswa.tahun_masuk or '—' }}</strong>
-                </span>
+                <div class="student-profile-name">
+                    <span class="section-kicker">STUDENT PROFILE</span>
+                    <h2>{{ siswa.nama or 'Nama siswa belum tersedia' }}</h2>
+                    <p>
+                        <span class="student-id-icon">ID</span>
+                        NISN: <strong>{{ siswa.nisn or '—' }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="student-profile-badge">
+                <span class="student-profile-badge-dot"></span>
+                Data siswa
             </div>
         </div>
 
-        <div class="profile-badge">
-            <span class="profile-badge-dot"></span>
-            <span>Profil terverifikasi</span>
+        <div class="student-profile-divider"></div>
+
+        <div class="student-profile-details">
+
+            <div class="student-info-item">
+                <div class="student-info-icon student-info-icon-green">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M3 10 12 4l9 6M5.5 9v10h13V9M9 19v-6h6v6"
+                            stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="student-info-copy">
+                    <span>Tingkat dan Rombel</span>
+                    <strong>{{ kelas or 'Belum ditentukan' }}</strong>
+                </div>
+            </div>
+
+            <div class="student-info-item">
+                <div class="student-info-icon student-info-icon-gold">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="4" y="5" width="16" height="15" rx="2.5"
+                            stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M8 3v4M16 3v4M4 10h16M8 14h3"
+                            stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="student-info-copy">
+                    <span>Tahun Angkatan</span>
+                    <strong>{{ siswa.tahun_masuk or siswa.tahun_diterima or 'Belum tersedia' }}</strong>
+                </div>
+            </div>
+
+            <div class="student-info-item">
+                <div class="student-info-icon student-info-icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="9" cy="8" r="3.5"
+                                stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5.5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"
+                            stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="student-info-copy">
+                    <span>Nama Ayah</span>
+                    <strong>{{ siswa.nama_ayah or 'Belum diisi' }}</strong>
+                </div>
+            </div>
+
+            <div class="student-info-item">
+                <div class="student-info-icon student-info-icon-rose">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="7" r="3.5"
+                                stroke="currentColor" stroke-width="1.7"/>
+                        <path d="M5 20v-1.5a7 7 0 0 1 14 0V20"
+                            stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round"/>
+                        <path d="M3 20h18"
+                            stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="student-info-copy">
+                    <span>Nama Ibu</span>
+                    <strong>{{ siswa.nama_ibu or 'Belum diisi' }}</strong>
+                </div>
+            </div>
+
         </div>
+
+        <div class="student-profile-foot">
+            <span class="student-profile-foot-icon">i</span>
+            <p>
+                Pastikan NISN dan nama orang tua sesuai sebelum melanjutkan
+                pembayaran tagihan siswa.
+            </p>
+        </div>
+
     </section>
+
 
     <!-- FINANCIAL OVERVIEW -->
     <section class="overview-section reveal">
@@ -393,7 +466,7 @@
                         <div class="bill-group">
                             <div class="bill-group-heading">
                                 <span class="bill-group-marker"></span>
-                                <span>{{ bulan|title }}</span>
+                                <span>{{ items_bulan[0].label_periode }}</span>
                                 <span class="bill-group-line"></span>
                                 <span class="bill-group-count">{{ items_bulan|length }} item</span>
                             </div>
@@ -428,7 +501,7 @@
                                             {% endif %}
                                             {% if item.tahun_pelajaran %}
                                                 <span class="bill-meta-divider"></span>
-                                                <span>TP {{ item.tahun_pelajaran }}</span>
+                                                <span>TP {{ item.tahun_pelajaran|label_tp }}</span>
                                             {% endif %}
                                         </div>
 
