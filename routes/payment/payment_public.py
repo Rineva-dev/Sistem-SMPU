@@ -16,6 +16,8 @@ from models import (
 from datetime import date, datetime
 import re
 import secrets
+import os
+from werkzeug.utils import secure_filename
 
 payment_public_bp = Blueprint(
     "payment_public",
@@ -791,3 +793,130 @@ def detail_transaksi(nisn, kode_transaksi):
             pengajuan.status.replace("_", " ").title(),
         ),
     )
+
+
+@payment_public_bp.route(
+    "/unggah-bukti/<string:nisn>/<string:kode_transaksi>",
+    methods=["POST"],
+    endpoint="unggah_bukti",
+)
+def unggah_bukti(nisn, kode_transaksi):
+
+    if not nisn.isdigit() or len(nisn) != 10:
+        abort(404)
+
+    siswa = Siswa.query.filter_by(nisn=nisn).first_or_404()
+
+    pengajuan = (
+        PengajuanPembayaran.query
+        .filter_by(
+            kode_transaksi=kode_transaksi,
+            siswa_id=siswa.id,
+        )
+        .with_for_update()
+        .first_or_404()
+    )
+
+    tujuan_redirect = url_for(
+        "payment_public.detail_transaksi",
+        nisn=nisn,
+        kode_transaksi=kode_transaksi,
+    )
+
+    # Hanya Transfer Bank yang menerima bukti manual.
+    if pengajuan.metode != "Transfer Bank":
+        flash(
+            "Unggah bukti hanya tersedia untuk metode Transfer Bank.",
+            "error",
+        )
+        return redirect(tujuan_redirect)
+
+    # Bukti yang sudah ada tidak boleh diganti orang tua.
+    if pengajuan.bukti_pembayaran:
+        flash(
+            "Bukti pembayaran sudah tercatat dan tidak dapat diganti.",
+            "warning",
+        )
+        return redirect(tujuan_redirect)
+
+    # Hanya transaksi menunggu verifikasi yang dapat menerima bukti.
+    if pengajuan.status != "menunggu_verifikasi":
+        flash(
+            "Transaksi ini tidak dapat menerima unggahan bukti.",
+            "error",
+        )
+        return redirect(tujuan_redirect)
+
+    file = request.files.get("bukti_pembayaran")
+
+    if not file or not file.filename:
+        flash("Pilih file bukti pembayaran terlebih dahulu.", "error")
+        return redirect(tujuan_redirect)
+
+    nama_asli = secure_filename(file.filename)
+
+    if "." not in nama_asli:
+        flash("Format file tidak valid.", "error")
+        return redirect(tujuan_redirect)
+
+    ekstensi = nama_asli.rsplit(".", 1)[1].lower()
+    ekstensi_diizinkan = {"jpg", "jpeg", "png", "pdf"}
+
+    if ekstensi not in ekstensi_diizinkan:
+        flash(
+            "Format file harus JPG, JPEG, PNG, atau PDF.",
+            "error",
+        )
+        return redirect(tujuan_redirect)
+
+    isi_file = file.read(3 * 1024 * 1024 + 1)
+
+    if not isi_file:
+        flash("File yang dipilih kosong.", "error")
+        return redirect(tujuan_redirect)
+
+    if len(isi_file) > 3 * 1024 * 1024:
+        flash("Ukuran file maksimal 3 MB.", "error")
+        return redirect(tujuan_redirect)
+
+    nama_file = secrets.token_hex(16) + "." + ekstensi
+
+    folder_upload = os.path.join(
+        current_app.instance_path,
+        "uploads",
+        "bukti_pembayaran",
+    )
+
+    os.makedirs(folder_upload, exist_ok=True)
+
+    path_file = os.path.join(folder_upload, nama_file)
+
+    try:
+        with open(path_file, "wb") as tujuan:
+            tujuan.write(isi_file)
+
+        pengajuan.bukti_pembayaran = nama_file
+        db.session.commit()
+
+        flash(
+            "Bukti pembayaran berhasil diunggah. "
+            "Silakan tunggu verifikasi pihak sekolah.",
+            "success",
+        )
+
+    except Exception:
+        db.session.rollback()
+
+        if os.path.exists(path_file):
+            os.remove(path_file)
+
+        current_app.logger.exception(
+            "Gagal menyimpan bukti pembayaran"
+        )
+
+        flash(
+            "Bukti pembayaran gagal disimpan. Silakan coba kembali.",
+            "error",
+        )
+
+    return redirect(tujuan_redirect)

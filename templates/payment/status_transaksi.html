@@ -4,170 +4,1739 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#064b37">
+    <meta name="theme-color" content="#092c23">
+
     <title>Status Transaksi — SMP Unggulan Hamzanwadi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; }
+        :root {
+            --green: #103d30;
+            --green-dark: #092c23;
+            --green-deep: #05251d;
+            --gold: #d9b875;
+            --gold-light: #f3e4bd;
+            --text: #18382d;
+            --muted: #7b8983;
+            --border: #e8eee9;
+            --surface: #ffffff;
+            --bg: #f5f7f5;
+
+            --success: #16845b;
+            --warning: #b77b18;
+            --danger: #c34d43;
+
+            --shadow:
+                0 20px 60px rgba(9, 44, 35, .075),
+                0 2px 8px rgba(9, 44, 35, .025);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            padding: 24px;
-            background: #f3f7f5;
-            color: #19372c;
-            font-family: Inter, sans-serif;
+            min-height: 100vh;
+            padding: 30px 18px 45px;
+            background:
+                radial-gradient(circle at 8% 5%, rgba(217,184,117,.13), transparent 25%),
+                radial-gradient(circle at 95% 35%, rgba(16,61,48,.07), transparent 28%),
+                var(--bg);
+            color: var(--text);
+            font-family: "DM Sans", sans-serif;
+            overflow-x: hidden;
         }
-        .card {
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .page {
             width: 100%;
-            max-width: 560px;
-            margin: 40px auto;
-            padding: 30px;
-            background: white;
-            border: 1px solid #e1eae4;
-            border-radius: 22px;
-            box-shadow: 0 16px 45px #173b2b0c;
+            max-width: 720px;
+            margin: 0 auto;
         }
-        .eyebrow {
-            color: #16815b;
-            font-size: 11px;
+
+        /* =====================================
+           HEADER — IDENTITAS SMPU HAMZANWADI
+        ===================================== */
+
+        .detail-header {
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 25px;
+            animation: slideDown .7s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .detail-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand-symbol {
+            position: relative;
+            width: 47px;
+            height: 47px;
+            flex: 0 0 47px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #164c3c, #092c23);
+            color: var(--gold);
+            box-shadow: 0 8px 20px rgba(9,44,35,.17);
+            overflow: hidden;
+        }
+
+        .brand-symbol::after {
+            content: "";
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            top: -42px;
+            right: -35px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+        }
+
+        .brand-symbol svg {
+            width: 27px;
+            height: 27px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-copy {
+            min-width: 0;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--green);
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 15px;
             font-weight: 800;
-            letter-spacing: 1.3px;
+            letter-spacing: -.5px;
         }
-        h1 { margin: 12px 0; font-size: 25px; }
-        .status {
-            display: inline-block;
-            margin: 12px 0;
+
+        .brand-title span {
+            color: #b28b43;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .5px;
+        }
+
+        .header-label {
             padding: 9px 13px;
-            border-radius: 999px;
-            background: #e6f5ec;
-            color: #08734f;
-            font-size: 12px;
+            border: 1px solid rgba(16,61,48,.09);
+            border-radius: 50px;
+            background: rgba(255,255,255,.7);
+            color: var(--green);
+            font-size: 10px;
             font-weight: 800;
+            letter-spacing: .4px;
+            white-space: nowrap;
         }
-        .notice {
-            margin: 18px 0;
-            padding: 15px;
+
+        /* =====================================
+           FLASH MESSAGE
+        ===================================== */
+
+        .flash-messages {
+            margin-bottom: 14px;
+        }
+
+        .flash {
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border: 1px solid transparent;
             border-radius: 12px;
-            background: #fff6df;
-            color: #77530b;
-            font-size: 13px;
-            line-height: 1.7;
+            font-size: 12px;
+            line-height: 1.6;
+            animation: slideDown .4s ease both;
         }
+
+        .flash.success {
+            color: #08734f;
+            background: #e9f7ef;
+            border-color: #d5ecde;
+        }
+
+        .flash.error,
+        .flash.warning {
+            color: #a34228;
+            background: #fff1e9;
+            border-color: #f4ddd0;
+        }
+
+        /* =====================================
+           MAIN CARD
+        ===================================== */
+
+        .main-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(16,61,48,.07);
+            border-radius: 25px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+            animation: cardEnter .8s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        /* =====================================
+           HERO
+        ===================================== */
+
+        .hero {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            padding: 38px 28px 34px;
+            background:
+                radial-gradient(circle at 90% 10%, rgba(217,184,117,.19), transparent 30%),
+                linear-gradient(135deg, #164a39 0%, #0c3529 52%, #092c23 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            border: 1px solid rgba(217,184,117,.16);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero::before {
+            width: 290px;
+            height: 290px;
+            top: -190px;
+            right: -70px;
+            animation: orbit 16s linear infinite;
+        }
+
+        .hero::after {
+            width: 220px;
+            height: 220px;
+            bottom: -175px;
+            left: -65px;
+            animation: orbit 20s linear infinite reverse;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 190px;
+            height: 190px;
+            top: -110px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: rgba(217,184,117,.12);
+            filter: blur(45px);
+            animation: glowPulse 5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold-light);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .hero-kicker::before,
+        .hero-kicker::after {
+            content: "";
+            width: 19px;
+            height: 1px;
+            background: var(--gold);
+            opacity: .7;
+        }
+
+        .hero-icon {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            display: grid;
+            place-items: center;
+            margin: 20px auto 15px;
+            border: 1px solid rgba(255,255,255,.19);
+            border-radius: 23px;
+            background: rgba(255,255,255,.10);
+            backdrop-filter: blur(12px);
+            box-shadow:
+                0 10px 30px rgba(0,0,0,.13),
+                inset 0 1px 0 rgba(255,255,255,.16);
+            font-size: 29px;
+            font-weight: 800;
+            animation: iconFloat 4s ease-in-out infinite;
+        }
+
+        .hero-icon.pending {
+            color: #ffe0a0;
+        }
+
+        .hero-icon.success {
+            color: #8af0b7;
+        }
+
+        .hero-icon.rejected {
+            color: #ffaaa1;
+        }
+
+        .hero-icon.cancelled {
+            color: #d5dfda;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+        }
+
+        .hero-description {
+            max-width: 420px;
+            margin: 10px auto 0;
+            color: rgba(255,255,255,.72);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 19px;
+            padding: 9px 15px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 50px;
+            background: rgba(255,255,255,.10);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 4px rgba(217,184,117,.15);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        .status-badge.success .status-dot {
+            background: #72e2a3;
+            box-shadow: 0 0 0 4px rgba(114,226,163,.15);
+        }
+
+        .status-badge.rejected .status-dot {
+            background: #ff9388;
+        }
+
+        /* =====================================
+           CONTENT
+        ===================================== */
+
+        .content {
+            padding: 27px 29px 30px;
+        }
+
+        .section {
+            margin-top: 25px;
+            animation: fadeUp .65s ease both;
+        }
+
+        .section:first-child {
+            margin-top: 0;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            margin: 0;
+            color: var(--green);
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: -.2px;
+        }
+
+        .section-caption {
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* =====================================
+           TRANSACTION DETAILS
+        ===================================== */
+
+        .transaction-box {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: linear-gradient(145deg, #fff, #fbfdfb);
+        }
+
+        .transaction-code {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            margin-bottom: 3px;
+            border-bottom: 1px dashed #dce7df;
+        }
+
+        .transaction-code small {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .transaction-code strong {
+            color: var(--green);
+            font-size: 13px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .code-mark {
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            border-radius: 11px;
+            background: var(--green);
+            color: var(--gold);
+            font-size: 16px;
+        }
+
         .line {
             display: flex;
             justify-content: space-between;
-            gap: 16px;
-            padding: 13px 0;
-            border-bottom: 1px solid #edf1ee;
-            font-size: 13px;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eff3f0;
+            font-size: 11px;
         }
-        .line span { color: #718078; }
-        .line strong { text-align: right; overflow-wrap: anywhere; }
-        .total { font-size: 20px; color: #08734f; }
-        .button {
+
+        .line:last-child {
+            border-bottom: 0;
+        }
+
+        .line span {
+            color: var(--muted);
+        }
+
+        .line strong {
+            color: var(--text);
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .total {
+            color: var(--green) !important;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        /* =====================================
+           BANK ACCOUNT CARD
+        ===================================== */
+
+        .bank-card {
+            position: relative;
+            overflow: hidden;
+            padding: 21px;
+            border: 1px solid rgba(217,184,117,.25);
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(217,184,117,.20), transparent 35%),
+                linear-gradient(135deg, #164a39, #092c23);
+            color: white;
+            box-shadow: 0 12px 28px rgba(9,44,35,.12);
+            transition: transform .3s, box-shadow .3s;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 17px 35px rgba(9,44,35,.17);
+        }
+
+        .bank-card::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: -115px;
+            right: -50px;
+            border: 1px solid rgba(217,184,117,.20);
+            border-radius: 50%;
+        }
+
+        .bank-card::after {
+            content: "";
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            top: -82px;
+            right: -25px;
+            border: 1px solid rgba(217,184,117,.14);
+            border-radius: 50%;
+        }
+
+        .bank-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .bank-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .bank-logo {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255,255,255,.17);
+            border-radius: 11px;
+            background: rgba(255,255,255,.10);
+            color: var(--gold-light);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .bank-name {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .bank-type {
+            margin-top: 3px;
+            color: rgba(255,255,255,.62);
+            font-size: 9px;
+        }
+
+        .bank-label {
+            padding: 6px 9px;
+            border: 1px solid rgba(217,184,117,.32);
+            border-radius: 30px;
+            color: var(--gold-light);
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        .account-caption {
+            position: relative;
+            z-index: 1;
             display: block;
-            margin-top: 22px;
-            padding: 14px 18px;
+            margin-top: 25px;
+            color: rgba(255,255,255,.64);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+
+        .account-number-row {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .account-number {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: clamp(20px, 5vw, 27px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .copy-button {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 11px;
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 9px;
+            background: rgba(255,255,255,.10);
+            color: white;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .copy-button:hover {
+            background: rgba(255,255,255,.2);
+        }
+
+        .account-owner {
+            position: relative;
+            z-index: 1;
+            margin-top: 17px;
+            padding-top: 13px;
+            border-top: 1px solid rgba(255,255,255,.14);
+        }
+
+        .account-owner small {
+            display: block;
+            color: rgba(255,255,255,.6);
+            font-size: 9px;
+        }
+
+        .account-owner strong {
+            display: block;
+            margin-top: 4px;
+            color: var(--gold-light);
+            font-size: 11px;
+        }
+
+        .bank-note {
+            display: flex;
+            gap: 10px;
+            margin-top: 13px;
+            padding: 13px;
+            border: 1px solid #f0e5c9;
             border-radius: 12px;
-            background: #064b37;
+            background: #fff9ec;
+            color: #795812;
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .bank-note-icon {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+            color: #176b50;
+            background: #f6e8c9;
+        }
+
+        .bank-note-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: rgb(107 82 23);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* =====================================
+           UPLOAD
+        ===================================== */
+
+        .upload-box {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            background: #fff;
+        }
+
+        .upload-description {
+            margin: 0 0 15px;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .file-label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 135px;
+            padding: 20px;
+            border: 1.5px dashed #b9d1c2;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #fbfefc, #f4faf6);
+            cursor: pointer;
+            text-align: center;
+            transition: .25s ease;
+        }
+
+        .file-label:hover {
+            border-color: var(--green);
+            background: #eff8f2;
+            transform: translateY(-2px);
+        }
+
+        .file-label.dragging {
+            border-color: var(--green);
+            background: #eaf6ee;
+            box-shadow: 0 0 0 4px rgba(16,61,48,.07);
+        }
+
+        .file-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e8f4ec;
+            color: var(--green);
+            font-size: 21px;
+            transition: transform .3s;
+        }
+
+        .file-label:hover .file-icon {
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        .file-label strong {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .file-label small {
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            display: none;
+            margin-top: 13px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: #fbfdfc;
+            animation: fadeUp .3s ease both;
+        }
+
+        .file-preview img {
+            display: block;
+            max-width: 100%;
+            max-height: 230px;
+            margin: 0 auto 12px;
+            border-radius: 9px;
+            object-fit: contain;
+        }
+
+        .file-name {
+            color: var(--text);
+            font-size: 10px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .file-size {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        .upload-button,
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            min-height: 47px;
+            margin-top: 13px;
+            padding: 12px 16px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #164a39, #092c23);
             color: white;
             text-align: center;
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 800;
-        }
-        .small {
-            color: #718078;
             font-size: 11px;
-            line-height: 1.7;
-        }
-        @media (max-width: 480px) {
-            body { padding: 12px; }
-            .card { margin: 12px auto; padding: 22px; }
-            h1 { font-size: 22px; }
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 7px 17px rgba(9,44,35,.12);
+            transition: transform .25s, box-shadow .25s, opacity .2s;
         }
 
-        
+        .upload-button:hover,
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 11px 22px rgba(9,44,35,.18);
+        }
+
+        .upload-button:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .button-secondary {
-            margin-top: 10px;
-            background: #ffffff;
-            color: #064b37;
-            border: 1px solid #d6e5dc;
+            border: 1px solid #dce8df;
+            background: white;
+            color: var(--green);
+            box-shadow: none;
         }
 
         .button-secondary:hover {
-            background: #f0f7f3;
+            background: #f4f9f5;
+            box-shadow: 0 7px 16px rgba(9,44,35,.06);
         }
 
+        /* =====================================
+           LOCKED STATE
+        ===================================== */
+
+        .locked-box {
+            display: flex;
+            gap: 12px;
+            padding: 17px;
+            border: 1px solid #d8eade;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #f5fbf7, #edf7f0);
+            color: #286348;
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .locked-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #e0f1e5;
+            font-size: 15px;
+        }
+
+        .locked-box strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .rejected-box {
+            border-color: #f0d9d4;
+            background: #fff7f5;
+            color: #a34238;
+        }
+
+        .rejected-box .locked-icon {
+            background: #fde9e5;
+        }
+
+        /* =====================================
+           NOTES
+        ===================================== */
+
+        .admin-note {
+            padding: 15px;
+            border: 1px solid #eee5d0;
+            border-radius: 13px;
+            background: #fffaf0;
+            color: #765a23;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .footer {
+            padding: 22px 10px 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 9px;
+            line-height: 1.8;
+        }
+
+        .footer strong {
+            color: var(--green);
+            font-weight: 800;
+        }
+
+        /* =====================================
+           ANIMATIONS
+        ===================================== */
+
+        @keyframes cardEnter {
+            from {
+                opacity: 0;
+                transform: translateY(22px) scale(.985);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: .45;
+                transform: translateX(-50%) scale(.9);
+            }
+            50% {
+                opacity: .9;
+                transform: translateX(-50%) scale(1.15);
+            }
+        }
+
+        @keyframes dotPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(217,184,117,.13);
+            }
+            50% {
+                box-shadow: 0 0 0 7px rgba(217,184,117,.05);
+            }
+        }
+
+        @keyframes orbit {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 540px) {
+            body {
+                padding: 17px 12px 30px;
+            }
+
+            .detail-header {
+                min-height: 60px;
+                margin-bottom: 18px;
+            }
+
+            .brand-symbol {
+                width: 42px;
+                height: 42px;
+                flex-basis: 42px;
+            }
+
+            .brand-title {
+                font-size: 13px;
+            }
+
+            .brand-subtitle {
+                font-size: 9px;
+            }
+
+            .header-label {
+                padding: 8px 10px;
+                font-size: 8px;
+            }
+
+            .main-card {
+                border-radius: 20px;
+            }
+
+            .hero {
+                padding: 31px 18px 29px;
+            }
+
+            .hero h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 22px 17px 23px;
+            }
+
+            .transaction-box {
+                padding: 14px;
+            }
+
+            .bank-card {
+                padding: 18px;
+            }
+
+            .account-number {
+                font-size: 20px;
+                letter-spacing: 1.3px;
+            }
+
+            .copy-button {
+                padding: 8px;
+                font-size: 8px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-label {
+                display: none;
+            }
+
+            .line {
+                gap: 8px;
+                font-size: 10px;
+            }
+
+            .account-number-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
     </style>
 </head>
+
 <body>
-<main class="card">
-    <span class="eyebrow">STUDENT PAYMENT CENTER</span>
-    <h1>Status transaksi</h1>
-    <p class="small">
-        Status saat ini: <strong>{{ status_label }}</strong>.
-        Status ditampilkan berdasarkan data yang tersimpan saat halaman dibuka.
-        Silakan buka kembali halaman ini untuk melihat perubahan terbaru.
-    </p>
 
-    <div class="status">{{ status_label }}</div>
+{% set status = (pengajuan.status or '')|lower %}
+{% set sudah_ada_bukti = pengajuan.bukti_pembayaran %}
+{% set metode_transfer = pengajuan.metode == "Transfer Bank" %}
 
-    <div class="line">
-        <span>Kode transaksi</span>
-        <strong>{{ pengajuan.kode_transaksi }}</strong>
-    </div>
-    <div class="line">
-        <span>Nama siswa</span>
-        <strong>{{ pengajuan.siswa.nama }}</strong>
-    </div>
-    <div class="line">
-        <span>Metode</span>
-        <strong>{{ pengajuan.metode }}</strong>
-    </div>
-    <div class="line">
-        <span>Total</span>
-        <strong class="total">
-            Rp {{ "{:,.0f}".format(pengajuan.total_diajukan).replace(",", ".") }}
-        </strong>
-    </div>
+{% if status == "disetujui" %}
+    {% set status_class = "success" %}
+    {% set status_icon = "✓" %}
+    {% set deskripsi_status = "Pembayaran telah diperiksa dan disetujui oleh pihak sekolah." %}
+{% elif status == "ditolak" %}
+    {% set status_class = "rejected" %}
+    {% set status_icon = "!" %}
+    {% set deskripsi_status = "Pengajuan pembayaran belum dapat disetujui. Silakan periksa catatan dari pihak sekolah." %}
+{% elif status == "dibatalkan" %}
+    {% set status_class = "cancelled" %}
+    {% set status_icon = "×" %}
+    {% set deskripsi_status = "Transaksi ini telah dibatalkan dan tidak dapat dilanjutkan." %}
+{% else %}
+    {% set status_class = "pending" %}
+    {% set status_icon = "…" %}
+    {% set deskripsi_status = "Pengajuan pembayaran sedang menunggu pemeriksaan pihak sekolah." %}
+{% endif %}
 
-    {% if pengajuan.metode == "Transfer Bank" %}
-        <div class="notice">
-            <strong>Transfer Bank — menunggu verifikasi</strong><br>
-            Rekening sementara: <strong>123456789</strong><br>
-            Nomor rekening ini harus dikonfirmasi oleh pihak sekolah
-            sebelum digunakan untuk transfer nyata. Setelah transfer,
-            pembayaran tetap menunggu pemeriksaan petugas.
+<main class="page">
+
+    <!-- HEADER -->
+    <header class="detail-header">
+
+        <div class="detail-brand">
+
+            <div class="brand-symbol">
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.5 20 5.5v6.1c0 5.1-3.3 8.3-8 10-4.7-1.7-8-4.9-8-10V5.5l8-3Z"/>
+                    <path d="m7.5 10 4.5-2 4.5 2-4.5 2-4.5-2Z"/>
+                    <path d="M9 11.2v2.4c1.9 1.2 4.1 1.2 6 0v-2.4"/>
+                    <path d="M16.5 10v3"/>
+                </svg>
+            </div>
+
+            <div class="brand-copy">
+                <div class="brand-title">
+                    SMPU <span>HAMZANWADI</span>
+                </div>
+                <div class="brand-subtitle">
+                    Student Payment Center
+                </div>
+            </div>
+
         </div>
-    {% else %}
-        <div class="notice">
-            <strong>Mode simulasi</strong><br>
-            {% if pengajuan.metode == "VA" %}
-                Virtual Account belum terhubung ke bank atau penyedia
-                gateway. Belum ada nomor VA aktif untuk dibayarkan.
-            {% else %}
-                QRIS belum terhubung ke penyedia gateway. Belum ada
-                kode QR pembayaran resmi untuk dipindai.
+
+        <div class="header-label">
+            PAYMENT CENTER
+        </div>
+
+    </header>
+
+    <!-- FLASH MESSAGE -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <main class="main-card">
+
+        <!-- HERO STATUS -->
+        <section class="hero">
+
+            <div class="hero-glow"></div>
+
+            <div class="hero-content">
+
+                <div class="hero-kicker">
+                    TRANSACTION INFORMATION
+                </div>
+
+                <div class="hero-icon {{ status_class }}">
+                    {{ status_icon }}
+                </div>
+
+                <h1>Status Transaksi</h1>
+
+                <p class="hero-description">
+                    {{ deskripsi_status }}
+                </p>
+
+                <div class="status-badge {{ status_class }}">
+                    <span class="status-dot"></span>
+                    {{ status_label }}
+                </div>
+
+            </div>
+
+        </section>
+
+        <div class="content">
+
+            <!-- INFORMASI TRANSAKSI -->
+            <section class="section">
+
+                <div class="section-heading">
+                    <h2 class="section-title">
+                        Informasi Pembayaran
+                    </h2>
+
+                    <span class="section-caption">
+                        DETAIL TRANSAKSI
+                    </span>
+                </div>
+
+                <div class="transaction-box">
+
+                    <div class="transaction-code">
+
+                        <div>
+                            <small>KODE TRANSAKSI</small>
+                            <strong>{{ pengajuan.kode_transaksi }}</strong>
+                        </div>
+
+                        <div class="code-mark">#</div>
+
+                    </div>
+
+                    <div class="line">
+                        <span>Nama siswa</span>
+                        <strong>{{ pengajuan.siswa.nama }}</strong>
+                    </div>
+
+                    <div class="line">
+                        <span>NISN</span>
+                        <strong>{{ pengajuan.siswa.nisn }}</strong>
+                    </div>
+
+                    <div class="line">
+                        <span>Metode pembayaran</span>
+                        <strong>{{ pengajuan.metode }}</strong>
+                    </div>
+
+                    <div class="line">
+                        <span>Tanggal pengajuan</span>
+                        <strong>
+                            {{ pengajuan.diajukan_pada.strftime("%d %b %Y, %H:%M") if pengajuan.diajukan_pada else "-" }}
+                        </strong>
+                    </div>
+
+                    <div class="line">
+                        <span>Total pembayaran</span>
+                        <strong class="total">
+                            Rp {{ "{:,.0f}".format(pengajuan.total_diajukan or 0).replace(",", ".") }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- TRANSFER BANK -->
+            {% if metode_transfer and status not in ["disetujui", "ditolak", "dibatalkan"] %}
+
+                <section class="section">
+
+                    <div class="section-heading">
+                        <h2 class="section-title">
+                            Rekening Tujuan Transfer
+                        </h2>
+
+                        <span class="section-caption">
+                            BSI
+                        </span>
+                    </div>
+
+                    <div class="bank-card">
+
+                        <div class="bank-top">
+
+                            <div class="bank-brand">
+
+                                <div class="bank-logo">
+                                    BSI
+                                </div>
+
+                                <div>
+                                    <div class="bank-name">
+                                        Bank Syariah Indonesia
+                                    </div>
+                                    <div class="bank-type">
+                                        Rekening resmi tujuan pembayaran
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="bank-label">
+                                TRANSFER
+                            </div>
+
+                        </div>
+
+                        <span class="account-caption">
+                            NOMOR REKENING
+                        </span>
+
+                        <div class="account-number-row">
+
+                            <div class="account-number" id="nomorRekening">
+                                0123456789
+                            </div>
+
+                            <button
+                                type="button"
+                                class="copy-button"
+                                id="copyRekening"
+                            >
+                                <span>▣</span>
+                                <span id="copyText">Salin</span>
+                            </button>
+
+                        </div>
+
+                        <div class="account-owner">
+                            <small>ATAS NAMA</small>
+                            <strong>SMP Unggulan Hamzanwadi</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="bank-note">
+                        <span class="bank-note-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9" />
+                                <path d="M12 11v5" />
+                                <path d="M12 8h.01" />
+                            </svg>
+                        </span>
+                        <div>
+                            <strong>Perhatikan sebelum transfer.</strong>
+                            Pastikan rekening dan nama penerima sudah
+                            dikonfirmasi kepada pihak sekolah sebelum
+                            melakukan transfer. Transfer sesuai dengan
+                            total pembayaran yang tertera di atas.
+                        </div>
+                    </div>
+
+                </section>
+
+            {% elif pengajuan.metode in ["VA", "QRIS"] %}
+
+                <section class="section">
+
+                    <div class="bank-note">
+                        <span class="bank-note-icon">⚠</span>
+                        <div>
+                            <strong>Metode pembayaran belum aktif</strong>
+                            {{ pengajuan.metode }} masih dalam mode simulasi
+                            dan belum terhubung dengan penyedia pembayaran.
+                            Belum tersedia nomor VA atau kode QRIS resmi.
+                            Transaksi ini belum membuktikan pembayaran nyata.
+                        </div>
+                    </div>
+
+                </section>
+
             {% endif %}
-            <br>Transaksi ini belum membuktikan adanya pembayaran nyata
-            dan tidak dapat dianggap lunas.
+
+            <!-- UPLOAD BUKTI -->
+            {% if metode_transfer %}
+
+                <section class="section">
+
+                    <div class="section-heading">
+                        <h2 class="section-title">
+                            Bukti Pembayaran
+                        </h2>
+
+                        <span class="section-caption">
+                            PAYMENT PROOF
+                        </span>
+                    </div>
+
+                    {% if sudah_ada_bukti %}
+
+                        <div class="locked-box">
+                            <div class="locked-icon">✓</div>
+                            <div>
+                                <strong>Bukti pembayaran sudah tercatat</strong>
+                                Bukti pembayaran telah tersimpan di sistem.
+                                Orang tua tidak dapat mengunggah ulang,
+                                mengganti, atau menghapus bukti ini.
+                                Silakan tunggu pemeriksaan pihak sekolah.
+                            </div>
+                        </div>
+
+                    {% elif status == "menunggu_verifikasi" %}
+
+                        <div class="upload-box">
+
+                            <p class="upload-description">
+                                Setelah melakukan transfer ke rekening resmi
+                                sekolah, unggah bukti pembayaran melalui
+                                formulir berikut. Pastikan informasi transaksi
+                                terlihat jelas dan mudah dibaca.
+                            </p>
+
+                            <form
+                                id="formBukti"
+                                action="{{ url_for(
+                                    'payment_public.unggah_bukti',
+                                    nisn=pengajuan.siswa.nisn,
+                                    kode_transaksi=pengajuan.kode_transaksi
+                                ) }}"
+                                method="POST"
+                                enctype="multipart/form-data"
+                            >
+
+                                <label
+                                    for="buktiPembayaran"
+                                    class="file-label"
+                                    id="fileDropArea"
+                                >
+
+                                    <span class="file-icon">↑</span>
+
+                                    <strong>
+                                        Klik untuk memilih bukti pembayaran
+                                    </strong>
+
+                                    <small>
+                                        JPG, JPEG, PNG atau PDF · Maksimal 3 MB
+                                    </small>
+
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="bukti_pembayaran"
+                                    id="buktiPembayaran"
+                                    class="file-input"
+                                    accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+                                    required
+                                >
+
+                                <div class="file-preview" id="filePreview">
+
+                                    <img
+                                        id="previewImage"
+                                        alt="Pratinjau bukti pembayaran"
+                                        style="display:none;"
+                                    >
+
+                                    <div class="file-name" id="fileName"></div>
+                                    <div class="file-size" id="fileSize"></div>
+
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    class="upload-button"
+                                    id="uploadButton"
+                                    disabled
+                                >
+                                    <span>↑</span>
+                                    Unggah Bukti Pembayaran
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    {% elif status == "disetujui" %}
+
+                        <div class="locked-box">
+                            <div class="locked-icon">✓</div>
+                            <div>
+                                <strong>Pembayaran telah disetujui</strong>
+                                Transaksi telah selesai diperiksa.
+                                Bukti pembayaran tidak dapat diubah oleh orang tua.
+                            </div>
+                        </div>
+
+                    {% elif status == "ditolak" %}
+
+                        <div class="locked-box rejected-box">
+                            <div class="locked-icon">!</div>
+                            <div>
+                                <strong>Pengajuan ditolak</strong>
+                                Pengajuan ini tidak dapat menerima unggahan baru.
+                                Silakan hubungi pihak sekolah untuk informasi
+                                lebih lanjut.
+                            </div>
+                        </div>
+
+                    {% else %}
+
+                        <div class="locked-box">
+                            <div class="locked-icon">i</div>
+                            <div>
+                                <strong>Transaksi tidak aktif</strong>
+                                Transaksi ini tidak dapat menerima unggahan bukti.
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                </section>
+
+            {% endif %}
+
+            <!-- CATATAN ADMIN -->
+            {% if pengajuan.catatan_admin %}
+
+                <section class="section">
+
+                    <div class="section-heading">
+                        <h2 class="section-title">
+                            Catatan dari Sekolah
+                        </h2>
+                    </div>
+
+                    <div class="admin-note">
+                        {{ pengajuan.catatan_admin }}
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+            <!-- NAVIGASI -->
+            <section class="section">
+
+                <a
+                    class="button"
+                    href="{{ url_for(
+                        'payment_public.riwayat_transaksi',
+                        nisn=pengajuan.siswa.nisn
+                    ) }}"
+                >
+                    Lihat Riwayat Transaksi →
+                </a>
+
+                <a
+                    class="button button-secondary"
+                    href="{{ url_for(
+                        'payment_public.detail_pembayaran',
+                        nisn=pengajuan.siswa.nisn
+                    ) }}"
+                >
+                    Kembali ke Detail Pembayaran
+                </a>
+
+            </section>
+
         </div>
-    {% endif %}
 
-    <p class="small">
-        Status saat ini: {{ pengajuan.status }}.
-        Halaman ini menampilkan status yang tersimpan ketika halaman dibuka.
-    </p>
+    </main>
 
-    <a class="button"
-        href="{{ url_for('payment_public.riwayat_transaksi', nisn=pengajuan.siswa.nisn) }}">
-        Lihat riwayat transaksi
-    </a>
+    <footer class="footer">
+        <strong>SMP Unggulan Hamzanwadi</strong><br>
+        Student Payment Center · Secure Transaction
+    </footer>
 
-    <a class="button button-secondary"
-        href="{{ url_for('payment_public.detail_pembayaran', nisn=pengajuan.siswa.nisn) }}">
-        Kembali ke detail pembayaran
-    </a>
 </main>
+
+<script>
+    // =====================================
+    // SALIN NOMOR REKENING
+    // =====================================
+
+    const copyButton = document.getElementById("copyRekening");
+    const copyText = document.getElementById("copyText");
+
+    if (copyButton) {
+        copyButton.addEventListener("click", async function () {
+
+            const nomor = document
+                .getElementById("nomorRekening")
+                .textContent
+                .trim();
+
+            try {
+                await navigator.clipboard.writeText(nomor);
+
+                copyText.textContent = "Tersalin ✓";
+
+                setTimeout(() => {
+                    copyText.textContent = "Salin";
+                }, 2000);
+
+            } catch (error) {
+                const temp = document.createElement("textarea");
+                temp.value = nomor;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand("copy");
+                temp.remove();
+
+                copyText.textContent = "Tersalin ✓";
+
+                setTimeout(() => {
+                    copyText.textContent = "Salin";
+                }, 2000);
+            }
+        });
+    }
+
+    // =====================================
+    // FILE UPLOAD & PREVIEW
+    // =====================================
+
+    const inputFile = document.getElementById("buktiPembayaran");
+    const previewBox = document.getElementById("filePreview");
+    const previewImage = document.getElementById("previewImage");
+    const fileName = document.getElementById("fileName");
+    const fileSize = document.getElementById("fileSize");
+    const uploadButton = document.getElementById("uploadButton");
+    const formBukti = document.getElementById("formBukti");
+    const dropArea = document.getElementById("fileDropArea");
+
+    const MAX_SIZE = 3 * 1024 * 1024;
+    const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
+
+    function tampilkanFile(file) {
+
+        if (!file) return;
+
+        const ekstensi = file.name.split(".").pop().toLowerCase();
+
+        if (!ALLOWED_EXTENSIONS.includes(ekstensi)) {
+            alert("Format file harus JPG, JPEG, PNG, atau PDF.");
+            inputFile.value = "";
+            previewBox.style.display = "none";
+            uploadButton.disabled = true;
+            return;
+        }
+
+        if (file.size > MAX_SIZE) {
+            alert("Ukuran file maksimal 3 MB.");
+            inputFile.value = "";
+            previewBox.style.display = "none";
+            uploadButton.disabled = true;
+            return;
+        }
+
+        if (file.size === 0) {
+            alert("File yang dipilih kosong.");
+            inputFile.value = "";
+            previewBox.style.display = "none";
+            uploadButton.disabled = true;
+            return;
+        }
+
+        previewBox.style.display = "block";
+
+        fileName.textContent = file.name;
+
+        fileSize.textContent =
+            (file.size / 1024).toFixed(1) + " KB";
+
+        previewImage.style.display = "none";
+        previewImage.src = "";
+
+        if (["jpg", "jpeg", "png"].includes(ekstensi)) {
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                previewImage.src = event.target.result;
+                previewImage.style.display = "block";
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        uploadButton.disabled = false;
+    }
+
+    if (inputFile) {
+        inputFile.addEventListener("change", function () {
+            tampilkanFile(this.files[0]);
+        });
+    }
+
+    // Drag and drop file
+    if (dropArea && inputFile) {
+
+        ["dragenter", "dragover"].forEach(eventName => {
+            dropArea.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropArea.classList.add("dragging");
+            });
+        });
+
+        ["dragleave", "drop"].forEach(eventName => {
+            dropArea.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                dropArea.classList.remove("dragging");
+            });
+        });
+
+        dropArea.addEventListener("drop", function (event) {
+
+            const files = event.dataTransfer.files;
+
+            if (!files.length) return;
+
+            inputFile.files = files;
+            tampilkanFile(files[0]);
+        });
+    }
+
+    // Konfirmasi sebelum upload
+    if (formBukti) {
+
+        formBukti.addEventListener("submit", function (event) {
+
+            const file = inputFile.files[0];
+
+            if (!file) {
+                event.preventDefault();
+                alert("Silakan pilih bukti pembayaran terlebih dahulu.");
+                return;
+            }
+
+            const yakin = confirm(
+                "Pastikan bukti pembayaran yang dipilih sudah benar.\n\n" +
+                "Bukti yang berhasil diunggah tidak dapat diganti atau dihapus.\n\n" +
+                "Apakah kamu yakin ingin melanjutkan?"
+            );
+
+            if (!yakin) {
+                event.preventDefault();
+                return;
+            }
+
+            uploadButton.disabled = true;
+            uploadButton.innerHTML = "Mengunggah bukti...";
+        });
+    }
+</script>
+
 </body>
 </html>

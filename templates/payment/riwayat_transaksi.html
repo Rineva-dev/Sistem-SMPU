@@ -1,16 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#064b37">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#064e3b">
+    <meta name="color-scheme" content="light">
 
     <title>Riwayat Transaksi — SMP Unggulan Hamzanwadi</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
     <link
         rel="stylesheet"
@@ -19,428 +23,700 @@
 </head>
 
 <body>
-<div class="page-shell">
+    <div class="page-shell">
 
-    <!-- HEADER -->
-    <header class="topbar">
-        <a
-            class="brand"
-            href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
-            aria-label="Kembali ke detail pembayaran"
-        >
-            <span class="brand-mark">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M3 9.5 12 4l9 5.5-9 5.5-9-5.5Z"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linejoin="round"/>
-                    <path d="M6.5 12v4.5c3.5 3 7.5 3 11 0V12"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                    <path d="M21 10v6"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                </svg>
-            </span>
+        <!-- Ambient background -->
+        <div class="ambient ambient-one" aria-hidden="true"></div>
+        <div class="ambient ambient-two" aria-hidden="true"></div>
 
-            <span class="brand-copy">
-                <strong>SMPU <span>Hamzanwadi</span></strong>
-                <small>Student Payment Center</small>
-            </span>
-        </a>
-
-        <a
-            class="topbar-link"
-            href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
-        >
-            <span aria-hidden="true">←</span>
-            <span>Kembali ke tagihan</span>
-        </a>
-    </header>
-
-
-    <!-- MAIN -->
-    <main class="main-content">
-
-        <!-- HERO -->
-        <section class="hero">
-            <div class="hero-content">
-                <div class="eyebrow">
-                    <span class="eyebrow-dot"></span>
-                    PUSAT PEMBAYARAN SISWA
-                </div>
-
-                <h1>Riwayat <span>Transaksi</span></h1>
-
-                <p class="hero-description">
-                    Pantau semua pengajuan pembayaran sekolah dalam satu tempat.
-                    Periksa status dan buka detail transaksi kapan saja.
-                </p>
-
-                <div class="student-chip">
-                    <span class="student-avatar" aria-hidden="true">
-                        {{ (siswa.nama or 'S')[0]|upper }}
-                    </span>
-
-                    <span class="student-info">
-                        <strong>{{ siswa.nama or 'Nama siswa' }}</strong>
-                        <small>NISN {{ siswa.nisn }}</small>
-                    </span>
-
-                    <span class="student-verified" title="Data siswa">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="m5 12 4 4L19 6"
-                                  stroke="currentColor" stroke-width="2.2"
-                                  stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                </div>
-            </div>
-
-            <div class="hero-decoration" aria-hidden="true">
-                <div class="decoration-circle circle-one"></div>
-                <div class="decoration-circle circle-two"></div>
-
-                <div class="hero-icon">
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <rect x="4" y="3" width="16" height="18" rx="3"
-                              stroke="currentColor" stroke-width="1.7"/>
-                        <path d="M8 8h8M8 12h5M8 16h3"
-                              stroke="currentColor" stroke-width="1.7"
-                              stroke-linecap="round"/>
-                        <circle cx="17" cy="16" r="3.5"
-                                fill="#f2bd63" stroke="#064b37" stroke-width="1.4"/>
-                        <path d="m15.5 16 1 1 2-2"
-                              stroke="#064b37" stroke-width="1.4"
-                              stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- HEADER -->
+        <header class="topbar">
+            <a
+                href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
+                class="brand"
+                aria-label="Kembali ke halaman pembayaran"
+            >
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" fill="none">
+                        <path
+                            d="M24 4L42 13V27C42 35 34.5 41 24 45C13.5 41 6 35 6 27V13L24 4Z"
+                            fill="currentColor"
+                            opacity=".15"
+                        />
+                        <path
+                            d="M24 7L39 14.5V27C39 33.5 32.5 38.8 24 42C15.5 38.8 9 33.5 9 27V14.5L24 7Z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        />
+                        <path
+                            d="M15 19L24 14L33 19L24 24L15 19Z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M18 22V28C21.5 31 26.5 31 30 28V22M33 19V26"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
                     </svg>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- FLASH MESSAGE -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-list" aria-live="polite">
-                    {% for category, message in messages %}
-                        <div class="flash-message flash-{{ category }}">
-                            <span class="flash-icon" aria-hidden="true">
-                                {% if category == 'success' %}
-                                    ✓
-                                {% elif category == 'warning' %}
-                                    !
-                                {% else %}
-                                    i
-                                {% endif %}
-                            </span>
-                            <span>{{ message }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-
-        <!-- SUMMARY -->
-        {% set ringkasan = namespace(total=0) %}
-        {% for pengajuan in pengajuan_list %}
-            {% set ringkasan.total = ringkasan.total + (pengajuan.total_diajukan or 0) %}
-        {% endfor %}
-
-        {% set statistik = namespace(menunggu=0, disetujui=0, bermasalah=0) %}
-        {% for pengajuan in pengajuan_list %}
-            {% if pengajuan.status in ['menunggu_pembayaran', 'menunggu_verifikasi', 'diproses'] %}
-                {% set statistik.menunggu = statistik.menunggu + 1 %}
-            {% elif pengajuan.status == 'disetujui' %}
-                {% set statistik.disetujui = statistik.disetujui + 1 %}
-            {% elif pengajuan.status in ['ditolak', 'dibatalkan'] %}
-                {% set statistik.bermasalah = statistik.bermasalah + 1 %}
-            {% endif %}
-        {% endfor %}
-
-        <section class="summary-grid" aria-label="Ringkasan transaksi">
-
-            <article class="summary-card summary-primary">
-                <div class="summary-top">
-                    <span class="summary-label">Total Pengajuan</span>
-                    <span class="summary-icon icon-green">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <rect x="5" y="3" width="14" height="18" rx="2.5"
-                                  stroke="currentColor" stroke-width="1.7"/>
-                            <path d="M9 8h6M9 12h6M9 16h3"
-                                  stroke="currentColor" stroke-width="1.7"
-                                  stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="summary-value">{{ pengajuan_list|length }}</div>
-                <div class="summary-caption">Transaksi tercatat</div>
-            </article>
-
-            <article class="summary-card">
-                <div class="summary-top">
-                    <span class="summary-label">Total Nominal Diajukan</span>
-                    <span class="summary-icon icon-gold">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"
-                                    stroke="currentColor" stroke-width="1.7"/>
-                            <path d="M15.5 8.5c-.6-.7-1.5-1-2.8-1-1.6 0-2.7.8-2.7 2s1.1 1.8 2.7 2.2 2.7 1 2.7 2.2-1.1 2.1-2.8 2.1c-1.3 0-2.4-.5-3.1-1.3M12.5 5.5v13"
-                                  stroke="currentColor" stroke-width="1.5"
-                                  stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="summary-value summary-money">
-                    Rp {{ "{:,.0f}".format(ringkasan.total or 0).replace(",", ".") }}
-                </div>
-                <div class="summary-caption">Akumulasi nominal pengajuan</div>
-            </article>
-
-            <article class="summary-card">
-                <div class="summary-top">
-                    <span class="summary-label">Menunggu Proses</span>
-                    <span class="summary-icon icon-orange">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"
-                                    stroke="currentColor" stroke-width="1.7"/>
-                            <path d="M12 7v5l3 2"
-                                  stroke="currentColor" stroke-width="1.7"
-                                  stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="summary-value">{{ statistik.menunggu }}</div>
-                <div class="summary-caption">Menunggu atau sedang diproses</div>
-            </article>
-
-            <article class="summary-card">
-                <div class="summary-top">
-                    <span class="summary-label">Disetujui</span>
-                    <span class="summary-icon icon-blue">
-                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"
-                                    stroke="currentColor" stroke-width="1.7"/>
-                            <path d="m8 12 2.5 2.5L16.5 8.5"
-                                  stroke="currentColor" stroke-width="1.8"
-                                  stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="summary-value">{{ statistik.disetujui }}</div>
-                <div class="summary-caption">Pengajuan berstatus disetujui</div>
-            </article>
-
-        </section>
-
-
-        <!-- TRANSACTION SECTION -->
-        <section class="transactions-section">
-
-            <div class="section-heading">
-                <div>
-                    <div class="section-kicker">AKTIVITAS PEMBAYARAN</div>
-                    <h2>Semua transaksi</h2>
-                    <p>Daftar pengajuan pembayaran yang pernah dibuat.</p>
-                </div>
-
-                <span class="transaction-count">
-                    {{ pengajuan_list|length }} transaksi
                 </span>
-            </div>
 
+                <span class="brand-copy">
+                    <span class="brand-name">SMPU <strong>Hamzanwadi</strong></span>
+                    <span class="brand-subtitle">Student Payment Center</span>
+                </span>
+            </a>
 
-            {% if pengajuan_list %}
+            <a
+                href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
+                class="back-link"
+            >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M19 12H5M12 19L5 12L12 5"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+                <span>Kembali ke Tagihan</span>
+            </a>
+        </header>
 
-                <div class="transaction-list">
-
-                    {% for pengajuan in pengajuan_list %}
-
-                        {% set status = pengajuan.status or 'menunggu_verifikasi' %}
-
-                        <article class="transaction-card">
-
-                            <div class="transaction-main">
-
-                                <div class="transaction-symbol
-                                    {% if status == 'disetujui' %}
-                                        symbol-success
-                                    {% elif status == 'ditolak' or status == 'dibatalkan' %}
-                                        symbol-danger
-                                    {% elif status == 'diproses' %}
-                                        symbol-info
-                                    {% else %}
-                                        symbol-pending
-                                    {% endif %}"
-                                >
-                                    {% if status == 'disetujui' %}
-                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                            <path d="m5 12 4 4L19 6"
-                                                  stroke="currentColor" stroke-width="2"
-                                                  stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                    {% elif status == 'ditolak' or status == 'dibatalkan' %}
-                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                            <path d="m7 7 10 10M17 7 7 17"
-                                                  stroke="currentColor" stroke-width="2"
-                                                  stroke-linecap="round"/>
-                                        </svg>
-                                    {% elif status == 'diproses' %}
-                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                            <path d="M12 7v5l3 2"
-                                                  stroke="currentColor" stroke-width="2"
-                                                  stroke-linecap="round" stroke-linejoin="round"/>
-                                            <circle cx="12" cy="12" r="9"
-                                                    stroke="currentColor" stroke-width="1.7"/>
-                                        </svg>
-                                    {% else %}
-                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                            <circle cx="12" cy="12" r="9"
-                                                    stroke="currentColor" stroke-width="1.7"/>
-                                            <path d="M12 7v5l3 2"
-                                                  stroke="currentColor" stroke-width="1.7"
-                                                  stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
-                                    {% endif %}
-                                </div>
-
-
-                                <div class="transaction-info">
-                                    <div class="transaction-title-row">
-                                        <h3>{{ pengajuan.kode_transaksi }}</h3>
-
-                                        <span class="status-badge status-{{ status }}">
-                                            <span class="status-dot"></span>
-                                            {{ status_labels.get(status, status.replace('_', ' ').title()) }}
-                                        </span>
-                                    </div>
-
-                                    <div class="transaction-meta">
-                                        <span class="meta-item">
-                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                                <rect x="3" y="5" width="18" height="16" rx="2"
-                                                      stroke="currentColor" stroke-width="1.7"/>
-                                                <path d="M16 3v4M8 3v4M3 10h18"
-                                                      stroke="currentColor" stroke-width="1.7"
-                                                      stroke-linecap="round"/>
-                                            </svg>
-
-                                            {% if pengajuan.diajukan_pada %}
-                                                {{ pengajuan.diajukan_pada.strftime('%d-%m-%Y, %H:%M') }}
-                                            {% else %}
-                                                Tanggal tidak tersedia
-                                            {% endif %}
-                                        </span>
-
-                                        <span class="meta-separator"></span>
-
-                                        <span class="meta-item">
-                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                                <rect x="3" y="5" width="18" height="14" rx="2"
-                                                      stroke="currentColor" stroke-width="1.7"/>
-                                                <path d="M3 10h18"
-                                                      stroke="currentColor" stroke-width="1.7"/>
-                                            </svg>
-                                            {{ pengajuan.metode or 'Metode tidak tersedia' }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <div class="transaction-side">
-                                <div class="amount-label">Nominal pengajuan</div>
-
-                                <div class="transaction-amount">
-                                    Rp {{ "{:,.0f}".format(pengajuan.total_diajukan or 0).replace(",", ".") }}
-                                </div>
-
-                                <a
-                                    class="detail-button"
-                                    href="{{ url_for(
-                                        'payment_public.detail_transaksi',
-                                        nisn=siswa.nisn,
-                                        kode_transaksi=pengajuan.kode_transaksi
-                                    ) }}"
-                                >
-                                    Detail transaksi
-                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                        <path d="M5 12h14m-6-6 6 6-6 6"
-                                              stroke="currentColor" stroke-width="1.8"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </a>
-                            </div>
-
-                        </article>
-
-                    {% endfor %}
-
-                </div>
-
-                <div class="bottom-note">
-                    <span class="note-icon" aria-hidden="true">i</span>
-                    <p>
-                        Nominal di atas merupakan jumlah yang diajukan.
-                        Status <strong>Disetujui</strong> menunjukkan hasil verifikasi
-                        pengajuan, bukan pengganti pencatatan pembayaran pada riwayat pembayaran.
-                    </p>
-                </div>
-
-            {% else %}
-
-                <!-- EMPTY STATE -->
-                <div class="empty-state">
-                    <div class="empty-illustration">
-                        <div class="empty-circle">
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <rect x="5" y="3" width="14" height="18" rx="3"
-                                      stroke="currentColor" stroke-width="1.7"/>
-                                <path d="M9 8h6M9 12h6M9 16h3"
-                                      stroke="currentColor" stroke-width="1.7"
-                                      stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <span class="empty-spark spark-one"></span>
-                        <span class="empty-spark spark-two"></span>
+        <main>
+            <!-- HERO -->
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        PUSAT PEMBAYARAN SISWA
                     </div>
 
-                    <h3>Belum ada transaksi</h3>
+                    <h1>
+                        Riwayat <span>Transaksi.</span>
+                    </h1>
 
-                    <p>
-                        Pengajuan pembayaran yang kamu buat akan muncul di halaman ini.
-                        Saat ini belum ada transaksi yang tercatat untuk siswa ini.
+                    <p class="hero-description">
+                        Pantau seluruh pengajuan pembayaran kamu dengan mudah.
+                        Semua informasi transaksi tersusun rapi dalam satu halaman.
                     </p>
 
-                    <a
-                        class="empty-button"
-                        href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
-                    >
-                        Lihat detail tagihan
-                        <span aria-hidden="true">→</span>
-                    </a>
+                    <div class="student-chip">
+                        <span class="student-avatar" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M20 21V19C20 16.8 18.2 15 16 15H8C5.8 15 4 16.8 4 19V21"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    stroke-linecap="round"
+                                />
+                                <circle
+                                    cx="12"
+                                    cy="7"
+                                    r="4"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                />
+                            </svg>
+                        </span>
+
+                        <span class="student-info">
+                            <span class="student-name">{{ siswa.nama }}</span>
+                            <span class="student-nisn">NISN {{ siswa.nisn }}</span>
+                        </span>
+
+                        <span class="student-verified" title="Identitas siswa">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path
+                                    d="M5 12.5L9.5 17L19 7.5"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
-            {% endif %}
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="visual-orbit orbit-one"></div>
+                    <div class="visual-orbit orbit-two"></div>
 
-        </section>
+                    <div class="visual-card visual-card-back">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
+                    <div class="visual-card visual-card-front">
+                        <div class="visual-card-top">
+                            <span class="visual-icon">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M4 7.5C4 6.1 5.1 5 6.5 5H19V19H6.5C5.1 19 4 17.9 4 16.5V7.5Z"
+                                        stroke="currentColor"
+                                        stroke-width="1.7"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M4 8H16M8 12H12M8 15H14"
+                                        stroke="currentColor"
+                                        stroke-width="1.7"
+                                        stroke-linecap="round"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="visual-label">PAYMENT HISTORY</span>
+                        </div>
+
+                        <div class="visual-card-line"></div>
+                        <div class="visual-card-line short"></div>
+
+                        <div class="visual-card-bottom">
+                            <span class="visual-check">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M5 12.5L9.5 17L19 7.5"
+                                        stroke="currentColor"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </span>
+                            <span>Transaksi Tercatat</span>
+                        </div>
+                    </div>
+
+                    <div class="visual-float float-top">
+                        <span class="float-dot"></span>
+                        Aman & Terorganisasi
+                    </div>
+
+                    <div class="visual-float float-bottom">
+                        <span class="float-symbol">↗</span>
+                        Informasi Transparan
+                    </div>
+                </div>
+            </section>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-container" aria-live="polite">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                <span class="flash-indicator"></span>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- SUMMARY CALCULATION -->
+            {% set ns = namespace(
+                total=0,
+                menunggu=0,
+                disetujui=0,
+                bermasalah=0
+            ) %}
+
+            {% for pengajuan in pengajuan_list %}
+                {% set ns.total = ns.total + (pengajuan.total_diajukan or 0) %}
+
+                {% set status = pengajuan.status or 'menunggu_verifikasi' %}
+
+                {% if status == 'menunggu_verifikasi' %}
+                    {% set ns.menunggu = ns.menunggu + 1 %}
+                {% elif status == 'disetujui' %}
+                    {% set ns.disetujui = ns.disetujui + 1 %}
+                {% elif status in ['ditolak', 'dibatalkan'] %}
+                    {% set ns.bermasalah = ns.bermasalah + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            <!-- SUMMARY -->
+            <section class="summary-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">RINGKASAN</span>
+                        <h2>Gambaran transaksi</h2>
+                        <p>Ringkasan pengajuan pembayaran kamu.</p>
+                    </div>
+
+                    <span class="summary-live">
+                        <span></span>
+                        Data transaksi
+                    </span>
+                </div>
+
+                <div class="summary-grid">
+                    <!-- TOTAL TRANSAKSI -->
+                    <article class="summary-card card-transactions">
+                        <div class="summary-card-top">
+                            <div class="top-left">
+                                <span class="summary-icon icon-green">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <rect
+                                            x="5"
+                                            y="4"
+                                            width="14"
+                                            height="17"
+                                            rx="2.5"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                        />
+                                        <path
+                                            d="M9 4.5V3H15V4.5M9 10H15M9 14H15M9 18H12"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                </span>
+                                <p class="summary-label">Total Transaksi</p>
+                            </div>
+                            <span class="summary-index">01</span>
+
+                        </div>
+
+                        <div class="summary-value">
+                            {{ pengajuan_list|length }}
+                            <span class="summary-unit">transaksi</span>
+                        </div>
+
+                        <p class="summary-footnote">
+                            Seluruh pengajuan tercatat
+                        </p>
+                    </article>
+
+                    <!-- TOTAL NOMINAL -->
+                    <article class="summary-card card-nominal">
+                        <div class="summary-card-top">
+                            <div class="top-left">
+                                <span class="summary-icon icon-gold">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <rect
+                                            x="3"
+                                            y="6"
+                                            width="18"
+                                            height="13"
+                                            rx="2.5"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                        />
+                                        <path
+                                            d="M3 10H21M7 15H10"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                </span>
+                                <p class="summary-label">Total Nominal Diajukan</p>
+                            </div>
+
+                            <span class="summary-index">02</span>
+                        </div>
+
+                        <div class="summary-value currency-value">
+                            <span class="currency-prefix">Rp</span>
+                            {{ '{:,.0f}'.format(ns.total).replace(',', '.') }}
+                        </div>
+
+                        <p class="summary-footnote">
+                            Akumulasi nominal pengajuan
+                        </p>
+                    </article>
+
+                    <!-- MENUNGGU -->
+                    <article class="summary-card card-pending">
+                        <div class="summary-card-top">
+                            <div class="top-left">
+                                <span class="summary-icon icon-orange">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="8.5"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                        />
+                                        <path
+                                            d="M12 7V12L15 14"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </span>
+                                <p class="summary-label">Menunggu Proses</p>
+                            </div>
+                            <span class="summary-index">03</span>
+                        </div>
+
+                        <div class="summary-value">
+                            {{ ns.menunggu }}
+                            <span class="summary-unit">transaksi</span>
+                        </div>
+
+                        <p class="summary-footnote">
+                            Menunggu verifikasi
+                        </p>
+                    </article>
+
+                    <!-- DISETUJUI -->
+                    <article class="summary-card card-approved">
+                        <div class="summary-card-top">
+                            <div class="top-left">
+                                <span class="summary-icon icon-blue">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="8.5"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                        />
+                                        <path
+                                            d="M8 12.5L10.5 15L16.5 9"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </span>
+                                <p class="summary-label">Disetujui</p>
+                            </div>
+                            <span class="summary-index">04</span>
+                        </div>
+
+                        <div class="summary-value">
+                            {{ ns.disetujui }}
+                            <span class="summary-unit">transaksi</span>
+                        </div>
+
+                        <p class="summary-footnote">
+                            Pengajuan telah disetujui
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- TRANSACTION HISTORY -->
+            <section class="transactions-section">
+                <div class="section-heading transaction-heading">
+                    <div>
+                        <span class="section-kicker">AKTIVITAS PEMBAYARAN</span>
+                        <h2>Daftar transaksi</h2>
+                        <p>Detail pengajuan pembayaran yang pernah kamu lakukan.</p>
+                    </div>
+
+                    <span class="transaction-count">
+                        <span>{{ pengajuan_list|length }}</span>
+                        data transaksi
+                    </span>
+                </div>
+
+                {% if pengajuan_list %}
+                    <div class="transaction-list">
+                        {% for pengajuan in pengajuan_list %}
+                            {% set status = pengajuan.status or 'menunggu_verifikasi' %}
+
+                            <article class="transaction-card">
+                                <div class="transaction-main">
+                                    <div class="transaction-status-icon
+                                        {% if status == 'disetujui' %}
+                                            status-icon-approved
+                                        {% elif status in ['ditolak', 'dibatalkan'] %}
+                                            status-icon-rejected
+                                        {% elif status == 'diproses' %}
+                                            status-icon-processing
+                                        {% else %}
+                                            status-icon-pending
+                                        {% endif %}
+                                    ">
+                                        {% if status == 'disetujui' %}
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path
+                                                    d="M5 12.5L9.5 17L19 7.5"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                />
+                                            </svg>
+                                        {% elif status in ['ditolak', 'dibatalkan'] %}
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path
+                                                    d="M7 7L17 17M17 7L7 17"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                />
+                                            </svg>
+                                        {% elif status == 'diproses' %}
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path
+                                                    d="M12 7V12L15 14"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.8"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                />
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="8.5"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.8"
+                                                />
+                                            </svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="8.5"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.8"
+                                                />
+                                                <path
+                                                    d="M12 7V12L15 14"
+                                                    stroke="currentColor"
+                                                    stroke-width="1.8"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                />
+                                            </svg>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="transaction-info">
+                                        <div class="transaction-title-row">
+                                            <h3>{{ pengajuan.kode_transaksi }}</h3>
+
+                                            <span class="status-badge
+                                                {% if status == 'disetujui' %}
+                                                    badge-approved
+                                                {% elif status in ['ditolak', 'dibatalkan'] %}
+                                                    badge-rejected
+                                                {% elif status == 'diproses' %}
+                                                    badge-processing
+                                                {% else %}
+                                                    badge-pending
+                                                {% endif %}
+                                            ">
+                                                <span class="badge-dot"></span>
+                                                {{ status_labels.get(status, status.replace('_', ' ').title()) }}
+                                            </span>
+                                        </div>
+
+                                        <div class="transaction-meta">
+                                            <span class="meta-item">
+                                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                    <rect
+                                                        x="3.5"
+                                                        y="5"
+                                                        width="17"
+                                                        height="16"
+                                                        rx="2"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.6"
+                                                    />
+                                                    <path
+                                                        d="M7.5 3V7M16.5 3V7M3.5 10H20.5"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.6"
+                                                        stroke-linecap="round"
+                                                    />
+                                                </svg>
+
+                                                {% if pengajuan.diajukan_pada %}
+                                                    {{ pengajuan.diajukan_pada.strftime('%d-%m-%Y, %H:%M') }}
+                                                {% else %}
+                                                    Tanggal tidak tersedia
+                                                {% endif %}
+                                            </span>
+
+                                            <span class="meta-divider"></span>
+
+                                            <span class="meta-item">
+                                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                    <rect
+                                                        x="3"
+                                                        y="5"
+                                                        width="18"
+                                                        height="14"
+                                                        rx="2"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.6"
+                                                    />
+                                                    <path
+                                                        d="M3 10H21M7 15H10"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.6"
+                                                        stroke-linecap="round"
+                                                    />
+                                                </svg>
+                                                {{ pengajuan.metode or 'Metode tidak tersedia' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="transaction-divider"></div>
+
+                                <div class="transaction-bottom">
+                                    <div class="transaction-amount">
+                                        <span class="amount-label">Nominal diajukan</span>
+                                        <strong>
+                                            <span>Rp</span>
+                                            {{ '{:,.0f}'.format(pengajuan.total_diajukan or 0).replace(',', '.') }}
+                                        </strong>
+                                    </div>
+
+                                    <a
+                                        href="{{ url_for(
+                                            'payment_public.detail_transaksi',
+                                            nisn=siswa.nisn,
+                                            kode_transaksi=pengajuan.kode_transaksi
+                                        ) }}"
+                                        class="detail-button"
+                                    >
+                                        <span>Lihat Detail</span>
+                                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path
+                                                d="M5 12H19M12 5L19 12L12 19"
+                                                stroke="currentColor"
+                                                stroke-width="1.8"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- EMPTY STATE -->
+                    <div class="empty-state">
+                        <div class="empty-illustration" aria-hidden="true">
+                            <div class="empty-circle empty-circle-one"></div>
+                            <div class="empty-circle empty-circle-two"></div>
+
+                            <div class="empty-document">
+                                <svg viewBox="0 0 48 48" fill="none">
+                                    <path
+                                        d="M14 5H28L37 14V39C37 41.2 35.2 43 33 43H14C11.8 43 10 41.2 10 39V9C10 6.8 11.8 5 14 5Z"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linejoin="round"
+                                    />
+                                    <path
+                                        d="M27 5V15H37M17 23H30M17 29H30M17 35H25"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <span class="empty-eyebrow">BELUM ADA AKTIVITAS</span>
+                        <h3>Belum ada transaksi</h3>
+                        <p>
+                            Riwayat pembayaran kamu akan muncul di sini setelah
+                            pengajuan transaksi dilakukan.
+                        </p>
+
+                        <a
+                            href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
+                            class="empty-button"
+                        >
+                            Lihat Tagihan
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path
+                                    d="M5 12H19M12 5L19 12L12 19"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </a>
+                    </div>
+                {% endif %}
+            </section>
+
+            <!-- INFORMATION NOTE -->
+            <aside class="information-note">
+                <span class="note-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+                        <path
+                            d="M12 11V16M12 8H12.01"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                </span>
+
+                <div>
+                    <strong>Informasi penting</strong>
+                    <p>
+                        Nominal yang ditampilkan merupakan nominal yang diajukan.
+                        Status <b>Disetujui</b> menunjukkan hasil verifikasi pengajuan,
+                        bukan pengganti catatan pembayaran yang sah.
+                    </p>
+                </div>
+            </aside>
+        </main>
 
         <!-- FOOTER -->
-        <footer class="page-footer">
+        <footer class="footer">
             <div class="footer-brand">
-                <span class="footer-dot"></span>
+                <span class="footer-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M12 2L21 6.5V13C21 17 17.3 20 12 22C6.7 20 3 17 3 13V6.5L12 2Z"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M7 10L12 7L17 10L12 13L7 10ZM9 12V15C11 16.5 13 16.5 15 15V12"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
+
                 <span>SMP Unggulan Hamzanwadi</span>
             </div>
 
-            <p>Student Payment Center · Informasi transaksi pembayaran sekolah</p>
+            <span class="footer-caption">
+                Student Payment Center
+            </span>
         </footer>
-
-    </main>
-</div>
+    </div>
 </body>
 </html>
