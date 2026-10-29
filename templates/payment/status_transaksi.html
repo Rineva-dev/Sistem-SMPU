@@ -263,6 +263,8 @@
         .hero-content {
             position: relative;
             z-index: 1;
+            display: contents;
+            align-items: center;
         }
 
         .hero-kicker {
@@ -317,6 +319,69 @@
 
         .hero-icon.cancelled {
             color: #d5dfda;
+        }
+
+        .status-icon {
+            width: 68px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            flex-shrink: 0;
+            margin: 16px auto 12px;
+        }
+
+        .status-icon svg {
+            width: 34px;
+            height: 34px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .status-icon.success {
+            color: #16845b;
+            background: #e7f6ee;
+        }
+
+        .status-icon.rejected {
+            color: #d04444;
+            background: #fff0f0;
+        }
+
+        .status-icon.cancelled {
+            color: #64748b;
+            background: #eef1f5;
+        }
+
+        .status-icon.pending {
+            color: #c18425;
+            background: #fff5df;
+        }
+
+        .status-icon.pending svg {
+            animation: pending-clock 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pending-clock {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+            20% {
+                transform: rotate(-12deg);
+            }
+            40% {
+                transform: rotate(12deg);
+            }
+            60% {
+                transform: rotate(-6deg);
+            }
+            80% {
+                transform: rotate(0deg);
+            }
         }
 
         .hero h1 {
@@ -1074,8 +1139,9 @@
             }
 
             .account-number-row {
-                align-items: flex-start;
-                flex-direction: column;
+                align-items: center;
+                flex-direction: row;
+
             }
         }
 
@@ -1100,19 +1166,22 @@
 
 {% if status == "disetujui" %}
     {% set status_class = "success" %}
-    {% set status_icon = "✓" %}
+    {% set status_icon = "check-circle" %}
     {% set deskripsi_status = "Pembayaran telah diperiksa dan disetujui oleh pihak sekolah." %}
+
 {% elif status == "ditolak" %}
     {% set status_class = "rejected" %}
-    {% set status_icon = "!" %}
+    {% set status_icon = "x-circle" %}
     {% set deskripsi_status = "Pengajuan pembayaran belum dapat disetujui. Silakan periksa catatan dari pihak sekolah." %}
+
 {% elif status == "dibatalkan" %}
     {% set status_class = "cancelled" %}
-    {% set status_icon = "×" %}
+    {% set status_icon = "ban" %}
     {% set deskripsi_status = "Transaksi ini telah dibatalkan dan tidak dapat dilanjutkan." %}
+
 {% else %}
     {% set status_class = "pending" %}
-    {% set status_icon = "…" %}
+    {% set status_icon = "clock" %}
     {% set deskripsi_status = "Pengajuan pembayaran sedang menunggu pemeriksaan pihak sekolah." %}
 {% endif %}
 
@@ -1175,8 +1244,31 @@
                     TRANSACTION INFORMATION
                 </div>
 
-                <div class="hero-icon {{ status_class }}">
-                    {{ status_icon }}
+                <div class="status-icon {{ status_class }}">
+                    {% if status_icon == "check-circle" %}
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="m8 12 2.5 2.5L16 9"/>
+                        </svg>
+
+                    {% elif status_icon == "x-circle" %}
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="m9 9 6 6M15 9l-6 6"/>
+                        </svg>
+
+                    {% elif status_icon == "ban" %}
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="m5.6 5.6 12.8 12.8"/>
+                        </svg>
+
+                    {% else %}
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 7v5l3 2"/>
+                        </svg>
+                    {% endif %}
                 </div>
 
                 <h1>Status Transaksi</h1>
