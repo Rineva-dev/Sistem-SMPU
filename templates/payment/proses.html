@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#064b37">
+
+    <title>Proses Pembayaran — SMP Unggulan Hamzanwadi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/payment/proses.css') }}">
+</head>
+<body>
+
+<div class="payment-page">
+
+    <header class="payment-topbar">
+        <a href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}"
+           class="back-link">
+            <span class="back-arrow">←</span>
+            <span>Kembali ke detail</span>
+        </a>
+
+        <div class="secure-label">
+            <span class="secure-dot"></span>
+            Pembayaran Siswa
+        </div>
+    </header>
+
+    <section class="payment-hero">
+        <div class="hero-copy">
+            <span class="hero-eyebrow">STUDENT PAYMENT CENTER</span>
+            <h1>Selesaikan Pembayaran<br><span>dengan mudah.</span></h1>
+            <p>Pilih tagihan yang ingin dibayarkan, tentukan metode pembayaran, lalu ikuti petunjuknya.</p>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+            <div class="hero-wallet">
+                <svg viewBox="0 0 48 48">
+                    <rect x="5" y="11" width="38" height="29" rx="7"/>
+                    <path d="M5 18h38"/>
+                    <path d="M31 28h12"/>
+                    <circle cx="32" cy="28" r="2"/>
+                    <path d="M10 11V8a3 3 0 0 1 3-3h23"/>
+                </svg>
+            </div>
+            <span class="floating-check">✓</span>
+        </div>
+    </section>
+
+    <!-- IDENTITAS SISWA -->
+    <section class="student-mini-card">
+        <div class="student-avatar">
+            {{ (siswa.nama or 'S')[0]|upper }}
+        </div>
+
+        <div class="student-mini-info">
+            <span>PEMBAYARAN ATAS NAMA</span>
+            <strong>{{ siswa.nama or 'Nama siswa belum tersedia' }}</strong>
+            <small>NISN {{ siswa.nisn or '—' }} · {{ kelas }}</small>
+        </div>
+
+        <div class="student-mini-badge">
+            <span></span> Siswa
+        </div>
+    </section>
+
+    <form
+        id="paymentForm"
+        method="POST"
+        action="{{ url_for('payment_public.proses_pembayaran', nisn=siswa.nisn) }}"
+        novalidate
+    >
+
+        <div class="checkout-layout">
+
+            <!-- KOLOM KIRI -->
+            <main class="checkout-main">
+
+                <section class="checkout-section">
+                    <div class="section-heading">
+                        <div class="step-number">01</div>
+                        <div>
+                            <h2>Pilih tagihan</h2>
+                            <p>Centang satu atau beberapa tagihan yang ingin dibayar.</p>
+                        </div>
+                    </div>
+
+                    {% if daftar_tagihan %}
+
+                    <div class="selection-toolbar">
+                        <label class="select-all-label">
+                            <input type="checkbox" id="selectAll">
+                            <span>Pilih semua tagihan</span>
+                        </label>
+                        <span class="bill-count">
+                            {{ daftar_tagihan|length }} tagihan tercatat
+                        </span>
+                    </div>
+
+                    
+                    <div class="bill-list">
+
+                        {% for grup in grup_tagihan %}
+
+                        <section class="bill-month-group">
+
+                            <div class="bill-month-header">
+                                <div class="bill-month-icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <rect x="3" y="5" width="18" height="16" rx="3"/>
+                                        <path d="M16 3v4M8 3v4M3 10h18"/>
+                                    </svg>
+                                </div>
+
+                                <div class="bill-month-info">
+                                    <h3>{{ grup.label }}</h3>
+                                    <p>
+                                        Tahun Pelajaran {{ grup.tahun_pelajaran }}
+                                        · {{ grup.daftar|length }} tagihan belum lunas
+                                    </p>
+                                </div>
+
+                                <div class="bill-month-total">
+                                    <small>Total kelompok</small>
+                                    <strong>
+                                        Rp {{ "{:,.0f}".format(
+                                            grup.daftar | sum(attribute='sisa_tagihan')
+                                        ).replace(",", ".") }}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <div class="bill-month-items">
+
+                                {% for tagihan in grup.daftar %}
+
+                                {% if tagihan.terkunci_transaksi %}
+                                    <article class="bill-item bill-item-locked">
+                                        <span class="bill-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <rect x="5" y="10" width="14" height="11" rx="2"
+                                                    stroke="currentColor" stroke-width="1.6"/>
+                                                <path d="M8 10V7a4 4 0 0 1 8 0v3"
+                                                    stroke="currentColor" stroke-width="1.6"
+                                                    stroke-linecap="round"/>
+                                            </svg>
+                                        </span>
+
+                                        <span class="bill-info">
+                                            <strong>{{ tagihan.nama }}</strong>
+                                            <small>
+                                                {{ tagihan.bulan or 'Tagihan sekolah' }}
+                                                · TP {{ tagihan.tahun_pelajaran }}
+                                            </small>
+                                            <span class="bill-progress">
+                                                Sedang dalam transaksi
+                                                {{ tagihan.transaksi_aktif.kode_transaksi }}
+                                            </span>
+                                        </span>
+
+                                        <span class="bill-price">
+                                            <strong>
+                                                Rp {{ "{:,.0f}".format(
+                                                    tagihan.sisa_tagihan
+                                                ).replace(",", ".") }}
+                                            </strong>
+                                            <small>Menunggu verifikasi</small>
+                                            <a
+                                                href="{{ url_for(
+                                                    'payment_public.detail_transaksi',
+                                                    nisn=siswa.nisn,
+                                                    kode_transaksi=tagihan.transaksi_aktif.kode_transaksi
+                                                ) }}"
+                                                class="bill-transaction-link"
+                                            >
+                                                Lihat transaksi
+                                            </a>
+                                        </span>
+                                    </article>
+                                {% else %}
+                                    <label class="bill-item"
+                                        for="bill-{{ tagihan.id }}"
+                                        data-remaining="{{ tagihan.sisa_tagihan }}">
+
+                                        <input
+                                            type="checkbox"
+                                            class="bill-checkbox"
+                                            id="bill-{{ tagihan.id }}"
+                                            name="tagihan_ids"
+                                            value="{{ tagihan.id }}"
+                                            data-remaining="{{ tagihan.sisa_tagihan }}"
+                                        >
+
+                                        <span class="bill-checkmark">
+                                            <svg viewBox="0 0 20 20">
+                                                <path d="m4 10 4 4 8-8"/>
+                                            </svg>
+                                        </span>
+
+                                        <span class="bill-icon">
+                                            <svg viewBox="0 0 24 24">
+                                                <rect x="4" y="3" width="16" height="18" rx="3"/>
+                                                <path d="M8 8h8M8 12h8M8 16h4"/>
+                                            </svg>
+                                        </span>
+
+                                        <span class="bill-info">
+                                            <strong>{{ tagihan.nama }}</strong>
+
+                                            <small>
+                                                {{ tagihan.bulan or 'Tagihan sekolah' }}
+                                                · TP {{ tagihan.tahun_pelajaran }}
+                                            </small>
+
+                                            <span class="bill-progress">
+                                                {% if tagihan.sudah_dibayar > 0 %}
+                                                    Sudah dibayar sebagian
+                                                {% else %}
+                                                    Menunggu pembayaran
+                                                {% endif %}
+                                            </span>
+                                        </span>
+
+                                        <span class="bill-price">
+                                            <strong>
+                                                Rp {{ "{:,.0f}".format(
+                                                    tagihan.sisa_tagihan
+                                                ).replace(",", ".") }}
+                                            </strong>
+                                            <small>Sisa tagihan</small>
+                                        </span>
+                                    </label>
+                                {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+                        </section>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    {% else %}
+
+                    <div class="empty-bills">
+                        <div class="empty-icon">✓</div>
+                        <h3>Tidak ada tagihan tertunda</h3>
+                        <p>Semua tagihan siswa sudah lunas atau belum tersedia tagihan yang perlu dibayar.</p>
+                        <a href="{{ url_for('payment_public.detail_pembayaran', nisn=siswa.nisn) }}">
+                            Kembali ke detail siswa
+                        </a>
+                    </div>
+
+                    {% endif %}
+                </section>
+
+                {% if daftar_tagihan %}
+
+                <!-- METODE PEMBAYARAN -->
+                <section class="checkout-section method-section">
+                    <div class="section-heading">
+                        <div class="step-number">02</div>
+                        <div>
+                            <h2>Metode pembayaran</h2>
+                            <p>Pilih metode yang akan digunakan.</p>
+                        </div>
+                    </div>
+
+                    <div class="method-grid">
+
+                        <label class="method-card">
+                            <input type="radio" name="metode" value="VA">
+                            <span class="method-radio"></span>
+                            <span class="method-icon va-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="5" width="18" height="14" rx="3"/>
+                                    <path d="M7 9h10M7 13h4"/>
+                                </svg>
+                            </span>
+                            <strong>Virtual Account</strong>
+                            <small>Transfer menggunakan nomor VA</small>
+                            <span class="method-tag">VA</span>
+                        </label>
+
+                        <label class="method-card">
+                            <input type="radio" name="metode" value="QRIS">
+                            <span class="method-radio"></span>
+                            <span class="method-icon qris-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                    <path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20h1"/>
+                                </svg>
+                            </span>
+                            <strong>QRIS</strong>
+                            <small>Bayar dengan aplikasi yang mendukung QRIS</small>
+                            <span class="method-tag">QR</span>
+                        </label>
+
+                        <label class="method-card">
+                            <input type="radio" name="metode" value="Transfer Bank">
+                            <span class="method-radio"></span>
+                            <span class="method-icon transfer-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M3 10h18L12 4 3 10Z"/>
+                                    <path d="M5 20h14M7 10v7M12 10v7M17 10v7M4 20v-3h16v3"/>
+                                </svg>
+                            </span>
+                            <strong>Transfer Bank</strong>
+                            <small>Transfer ke rekening resmi sekolah</small>
+                            <span class="method-tag">BANK</span>
+                        </label>
+
+                    </div>
+
+                    <div class="method-instructions" id="methodInstructions" hidden>
+                        <div class="instruction-heading">
+                            <span class="instruction-icon">i</span>
+                            <div>
+                                <strong id="instructionTitle">Petunjuk pembayaran</strong>
+                                <p id="instructionText"></p>
+                            </div>
+                        </div>
+
+                        <div class="instruction-notice" id="instructionNotice">
+                            <strong>Informasi pembayaran</strong>
+                            <p id="instructionNoticeText">
+                                Pilih metode pembayaran untuk melihat petunjuk selanjutnya.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {% endif %}
+
+            </main>
+
+            <!-- KOLOM KANAN -->
+            <aside class="checkout-sidebar">
+
+                <section class="summary-panel">
+                    <div class="summary-panel-header">
+                        <span class="summary-panel-icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="17" rx="3"/>
+                                <path d="M8 2v4M16 2v4M3 9h18"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <h2>Ringkasan transaksi</h2>
+                            <p>Periksa kembali pilihanmu.</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-line">
+                        <span>Tagihan dipilih</span>
+                        <strong id="selectedCount">0 tagihan</strong>
+                    </div>
+
+                    <div class="summary-line">
+                        <span>Metode pembayaran</span>
+                        <strong id="selectedMethod">Belum dipilih</strong>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="total-label">Total yang harus dibayar</div>
+                    <div class="total-amount" id="totalAmount">Rp 0</div>
+                    <p class="total-caption">Jumlah dihitung berdasarkan sisa tagihan yang dipilih.</p>
+
+                    <button
+                        type="submit"
+                        class="checkout-button"
+                        id="checkoutButton"
+                        {% if not daftar_tagihan %}disabled{% endif %}
+                    >
+                        <span>Lanjutkan pembayaran</span>
+                        <span class="button-arrow">→</span>
+                    </button>
+
+                    <div class="secure-note">
+                        <span class="secure-shield">✓</span>
+                         <span>Transaksi divalidasi server. Pembayaran dinyatakan berhasil setelah diverifikasi.</span>
+                    </div>
+                </section>
+
+                <section class="help-panel">
+                    <div class="help-icon">?</div>
+                    <div>
+                        <strong>Butuh bantuan?</strong>
+                        <p>Jika mengalami kendala, hubungi petugas administrasi sekolah melalui kanal resmi sekolah.</p>
+                    </div>
+                </section>
+
+            </aside>
+
+        </div>
+    </form>
+
+    <footer class="payment-footer">
+        <span>© SMP Unggulan Hamzanwadi</span>
+        <span>Pusat Pembayaran Siswa</span>
+    </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/payment/proses.js') }}"></script>
+</body>
+</html>

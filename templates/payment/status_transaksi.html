@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#064b37">
+    <title>Status Transaksi — SMP Unggulan Hamzanwadi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 24px;
+            background: #f3f7f5;
+            color: #19372c;
+            font-family: Inter, sans-serif;
+        }
+        .card {
+            width: 100%;
+            max-width: 560px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border: 1px solid #e1eae4;
+            border-radius: 22px;
+            box-shadow: 0 16px 45px #173b2b0c;
+        }
+        .eyebrow {
+            color: #16815b;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+        }
+        h1 { margin: 12px 0; font-size: 25px; }
+        .status {
+            display: inline-block;
+            margin: 12px 0;
+            padding: 9px 13px;
+            border-radius: 999px;
+            background: #e6f5ec;
+            color: #08734f;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .notice {
+            margin: 18px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff6df;
+            color: #77530b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .line {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 13px 0;
+            border-bottom: 1px solid #edf1ee;
+            font-size: 13px;
+        }
+        .line span { color: #718078; }
+        .line strong { text-align: right; overflow-wrap: anywhere; }
+        .total { font-size: 20px; color: #08734f; }
+        .button {
+            display: block;
+            margin-top: 22px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: #064b37;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .small {
+            color: #718078;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .card { margin: 12px auto; padding: 22px; }
+            h1 { font-size: 22px; }
+        }
+
+        
+        .button-secondary {
+            margin-top: 10px;
+            background: #ffffff;
+            color: #064b37;
+            border: 1px solid #d6e5dc;
+        }
+
+        .button-secondary:hover {
+            background: #f0f7f3;
+        }
+
+    </style>
+</head>
+<body>
+<main class="card">
+    <span class="eyebrow">STUDENT PAYMENT CENTER</span>
+    <h1>Status transaksi</h1>
+    <p class="small">
+        Status saat ini: <strong>{{ status_label }}</strong>.
+        Status ditampilkan berdasarkan data yang tersimpan saat halaman dibuka.
+        Silakan buka kembali halaman ini untuk melihat perubahan terbaru.
+    </p>
+
+    <div class="status">{{ status_label }}</div>
+
+    <div class="line">
+        <span>Kode transaksi</span>
+        <strong>{{ pengajuan.kode_transaksi }}</strong>
+    </div>
+    <div class="line">
+        <span>Nama siswa</span>
+        <strong>{{ pengajuan.siswa.nama }}</strong>
+    </div>
+    <div class="line">
+        <span>Metode</span>
+        <strong>{{ pengajuan.metode }}</strong>
+    </div>
+    <div class="line">
+        <span>Total</span>
+        <strong class="total">
+            Rp {{ "{:,.0f}".format(pengajuan.total_diajukan).replace(",", ".") }}
+        </strong>
+    </div>
+
+    {% if pengajuan.metode == "Transfer Bank" %}
+        <div class="notice">
+            <strong>Transfer Bank — menunggu verifikasi</strong><br>
+            Rekening sementara: <strong>123456789</strong><br>
+            Nomor rekening ini harus dikonfirmasi oleh pihak sekolah
+            sebelum digunakan untuk transfer nyata. Setelah transfer,
+            pembayaran tetap menunggu pemeriksaan petugas.
+        </div>
+    {% else %}
+        <div class="notice">
+            <strong>Mode simulasi</strong><br>
+            {% if pengajuan.metode == "VA" %}
+                Virtual Account belum terhubung ke bank atau penyedia
+                gateway. Belum ada nomor VA aktif untuk dibayarkan.
+            {% else %}
+                QRIS belum terhubung ke penyedia gateway. Belum ada
+                kode QR pembayaran resmi untuk dipindai.
+            {% endif %}
+            <br>Transaksi ini belum membuktikan adanya pembayaran nyata
+            dan tidak dapat dianggap lunas.
+        </div>
+    {% endif %}
+
+    <p class="small">
+        Status saat ini: {{ pengajuan.status }}.
+        Halaman ini menampilkan status yang tersimpan ketika halaman dibuka.
+    </p>
+
+    <a class="button"
+        href="{{ url_for('payment_public.riwayat_transaksi', nisn=pengajuan.siswa.nisn) }}">
+        Lihat riwayat transaksi
+    </a>
+
+    <a class="button button-secondary"
+        href="{{ url_for('payment_public.detail_pembayaran', nisn=pengajuan.siswa.nisn) }}">
+        Kembali ke detail pembayaran
+    </a>
+</main>
+</body>
+</html>
