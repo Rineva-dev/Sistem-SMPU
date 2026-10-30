@@ -172,17 +172,33 @@
                                                     tagihan.sisa_tagihan
                                                 ).replace(",", ".") }}
                                             </strong>
-                                            <small>Menunggu verifikasi</small>
-                                            <a
-                                                href="{{ url_for(
-                                                    'payment_public.detail_transaksi',
-                                                    nisn=siswa.nisn,
-                                                    kode_transaksi=tagihan.transaksi_aktif.kode_transaksi
-                                                ) }}"
-                                                class="bill-transaction-link"
-                                            >
-                                                Lihat transaksi
-                                            </a>
+                                            <small>Sisa tagihan</small>
+
+                                            {% if tagihan.jenis and tagihan.jenis.nama|lower == 'pembangunan' %}
+                                                <div class="partial-payment-input">
+                                                    <label for="nominal-{{ tagihan.id }}">
+                                                        Nominal yang dibayar
+                                                    </label>
+
+                                                    <input
+                                                        type="number"
+                                                        id="nominal-{{ tagihan.id }}"
+                                                        name="nominal_bayar_{{ tagihan.id }}"
+                                                        class="nominal-pembangunan"
+                                                        min="1"
+                                                        max="{{ tagihan.sisa_tagihan }}"
+                                                        step="1"
+                                                        value="{{ tagihan.sisa_tagihan }}"
+                                                        data-remaining="{{ tagihan.sisa_tagihan }}"
+                                                        disabled
+                                                    >
+                                                    <small>
+                                                        Maksimal Rp {{ "{:,.0f}".format(
+                                                            tagihan.sisa_tagihan
+                                                        ).replace(",", ".") }}
+                                                    </small>
+                                                </div>
+                                            {% endif %}
                                         </span>
                                     </article>
                                 {% else %}
@@ -190,53 +206,90 @@
                                         for="bill-{{ tagihan.id }}"
                                         data-remaining="{{ tagihan.sisa_tagihan }}">
 
-                                        <input
-                                            type="checkbox"
-                                            class="bill-checkbox"
-                                            id="bill-{{ tagihan.id }}"
-                                            name="tagihan_ids"
-                                            value="{{ tagihan.id }}"
-                                            data-remaining="{{ tagihan.sisa_tagihan }}"
-                                        >
+                                        <!-- BARIS INFORMASI TAGIHAN -->
+                                        <div class="bill-item-main">
 
-                                        <span class="bill-checkmark">
-                                            <svg viewBox="0 0 20 20">
-                                                <path d="m4 10 4 4 8-8"/>
-                                            </svg>
-                                        </span>
+                                            <input
+                                                type="checkbox"
+                                                class="bill-checkbox"
+                                                id="bill-{{ tagihan.id }}"
+                                                name="tagihan_ids"
+                                                value="{{ tagihan.id }}"
+                                                data-remaining="{{ tagihan.sisa_tagihan }}"
+                                            >
 
-                                        <span class="bill-icon">
-                                            <svg viewBox="0 0 24 24">
-                                                <rect x="4" y="3" width="16" height="18" rx="3"/>
-                                                <path d="M8 8h8M8 12h8M8 16h4"/>
-                                            </svg>
-                                        </span>
-
-                                        <span class="bill-info">
-                                            <strong>{{ tagihan.nama }}</strong>
-
-                                            <small>
-                                                {{ tagihan.bulan or 'Tagihan sekolah' }}
-                                                · TP {{ tagihan.tahun_pelajaran }}
-                                            </small>
-
-                                            <span class="bill-progress">
-                                                {% if tagihan.sudah_dibayar > 0 %}
-                                                    Sudah dibayar sebagian
-                                                {% else %}
-                                                    Menunggu pembayaran
-                                                {% endif %}
+                                            <span class="bill-checkmark">
+                                                <svg viewBox="0 0 20 20">
+                                                    <path d="m4 10 4 4 8-8"/>
+                                                </svg>
                                             </span>
-                                        </span>
 
-                                        <span class="bill-price">
-                                            <strong>
-                                                Rp {{ "{:,.0f}".format(
-                                                    tagihan.sisa_tagihan
-                                                ).replace(",", ".") }}
-                                            </strong>
-                                            <small>Sisa tagihan</small>
-                                        </span>
+                                            <span class="bill-icon">
+                                                <svg viewBox="0 0 24 24">
+                                                    <rect x="4" y="3" width="16" height="18" rx="3"/>
+                                                    <path d="M8 8h8M8 12h8M8 16h4"/>
+                                                </svg>
+                                            </span>
+
+                                            <span class="bill-info">
+                                                <strong>{{ tagihan.nama }}</strong>
+
+                                                <small>
+                                                    {{ tagihan.bulan or 'Tagihan sekolah' }}
+                                                    · TP {{ tagihan.tahun_pelajaran }}
+                                                </small>
+
+                                                <span class="bill-progress">
+                                                    {% if tagihan.sudah_dibayar > 0 %}
+                                                        Sudah dibayar sebagian
+                                                    {% else %}
+                                                        Menunggu pembayaran
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+
+                                            <span class="bill-price">
+                                                <strong>
+                                                    Rp {{ "{:,.0f}".format(
+                                                        tagihan.sisa_tagihan
+                                                    ).replace(",", ".") }}
+                                                </strong>
+                                                <small>Sisa tagihan</small>
+                                            </span>
+
+                                        </div>
+
+                                        <!-- BARIS INPUT CICILAN PEMBANGUNAN -->
+                                        {% if 'pembangunan' in (tagihan.nama or '')|lower %}
+
+                                            <div class="partial-payment-input" hidden>
+                                                <span class="partial-payment-label">
+                                                    Nominal yang akan dibayarkan
+                                                </span>
+
+                                                <div class="nominal-input-wrapper">
+                                                    <span class="nominal-prefix">Rp</span>
+
+                                                    <input
+                                                        type="text"
+                                                        id="nominal-{{ tagihan.id }}"
+                                                        name="nominal_bayar_{{ tagihan.id }}"
+                                                        class="nominal-pembangunan"
+                                                        inputmode="numeric"
+                                                        autocomplete="off"
+                                                        value="{{ '{:,.0f}'.format(tagihan.sisa_tagihan).replace(',', '.') }}"
+                                                        data-remaining="{{ tagihan.sisa_tagihan }}"
+                                                        disabled
+                                                    >
+                                                </div>
+
+                                                <small>
+                                                    Maksimal pembayaran Rp {{ "{:,.0f}".format(tagihan.sisa_tagihan).replace(",", ".") }}
+                                                </small>
+                                            </div>
+
+                                        {% endif %}
+
                                     </label>
                                 {% endif %}
 

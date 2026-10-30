@@ -1550,3 +1550,153 @@ a {
         box-sizing: border-box;
     }
 }
+
+/* =========================================
+   TAGIHAN DENGAN INPUT CICILAN PEMBANGUNAN
+========================================= */
+
+.bill-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 12px 15px;
+}
+
+/* Baris utama informasi tagihan */
+.bill-item-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Input cicilan berada di bawah informasi */
+.partial-payment-input {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+    min-width: 0;
+    margin-top: 14px;
+    padding: 13px 14px;
+    border: 1px solid #dcebe1;
+    border-radius: 11px;
+    background: #f8fcf9;
+    cursor: default;
+}
+
+.partial-payment-input[hidden] {
+    display: none !important;
+}
+
+.partial-payment-input label {
+    color: #344b3a;
+    font-size: 11px;
+    font-weight: 750;
+    cursor: default;
+}
+
+.partial-payment-input input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid #d3e1d7;
+    border-radius: 0 6px 6px 0;
+    outline: none;
+    background: #fff;
+    color: #07563b;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.partial-payment-input input:focus {
+    border-color: #087653;
+    box-shadow: 0 0 0 3px rgba(8, 118, 83, .10);
+}
+
+.partial-payment-input input:disabled {
+    background: #f1f5f2;
+    color: #94a39a;
+    cursor: not-allowed;
+}
+
+/* Tampilan HP */
+@media (max-width: 720px) {
+    .bill-item {
+        padding: 12px 10px;
+    }
+
+    .bill-item-main {
+        gap: 9px;
+    }
+
+    .partial-payment-input {
+        margin-top: 12px;
+        padding: 11px;
+    }
+}
+
+/* INPUT NOMINAL PEMBANGUNAN */
+.nominal-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 40px;
+    overflow: hidden;
+    border: 1px solid #dce7df;
+    border-radius: 6px;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.nominal-prefix {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    padding: 0 15px;
+    background: #edf5ef;
+    border-right: 1px solid #dce7df;
+    color: #176b45;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.nominal-pembangunan {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 13px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #173d2c;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.nominal-input-wrapper:focus-within {
+    border-color: #168451;
+    box-shadow: 0 0 0 3px rgba(22, 132, 81, 0.10);
+}
+
+.nominal-pembangunan:disabled {
+    background: #f8faf8;
+    color: #9aa69e;
+    cursor: not-allowed;
+}
+
+.nominal-input-wrapper:has(.nominal-pembangunan:disabled) {
+    background: #f8faf8;
+}
+
+.partial-payment-input small {
+    color: #839188;
+    font-size: 11px;
+}

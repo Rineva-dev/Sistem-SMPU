@@ -254,6 +254,10 @@ def tambah_siswa():
         jenis_pendaftaran = request.form.get('jenis_pendaftaran', '').strip()
         tanggal_diterima = request.form.get('tanggal_diterima')
         tahun_diterima = request.form.get('tahun_diterima') or None
+
+        # Tahun diterima selalu mengikuti tanggal diterima
+        tanggal_obj = datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None
+        tahun_diterima = tanggal_obj.year if tanggal_obj else None
         diterima_di_kelas_id = request.form.get('diterima_di_kelas') or None
         sekolah_sd = request.form.get('sekolah_sd', '').strip()
         tahun_lulus_sd = request.form.get('tahun_lulus_sd') or None
@@ -439,8 +443,8 @@ def tambah_siswa():
                 pekerjaan_ayah=pekerjaan_ayah,
                 pekerjaan_ibu=pekerjaan_ibu,
                 jenis_pendaftaran=jenis_pendaftaran,
-                tanggal_diterima=datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None,
-                tahun_diterima=int(tahun_diterima) if tahun_diterima else (int(dasar_tahun.split('/')[0]) if dasar_tahun else None),
+                tanggal_diterima=tanggal_obj,
+                tahun_diterima=tahun_diterima,
                 diterima_di_kelas=diterima_di_kelas,
                 sekolah_sd=sekolah_sd,
                 tahun_lulus_sd=int(tahun_lulus_sd) if tahun_lulus_sd else None,
@@ -551,7 +555,8 @@ def ubah_siswa(id):
 
         jenis_pendaftaran = request.form.get('jenis_pendaftaran', '').strip()
         tanggal_diterima = request.form.get('tanggal_diterima')
-        tahun_diterima = request.form.get('tahun_diterima') or None
+        tanggal_obj = datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None
+        tahun_diterima = tanggal_obj.year if tanggal_obj else None
         diterima_di_kelas_id = request.form.get('diterima_di_kelas') or None
         kelas_id_baru = request.form.get('kelas_id') or None
         sekolah_sd = request.form.get('sekolah_sd', '').strip()
@@ -643,8 +648,8 @@ def ubah_siswa(id):
         siswa.pekerjaan_ayah = pekerjaan_ayah
         siswa.pekerjaan_ibu = pekerjaan_ibu
         siswa.jenis_pendaftaran = jenis_pendaftaran
-        siswa.tanggal_diterima = datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None
-        siswa.tahun_diterima = int(tahun_diterima) if tahun_diterima else siswa.tahun_diterima
+        siswa.tanggal_diterima = tanggal_obj
+        siswa.tahun_diterima = tahun_diterima
         siswa.diterima_di_kelas = diterima_di_kelas
         siswa.sekolah_sd = sekolah_sd
         siswa.tahun_lulus_sd = int(tahun_lulus_sd) if tahun_lulus_sd else None

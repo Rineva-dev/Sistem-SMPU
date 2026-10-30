@@ -573,6 +573,89 @@
                                     </div>
                                 </div>
 
+                                <!-- COLLAPSIBLE RINCIAN PEMBAYARAN -->
+                                {% set rincian = rincian_pengajuan.get(pengajuan.id, []) %}
+
+                                <details class="transaction-details">
+                                    <summary class="transaction-details-toggle">
+                                        <span class="details-toggle-left">
+                                            <span class="details-toggle-icon">
+                                                <svg viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M8 6H20M8 12H20M8 18H20M4 6H4.01M4 12H4.01M4 18H4.01"
+                                                        stroke="currentColor"
+                                                        stroke-width="1.8"
+                                                        stroke-linecap="round"
+                                                    />
+                                                </svg>
+                                            </span>
+
+                                            <span class="details-toggle-text">
+                                                <strong>Detail Pembayaran</strong>
+                                                <small>
+                                                    {% if rincian %}
+                                                        {{ rincian|length }} jenis tagihan
+                                                    {% else %}
+                                                        Rincian belum tersedia
+                                                    {% endif %}
+                                                </small>
+                                            </span>
+                                        </span>
+
+                                        <span class="details-toggle-action">
+                                            <span class="show-text">Lihat Detail</span>
+                                            <span class="hide-text">Tutup Detail</span>
+
+                                            <svg viewBox="0 0 24 24" fill="none">
+                                                <path
+                                                    d="M6 9L12 15L18 9"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                />
+                                            </svg>
+                                        </span>
+                                    </summary>
+
+                                    <div class="transaction-details-content">
+                                        {% if rincian %}
+                                            <div class="transaction-items-list">
+                                                {% for item in rincian %}
+                                                    <div class="transaction-item">
+                                                        <div class="transaction-item-left">
+                                                            <span class="item-bullet"></span>
+
+                                                            <div class="item-description">
+                                                                <strong>{{ item.nama }}</strong>
+
+                                                                <span>
+                                                                    {% if item.bulan %}
+                                                                        {{ item.bulan }}
+                                                                    {% endif %}
+
+                                                                    {% if item.tahun_pelajaran %}
+                                                                        {% if item.bulan %} · {% endif %}
+                                                                        TP {{ item.tahun_pelajaran }}
+                                                                    {% endif %}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <strong class="item-amount">
+                                                            Rp {{ '{:,.0f}'.format(item.nominal).replace(',', '.') }}
+                                                        </strong>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <div class="transaction-items-empty">
+                                                Rincian pembayaran belum tersedia.
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </details>
+
                                 <div class="transaction-divider"></div>
 
                                 <div class="transaction-bottom">

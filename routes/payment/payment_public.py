@@ -20,7 +20,9 @@ from models import (
     RiwayatPembayaran,
     PengajuanPembayaran,
     DetailPengajuanPembayaran,
+    RiwayatKelas, TahunPelajaran
 )
+from routes.sections.bendahara.bendahara import cari_tp_berdasarkan_tanggal, pastikan_tagihan_tercatat, hitung_dan_dapat_total_tagihan
 
 payment_public_bp = Blueprint(
     "payment_public",
@@ -200,6 +202,97 @@ def ambil_transaksi_aktif_tagihan(daftar_tagihan_ids):
 
     return transaksi_per_tagihan
 
+def ambil_tagihan_valid_siswa(siswa):
+    # Ambil riwayat kelas paling awal sebagai data cadangan
+    riwayat_pertama = (
+        RiwayatKelas.query
+        .filter_by(siswa_id=siswa.id)
+        .order_by(RiwayatKelas.tahun_pelajaran.asc())
+        .first()
+    )
+
+    tahun_penuh = (
+        riwayat_pertama.tahun_pelajaran.strip()
+        if riwayat_pertama
+        else None
+    )
+
+    # Tentukan tahun pelajaran awal berdasarkan tanggal diterima
+    tp_awal = (
+        cari_tp_berdasarkan_tanggal(siswa.tanggal_diterima)
+        if siswa.tanggal_diterima
+        else None
+    )
+
+    if tp_awal:
+        angkatan_masuk = str(tp_awal.tahun_mulai)
+        tgl_mulai_angkatan = siswa.tanggal_diterima
+
+    else:
+        angkatan_masuk = (
+            tahun_penuh[:4]
+            if tahun_penuh
+            else str(siswa.tahun_masuk)
+        )
+
+        tp_awal = (
+            TahunPelajaran.query
+            .filter(
+                TahunPelajaran.kode.like(
+                    f"{angkatan_masuk}%"
+                )
+            )
+            .order_by(TahunPelajaran.tanggal_mulai.asc())
+            .first()
+        )
+
+        tgl_mulai_angkatan = (
+            tp_awal.tanggal_mulai
+            if tp_awal
+            else date(int(angkatan_masuk), 8, 1)
+        )
+
+    batas_akhir = (
+        None
+        if (siswa.status or "").strip().lower() == "aktif"
+        else siswa.tanggal_berhenti
+    )
+
+    # Pastikan tagihan yang seharusnya ada sudah tercatat
+    pastikan_tagihan_tercatat(
+        id_siswa=siswa.id,
+        angkatan_masuk=angkatan_masuk,
+        tgl_mulai=tgl_mulai_angkatan,
+        batas_akhir=batas_akhir,
+    )
+
+    # Hitung kembali tagihan menggunakan aturan yang sama
+    daftar_tagihan, _ = hitung_dan_dapat_total_tagihan(
+        id_siswa=siswa.id,
+        angkatan_masuk=angkatan_masuk,
+        tgl_mulai=tgl_mulai_angkatan,
+        batas_akhir=batas_akhir,
+    )
+
+    id_tagihan_valid = [
+        item["id"]
+        for item in daftar_tagihan
+        if item.get("id") is not None
+    ]
+
+    if not id_tagihan_valid:
+        return []
+
+    return (
+        TagihanSiswa.query
+        .filter(
+            TagihanSiswa.siswa_id == siswa.id,
+            TagihanSiswa.id.in_(id_tagihan_valid),
+        )
+        .order_by(TagihanSiswa.id.asc())
+        .all()
+    )
+
 @payment_public_bp.route("/", methods=["GET", "POST"])
 def index():
     # Halaman utama — tidak perlu perubahan besar
@@ -264,9 +357,7 @@ def detail_pembayaran(nisn):
         abort(404)
 
     # 2. Ambil tagihan siswa yang sudah tercatat di database
-    semua_tagihan = TagihanSiswa.query.filter_by(
-        siswa_id=siswa.id
-    ).all()
+    semua_tagihan = ambil_tagihan_valid_siswa(siswa)
 
     # Ambil transaksi aktif yang masih mengikat tagihan siswa.
     transaksi_aktif = ambil_transaksi_aktif_tagihan(
@@ -475,6 +566,27 @@ def proses_pembayaran(nisn):
         try:
             # Mengunci baris tagihan saat transaksi diproses.
             # Mendukung PostgreSQL dan tidak menggunakan SQL khusus SQLite.
+
+            id_tagihan_valid = {
+                tagihan.id
+                for tagihan in ambil_tagihan_valid_siswa(siswa)
+            }
+
+            if not set(tagihan_ids).issubset(id_tagihan_valid):
+                db.session.rollback()
+
+                flash(
+                    "Ada tagihan yang sudah tidak berlaku atau berubah. "
+                    "Silakan muat ulang halaman pembayaran.",
+                    "warning",
+                )
+
+                return redirect(
+                    url_for(
+                        "payment_public.proses_pembayaran",
+                        nisn=nisn,
+                    )
+                )
             tagihan_dipilih = (
                 TagihanSiswa.query
                 .filter(
@@ -526,17 +638,73 @@ def proses_pembayaran(nisn):
                     0,
                     int(tagihan.nominal_tagihan or 0),
                 )
+
                 sudah_dibayar = max(
                     0,
                     int(tagihan.sudah_dibayar or 0),
                 )
+
                 sisa = max(0, nominal - sudah_dibayar)
 
                 if sisa <= 0:
                     continue
 
-                rincian.append((tagihan, sisa))
-                total += sisa
+                jenis_nama = (
+                    (tagihan.jenis.nama or "").strip().lower()
+                    if tagihan.jenis
+                    else ""
+                )
+
+                # ==========================================
+                # PEMBAYARAN PEMBANGUNAN: BOLEH SEBAGIAN
+                # ==========================================
+                if jenis_nama == "pembangunan":
+                    nominal_input = request.form.get(
+                        f"nominal_bayar_{tagihan.id}",
+                        ""
+                    ).strip()
+
+                    try:
+                        nominal_dibayar = int(nominal_input)
+                    except (TypeError, ValueError):
+                        db.session.rollback()
+
+                        flash(
+                            "Nominal pembayaran Pembangunan tidak valid.",
+                            "error",
+                        )
+
+                        return redirect(
+                            url_for(
+                                "payment_public.proses_pembayaran",
+                                nisn=nisn,
+                            )
+                        )
+
+                    if nominal_dibayar < 1 or nominal_dibayar > sisa:
+                        db.session.rollback()
+
+                        flash(
+                            "Nominal pembayaran Pembangunan harus lebih dari "
+                            "Rp 0 dan tidak boleh melebihi sisa tagihan.",
+                            "error",
+                        )
+
+                        return redirect(
+                            url_for(
+                                "payment_public.proses_pembayaran",
+                                nisn=nisn,
+                            )
+                        )
+
+                # ==========================================
+                # SPP, PEMINATAN, EKSKUL: HARUS LUNAS
+                # ==========================================
+                else:
+                    nominal_dibayar = sisa
+
+                rincian.append((tagihan, nominal_dibayar))
+                total += nominal_dibayar
 
             if not rincian or total <= 0:
                 db.session.rollback()
@@ -618,9 +786,7 @@ def proses_pembayaran(nisn):
     # =====================================================
     # GET: TAMPILKAN TAGIHAN YANG BELUM TERIKAT TRANSAKSI
     # =====================================================
-    semua_tagihan = TagihanSiswa.query.filter_by(
-        siswa_id=siswa.id
-    ).all()
+    semua_tagihan = ambil_tagihan_valid_siswa(siswa)
 
     transaksi_aktif = ambil_transaksi_aktif_tagihan(
         [t.id for t in semua_tagihan]
@@ -761,7 +927,6 @@ def status_transaksi(kode_transaksi):
         )
     )
 
-
 @payment_public_bp.route(
     "/riwayat/<string:nisn>",
     methods=["GET"],
@@ -780,6 +945,40 @@ def riwayat_transaksi(nisn):
         .all()
     )
 
+    # ==========================================
+    # AMBIL RINCIAN TAGIHAN SETIAP TRANSAKSI
+    # ==========================================
+
+    rincian_pengajuan = {}
+
+    for pengajuan in pengajuan_list:
+
+        detail_list = (
+            DetailPengajuanPembayaran.query
+            .filter_by(pengajuan_id=pengajuan.id)
+            .all()
+        )
+
+        rincian = []
+
+        for detail in detail_list:
+
+            tagihan = TagihanSiswa.query.get(detail.tagihan_id)
+
+            if not tagihan:
+                continue
+
+            jenis = tagihan.jenis
+
+            rincian.append({
+                "nama": jenis.nama if jenis else "Jenis pembayaran tidak tersedia",
+                "bulan": tagihan.bulan or "",
+                "tahun_pelajaran": tagihan.tahun_pelajaran or "",
+                "nominal": detail.nominal_dibayar or 0,
+            })
+
+        rincian_pengajuan[pengajuan.id] = rincian
+
     status_labels = {
         "menunggu_verifikasi": "Menunggu Verifikasi",
         "menunggu_pembayaran": "Menunggu Pembayaran",
@@ -793,6 +992,7 @@ def riwayat_transaksi(nisn):
         "payment/riwayat_transaksi.html",
         siswa=siswa,
         pengajuan_list=pengajuan_list,
+        rincian_pengajuan=rincian_pengajuan,
         status_labels=status_labels,
     )
 

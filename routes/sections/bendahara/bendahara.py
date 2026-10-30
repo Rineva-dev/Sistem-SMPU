@@ -7,7 +7,12 @@ from models import (
 )
 
 # === FUNGSI BANTU DIPERBAIKI ===
-def daftar_bulan_semester(kode_tahun_dasar, pola_waktu, sampai_tanggal=None):
+def daftar_bulan_semester(
+    kode_tahun_dasar,
+    pola_waktu,
+    sampai_tanggal=None,
+    mulai_dari=None
+):
     # Tagihan satu kali pada semester atau awal tahun
     if pola_waktu == 'semester_1':
         return [(1, "Pembayaran 1", 1)]
@@ -19,23 +24,29 @@ def daftar_bulan_semester(kode_tahun_dasar, pola_waktu, sampai_tanggal=None):
         return [(1, "Pembayaran Awal Tahun", 1)]
 
     # Tagihan bulanan
-    semua_semester = TahunPelajaran.query.filter(
-        TahunPelajaran.kode.like(f"{kode_tahun_dasar}%")
-    ).order_by(TahunPelajaran.tanggal_mulai.asc()).all()
-
     nama_bulan = [
         "Januari", "Februari", "Maret", "April", "Mei", "Juni",
         "Juli", "Agustus", "September", "Oktober", "November", "Desember"
     ]
 
-    if semua_semester:
-        sekarang = semua_semester[0].tanggal_mulai
+    # Prioritaskan tanggal diterima siswa.
+    # Jika tidak tersedia, gunakan awal periode TP seperti logika lama.
+    if mulai_dari:
+        sekarang = date(mulai_dari.year, mulai_dari.month, 1)
     else:
-        try:
-            tahun = int(str(kode_tahun_dasar)[:4])
-            sekarang = date(tahun, 8, 1)
-        except (ValueError, TypeError):
-            return []
+        semua_semester = TahunPelajaran.query.filter(
+            TahunPelajaran.kode.like(f"{kode_tahun_dasar}%")
+        ).order_by(TahunPelajaran.tanggal_mulai.asc()).all()
+
+        if semua_semester:
+            tanggal_awal = semua_semester[0].tanggal_mulai
+            sekarang = date(tanggal_awal.year, tanggal_awal.month, 1)
+        else:
+            try:
+                tahun = int(str(kode_tahun_dasar)[:4])
+                sekarang = date(tahun, 8, 1)
+            except (ValueError, TypeError):
+                return []
 
     akhir = sampai_tanggal if sampai_tanggal is not None else date.today()
     bulan_list = []
@@ -54,6 +65,40 @@ def daftar_bulan_semester(kode_tahun_dasar, pola_waktu, sampai_tanggal=None):
 
     return bulan_list
 
+def cari_tp_berdasarkan_tanggal(tanggal):
+    """
+    Mencari Tahun Pelajaran yang mencakup tanggal diterima siswa.
+    """
+    if not tanggal:
+        return None
+
+    daftar_tp = TahunPelajaran.query.filter(
+        TahunPelajaran.tanggal_mulai <= tanggal,
+        TahunPelajaran.tanggal_selesai >= tanggal
+    ).all()
+
+    if len(daftar_tp) == 1:
+        return daftar_tp[0]
+
+    if len(daftar_tp) > 1:
+        import re
+
+        # Jika ada periode yang bertumpang tindih,
+        # prioritaskan TP dengan kode semester -1 atau -2.
+        daftar_semester = [
+            tp for tp in daftar_tp
+            if re.search(r"-[12]$", tp.kode or "")
+        ]
+
+        if len(daftar_semester) == 1:
+            return daftar_semester[0]
+
+        raise ValueError(
+            f"Tanggal {tanggal} masuk ke beberapa periode TP: "
+            f"{[tp.kode for tp in daftar_tp]}"
+        )
+
+    return None
 
 def cari_kode_tp_per_bulan(bulan, tahun):
     """
@@ -113,17 +158,30 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
 
     daftar_tagihan_terperinci = []
 
-    riwayat_pertama_siswa = RiwayatKelas.query.filter_by(siswa_id=id_siswa).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
+    siswa_obj = db.session.get(Siswa, id_siswa)
 
-    if riwayat_pertama_siswa:
+    tp_diterima = cari_tp_berdasarkan_tanggal(
+        siswa_obj.tanggal_diterima
+    ) if siswa_obj and siswa_obj.tanggal_diterima else None
+
+    riwayat_pertama_siswa = RiwayatKelas.query.filter_by(
+        siswa_id=id_siswa
+    ).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
+
+    if tp_diterima:
+        tahun_pelajaran_kode = tp_diterima.kode
+    elif riwayat_pertama_siswa:
         tahun_pelajaran_kode = riwayat_pertama_siswa.tahun_pelajaran
     else:
         tahun_pelajaran_kode = f"{angkatan_masuk}-1"
 
     semua_versi_tarif = JenisPembayaran.query.filter(
         JenisPembayaran.tahun_pelajaran.like(f"{angkatan_masuk}%"),
-        # JenisPembayaran.aktif == True
-    ).order_by(JenisPembayaran.pola_waktu, JenisPembayaran.nama).all()
+        JenisPembayaran.aktif == True
+    ).order_by(
+        JenisPembayaran.tahun_pelajaran.desc(),
+        JenisPembayaran.id.desc()
+    ).all()
 
     # === FUNGSI BANTU: Cek status lunas dari database ===
     
@@ -164,11 +222,12 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
         if not tagihan_db:
             return 'Belum Lunas', 0, None
 
-        sudah = tagihan_db.sudah_dibayar or 0
+        sudah = max(0, int(tagihan_db.sudah_dibayar or 0))
+        nominal = max(0, int(tarif.nominal or 0))
 
-        if tagihan_db.status in ['Sudah Lunas', 'Lunas']:
+        if nominal > 0 and sudah >= nominal:
             status = 'Lunas'
-        elif tagihan_db.status == 'Sebagian':
+        elif sudah > 0:
             status = 'Sebagian'
         else:
             status = 'Belum Lunas'
@@ -178,6 +237,7 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
     # === LANJUT LOGIKA UTAMA ===
     if semua_versi_tarif:
         tarif_terpilih = {}
+
         for vt in semua_versi_tarif:
             if vt.kode not in tarif_terpilih:
                 tarif_terpilih[vt.kode] = vt
@@ -188,7 +248,8 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
             daftar_bulan_semua = daftar_bulan_semester(
                 angkatan_masuk,
                 tarif.pola_waktu,
-                batas_akhir
+                batas_akhir,
+                mulai_dari=tgl_mulai
             )
 
             # ======================================
@@ -363,25 +424,28 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
     return daftar_tagihan_terperinci, total_murni
 
 # === FUNGSI: PASTIKAN TAGIHAN SUDAH ADA DI TABEL TagihanSiswa ===
-def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
+
+def pastikan_tagihan_tercatat(
+    id_siswa,
+    angkatan_masuk,
+    tgl_mulai,
+    batas_akhir
+):
     daftar_sementara, _ = hitung_dan_dapat_total_tagihan(
-        id_siswa, angkatan_masuk, tgl_mulai, batas_akhir
+        id_siswa,
+        angkatan_masuk,
+        tgl_mulai,
+        batas_akhir
     )
 
     daftar_tersimpan = []
-    siswa = Siswa.query.get(id_siswa)
-    riwayat_pertama = RiwayatKelas.query.filter_by(siswa_id=id_siswa)\
-        .order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
-    
-    if riwayat_pertama:
-        tahun_pelajaran_kode = riwayat_pertama.tahun_pelajaran.strip()
-    else:
-        tahun_pelajaran_kode = f"{angkatan_masuk}-1"
 
-    # === AMBIL BAGIAN DASAR TAHUN untuk pencarian ===
-    dasar_tahun = tahun_pelajaran_kode.split('-')[0] if '-' in tahun_pelajaran_kode else tahun_pelajaran_kode
+    daftar_bulan = [
+        'Januari', 'Februari', 'Maret', 'April',
+        'Mei', 'Juni', 'Juli', 'Agustus',
+        'September', 'Oktober', 'November', 'Desember'
+    ]
 
-    
     for item in daftar_sementara:
         jenis_id = item.get('jenis_pembayaran_id')
 
@@ -389,51 +453,72 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
             continue
 
         jenis = db.session.get(JenisPembayaran, jenis_id)
+
         if not jenis:
             continue
 
+        # Gunakan TP hasil perhitungan utama.
+        # Jangan mengambil TP dari RiwayatKelas lagi.
         tahun_item = (
             item.get('tahun_pelajaran_tagihan')
-            or tahun_pelajaran_kode
+            or f"{angkatan_masuk}-1"
         )
 
         waktu = (item.get('waktu') or '').strip()
 
-        daftar_bulan = [
-            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-        ]
-
         bulan_tagihan = None
         semester_tagihan = None
 
-        if any(waktu.startswith(b + ' ') for b in daftar_bulan):
+        # =========================================
+        # IDENTIFIKASI PERIODE TAGIHAN
+        # =========================================
+
+        if any(
+            waktu.startswith(b + ' ')
+            for b in daftar_bulan
+        ):
             bulan_tagihan = waktu
 
-            tagihan = TagihanSiswa.query.filter_by(
+            query = TagihanSiswa.query.filter_by(
                 siswa_id=id_siswa,
                 jenis_pembayaran_id=jenis.id,
                 bulan=bulan_tagihan,
                 tahun_pelajaran=tahun_item
-            ).order_by(TagihanSiswa.id.asc()).first()
+            )
 
         else:
             if jenis.pola_waktu == 'semester_1':
                 semester_tagihan = 1
+
             elif jenis.pola_waktu == 'semester_2':
                 semester_tagihan = 2
+
             elif jenis.pola_waktu == 'awal_tahun':
                 semester_tagihan = 1
+
             else:
                 continue
 
-            tagihan = TagihanSiswa.query.filter(
+            query = TagihanSiswa.query.filter(
                 TagihanSiswa.siswa_id == id_siswa,
                 TagihanSiswa.jenis_pembayaran_id == jenis.id,
                 TagihanSiswa.bulan.is_(None),
                 TagihanSiswa.semester == semester_tagihan,
                 TagihanSiswa.tahun_pelajaran == tahun_item
-            ).order_by(TagihanSiswa.id.asc()).first()
+            )
+
+        tagihan = query.order_by(
+            TagihanSiswa.id.asc()
+        ).first()
+
+        nominal_baru = max(
+            0,
+            int(item.get('nominal') or 0)
+        )
+
+        # =========================================
+        # BUAT TAGIHAN JIKA BELUM ADA
+        # =========================================
 
         if not tagihan:
             tagihan = TagihanSiswa(
@@ -442,28 +527,60 @@ def pastikan_tagihan_tercatat(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
                 bulan=bulan_tagihan,
                 semester=semester_tagihan,
                 tahun_pelajaran=tahun_item,
-                nominal_tagihan=item['nominal'],
+                nominal_tagihan=nominal_baru,
                 sudah_dibayar=0,
                 status='Belum Lunas'
             )
+
             db.session.add(tagihan)
             db.session.flush()
 
+        # =========================================
+        # SINKRONISASI NOMINAL DAN STATUS
+        # =========================================
+
+        sudah_dibayar = max(
+            0,
+            int(tagihan.sudah_dibayar or 0)
+        )
+
+        # Nominal mengikuti tarif terbaru.
+        # Pembayaran yang sudah masuk tidak dihapus.
+        tagihan.nominal_tagihan = nominal_baru
+
+        if nominal_baru > 0 and sudah_dibayar >= nominal_baru:
+            tagihan.status = 'Sudah Lunas'
+            tagihan.tanggal_lunas = (
+                tagihan.tanggal_lunas or date.today()
+            )
+
+        elif sudah_dibayar > 0:
+            tagihan.status = 'Sebagian'
+            tagihan.tanggal_lunas = None
+
+        else:
+            tagihan.status = 'Belum Lunas'
+            tagihan.tanggal_lunas = None
+
+        sisa_tagihan = max(
+            0,
+            nominal_baru - sudah_dibayar
+        )
+
         daftar_tersimpan.append({
             "objek": tagihan,
-            "nominal_asli": item['nominal'],
+            "nominal_asli": nominal_baru,
             "nama": item['nama'],
             "waktu": waktu,
-            "sudah_dibayar": tagihan.sudah_dibayar or 0,
-            "sisa_tagihan": max(
-                0,
-                item['nominal'] - (tagihan.sudah_dibayar or 0)
-            ),
+            "sudah_dibayar": sudah_dibayar,
+            "sisa_tagihan": sisa_tagihan,
             "status": tagihan.status
         })
 
     db.session.commit()
+
     return daftar_tersimpan
+
 
 bendahara_bp = Blueprint('bendahara', __name__, url_prefix='/bendahara')
 
@@ -922,11 +1039,25 @@ def spp_siswa():
             
             r = data_riwayat[sid]
 
-            riwayat_pertama_siswa = RiwayatKelas.query.filter_by(siswa_id=sid).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
-            tahun_penuh = riwayat_pertama_siswa.tahun_pelajaran.strip()
-            angkatan_masuk = tahun_penuh[:4]
+            riwayat_pertama_siswa = RiwayatKelas.query.filter_by(
+                siswa_id=sid
+            ).order_by(RiwayatKelas.tahun_pelajaran.asc()).first()
 
-            tgl_mulai_angkatan = date(int(angkatan_masuk), 8, 1)
+            if not riwayat_pertama_siswa:
+                continue
+
+            tahun_penuh = riwayat_pertama_siswa.tahun_pelajaran.strip()
+
+            # Prioritaskan TP berdasarkan tanggal diterima siswa
+            tp_diterima = cari_tp_berdasarkan_tanggal(s.tanggal_diterima)
+
+            if tp_diterima:
+                angkatan_masuk = str(tp_diterima.tahun_mulai)
+                tgl_mulai_angkatan = s.tanggal_diterima
+            else:
+                angkatan_masuk = tahun_penuh[:4]
+                tgl_mulai_angkatan = date(int(angkatan_masuk), 8, 1)
+
             batas_akhir = None if s.status == 'Aktif' else s.tanggal_berhenti
 
             daftar_tag, total_murni = hitung_dan_dapat_total_tagihan(
@@ -975,11 +1106,18 @@ def spp_siswa():
     siswa_belum = total_siswa - siswa_lunas
     persen_lunas = round((siswa_lunas / total_siswa * 100), 1) if total_siswa > 0 else 0
 
+    # =========================================================
+    # JUMLAH PENGAJUAN PEMBAYARAN ONLINE MENUNGGU VERIFIKASI
+    # =========================================================
+    jumlah_menunggu_verifikasi = PengajuanPembayaran.query.filter_by(
+        status='menunggu_verifikasi'
+    ).count()
 
     return render_template('index.html',
         active_page='spp_siswa', halaman_aktif='bendahara', user=user,
         user_name=session.get('user_name','Pengguna'), tahun_ajaran=nama_tahun,
         semester=nama_semester, kode_tahun_aktif=kode_tahun_aktif,
+        jumlah_menunggu_verifikasi=jumlah_menunggu_verifikasi,
         total_siswa=total_siswa, siswa_lunas=siswa_lunas, siswa_belum=siswa_belum, persen_lunas=persen_lunas,
         daftar_siswa=daftar_siswa, daftar_tahun=TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all(),
         daftar_kelas=Kelas.query.filter_by(tahun_pelajaran=get_base_tahun(kode_tahun_aktif)).order_by(Kelas.jenjang,'nama_kelas').all() if kode_tahun_aktif else [],
@@ -1131,11 +1269,24 @@ def rincian_tagihan(kode):
         return redirect(url_for('bendahara.spp_siswa'))
 
     tahun_penuh = riwayat_pertama.tahun_pelajaran.strip()
-    angkatan_masuk = tahun_penuh[:4]
 
-    tp_awal = TahunPelajaran.query.filter(TahunPelajaran.kode.like(f"{angkatan_masuk}%"))\
-                                  .order_by(TahunPelajaran.tanggal_mulai.asc()).first()
-    tgl_mulai_angkatan = tp_awal.tanggal_mulai if tp_awal else date(int(angkatan_masuk), 8, 1)
+    tp_awal = cari_tp_berdasarkan_tanggal(siswa.tanggal_diterima)
+
+    if tp_awal:
+        angkatan_masuk = str(tp_awal.tahun_mulai)
+        tgl_mulai_angkatan = siswa.tanggal_diterima
+    else:
+        angkatan_masuk = tahun_penuh[:4]
+
+        tp_awal = TahunPelajaran.query.filter(
+            TahunPelajaran.kode.like(f"{angkatan_masuk}%")
+        ).order_by(TahunPelajaran.tanggal_mulai.asc()).first()
+
+        tgl_mulai_angkatan = (
+            tp_awal.tanggal_mulai
+            if tp_awal else date(int(angkatan_masuk), 8, 1)
+        )
+
     batas_akhir = None if siswa.status == 'Aktif' else siswa.tanggal_berhenti
 
     # ✅ PASTIKAN TAGIHAN MASUK KE DATABASE SEBELUM DITAMPILKAN
@@ -1536,11 +1687,23 @@ def api_rincian_tagihan(id_siswa):
         return jsonify({"sukses": False, "pesan": "Riwayat kelas tidak ditemukan!"}), 404
 
     tahun_penuh = riwayat_pertama.tahun_pelajaran.strip()
-    angkatan_masuk = tahun_penuh[:4]
 
-    tp_awal = TahunPelajaran.query.filter(TahunPelajaran.kode.like(f"{angkatan_masuk}%"))\
-                                  .order_by(TahunPelajaran.tanggal_mulai.asc()).first()
-    tgl_mulai_angkatan = tp_awal.tanggal_mulai if tp_awal else date(int(angkatan_masuk), 8, 1)
+    tp_awal = cari_tp_berdasarkan_tanggal(siswa.tanggal_diterima)
+
+    if tp_awal:
+        angkatan_masuk = str(tp_awal.tahun_mulai)
+        tgl_mulai_angkatan = siswa.tanggal_diterima
+    else:
+        angkatan_masuk = tahun_penuh[:4]
+
+        tp_awal = TahunPelajaran.query.filter(
+            TahunPelajaran.kode.like(f"{angkatan_masuk}%")
+        ).order_by(TahunPelajaran.tanggal_mulai.asc()).first()
+
+        tgl_mulai_angkatan = (
+            tp_awal.tanggal_mulai
+            if tp_awal else date(int(angkatan_masuk), 8, 1)
+        )
 
     batas_akhir = None if siswa.status == 'Aktif' else siswa.tanggal_berhenti
 

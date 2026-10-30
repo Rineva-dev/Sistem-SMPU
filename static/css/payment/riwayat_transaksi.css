@@ -2159,3 +2159,222 @@ svg {
         transition-duration: .01ms !important;
     }
 }
+
+/* =========================================
+   COLLAPSIBLE DETAIL PEMBAYARAN
+========================================= */
+
+.transaction-details {
+    margin: 16px 0;
+    border: 1px solid #e5eee9;
+    border-radius: 13px;
+    background: #f8faf9;
+    overflow: hidden;
+}
+
+.transaction-details-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    cursor: pointer;
+    list-style: none;
+    transition: background .2s ease;
+}
+
+.transaction-details-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.transaction-details-toggle:hover {
+    background: #f0f6f2;
+}
+
+.details-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+.details-toggle-icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #e6f3eb;
+    color: #16734e;
+}
+
+.details-toggle-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.details-toggle-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.details-toggle-text strong {
+    color: #234536;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.details-toggle-text small {
+    color: #84948b;
+    font-size: 10px;
+}
+
+.details-toggle-action {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #16734e;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.details-toggle-action svg {
+    width: 16px;
+    height: 16px;
+    transition: transform .25s ease;
+}
+
+.hide-text {
+    display: none;
+}
+
+.transaction-details[open] .show-text {
+    display: none;
+}
+
+.transaction-details[open] .hide-text {
+    display: inline;
+}
+
+.transaction-details[open] .details-toggle-action svg {
+    transform: rotate(180deg);
+}
+
+.transaction-details-content {
+    padding: 0 15px 12px;
+    animation: detailsFade .2s ease;
+}
+
+@keyframes detailsFade {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.transaction-items-list {
+    border-top: 1px solid #e5eee9;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9efeb;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-item-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.item-bullet {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: #19845d;
+}
+
+.item-description {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.item-description strong {
+    color: #253c33;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.item-description span {
+    color: #82918a;
+    font-size: 10px;
+}
+
+.item-amount {
+    flex-shrink: 0;
+    color: #164b37;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.transaction-items-empty {
+    padding: 13px 0 3px;
+    color: #89958f;
+    font-size: 11px;
+}
+
+@media (max-width: 480px) {
+    .transaction-details-toggle {
+        padding: 11px 12px;
+    }
+
+    .details-toggle-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .details-toggle-action {
+        font-size: 10px;
+        gap: 4px;
+    }
+
+    .transaction-details-content {
+        padding: 0 12px 10px;
+    }
+
+    .transaction-item {
+        gap: 8px;
+    }
+
+    .item-description strong,
+    .item-amount {
+        font-size: 11px;
+    }
+
+    .item-description span {
+        font-size: 10px;
+    }
+}

@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currency: "IDR",
             maximumFractionDigits: 0
         }).format(nominal);
-
+        
     const metodeInfo = {
         "Transfer Bank": {
             title: "Transfer Bank",
@@ -52,16 +52,86 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
+    function angkaDariRupiah(value) {
+        return Number(
+            String(value).replace(/\D/g, "")
+        ) || 0;
+    }
+
+    function formatInputRupiah(value) {
+        const angka = angkaDariRupiah(value);
+
+        if (angka === 0) return "";
+
+        return "Rp " + angka.toLocaleString("id-ID");
+    }
+
     function getMetode() {
         return methodInputs.find(input => input.checked)?.value || "";
     }
 
     function updateSummary() {
         const selected = checkboxes.filter(item => item.checked);
+        let total = 0;
 
-        const total = selected.reduce((sum, item) => {
-            return sum + Math.max(0, Number(item.dataset.remaining) || 0);
-        }, 0);
+        // Atur input nominal Pembangunan
+        document.querySelectorAll(".nominal-pembangunan").forEach(input => {
+            const billItem = input.closest(".bill-item");
+            const checkbox = billItem?.querySelector(".bill-checkbox");
+            const wrapper = input.closest(".partial-payment-input");
+
+            const isSelected = checkbox?.checked === true;
+
+            // Input hanya aktif jika tagihan dipilih
+            input.disabled = !isSelected;
+
+            if (wrapper) {
+                wrapper.hidden = !isSelected;
+            }
+
+            // Format nominal saat pertama kali ditampilkan
+            if (isSelected) {
+                const nominal = angkaDariRupiah(input.value);
+
+                input.value = nominal > 0
+                    ? nominal.toLocaleString("id-ID")
+                    : "";
+            }
+
+            // Pastikan nominal tidak melebihi sisa tagihan
+            const maksimal = Number(input.dataset.remaining) || 0;
+            let nominal = Number(input.value) || 0;
+
+            if (nominal > maksimal) {
+                nominal = maksimal;
+                input.value = maksimal;
+            }
+        });
+
+        // Hitung total berdasarkan tagihan yang dipilih
+        selected.forEach(item => {
+            const sisa = Math.max(
+                0,
+                Number(item.dataset.remaining) || 0
+            );
+
+            const billItem = item.closest(".bill-item");
+            const inputNominal = billItem?.querySelector(
+                ".nominal-pembangunan"
+            );
+
+            if (inputNominal) {
+                // Pembangunan menggunakan nominal yang diinput
+                let nominal = angkaDariRupiah(inputNominal.value);
+
+                nominal = Math.max(0, Math.min(nominal, sisa));
+
+                total += nominal;
+            } else {
+                // Tagihan lainnya tetap membayar seluruh sisa tagihan
+                total += sisa;
+            }
+        });
 
         selectedCount.textContent = `${selected.length} tagihan`;
         totalAmount.textContent = rupiah(total);
@@ -80,12 +150,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (checkoutButton) {
-            checkoutButton.disabled = selected.length === 0 || !metode;
+            checkoutButton.disabled =
+                selected.length === 0 || !metode;
         }
 
         document.querySelectorAll(".method-card").forEach(card => {
             const radio = card.querySelector('input[name="metode"]');
-            card.classList.toggle("selected", Boolean(radio?.checked));
+
+            card.classList.toggle(
+                "selected",
+                Boolean(radio?.checked)
+            );
         });
     }
 
@@ -108,6 +183,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener("change", updateSummary);
+    });
+
+    document.querySelectorAll(".nominal-pembangunan").forEach(input => {
+
+        // Format nominal ketika pengguna mengetik
+        input.addEventListener("input", () => {
+            const maksimal = Number(input.dataset.remaining) || 0;
+
+            let nominal = angkaDariRupiah(input.value);
+
+            if (nominal > maksimal) {
+                nominal = maksimal;
+            }
+
+            input.value = nominal > 0
+                ? "Rp " + nominal.toLocaleString("id-ID")
+                : "";
+
+            updateSummary();
+        });
+
+        // Validasi ketika pengguna selesai mengisi
+        input.addEventListener("change", () => {
+            const maksimal = Number(input.dataset.remaining) || 0;
+            let nominal = angkaDariRupiah(input.value);
+
+            if (nominal < 1) {
+                nominal = 1;
+            }
+
+            if (nominal > maksimal) {
+                nominal = maksimal;
+            }
+
+            input.value = "Rp " + nominal.toLocaleString("id-ID");
+
+            updateSummary();
+        });
     });
 
     selectAll?.addEventListener("change", () => {
