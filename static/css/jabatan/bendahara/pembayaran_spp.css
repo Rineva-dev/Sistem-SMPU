@@ -2441,3 +2441,1599 @@
         transition-duration: .01ms !important;
     }
 }
+
+
+/* =========================================================
+   PREMIUM FINTECH PAYMENT WORKSPACE
+   Manual SPP Payment Modal — UI Upgrade
+========================================================= */
+
+#modalPembayaranDaftar {
+    --pay-primary: #08745a;
+    --pay-primary-dark: #064b3b;
+    --pay-primary-deep: #032f26;
+    --pay-mint: #e9f8ef;
+    --pay-text: #183b2e;
+    --pay-muted: #84958b;
+    --pay-border: #e8efeb;
+    --pay-surface: #ffffff;
+    --pay-soft: #f7faf8;
+    --pay-gold: #c69b52;
+    --pay-shadow: 0 24px 80px rgba(5, 44, 31, .22);
+    font-family: Inter, "Segoe UI", sans-serif;
+}
+
+#modalPembayaranDaftar *,
+#modalPembayaranDaftar *::before,
+#modalPembayaranDaftar *::after {
+    box-sizing: border-box;
+}
+
+#modalPembayaranDaftar .spp-payment-dialog {
+    max-width: 820px;
+}
+
+#modalPembayaranDaftar .spp-modal {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .8);
+    border-radius: 23px;
+    background: #fff;
+    box-shadow: var(--pay-shadow);
+    animation: payModalEnter .45s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes payModalEnter {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes payFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+}
+
+@keyframes payPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(111, 225, 164, .35); }
+    50% { box-shadow: 0 0 0 7px rgba(111, 225, 164, 0); }
+}
+
+@keyframes payShimmer {
+    0% { transform: translateX(-120%) skewX(-18deg); }
+    100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+@keyframes paySpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes payFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(9px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#modalPembayaranDaftar .spp-payment-header {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 23px 27px 15px;
+    color: #fff;
+    background:
+        radial-gradient(circle at 82% 5%, rgba(93, 219, 151, .22), transparent 30%),
+        radial-gradient(circle at 5% 110%, rgba(22, 148, 104, .24), transparent 38%),
+        linear-gradient(125deg, #032f26 0%, #064b3b 48%, #08745a 100%);
+}
+
+#modalPembayaranDaftar .spp-header-grid {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: .13;
+    background-image:
+        linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(110deg, transparent, #000 70%);
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-header-orb {
+    position: absolute;
+    z-index: -1;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-header-orb-one {
+    top: -100px;
+    right: 80px;
+    width: 240px;
+    height: 240px;
+    box-shadow:
+        0 0 0 24px rgba(255,255,255,.025),
+        0 0 0 50px rgba(255,255,255,.018);
+    animation: payFloat 7s ease-in-out infinite;
+}
+
+#modalPembayaranDaftar .spp-header-orb-two {
+    right: 22%;
+    bottom: -105px;
+    width: 175px;
+    height: 175px;
+    border-color: rgba(150, 235, 184, .12);
+    animation: payFloat 9s ease-in-out infinite reverse;
+}
+
+#modalPembayaranDaftar .spp-payment-header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+#modalPembayaranDaftar .spp-payment-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-payment-brand-icon {
+    position: relative;
+    display: grid;
+    flex: 0 0 52px;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 17px;
+    color: #d7f9e4;
+    background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.07));
+    box-shadow: 0 8px 24px rgba(0,0,0,.12), inset 0 1px rgba(255,255,255,.2);
+    font-size: 21px;
+}
+
+#modalPembayaranDaftar .spp-brand-pulse {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid #07503d;
+    border-radius: 50%;
+    background: #78e2a6;
+    animation: payPulse 2s infinite;
+}
+
+#modalPembayaranDaftar .spp-payment-heading {
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-payment-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 5px;
+    color: #a9e8c5;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: 1.8px;
+}
+
+#modalPembayaranDaftar .spp-eyebrow-dot,
+#modalPembayaranDaftar .spp-reference-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #8ce5ad;
+    box-shadow: 0 0 0 4px rgba(140,229,173,.12);
+}
+
+#modalPembayaranDaftar .spp-payment-heading .modal-title {
+    margin: 0;
+    color: #fff;
+    font-size: 21px;
+    font-weight: 850;
+    letter-spacing: -.7px;
+}
+
+#modalPembayaranDaftar .spp-payment-heading p {
+    margin: 5px 0 0;
+    color: rgba(255,255,255,.68);
+    font-size: 10px;
+}
+
+#modalPembayaranDaftar .spp-header-right {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+#modalPembayaranDaftar .spp-secure-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 8px;
+    color: #c8f0d8;
+    background: rgba(255,255,255,.08);
+    font-size: 8px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+#modalPembayaranDaftar .spp-modal-close {
+    display: grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px;
+    color: #fff;
+    background: rgba(255,255,255,.1);
+    transition: .25s ease;
+}
+
+#modalPembayaranDaftar .spp-modal-close:hover {
+    border-color: rgba(255,255,255,.45);
+    background: rgba(255,255,255,.2);
+    transform: rotate(90deg);
+}
+
+#modalPembayaranDaftar .spp-header-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+#modalPembayaranDaftar .spp-header-caption,
+#modalPembayaranDaftar .spp-header-reference {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,.62);
+    font-size: 8px;
+    font-weight: 750;
+    letter-spacing: 1px;
+}
+
+#modalPembayaranDaftar .spp-header-caption i {
+    color: #d6c18c;
+}
+
+#modalPembayaranDaftar .spp-reference-dot {
+    width: 5px;
+    height: 5px;
+}
+
+
+/* =========================================================
+   BODY AND PROGRESS
+========================================================= */
+
+#modalPembayaranDaftar .spp-payment-body {
+    max-height: calc(100vh - 235px);
+    overflow-y: auto;
+    padding: 23px 27px 25px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(8,116,90,.025), transparent 28%),
+        #fff;
+    scrollbar-width: thin;
+    scrollbar-color: #cbded1 transparent;
+}
+
+#modalPembayaranDaftar .spp-payment-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+#modalPembayaranDaftar .spp-payment-body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #d5e4da;
+}
+
+#modalPembayaranDaftar .spp-payment-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 12px 16px;
+    border: 1px solid #edf2ef;
+    border-radius: 13px;
+    background: linear-gradient(110deg, #fbfdfb, #f7faf8);
+}
+
+#modalPembayaranDaftar .spp-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #a1afa7;
+    transition: .25s ease;
+}
+
+#modalPembayaranDaftar .spp-progress-number {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #e4ebe6;
+    border-radius: 8px;
+    color: #91a097;
+    background: #fff;
+    font-size: 8px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-progress-label {
+    font-size: 9px;
+    font-weight: 750;
+}
+
+#modalPembayaranDaftar .spp-progress-item.is-active {
+    color: #08745a;
+}
+
+#modalPembayaranDaftar .spp-progress-item.is-active .spp-progress-number {
+    border-color: #bfe6ce;
+    color: #08745a;
+    background: #e9f8ef;
+    box-shadow: 0 3px 9px rgba(8,116,90,.08);
+}
+
+#modalPembayaranDaftar .spp-progress-line {
+    flex: 0 1 45px;
+    height: 1px;
+    background: #e5ede8;
+}
+
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+#modalPembayaranDaftar .spp-workspace-section {
+    min-width: 0;
+    margin-bottom: 23px;
+}
+
+#modalPembayaranDaftar .spp-section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+#modalPembayaranDaftar .spp-section-title-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-section-icon {
+    display: grid;
+    flex: 0 0 39px;
+    place-items: center;
+    width: 39px;
+    height: 39px;
+    border: 1px solid #dcefe4;
+    border-radius: 12px;
+    color: #08745a;
+    background: linear-gradient(145deg, #f0faf4, #e5f6ec);
+    font-size: 15px;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+#modalPembayaranDaftar .spp-workspace-section:hover > .spp-section-title-row .spp-section-icon {
+    transform: translateY(-2px) rotate(-4deg);
+    box-shadow: 0 6px 14px rgba(8,116,90,.1);
+}
+
+#modalPembayaranDaftar .spp-icon-bill {
+    color: #b17b35;
+    border-color: #f1e5d1;
+    background: linear-gradient(145deg, #fff9ef, #fdf1df);
+}
+
+#modalPembayaranDaftar .spp-icon-payment {
+    color: #3977a3;
+    border-color: #dceaf4;
+    background: linear-gradient(145deg, #f1f8fd, #e6f2fa);
+}
+
+#modalPembayaranDaftar .payment-section-heading {
+    display: block;
+    min-width: 0;
+    margin: 0;
+}
+
+#modalPembayaranDaftar .spp-section-overline {
+    display: block;
+    margin-bottom: 3px;
+    color: #9aaa9f;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: 1.3px;
+}
+
+#modalPembayaranDaftar .payment-section-heading h6 {
+    margin: 0;
+    color: #244637;
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: -.2px;
+}
+
+#modalPembayaranDaftar .payment-section-heading p {
+    margin: 4px 0 0;
+    color: #93a198;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+#modalPembayaranDaftar .spp-section-index {
+    color: #a6b2aa;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .8px;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STUDENT SELECT
+========================================================= */
+
+#modalPembayaranDaftar .spp-student-select-card {
+    padding: 15px;
+    border: 1px solid #e8efeb;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fbfdfb, #fff);
+    transition: border-color .25s ease, box-shadow .25s ease;
+}
+
+#modalPembayaranDaftar .spp-student-select-card:focus-within {
+    border-color: #a7d7bb;
+    box-shadow: 0 0 0 4px rgba(8,116,90,.055);
+}
+
+#modalPembayaranDaftar .spp-field-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: #536b5d;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+#modalPembayaranDaftar .spp-required-label {
+    color: #b17b35;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .8px;
+}
+
+#modalPembayaranDaftar .spp-select-shell {
+    position: relative;
+}
+
+#modalPembayaranDaftar .spp-select-leading {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    z-index: 2;
+    color: #8da295;
+    font-size: 11px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-select-shell select {
+    width: 100%;
+    min-height: 47px;
+    padding: 0 42px 0 36px;
+    appearance: none;
+    border: 1px solid #e2ebe5;
+    border-radius: 10px;
+    outline: 0;
+    color: #345444;
+    background: #fff;
+    box-shadow: none;
+    font-size: 10px;
+    font-weight: 650;
+    transition: .2s ease;
+}
+
+#modalPembayaranDaftar .spp-select-shell select:focus {
+    border-color: #79bd99;
+    box-shadow: 0 0 0 3px rgba(8,116,90,.075);
+}
+
+#modalPembayaranDaftar .spp-select-decoration {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    color: #91a397;
+    font-size: 9px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-field-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 9px;
+    color: #9aa89f;
+    font-size: 8px;
+}
+
+#modalPembayaranDaftar .spp-field-hint i {
+    color: #7eae91;
+}
+
+
+/* =========================================================
+   STUDENT PROFILE CARD
+========================================================= */
+
+#modalPembayaranDaftar .spp-student-profile {
+    position: relative;
+    overflow: hidden;
+    margin: -4px 0 24px;
+    padding: 16px;
+    border: 1px solid #d9eee2;
+    border-radius: 15px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(96,190,133,.12), transparent 36%),
+        linear-gradient(120deg, #f2faf5, #fbfefc);
+    animation: payFadeUp .35s ease both;
+}
+
+#modalPembayaranDaftar .spp-profile-top {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#modalPembayaranDaftar .spp-profile-avatar {
+    position: relative;
+    display: grid;
+    flex: 0 0 45px;
+    place-items: center;
+    width: 45px;
+    height: 45px;
+    border: 1px solid #cce8d6;
+    border-radius: 14px;
+    color: #08745a;
+    background: linear-gradient(145deg, #e2f6e9, #ccebd8);
+    font-size: 18px;
+}
+
+#modalPembayaranDaftar .spp-avatar-status {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid #f3fbf6;
+    border-radius: 50%;
+    background: #26b77d;
+}
+
+#modalPembayaranDaftar .spp-profile-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-profile-caption {
+    color: #85a291;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: 1.2px;
+}
+
+#modalPembayaranDaftar .spp-profile-heading strong {
+    overflow: hidden;
+    color: #244b38;
+    font-size: 12px;
+    font-weight: 850;
+    text-overflow: ellipsis;
+}
+
+#modalPembayaranDaftar .spp-profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #159369;
+    font-size: 8px;
+    font-weight: 700;
+}
+
+#modalPembayaranDaftar .spp-profile-decoration {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    border-radius: 11px;
+    color: rgba(8,116,90,.35);
+    background: rgba(8,116,90,.06);
+    font-size: 17px;
+}
+
+#modalPembayaranDaftar .spp-profile-divider {
+    height: 1px;
+    margin: 14px 0;
+    background: #e0eee5;
+}
+
+#modalPembayaranDaftar .spp-profile-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 12px;
+}
+
+#modalPembayaranDaftar .spp-profile-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-profile-grid small {
+    color: #91a397;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: .7px;
+}
+
+#modalPembayaranDaftar .spp-profile-grid strong {
+    overflow: hidden;
+    color: #385b49;
+    font-size: 10px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   BILL CONTAINER
+========================================================= */
+
+#modalPembayaranDaftar .spp-bill-container {
+    overflow: hidden;
+    border: 1px solid #e7eee9;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(28,75,49,.025);
+}
+
+#modalPembayaranDaftar .spp-bill-container-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #edf2ef;
+    background: #fbfdfb;
+}
+
+#modalPembayaranDaftar .spp-bill-container-top > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#modalPembayaranDaftar .spp-bill-container-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #3c5b4a;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-bill-container-title i {
+    color: #0b916b;
+}
+
+#modalPembayaranDaftar .spp-bill-container-top small {
+    color: #9aa79f;
+    font-size: 8px;
+}
+
+#modalPembayaranDaftar .spp-bill-container-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 8px;
+    border: 1px solid #e3eee7;
+    border-radius: 7px;
+    color: #6c927a;
+    background: #f1f8f3;
+    font-size: 7px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+#modalPembayaranDaftar .daftar-modal-wrapper {
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+}
+
+#modalPembayaranDaftar .daftar-modal-wrapper:empty {
+    display: none;
+}
+
+
+/* Empty state */
+
+#modalPembayaranDaftar .spp-empty-bill {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 29px 18px 31px;
+    text-align: center;
+}
+
+#modalPembayaranDaftar .spp-empty-illustration {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 75px;
+    height: 65px;
+    margin-bottom: 12px;
+}
+
+#modalPembayaranDaftar .spp-empty-circle {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border: 1px solid #dcefe4;
+    border-radius: 18px;
+    color: #6da987;
+    background: linear-gradient(145deg, #f1faf4, #e5f5eb);
+    font-size: 20px;
+    animation: payFloat 3.5s ease-in-out infinite;
+}
+
+#modalPembayaranDaftar .spp-empty-spark {
+    position: absolute;
+    color: #c69b52;
+    font-size: 15px;
+    animation: payFloat 2.8s ease-in-out infinite;
+}
+
+#modalPembayaranDaftar .spp-empty-spark-one {
+    top: 0;
+    right: 4px;
+}
+
+#modalPembayaranDaftar .spp-empty-spark-two {
+    bottom: 0;
+    left: 4px;
+    animation-delay: .5s;
+}
+
+#modalPembayaranDaftar .spp-empty-bill strong {
+    color: #426151;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-empty-bill p {
+    max-width: 290px;
+    margin: 6px 0 0;
+    color: #9aa79f;
+    font-size: 9px;
+    line-height: 1.7;
+}
+
+
+/* Dynamic bill groups generated by JavaScript */
+
+#modalPembayaranDaftar .kelompok-modal {
+    overflow: hidden;
+    border: 0;
+    border-bottom: 1px solid #edf2ef;
+    border-radius: 0;
+    background: #fff;
+}
+
+#modalPembayaranDaftar .kelompok-modal:last-child {
+    border-bottom: 0;
+}
+
+#modalPembayaranDaftar .kelompok-modal > .card-header,
+#modalPembayaranDaftar .kelompok-modal .card-header {
+    padding: 12px 14px;
+    border: 0;
+    background: #fff;
+    transition: background .2s ease;
+}
+
+#modalPembayaranDaftar .kelompok-modal > .card-header:hover,
+#modalPembayaranDaftar .kelompok-modal .card-header:hover {
+    background: #f7fbf8;
+}
+
+#modalPembayaranDaftar .kelompok-modal .card-header [data-bs-toggle="collapse"] {
+    cursor: pointer;
+}
+
+#modalPembayaranDaftar .kelompok-modal .card-body {
+    padding: 0 12px 12px;
+    border: 0;
+    background: #fff;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 9px;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table thead th {
+    padding: 9px 8px;
+    border-bottom: 1px solid #eaf0ec;
+    color: #8c9c92;
+    background: #f8fbf9;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .6px;
+    white-space: nowrap;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f0f4f1;
+    color: #52695b;
+    background: #fff;
+    font-size: 9px;
+    vertical-align: middle;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table tbody tr {
+    transition: background .2s ease;
+}
+
+#modalPembayaranDaftar .kelompok-modal .table tbody tr:hover td {
+    background: #f8fcf9;
+}
+
+#modalPembayaranDaftar .kelompok-modal .cek-tagihan,
+#modalPembayaranDaftar .payment-select-all .form-check-input,
+#modalPembayaranDaftar .pilih-semua-kelompok {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #cbdcd1;
+    border-radius: 5px;
+    accent-color: #08745a;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+#modalPembayaranDaftar .kelompok-modal .cek-tagihan:checked,
+#modalPembayaranDaftar .pilih-semua-kelompok:checked {
+    border-color: #08745a;
+    background-color: #08745a;
+}
+
+#modalPembayaranDaftar .kelompok-modal .status-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 7px;
+    border: 1px solid #e7eee9;
+    border-radius: 6px;
+    color: #82948a;
+    background: #f7faf8;
+    font-size: 8px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+
+/* Select all control */
+
+#modalPembayaranDaftar .spp-bill-selection {
+    margin-left: auto;
+}
+
+#modalPembayaranDaftar .spp-select-all-control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #5f806c;
+    font-size: 9px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+#modalPembayaranDaftar .spp-select-all-control input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+#modalPembayaranDaftar .spp-custom-check {
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid #cbded1;
+    border-radius: 5px;
+    color: transparent;
+    background: #fff;
+    font-size: 8px;
+    transition: .2s ease;
+}
+
+#modalPembayaranDaftar .spp-select-all-control input:checked + .spp-custom-check {
+    border-color: #08745a;
+    color: #fff;
+    background: #08745a;
+}
+
+#modalPembayaranDaftar .spp-select-all-control input:focus-visible + .spp-custom-check {
+    outline: 3px solid rgba(8,116,90,.16);
+}
+
+
+/* =========================================================
+   PAYMENT FORM
+========================================================= */
+
+#modalPembayaranDaftar .spp-payment-form-section {
+    gap: 15px;
+    margin-top: 23px;
+    padding: 20px;
+    border: 1px solid #e8efeb;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #fcfefd, #f8fbf9);
+    animation: payFadeUp .35s ease both;
+}
+
+#modalPembayaranDaftar .spp-payment-form-section > .spp-section-title-row {
+    margin-bottom: 2px;
+}
+
+#modalPembayaranDaftar .payment-field {
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .payment-field > label {
+    display: block;
+    margin-bottom: 8px;
+    color: #65796d;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: .7px;
+}
+
+#modalPembayaranDaftar .spp-money-input {
+    position: relative;
+}
+
+#modalPembayaranDaftar .spp-money-icon,
+#modalPembayaranDaftar .spp-field-icon,
+#modalPembayaranDaftar .spp-note-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    color: #83a08e;
+    background: #f0f7f2;
+    font-size: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-money-input .form-control {
+    width: 100%;
+    min-height: 47px;
+    padding: 0 12px 0 48px;
+    border: 1px solid #e2ebe5;
+    border-radius: 10px;
+    color: #345544;
+    background: #fff;
+    box-shadow: none;
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+#modalPembayaranDaftar .spp-money-input .form-control:focus {
+    border-color: #79bd99;
+    box-shadow: 0 0 0 3px rgba(8,116,90,.07);
+}
+
+#modalPembayaranDaftar .spp-money-input .form-control[readonly] {
+    color: #08745a;
+    background: #f0f8f3 !important;
+}
+
+#modalPembayaranDaftar .spp-money-input-highlight .spp-money-icon {
+    color: #fff;
+    background: linear-gradient(145deg, #0a966c, #08745a);
+}
+
+#modalPembayaranDaftar .spp-money-input-highlight .form-control {
+    min-height: 50px;
+    border-color: #cfe8d8;
+    color: #08745a;
+    background: #fbfefc;
+    font-size: 14px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-money-input-highlight .form-control::placeholder {
+    color: #a8b7ad;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+#modalPembayaranDaftar .spp-input-caption {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 7px;
+    color: #9aa89f;
+    font-size: 8px;
+}
+
+#modalPembayaranDaftar .spp-input-caption i {
+    color: #85ad94;
+}
+
+
+/* Method and date */
+
+#modalPembayaranDaftar .spp-modern-select,
+#modalPembayaranDaftar .spp-modern-date {
+    position: relative;
+}
+
+#modalPembayaranDaftar .spp-modern-select select,
+#modalPembayaranDaftar .spp-modern-date input {
+    width: 100%;
+    min-height: 47px;
+    padding: 0 12px 0 47px;
+    border: 1px solid #e2ebe5;
+    border-radius: 10px;
+    outline: 0;
+    color: #355445;
+    background-color: #fff;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 10px;
+    transition: .2s ease;
+}
+
+#modalPembayaranDaftar .spp-modern-select select:focus,
+#modalPembayaranDaftar .spp-modern-date input:focus {
+    border-color: #79bd99;
+    box-shadow: 0 0 0 3px rgba(8,116,90,.07);
+}
+
+#modalPembayaranDaftar .spp-modern-select .spp-field-icon,
+#modalPembayaranDaftar .spp-modern-date .spp-field-icon {
+    top: 50%;
+}
+
+
+/* Note */
+
+#modalPembayaranDaftar .spp-note-wrapper {
+    position: relative;
+}
+
+#modalPembayaranDaftar .spp-note-icon {
+    top: 14px;
+    transform: none;
+}
+
+#modalPembayaranDaftar .spp-note-wrapper textarea {
+    width: 100%;
+    min-height: 78px;
+    padding: 12px 12px 12px 48px;
+    border: 1px solid #e2ebe5;
+    border-radius: 10px;
+    outline: 0;
+    color: #355445;
+    background: #fff;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 10px;
+    resize: vertical;
+    transition: .2s ease;
+}
+
+#modalPembayaranDaftar .spp-note-wrapper textarea:focus {
+    border-color: #79bd99;
+    box-shadow: 0 0 0 3px rgba(8,116,90,.07);
+}
+
+#modalPembayaranDaftar .spp-note-wrapper textarea::placeholder {
+    color: #a7b3aa;
+    font-size: 9px;
+}
+
+#modalPembayaranDaftar .optional-label {
+    margin-left: 5px;
+    color: #a4b0a8;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+
+/* Notice */
+
+#modalPembayaranDaftar .spp-payment-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #e3eee7;
+    border-radius: 10px;
+    background: #f3faf5;
+}
+
+#modalPembayaranDaftar .spp-notice-icon {
+    display: grid;
+    flex: 0 0 28px;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: #16845f;
+    background: #e2f4e9;
+    font-size: 11px;
+}
+
+#modalPembayaranDaftar .spp-payment-notice strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #3c654f;
+    font-size: 9px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-payment-notice p {
+    margin: 0;
+    color: #82978a;
+    font-size: 8px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+#modalPembayaranDaftar .spp-payment-footer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px 25px;
+    border-top: 1px solid #eaf0ec;
+    background: rgba(255,255,255,.97);
+    box-shadow: 0 -5px 18px rgba(22,65,42,.025);
+}
+
+#modalPembayaranDaftar .spp-footer-security {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+#modalPembayaranDaftar .spp-footer-security-icon {
+    display: grid;
+    flex: 0 0 30px;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e0eee5;
+    border-radius: 9px;
+    color: #16845f;
+    background: #f0f8f3;
+    font-size: 11px;
+}
+
+#modalPembayaranDaftar .spp-footer-security > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+#modalPembayaranDaftar .spp-footer-security strong {
+    color: #526c5c;
+    font-size: 8px;
+    font-weight: 850;
+}
+
+#modalPembayaranDaftar .spp-footer-security small {
+    color: #a0ada5;
+    font-size: 7px;
+}
+
+#modalPembayaranDaftar .spp-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+#modalPembayaranDaftar .spp-cancel-button {
+    min-height: 41px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 9px;
+}
+
+#modalPembayaranDaftar .spp-save-button {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 0 15px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: #fff;
+    background: linear-gradient(120deg, #0a936a, #07513d);
+    box-shadow: 0 6px 16px rgba(8,116,90,.18);
+    font-size: 9px;
+    font-weight: 800;
+    transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease;
+}
+
+#modalPembayaranDaftar .spp-save-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 35%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.17), transparent);
+    transform: translateX(-150%) skewX(-18deg);
+    pointer-events: none;
+}
+
+#modalPembayaranDaftar .spp-save-button:hover:not(:disabled) {
+    color: #fff;
+    box-shadow: 0 9px 22px rgba(8,116,90,.25);
+    transform: translateY(-2px);
+}
+
+#modalPembayaranDaftar .spp-save-button:hover:not(:disabled)::before {
+    animation: payShimmer .8s ease;
+}
+
+#modalPembayaranDaftar .spp-save-icon {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border-radius: 7px;
+    color: #08745a;
+    background: #fff;
+    font-size: 10px;
+}
+
+#modalPembayaranDaftar .spp-save-arrow {
+    margin-left: 2px;
+    font-size: 9px;
+    transition: transform .2s ease;
+}
+
+#modalPembayaranDaftar .spp-save-button:hover:not(:disabled) .spp-save-arrow {
+    transform: translateX(3px);
+}
+
+#modalPembayaranDaftar .spp-save-button:disabled {
+    border-color: #e6ece8;
+    color: #a4b0a8;
+    background: #edf1ee;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+#modalPembayaranDaftar .spp-save-button:disabled .spp-save-icon {
+    color: #9baaa0;
+    background: #e1e8e3;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 767px) {
+    #modalPembayaranDaftar .spp-payment-dialog {
+        margin: 10px;
+    }
+
+    #modalPembayaranDaftar .spp-modal {
+        border-radius: 18px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-header {
+        padding: 18px 17px 13px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-brand {
+        gap: 11px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-brand-icon {
+        flex-basis: 43px;
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        font-size: 17px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-heading .modal-title {
+        font-size: 17px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-heading p {
+        max-width: 220px;
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+    #modalPembayaranDaftar .spp-secure-label {
+        display: none;
+    }
+
+    #modalPembayaranDaftar .spp-header-right {
+        gap: 0;
+    }
+
+    #modalPembayaranDaftar .spp-header-bottom {
+        margin-top: 14px;
+    }
+
+    #modalPembayaranDaftar .spp-header-caption,
+    #modalPembayaranDaftar .spp-header-reference {
+        font-size: 7px;
+        letter-spacing: .6px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-body {
+        max-height: calc(100dvh - 205px);
+        padding: 17px 15px 20px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-progress {
+        gap: 6px;
+        margin-bottom: 21px;
+        padding: 10px 8px;
+    }
+
+    #modalPembayaranDaftar .spp-progress-item {
+        gap: 5px;
+    }
+
+    #modalPembayaranDaftar .spp-progress-number {
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+        font-size: 7px;
+    }
+
+    #modalPembayaranDaftar .spp-progress-label {
+        font-size: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-progress-line {
+        flex-basis: 20px;
+    }
+
+    #modalPembayaranDaftar .spp-section-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    #modalPembayaranDaftar .payment-section-heading h6 {
+        font-size: 11px;
+    }
+
+    #modalPembayaranDaftar .payment-section-heading p {
+        font-size: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-section-index {
+        font-size: 7px;
+    }
+
+    #modalPembayaranDaftar .spp-student-select-card {
+        padding: 12px;
+    }
+
+    #modalPembayaranDaftar .spp-select-shell select {
+        min-height: 44px;
+        font-size: 9px;
+    }
+
+    #modalPembayaranDaftar .spp-bill-container-top {
+        padding: 11px;
+    }
+
+    #modalPembayaranDaftar .spp-bill-container-badge {
+        font-size: 6px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-form-section {
+        grid-template-columns: 1fr;
+        gap: 13px;
+        padding: 14px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-form-section .full-width {
+        grid-column: auto;
+    }
+
+    #modalPembayaranDaftar .spp-payment-footer {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+        padding: 11px 14px;
+    }
+
+    #modalPembayaranDaftar .spp-footer-security {
+        display: none;
+    }
+
+    #modalPembayaranDaftar .spp-footer-actions {
+        display: grid;
+        grid-template-columns: .75fr 1.5fr;
+        width: 100%;
+    }
+
+    #modalPembayaranDaftar .spp-cancel-button,
+    #modalPembayaranDaftar .spp-save-button {
+        width: 100%;
+        min-height: 40px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+    #modalPembayaranDaftar .spp-payment-dialog {
+        margin: 7px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-header {
+        padding: 15px 13px 11px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-heading .modal-title {
+        font-size: 15px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-heading p {
+        max-width: 190px;
+        font-size: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-modal-close {
+        width: 29px;
+        height: 29px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-body {
+        padding: 14px 11px 17px;
+    }
+
+    #modalPembayaranDaftar .spp-progress-label {
+        font-size: 7px;
+    }
+
+    #modalPembayaranDaftar .spp-section-title-row {
+        gap: 7px;
+    }
+
+    #modalPembayaranDaftar .spp-section-title-left {
+        gap: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-section-index {
+        display: none;
+    }
+
+    #modalPembayaranDaftar .spp-bill-selection .spp-select-all-control {
+        font-size: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-profile-grid {
+        gap: 8px;
+    }
+
+    #modalPembayaranDaftar .spp-profile-grid strong {
+        font-size: 9px;
+    }
+
+    #modalPembayaranDaftar .spp-payment-form-section {
+        padding: 12px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    #modalPembayaranDaftar *,
+    #modalPembayaranDaftar *::before,
+    #modalPembayaranDaftar *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}

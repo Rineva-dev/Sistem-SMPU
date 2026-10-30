@@ -494,188 +494,337 @@
 </div>
 
 
+
 <!-- =========================================================
-     MODAL PEMBAYARAN MANUAL
+     PREMIUM MANUAL PAYMENT WORKSPACE
 ========================================================= -->
+
 <div class="modal fade" id="modalPembayaranDaftar" tabindex="-1" aria-hidden="true">
-
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable spp-payment-dialog">
         <div class="modal-content spp-modal">
 
-            <!-- MODAL HEADER -->
-            <div class="modal-header spp-modal-header">
+            <!-- HEADER -->
+            <div class="spp-payment-header">
+                <div class="spp-header-orb spp-header-orb-one"></div>
+                <div class="spp-header-orb spp-header-orb-two"></div>
+                <div class="spp-header-grid"></div>
 
-                <div class="modal-heading-content">
-                    <div class="modal-heading-icon">
-                        <i class="fas fa-wallet"></i>
+                <div class="spp-payment-header-content">
+                    <div class="spp-payment-brand">
+                        <div class="spp-payment-brand-icon">
+                            <i class="fas fa-wallet"></i>
+                            <span class="spp-brand-pulse"></span>
+                        </div>
+
+                        <div class="spp-payment-heading">
+                            <div class="spp-payment-eyebrow">
+                                <span class="spp-eyebrow-dot"></span>
+                                FINANCE MANAGEMENT
+                            </div>
+                            <h5 class="modal-title">Pembayaran SPP</h5>
+                            <p>Catat dan kelola transaksi pembayaran siswa.</p>
+                        </div>
                     </div>
 
-                    <div>
-                        <span class="modal-eyebrow">TRANSAKSI KEUANGAN</span>
-                        <h5 class="modal-title">Pembayaran SPP Siswa</h5>
-                        <small>Catat pembayaran tagihan siswa secara manual.</small>
+                    <div class="spp-header-right">
+                        <span class="spp-secure-label">
+                            <i class="fas fa-shield-alt"></i>
+                            Transaksi Aman
+                        </span>
+
+                        <button type="button"
+                                class="spp-modal-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Tutup">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Tutup"
-                ></button>
-
+                <div class="spp-header-bottom">
+                    <div class="spp-header-caption">
+                        <i class="fas fa-sparkles"></i>
+                        ADMINISTRASI KEUANGAN SEKOLAH
+                    </div>
+                    <div class="spp-header-reference">
+                        <span class="spp-reference-dot"></span>
+                        MANUAL PAYMENT
+                    </div>
+                </div>
             </div>
 
 
-            <!-- MODAL BODY -->
-            <div class="modal-body pembayaran">
+            <!-- BODY -->
+            <div class="modal-body pembayaran spp-payment-body">
 
-                <!-- PILIH SISWA -->
-                <div class="pilih-siswa payment-section">
-
-                    <div class="payment-section-heading">
-                        <span class="payment-step">01</span>
-                        <div>
-                            <h6>Pilih Siswa</h6>
-                            <p>Tentukan siswa yang akan melakukan pembayaran.</p>
-                        </div>
+                <!-- PROGRESS INDICATOR -->
+                <div class="spp-payment-progress">
+                    <div class="spp-progress-item is-active">
+                        <span class="spp-progress-number">01</span>
+                        <span class="spp-progress-label">Siswa</span>
                     </div>
 
-                    <label class="form-label fw-semibold" for="pilihSiswaBayar">
-                        Nama Siswa
-                    </label>
+                    <span class="spp-progress-line"></span>
 
-                    <select id="pilihSiswaBayar" class="form-select form-select-lg">
-                        <option value="">-- Pilih siswa --</option>
+                    <div class="spp-progress-item">
+                        <span class="spp-progress-number">02</span>
+                        <span class="spp-progress-label">Tagihan</span>
+                    </div>
 
-                        {% for s in daftar_siswa %}
-                            <option
-                                value="{{ s.id }}"
-                                data-nisn="{{ s.nisn }}"
-                                data-nama="{{ s.nama }}"
-                                data-kelas="{{ s.kelas }}"
-                            >
-                                {{ s.nisn }} — {{ s.nama }} | {{ s.kelas }}
-                            </option>
-                        {% endfor %}
+                    <span class="spp-progress-line"></span>
 
-                    </select>
+                    <div class="spp-progress-item">
+                        <span class="spp-progress-number">03</span>
+                        <span class="spp-progress-label">Pembayaran</span>
+                    </div>
                 </div>
 
 
-                <!-- STUDENT INFORMATION -->
-                <div id="infoSiswaTerpilih" class="student-info d-none">
+                <!-- STEP 01: STUDENT -->
+                <section class="spp-workspace-section pilih-siswa payment-section">
 
-                    <div class="student-info-heading">
-                        <i class="fas fa-id-card"></i>
-                        Informasi Siswa
-                    </div>
+                    <div class="spp-section-title-row">
+                        <div class="spp-section-title-left">
+                            <div class="spp-section-icon spp-icon-student">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
 
-                    <div class="student-info-grid">
-                        <div>
-                            <small>Nama Siswa</small>
-                            <strong id="infoNama"></strong>
+                            <div class="payment-section-heading">
+                                <span class="spp-section-overline">STEP 01</span>
+                                <h6>Pilih Siswa</h6>
+                                <p>Tentukan siswa yang akan melakukan pembayaran.</p>
+                            </div>
                         </div>
 
+                        <span class="spp-section-index">01 / 03</span>
+                    </div>
+
+                    <div class="spp-student-select-card">
+                        <label for="pilihSiswaBayar" class="spp-field-label">
+                            <span>Nama Siswa</span>
+                            <span class="spp-required-label">WAJIB DIISI</span>
+                        </label>
+
+                        <div class="spp-select-shell">
+                            <span class="spp-select-leading">
+                                <i class="fas fa-search"></i>
+                            </span>
+
+                            <select id="pilihSiswaBayar" class="form-select form-select-lg">
+                                <option value="">Pilih siswa berdasarkan nama atau NISN</option>
+
+                                {% for s in daftar_siswa %}
+                                    <option
+                                        value="{{ s.id }}"
+                                        data-nisn="{{ s.nisn }}"
+                                        data-nama="{{ s.nama }}"
+                                        data-kelas="{{ s.kelas }}"
+                                    >
+                                        {{ s.nisn }} — {{ s.nama }} | {{ s.kelas }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <span class="spp-select-decoration">
+                                <i class="fas fa-chevron-down"></i>
+                            </span>
+                        </div>
+
+                        <div class="spp-field-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Pilih satu siswa untuk menampilkan daftar tagihan aktif.
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- STUDENT PROFILE -->
+                <div id="infoSiswaTerpilih" class="student-info spp-student-profile d-none">
+
+                    <div class="spp-profile-top">
+                        <div class="spp-profile-avatar">
+                            <i class="fas fa-user-graduate"></i>
+                            <span class="spp-avatar-status"></span>
+                        </div>
+
+                        <div class="spp-profile-heading">
+                            <span class="spp-profile-caption">STUDENT PROFILE</span>
+                            <strong id="infoNama">Nama Siswa</strong>
+                            <span class="spp-profile-status">
+                                <i class="fas fa-check-circle"></i>
+                                Siswa terpilih
+                            </span>
+                        </div>
+
+                        <div class="spp-profile-decoration">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                    </div>
+
+                    <div class="spp-profile-divider"></div>
+
+                    <div class="student-info-grid spp-profile-grid">
                         <div>
-                            <small>NISN</small>
+                            <small>NOMOR INDUK SISWA</small>
                             <strong id="infoNisn"></strong>
                         </div>
 
                         <div>
-                            <small>Kelas</small>
+                            <small>KELAS</small>
                             <strong id="infoKelas"></strong>
                         </div>
                     </div>
-
                 </div>
 
 
-                <!-- BILL LIST -->
-                <div class="grup-tagihan payment-section">
+                <!-- STEP 02: BILL SELECTION -->
+                <section class="spp-workspace-section grup-tagihan payment-section">
 
-                    <div class="d-flex align-items-center justify-content-between mb-3 d-none"
-                         id="blokPilihSemua">
+                    <div class="spp-section-title-row spp-bill-heading-row">
+                        <div class="spp-section-title-left">
+                            <div class="spp-section-icon spp-icon-bill">
+                                <i class="fas fa-receipt"></i>
+                            </div>
 
-                        <div class="payment-section-heading mb-0">
-                            <span class="payment-step">02</span>
-                            <div>
+                            <div class="payment-section-heading">
+                                <span class="spp-section-overline">STEP 02</span>
                                 <h6>Pilih Tagihan</h6>
-                                <p>Pilih tagihan yang akan dibayarkan.</p>
+                                <p>Pilih tagihan yang ingin dibayarkan.</p>
                             </div>
                         </div>
 
-                        <label class="form-check mb-0 payment-select-all">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                id="pilihSemuaBelumLunasUtama"
-                            >
-                            <span>Pilih semua</span>
-                        </label>
-
+                        <div class="spp-bill-selection d-none" id="blokPilihSemua">
+                            <label class="spp-select-all-control">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="pilihSemuaBelumLunasUtama"
+                                >
+                                <span class="spp-custom-check">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span>Pilih semua</span>
+                            </label>
+                        </div>
                     </div>
 
-                    <div id="wadahDaftarTagihanUtama" class="daftar-modal-wrapper">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-hand-pointer"></i>
+                    <div class="spp-bill-container">
+                        <div class="spp-bill-container-top">
+                            <div>
+                                <span class="spp-bill-container-title">
+                                    <i class="fas fa-layer-group"></i>
+                                    Rincian Tagihan
+                                </span>
+                                <small>Pilih satu atau beberapa tagihan.</small>
                             </div>
-                            <strong>Pilih siswa terlebih dahulu</strong>
-                            <span>Daftar tagihan akan muncul setelah siswa dipilih.</span>
+
+                            <span class="spp-bill-container-badge">
+                                <i class="fas fa-list-check"></i>
+                                Tagihan Siswa
+                            </span>
+                        </div>
+
+                        <div id="wadahDaftarTagihanUtama" class="daftar-modal-wrapper">
+                            <div class="spp-empty-bill">
+                                <div class="spp-empty-illustration">
+                                    <div class="spp-empty-circle">
+                                        <i class="fas fa-hand-pointer"></i>
+                                    </div>
+                                    <span class="spp-empty-spark spp-empty-spark-one">✦</span>
+                                    <span class="spp-empty-spark spp-empty-spark-two">✧</span>
+                                </div>
+
+                                <strong>Belum ada siswa dipilih</strong>
+                                <p>Silakan pilih siswa terlebih dahulu. Daftar tagihan akan muncul di area ini.</p>
+                            </div>
                         </div>
                     </div>
+                </section>
 
-                </div>
 
+                <!-- STEP 03: PAYMENT FORM -->
+                <section class="spp-workspace-section spp-payment-form-section payment-form-grid d-none"
+                         id="blokPembayaranLengkap">
 
-                <!-- PAYMENT FORM -->
-                <div class="payment-form-grid d-none" id="blokPembayaranLengkap">
+                    <div class="spp-section-title-row full-width">
+                        <div class="spp-section-title-left">
+                            <div class="spp-section-icon spp-icon-payment">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
 
-                    <div class="payment-section-heading full-width">
-                        <span class="payment-step">03</span>
-                        <div>
-                            <h6>Informasi Pembayaran</h6>
-                            <p>Lengkapi detail transaksi pembayaran.</p>
+                            <div class="payment-section-heading">
+                                <span class="spp-section-overline">STEP 03</span>
+                                <h6>Informasi Pembayaran</h6>
+                                <p>Lengkapi detail transaksi pembayaran siswa.</p>
+                            </div>
                         </div>
+
+                        <span class="spp-section-index">03 / 03</span>
                     </div>
 
 
-                    <div class="payment-field">
-                        <label for="totalDipilihUtama">Total Tagihan Dipilih</label>
-                        <div class="payment-input-icon">
-                            <i class="fas fa-receipt"></i>
+                    <!-- TOTAL SELECTED -->
+                    <div class="payment-field spp-payment-total-field">
+                        <label for="totalDipilihUtama">TOTAL TAGIHAN DIPILIH</label>
+
+                        <div class="payment-input-icon spp-money-input">
+                            <span class="spp-money-icon">
+                                <i class="fas fa-receipt"></i>
+                            </span>
+
                             <input
                                 type="text"
-                                class="form-control bg-light fw-bold"
+                                class="form-control"
                                 id="totalDipilihUtama"
                                 readonly
                                 value="Rp 0"
                             >
                         </div>
+
+                        <small class="spp-input-caption">
+                            <i class="fas fa-lock"></i>
+                            Dihitung otomatis dari tagihan terpilih.
+                        </small>
                     </div>
 
 
-                    <div class="payment-field">
-                        <label for="uangDiterimaUtama">Nominal Dibayarkan</label>
-                        <div class="payment-input-icon">
-                            <i class="fas fa-money-bill-wave"></i>
+                    <!-- AMOUNT PAID -->
+                    <div class="payment-field spp-payment-amount-field">
+                        <label for="uangDiterimaUtama">NOMINAL DIBAYARKAN</label>
+
+                        <div class="payment-input-icon spp-money-input spp-money-input-highlight">
+                            <span class="spp-money-icon">
+                                <i class="fas fa-wallet"></i>
+                            </span>
+
                             <input
                                 type="text"
-                                class="form-control fw-bold"
+                                class="form-control"
                                 id="uangDiterimaUtama"
                                 placeholder="Masukkan nominal pembayaran"
+                                inputmode="numeric"
+                                autocomplete="off"
                             >
                         </div>
+
+                        <small class="spp-input-caption">
+                            <i class="fas fa-info-circle"></i>
+                            Masukkan nominal yang diterima dari siswa.
+                        </small>
                     </div>
 
 
+                    <!-- PAYMENT METHOD -->
                     <div class="payment-field">
-                        <label for="metodeBayarUtama">Metode Pembayaran</label>
-                        <div class="custom-select modal-bayar-select">
+                        <label for="metodeBayarUtama">METODE PEMBAYARAN</label>
+
+                        <div class="custom-select modal-bayar-select spp-modern-select">
+                            <span class="spp-field-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </span>
+
                             <select id="metodeBayarUtama" required>
-                                <option value="">-- Pilih Metode --</option>
+                                <option value="">Pilih metode pembayaran</option>
                                 <option value="Tunai">Tunai</option>
                                 <option value="Transfer Bank">Transfer Bank</option>
                                 <option value="Dompet Digital">Dompet Digital</option>
@@ -684,9 +833,15 @@
                     </div>
 
 
+                    <!-- PAYMENT DATE -->
                     <div class="payment-field">
-                        <label for="tanggalJamBayarUtama">Tanggal dan Jam Pembayaran</label>
-                        <div class="custom-date">
+                        <label for="tanggalJamBayarUtama">TANGGAL DAN JAM PEMBAYARAN</label>
+
+                        <div class="custom-date spp-modern-date">
+                            <span class="spp-field-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+
                             <input
                                 type="datetime-local"
                                 id="tanggalJamBayarUtama"
@@ -696,51 +851,84 @@
                     </div>
 
 
+                    <!-- NOTE -->
                     <div class="payment-field full-width">
                         <label for="catatanBayarUtama">
-                            Catatan Tambahan
-                            <span class="optional-label">Opsional</span>
+                            CATATAN TAMBAHAN
+                            <span class="optional-label">OPSIONAL</span>
                         </label>
 
-                        <textarea
-                            class="form-control"
-                            id="catatanBayarUtama"
-                            rows="2"
-                            placeholder="Tambahkan catatan pembayaran..."
-                        ></textarea>
+                        <div class="spp-note-wrapper">
+                            <span class="spp-note-icon">
+                                <i class="fas fa-pen"></i>
+                            </span>
+
+                            <textarea
+                                class="form-control"
+                                id="catatanBayarUtama"
+                                rows="3"
+                                placeholder="Tuliskan catatan tambahan jika diperlukan..."
+                            ></textarea>
+                        </div>
                     </div>
 
-                </div>
+
+                    <!-- PAYMENT NOTICE -->
+                    <div class="spp-payment-notice full-width">
+                        <div class="spp-notice-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+
+                        <div>
+                            <strong>Periksa kembali transaksi</strong>
+                            <p>Pastikan siswa, tagihan, nominal, dan metode pembayaran sudah benar sebelum menyimpan.</p>
+                        </div>
+                    </div>
+
+                </section>
 
             </div>
 
 
-            <!-- MODAL FOOTER -->
-            <div class="modal-footer spp-modal-footer">
+            <!-- FOOTER -->
+            <div class="modal-footer spp-modal-footer spp-payment-footer">
+                <div class="spp-footer-security">
+                    <span class="spp-footer-security-icon">
+                        <i class="fas fa-lock"></i>
+                    </span>
 
-                <button
-                    type="button"
-                    class="btn-spp-light"
-                    data-bs-dismiss="modal"
-                >
-                    Batal
-                </button>
+                    <span>
+                        <strong>Secure transaction</strong>
+                        <small>Data pembayaran tercatat di sistem.</small>
+                    </span>
+                </div>
 
-                <button
-                    type="button"
-                    class="btn-spp-primary"
-                    id="btnSimpanPembayaranUtama"
-                    disabled
-                >
-                    <i class="fas fa-save"></i>
-                    <span>Simpan Pembayaran</span>
-                </button>
+                <div class="spp-footer-actions">
+                    <button
+                        type="button"
+                        class="btn-spp-light spp-cancel-button"
+                        data-bs-dismiss="modal">
+                        Batal
+                    </button>
 
+                    <button
+                        type="button"
+                        class="btn-spp-primary spp-save-button"
+                        id="btnSimpanPembayaranUtama"
+                        disabled>
+                        <span class="spp-save-icon">
+                            <i class="fas fa-save"></i>
+                        </span>
+                        <span>Simpan Pembayaran</span>
+                        <i class="fas fa-arrow-right spp-save-arrow"></i>
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
 </div>
+
 
 
 <script src="{{ url_for('static', filename='js/sections/bendahara/spp_siswa.js') }}"></script>
