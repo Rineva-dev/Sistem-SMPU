@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --------------------------------------------------------
 
     function animasikanAngka() {
-        const angka = document.querySelectorAll('.stat-info h3');
+        const angka = document.querySelectorAll('.spp-page .stat-card-content h3');
 
         angka.forEach(elemen => {
             const teks = elemen.textContent.trim();
@@ -248,10 +248,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (wadahTagihan) {
             wadahTagihan.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-hand-pointer"></i>
-                    <strong>Pilih siswa terlebih dahulu</strong>
-                    <span>Daftar tagihan akan muncul setelah siswa dipilih.</span>
+                <div class="spp-empty-bill">
+                    <div class="spp-empty-illustration">
+                        <div class="spp-empty-circle">
+                            <i class="fas fa-hand-pointer"></i>
+                        </div>
+                        <span class="spp-empty-spark spp-empty-spark-one">✦</span>
+                        <span class="spp-empty-spark spp-empty-spark-two">✧</span>
+                    </div>
+                    <strong>Belum ada siswa dipilih</strong>
+                    <p>Silakan pilih siswa terlebih dahulu. Daftar tagihan akan muncul di area ini.</p>
                 </div>
             `;
         }
