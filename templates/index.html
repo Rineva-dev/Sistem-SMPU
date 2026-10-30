@@ -138,6 +138,10 @@
     {% include "sections/bendahara/spp_siswa.html" %}
 {% endif %}
 
+{% if active_page == "pengajuan_online" and halaman_aktif == "bendahara" %}
+    {% include "sections/bendahara/pengajuan_online.html" %}
+{% endif %}
+
 {% if active_page == "rincian_tagihan" and halaman_aktif == "bendahara" %}
     {% include "sections/bendahara/rincian_tagihan.html" %}
 {% endif %}
@@ -175,6 +179,10 @@
 
     {% if active_page == "spp_siswa" and halaman_aktif == "bendahara" %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/pembayaran_spp.css') }}">
+    {% endif %}
+
+    {% if active_page == "pengajuan_online" and halaman_aktif == "bendahara" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/pengajuan_online.css') }}">
     {% endif %}
 
     {% if active_page == "rincian_tagihan" and halaman_aktif == "bendahara" %}

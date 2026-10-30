@@ -3,6 +3,15 @@ from flask import (
     abort, redirect, url_for, flash, current_app
 )
 
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
+
+from datetime import date, datetime
+import re
+import secrets
+import os
+import logging
+
 from models import (
     db,
     Siswa,
@@ -13,18 +22,49 @@ from models import (
     DetailPengajuanPembayaran,
 )
 
-from datetime import date, datetime
-import re
-import secrets
-import os
-from werkzeug.utils import secure_filename
-
 payment_public_bp = Blueprint(
     "payment_public",
     __name__,
     url_prefix="/payment-public"
 )
 
+# =========================================================
+# KONFIGURASI BUKTI PEMBAYARAN
+# =========================================================
+
+BATAS_UKURAN_BUKTI = 3 * 1024 * 1024
+
+EKSTENSI_BUKTI_DIIZINKAN = {
+    "jpg",
+    "jpeg",
+    "png",
+    "pdf",
+}
+
+
+def folder_bukti_pembayaran():
+    folder = os.path.join(
+        current_app.instance_path,
+        "uploads",
+        "bukti_pembayaran",
+    )
+
+    os.makedirs(folder, exist_ok=True)
+
+    return folder
+
+
+def validasi_isi_bukti(isi_file, ekstensi):
+    if ekstensi in {"jpg", "jpeg"}:
+        return isi_file.startswith(b"\xff\xd8\xff")
+
+    if ekstensi == "png":
+        return isi_file.startswith(b"\x89PNG\r\n\x1a\n")
+
+    if ekstensi == "pdf":
+        return isi_file.startswith(b"%PDF-")
+
+    return False
 
 # Urutan bulan kalender
 URUTAN_BULAN = {
@@ -794,13 +834,16 @@ def detail_transaksi(nisn, kode_transaksi):
         ),
     )
 
-
 @payment_public_bp.route(
     "/unggah-bukti/<string:nisn>/<string:kode_transaksi>",
     methods=["POST"],
     endpoint="unggah_bukti",
 )
 def unggah_bukti(nisn, kode_transaksi):
+
+    # -----------------------------------------------------
+    # 1. VALIDASI SISWA DAN TRANSAKSI
+    # -----------------------------------------------------
 
     if not nisn.isdigit() or len(nisn) != 10:
         abort(404)
@@ -823,7 +866,10 @@ def unggah_bukti(nisn, kode_transaksi):
         kode_transaksi=kode_transaksi,
     )
 
-    # Hanya Transfer Bank yang menerima bukti manual.
+    # -----------------------------------------------------
+    # 2. VALIDASI STATUS DAN METODE
+    # -----------------------------------------------------
+
     if pengajuan.metode != "Transfer Bank":
         flash(
             "Unggah bukti hanya tersedia untuk metode Transfer Bank.",
@@ -831,15 +877,6 @@ def unggah_bukti(nisn, kode_transaksi):
         )
         return redirect(tujuan_redirect)
 
-    # Bukti yang sudah ada tidak boleh diganti orang tua.
-    if pengajuan.bukti_pembayaran:
-        flash(
-            "Bukti pembayaran sudah tercatat dan tidak dapat diganti.",
-            "warning",
-        )
-        return redirect(tujuan_redirect)
-
-    # Hanya transaksi menunggu verifikasi yang dapat menerima bukti.
     if pengajuan.status != "menunggu_verifikasi":
         flash(
             "Transaksi ini tidak dapat menerima unggahan bukti.",
@@ -847,48 +884,65 @@ def unggah_bukti(nisn, kode_transaksi):
         )
         return redirect(tujuan_redirect)
 
+    if pengajuan.bukti_pembayaran:
+        flash(
+            "Bukti pembayaran sudah tercatat dan tidak dapat diganti.",
+            "warning",
+        )
+        return redirect(tujuan_redirect)
+
+    # -----------------------------------------------------
+    # 3. VALIDASI FILE
+    # -----------------------------------------------------
+
     file = request.files.get("bukti_pembayaran")
 
     if not file or not file.filename:
-        flash("Pilih file bukti pembayaran terlebih dahulu.", "error")
+        flash(
+            "Pilih file bukti pembayaran terlebih dahulu.",
+            "error",
+        )
         return redirect(tujuan_redirect)
 
     nama_asli = secure_filename(file.filename)
 
-    if "." not in nama_asli:
-        flash("Format file tidak valid.", "error")
+    if not nama_asli or "." not in nama_asli:
+        flash("Nama atau format file tidak valid.", "error")
         return redirect(tujuan_redirect)
 
     ekstensi = nama_asli.rsplit(".", 1)[1].lower()
-    ekstensi_diizinkan = {"jpg", "jpeg", "png", "pdf"}
 
-    if ekstensi not in ekstensi_diizinkan:
+    if ekstensi not in EKSTENSI_BUKTI_DIIZINKAN:
         flash(
             "Format file harus JPG, JPEG, PNG, atau PDF.",
             "error",
         )
         return redirect(tujuan_redirect)
 
-    isi_file = file.read(3 * 1024 * 1024 + 1)
+    isi_file = file.stream.read(BATAS_UKURAN_BUKTI + 1)
 
     if not isi_file:
         flash("File yang dipilih kosong.", "error")
         return redirect(tujuan_redirect)
 
-    if len(isi_file) > 3 * 1024 * 1024:
+    if len(isi_file) > BATAS_UKURAN_BUKTI:
         flash("Ukuran file maksimal 3 MB.", "error")
         return redirect(tujuan_redirect)
 
+    if not validasi_isi_bukti(isi_file, ekstensi):
+        flash(
+            "Isi file tidak sesuai dengan format yang dipilih.",
+            "error",
+        )
+        return redirect(tujuan_redirect)
+
+    # -----------------------------------------------------
+    # 4. SIMPAN FILE DAN CATAT KE DATABASE
+    # -----------------------------------------------------
+
     nama_file = secrets.token_hex(16) + "." + ekstensi
 
-    folder_upload = os.path.join(
-        current_app.instance_path,
-        "uploads",
-        "bukti_pembayaran",
-    )
-
-    os.makedirs(folder_upload, exist_ok=True)
-
+    folder_upload = folder_bukti_pembayaran()
     path_file = os.path.join(folder_upload, nama_file)
 
     try:
@@ -896,6 +950,7 @@ def unggah_bukti(nisn, kode_transaksi):
             tujuan.write(isi_file)
 
         pengajuan.bukti_pembayaran = nama_file
+
         db.session.commit()
 
         flash(

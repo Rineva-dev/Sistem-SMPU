@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify, abort
 from datetime import datetime, date, timedelta
 from models import (
     db, User, TahunPelajaran, Siswa, Kelas, RiwayatKelas,
     JenisPembayaran, Ekstrakurikuler, Peminatan,
-    BulanLiburEkskul, BulanLiburPeminatan, TagihanSiswa, RiwayatPembayaran
+    BulanLiburEkskul, BulanLiburPeminatan, TagihanSiswa, RiwayatPembayaran, PengajuanPembayaran, DetailPengajuanPembayaran
 )
 
 # === FUNGSI BANTU DIPERBAIKI ===
@@ -952,9 +952,13 @@ def spp_siswa():
             sisa_tagihan = sum(item['sisa_tagihan'] for item in daftar_tersimpan)
 
             # ✅ Cek status lunas dari DB, bukan dari perhitungan
-            sudah_lunas = all(item['status'] in ['Lunas', 'Sudah Lunas'] for item in daftar_tersimpan)
-
-            print(f"[CEK PERULANGAN] SID:{sid} | Tahun Asli:{angkatan_masuk} | Hitung:{total_murni} | Lunas:{sudah_lunas}")
+            sudah_lunas = (
+                bool(daftar_tersimpan)
+                and all(
+                    item['status'] in ['Lunas', 'Sudah Lunas']
+                    for item in daftar_tersimpan
+                )
+            )
 
             daftar_siswa.append({
                 'id': s.id,
@@ -971,6 +975,7 @@ def spp_siswa():
     siswa_belum = total_siswa - siswa_lunas
     persen_lunas = round((siswa_lunas / total_siswa * 100), 1) if total_siswa > 0 else 0
 
+
     return render_template('index.html',
         active_page='spp_siswa', halaman_aktif='bendahara', user=user,
         user_name=session.get('user_name','Pengguna'), tahun_ajaran=nama_tahun,
@@ -979,6 +984,125 @@ def spp_siswa():
         daftar_siswa=daftar_siswa, daftar_tahun=TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all(),
         daftar_kelas=Kelas.query.filter_by(tahun_pelajaran=get_base_tahun(kode_tahun_aktif)).order_by(Kelas.jenjang,'nama_kelas').all() if kode_tahun_aktif else [],
         format_rupiah=format_rupiah)
+        
+# =========================================================
+# HALAMAN VERIFIKASI PEMBAYARAN ONLINE
+# =========================================================
+@bendahara_bp.route('/pengajuan-online')
+def pengajuan_online():
+    if not session.get('logged_in'):
+        return redirect(url_for('login.halaman_login'))
+
+    user = User.query.get(session.get('user_id'))
+    session['halaman_aktif'] = 'bendahara'
+
+    daftar_pengajuan = (
+        PengajuanPembayaran.query
+        .order_by(PengajuanPembayaran.diajukan_pada.desc())
+        .all()
+    )
+
+    jumlah_menunggu = sum(
+        1 for p in daftar_pengajuan
+        if p.status == 'menunggu_verifikasi'
+    )
+
+    jumlah_disetujui = sum(
+        1 for p in daftar_pengajuan
+        if p.status == 'disetujui'
+    )
+
+    jumlah_ditolak = sum(
+        1 for p in daftar_pengajuan
+        if p.status == 'ditolak'
+    )
+
+    return render_template(
+        'index.html',
+        active_page='pengajuan_online',
+        halaman_aktif='bendahara',
+        user=user,
+        user_name=session.get('user_name', 'Pengguna'),
+        daftar_pengajuan=daftar_pengajuan,
+        jumlah_pengajuan=len(daftar_pengajuan),
+        jumlah_menunggu=jumlah_menunggu,
+        jumlah_disetujui=jumlah_disetujui,
+        jumlah_ditolak=jumlah_ditolak
+    )
+
+@bendahara_bp.route('/api-pengajuan-online/<int:id_pengajuan>')
+def api_detail_pengajuan_online(id_pengajuan):
+    if not session.get('logged_in'):
+        return jsonify({
+            "sukses": False,
+            "pesan": "Silakan masuk kembali."
+        }), 401
+
+    # =========================================================
+    daftar_tugas = [
+        tugas.strip().lower()
+        for tugas in session.get('daftar_tugas', [])
+        if tugas.strip()
+    ]
+
+    if 'bendahara' not in daftar_tugas:
+        return jsonify({
+            "sukses": False,
+            "pesan": "Akses hanya diberikan kepada Bendahara."
+        }), 403
+
+    pengajuan = db.session.get(PengajuanPembayaran, id_pengajuan)
+
+    if not pengajuan:
+        return jsonify({
+            "sukses": False,
+            "pesan": "Pengajuan pembayaran tidak ditemukan."
+        }), 404
+
+    daftar_detail = []
+
+    for detail in pengajuan.detail_tagihan:
+        tagihan = detail.tagihan
+
+        nama_tagihan = "Tagihan"
+
+        if tagihan:
+            jenis = JenisPembayaran.query.get(tagihan.jenis_pembayaran_id)
+            nama_jenis = jenis.nama if jenis else "Pembayaran"
+            periode = tagihan.bulan or (
+                f"Semester {tagihan.semester}"
+                if tagihan.semester else ""
+            )
+
+            nama_tagihan = f"{nama_jenis} {periode}".strip()
+
+        daftar_detail.append({
+            "nama_tagihan": nama_tagihan,
+            "nominal_dibayar": detail.nominal_dibayar
+        })
+
+    return jsonify({
+        "sukses": True,
+        "pengajuan": {
+            "id": pengajuan.id,
+            "kode_transaksi": pengajuan.kode_transaksi,
+            "status": pengajuan.status,
+            "metode": pengajuan.metode,
+            "total_diajukan": pengajuan.total_diajukan,
+            "diajukan_pada": (
+                pengajuan.diajukan_pada.isoformat()
+                if pengajuan.diajukan_pada else None
+            ),
+            "catatan_orangtua": pengajuan.catatan_orangtua,
+            "catatan_admin": pengajuan.catatan_admin,
+            "bukti_pembayaran": pengajuan.bukti_pembayaran,
+            "siswa": {
+                "nama": pengajuan.siswa.nama if pengajuan.siswa else "-",
+                "nisn": pengajuan.siswa.nisn if pengajuan.siswa else "-"
+            },
+            "detail_tagihan": daftar_detail
+        }
+    })
 
 # === RINCIAN TAGIHAN ===
 @bendahara_bp.route('/rincian-tagihan/<kode>')
@@ -1114,7 +1238,11 @@ def simpan_pembayaran():
 
         for item in rincian:
             
-            dibayar = item.get('dibayar', 0)
+            try:
+                dibayar = int(item.get('dibayar', 0))
+            except (TypeError, ValueError):
+                continue
+
             if dibayar <= 0:
                 continue
 
@@ -1186,6 +1314,213 @@ def simpan_pembayaran():
         import traceback
         traceback.print_exc()
         return jsonify({"sukses": False, "pesan": f"Kesalahan: {str(e)}"}), 500
+
+
+@bendahara_bp.route(
+    '/pengajuan-online/<int:id_pengajuan>/verifikasi',
+    methods=['POST']
+)
+def verifikasi_pengajuan_online(id_pengajuan):
+    if not session.get('logged_in'):
+        return jsonify({
+            "sukses": False,
+            "pesan": "Silakan masuk kembali."
+        }), 401
+
+    # =========================================================
+    daftar_tugas = [
+        tugas.strip().lower()
+        for tugas in session.get('daftar_tugas', [])
+        if tugas.strip()
+    ]
+
+    if 'bendahara' not in daftar_tugas:
+        return jsonify({
+            "sukses": False,
+            "pesan": "Akses hanya diberikan kepada Bendahara."
+        }), 403
+
+    data = request.get_json(silent=True) or {}
+
+    tindakan = (data.get('tindakan') or '').strip().lower()
+    catatan_admin = (data.get('catatan_admin') or '').strip()
+
+    if tindakan not in ['setujui', 'tolak']:
+        return jsonify({
+            "sukses": False,
+            "pesan": "Tindakan verifikasi tidak valid."
+        }), 400
+
+    pengajuan = db.session.get(
+        PengajuanPembayaran,
+        id_pengajuan
+    )
+
+    if not pengajuan:
+        return jsonify({
+            "sukses": False,
+            "pesan": "Pengajuan pembayaran tidak ditemukan."
+        }), 404
+
+    # Pengajuan hanya boleh diproses satu kali.
+    if pengajuan.status != 'menunggu_verifikasi':
+        return jsonify({
+            "sukses": False,
+            "pesan": "Pengajuan ini sudah pernah diproses."
+        }), 400
+
+    try:
+        waktu_verifikasi = datetime.now()
+        id_pemeriksa = session.get('user_id')
+
+        # ==========================================
+        # TOLAK PENGAJUAN
+        # ==========================================
+        if tindakan == 'tolak':
+            pengajuan.status = 'ditolak'
+            pengajuan.catatan_admin = catatan_admin
+            pengajuan.diverifikasi_oleh = id_pemeriksa
+            pengajuan.diverifikasi_pada = waktu_verifikasi
+
+            db.session.commit()
+
+            return jsonify({
+                "sukses": True,
+                "pesan": "Pengajuan pembayaran berhasil ditolak."
+            })
+
+        # ==========================================
+        # SETUJUI PENGAJUAN
+        # ==========================================
+
+        daftar_detail = list(pengajuan.detail_tagihan)
+
+        if not daftar_detail:
+            return jsonify({
+                "sukses": False,
+                "pesan": "Pengajuan tidak memiliki rincian tagihan."
+            }), 400
+
+        # Validasi seluruh rincian terlebih dahulu.
+        total_detail = 0
+        total_per_tagihan = {}
+        data_tagihan = {}
+
+        for detail in daftar_detail:
+            nominal = detail.nominal_dibayar or 0
+
+            if nominal <= 0:
+                raise ValueError(
+                    "Ditemukan nominal pembayaran yang tidak valid."
+                )
+
+            tagihan = db.session.get(
+                TagihanSiswa,
+                detail.tagihan_id
+            )
+
+            if not tagihan:
+                raise ValueError(
+                    f"Tagihan dengan ID {detail.tagihan_id} tidak ditemukan."
+                )
+
+            # Pastikan tagihan benar-benar milik siswa pengaju.
+            if tagihan.siswa_id != pengajuan.siswa_id:
+                raise ValueError(
+                    "Ditemukan tagihan yang bukan milik siswa pengaju."
+                )
+
+            total_detail += nominal
+
+            total_per_tagihan[tagihan.id] = (
+                total_per_tagihan.get(tagihan.id, 0) + nominal
+            )
+
+            data_tagihan[tagihan.id] = tagihan
+
+        # Pastikan total rincian sama dengan total pengajuan.
+        if total_detail != pengajuan.total_diajukan:
+            raise ValueError(
+                "Total rincian tidak sama dengan total pengajuan."
+            )
+
+        # Pastikan tidak ada tagihan yang dibayar melebihi sisanya.
+        for tagihan_id, nominal_bayar in total_per_tagihan.items():
+            tagihan = data_tagihan[tagihan_id]
+
+            sisa_tagihan = max(
+                0,
+                (tagihan.nominal_tagihan or 0)
+                - (tagihan.sudah_dibayar or 0)
+            )
+
+            if nominal_bayar > sisa_tagihan:
+                raise ValueError(
+                    f"Pembayaran untuk tagihan ID {tagihan_id} "
+                    f"melebihi sisa tagihan. Sisa saat ini "
+                    f"Rp{ sisa_tagihan:,.0f }."
+                )
+
+        # ==========================================
+        # CATAT PEMBAYARAN SETELAH SEMUA VALID
+        # ==========================================
+
+        for detail in daftar_detail:
+            tagihan = data_tagihan[detail.tagihan_id]
+            nominal = detail.nominal_dibayar
+
+            riwayat_baru = RiwayatPembayaran(
+                tagihan_id=tagihan.id,
+                jumlah_bayar=nominal,
+                tanggal_bayar=waktu_verifikasi,
+                metode=pengajuan.metode,
+                keterangan=(
+                    f"Pembayaran online - "
+                    f"{pengajuan.kode_transaksi}"
+                )
+            )
+
+            db.session.add(riwayat_baru)
+
+        # Perbarui saldo setiap tagihan satu kali.
+        for tagihan_id, nominal_bayar in total_per_tagihan.items():
+            tagihan = data_tagihan[tagihan_id]
+
+            tagihan.sudah_dibayar = (
+                (tagihan.sudah_dibayar or 0) + nominal_bayar
+            )
+
+            if tagihan.sudah_dibayar >= tagihan.nominal_tagihan:
+                tagihan.status = 'Lunas'
+            elif tagihan.sudah_dibayar > 0:
+                tagihan.status = 'Sebagian'
+            else:
+                tagihan.status = 'Belum Lunas'
+
+        # Ubah status pengajuan.
+        pengajuan.status = 'disetujui'
+        pengajuan.catatan_admin = catatan_admin
+        pengajuan.diverifikasi_oleh = id_pemeriksa
+        pengajuan.diverifikasi_pada = waktu_verifikasi
+
+        # Semua perubahan disimpan bersama-sama.
+        db.session.commit()
+
+        return jsonify({
+            "sukses": True,
+            "pesan": "Pembayaran berhasil disetujui dan dicatat."
+        })
+
+    except Exception as e:
+        db.session.rollback()
+
+        print("KESALAHAN VERIFIKASI PEMBAYARAN:", str(e))
+
+        return jsonify({
+            "sukses": False,
+            "pesan": str(e)
+        }), 400
+
 
 @bendahara_bp.route('/api-rincian-tagihan/<int:id_siswa>')
 def api_rincian_tagihan(id_siswa):

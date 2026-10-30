@@ -1,0 +1,528 @@
+<div class="pengajuan-page">
+
+    <!-- HEADER -->
+    <div class="pengajuan-header">
+        <div>
+            <div class="pengajuan-breadcrumb">
+                <span>Pembayaran SPP</span>
+                <i class="fas fa-chevron-right"></i>
+                <span>Pengajuan Online</span>
+            </div>
+
+            <h2>Verifikasi Pembayaran Online</h2>
+            <p>Kelola dan verifikasi pembayaran yang dikirimkan oleh orang tua siswa.</p>
+        </div>
+
+        <div class="pengajuan-header-icon">
+            <i class="fas fa-receipt"></i>
+        </div>
+    </div>
+
+    <!-- STATISTIK -->
+    <div class="pengajuan-stats">
+
+        <div class="pengajuan-stat-card">
+            <div class="stat-icon stat-icon-total">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div>
+                <span>Total Pengajuan</span>
+                <h3>{{ jumlah_pengajuan }}</h3>
+                <small>Seluruh transaksi online</small>
+            </div>
+        </div>
+
+        <div class="pengajuan-stat-card">
+            <div class="stat-icon stat-icon-pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div>
+                <span>Menunggu Verifikasi</span>
+                <h3>{{ jumlah_menunggu }}</h3>
+                <small>Perlu diperiksa</small>
+            </div>
+        </div>
+
+        <div class="pengajuan-stat-card">
+            <div class="stat-icon stat-icon-approved">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <span>Disetujui</span>
+                <h3>{{ jumlah_disetujui }}</h3>
+                <small>Transaksi berhasil diverifikasi</small>
+            </div>
+        </div>
+
+        <div class="pengajuan-stat-card">
+            <div class="stat-icon stat-icon-rejected">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div>
+                <span>Ditolak</span>
+                <h3>{{ jumlah_ditolak }}</h3>
+                <small>Pengajuan tidak disetujui</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABEL PENGAJUAN -->
+    <div class="pengajuan-content">
+
+        <div class="pengajuan-content-header">
+            <div>
+                <h3>Daftar Pengajuan</h3>
+                <p>Periksa bukti pembayaran sebelum menyetujui transaksi.</p>
+            </div>
+
+            <div class="pengajuan-total-badge">
+                <i class="fas fa-list-ul"></i>
+                {{ jumlah_pengajuan }} transaksi
+            </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="pengajuan-toolbar">
+
+            <div class="pengajuan-search">
+                <i class="fas fa-search"></i>
+                <input
+                    type="text"
+                    id="cariPengajuan"
+                    placeholder="Cari nama siswa atau kode transaksi..."
+                >
+            </div>
+
+            <select id="filterStatusPengajuan">
+                <option value="semua">Semua Status</option>
+                <option value="menunggu_verifikasi">Menunggu Verifikasi</option>
+                <option value="disetujui">Disetujui</option>
+                <option value="ditolak">Ditolak</option>
+                <option value="dibatalkan">Dibatalkan</option>
+            </select>
+
+            <button type="button" id="resetFilterPengajuan" class="btn-reset-pengajuan">
+                <i class="fas fa-rotate-left"></i>
+                Reset
+            </button>
+
+        </div>
+
+        <!-- TABEL -->
+        <div class="pengajuan-table-wrapper">
+            <table class="pengajuan-table" id="tabelPengajuan">
+                <thead>
+                    <tr>
+                        <th>TRANSAKSI</th>
+                        <th>SISWA</th>
+                        <th>METODE</th>
+                        <th>TANGGAL</th>
+                        <th>TOTAL BAYAR</th>
+                        <th>STATUS</th>
+                        <th class="text-center">AKSI</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for p in daftar_pengajuan %}
+                    <tr
+                        class="baris-pengajuan"
+                        data-kode="{{ p.kode_transaksi|lower }}"
+                        data-nama="{{ (p.siswa.nama if p.siswa else '')|lower }}"
+                        data-status="{{ p.status }}"
+                    >
+                        <td>
+                            <div class="transaksi-kode">
+                                <strong>{{ p.kode_transaksi }}</strong>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="pengajuan-siswa">
+                                <div class="siswa-avatar">
+                                    {{ (p.siswa.nama[0] if p.siswa and p.siswa.nama else '?')|upper }}
+                                </div>
+                                <div>
+                                    <strong>{{ p.siswa.nama if p.siswa else 'Siswa tidak ditemukan' }}</strong>
+                                    <small>NISN: {{ p.siswa.nisn if p.siswa else '-' }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="metode-pembayaran">
+                                {{ p.metode|upper }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="tanggal-pengajuan">
+                                <strong>
+                                    {{ p.diajukan_pada.strftime('%d/%m/%Y') if p.diajukan_pada else '-' }}
+                                </strong>
+                                <small>
+                                    {{ p.diajukan_pada.strftime('%H:%M') if p.diajukan_pada else '-' }} WIB
+                                </small>
+                            </div>
+                        </td>
+
+                        <td>
+                            <strong class="nominal-pengajuan">
+                                Rp {{ "{:,.0f}".format(p.total_diajukan).replace(',', '.') }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if p.status == 'menunggu_verifikasi' %}
+                                <span class="status-pengajuan status-menunggu">
+                                    <i class="fas fa-clock"></i> Menunggu
+                                </span>
+                            {% elif p.status == 'disetujui' %}
+                                <span class="status-pengajuan status-disetujui">
+                                    <i class="fas fa-check-circle"></i> Disetujui
+                                </span>
+                            {% elif p.status == 'ditolak' %}
+                                <span class="status-pengajuan status-ditolak">
+                                    <i class="fas fa-times-circle"></i> Ditolak
+                                </span>
+                            {% else %}
+                                <span class="status-pengajuan status-dibatalkan">
+                                    {{ p.status|replace('_', ' ')|title }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+                            <button
+                                type="button"
+                                class="btn-detail-pengajuan"
+                                data-pengajuan-id="{{ p.id }}"
+                                title="Lihat detail"
+                            >
+                                <i class="fas fa-eye"></i>
+                                Detail
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="pengajuan-empty">
+                                <div class="empty-icon">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
+                                <h4>Belum Ada Pengajuan</h4>
+                                <p>Pengajuan pembayaran online akan muncul di halaman ini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="pengajuan-no-result" id="pengajuanNoResult" hidden>
+                <i class="fas fa-search"></i>
+                <strong>Data tidak ditemukan</strong>
+                <span>Coba ubah kata kunci atau filter pencarian.</span>
+            </div>
+        </div>
+
+        <div class="pengajuan-table-footer">
+            <span>Menampilkan <strong id="jumlahPengajuanTampil">{{ daftar_pengajuan|length }}</strong> transaksi</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL DETAIL PENGAJUAN -->
+<div class="pengajuan-modal-overlay" id="modalDetailPengajuan">
+    <div class="pengajuan-modal pengajuan-modal-premium">
+
+        <!-- HEADER PREMIUM -->
+        <div class="detail-modal-header">
+            <div class="detail-header-decoration detail-decoration-one"></div>
+            <div class="detail-header-decoration detail-decoration-two"></div>
+
+            <div class="detail-header-top">
+                <div class="detail-header-label">
+                    <span class="detail-header-label-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </span>
+                    PAYMENT VERIFICATION
+                </div>
+
+                <button type="button" class="detail-close-btn" data-close-modal
+                        aria-label="Tutup modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="detail-header-heading">
+                <div>
+                    <span class="detail-header-overline">PANEL VERIFIKASI</span>
+                    <h3>Detail Pengajuan</h3>
+                    <p>Periksa informasi dan bukti pembayaran sebelum mengambil keputusan.</p>
+                </div>
+
+                <div class="detail-header-symbol">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+            </div>
+
+            <div class="detail-header-bottom">
+                <span><i class="fas fa-lock"></i> Secure Transaction Review</span>
+                <span><i class="fas fa-circle"></i> Admin Workspace</span>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="pengajuan-modal-body detail-modal-body">
+
+            <!-- LOADING -->
+            <div id="detailPengajuanLoading" class="detail-loading">
+                <div class="detail-loading-animation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <strong>Menyiapkan detail transaksi</strong>
+                <span>Mohon tunggu sebentar...</span>
+            </div>
+
+            <!-- ERROR -->
+            <div id="detailPengajuanError" class="detail-error" hidden>
+                <div class="detail-error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <strong>Detail tidak dapat dimuat</strong>
+                <span>Silakan coba kembali beberapa saat lagi.</span>
+            </div>
+
+            <!-- CONTENT -->
+            <div id="detailPengajuanContent" hidden>
+
+                <!-- IDENTITAS SISWA -->
+                <section class="detail-profile-card">
+                    <div class="detail-profile-main">
+                        <div class="detail-avatar-wrap">
+                            <div class="detail-avatar" id="detailAvatar">?</div>
+                            <span class="detail-avatar-indicator"></span>
+                        </div>
+
+                        <div class="detail-profile-info">
+                            <span class="detail-profile-caption">IDENTITAS SISWA</span>
+                            <h4 id="detailNamaSiswa">-</h4>
+                            <span class="detail-profile-nisn" id="detailNisn">NISN: -</span>
+                        </div>
+
+                        <div class="detail-profile-status">
+                            <span class="detail-status-caption">STATUS TRANSAKSI</span>
+                            <div id="detailStatus" class="status-pengajuan"></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-profile-footer">
+                        <span><i class="fas fa-user-graduate"></i> Data Siswa</span>
+                        <span class="detail-profile-footer-divider"></span>
+                        <span><i class="fas fa-check-double"></i> Verifikasi Pembayaran</span>
+                    </div>
+                </section>
+
+                <!-- INFORMASI TRANSAKSI -->
+                <section class="detail-panel">
+                    <div class="detail-panel-heading">
+                        <div class="detail-panel-icon detail-icon-green">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div>
+                            <h4>Informasi Transaksi</h4>
+                            <p>Identitas dan informasi pengajuan pembayaran</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-transaction-grid">
+                        <div class="detail-transaction-item">
+                            <span>KODE TRANSAKSI</span>
+                            <strong id="detailKode">-</strong>
+                        </div>
+
+                        <div class="detail-transaction-item">
+                            <span>METODE PEMBAYARAN</span>
+                            <strong id="detailMetode">-</strong>
+                        </div>
+
+                        <div class="detail-transaction-item detail-transaction-date">
+                            <span>TANGGAL PENGAJUAN</span>
+                            <strong id="detailTanggal">-</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TOTAL PEMBAYARAN -->
+                <section class="detail-total-card">
+                    <div class="detail-total-decoration"></div>
+
+                    <div class="detail-total-top">
+                        <div>
+                            <span class="detail-total-eyebrow">TOTAL PEMBAYARAN</span>
+                            <p>Nominal yang diajukan orang tua</p>
+                        </div>
+
+                        <div class="detail-total-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+
+                    <strong class="detail-total-amount" id="detailTotal">Rp 0</strong>
+
+                    <div class="detail-total-bottom">
+                        <span><i class="fas fa-info-circle"></i> Nilai pengajuan transaksi</span>
+                        <span class="detail-total-secure">
+                            <i class="fas fa-shield-alt"></i> Payment Summary
+                        </span>
+                    </div>
+                </section>
+
+                <!-- RINCIAN TAGIHAN -->
+                <section class="detail-panel">
+                    <div class="detail-panel-heading">
+                        <div class="detail-panel-icon detail-icon-orange">
+                            <i class="fas fa-list-ul"></i>
+                        </div>
+                        <div>
+                            <h4>Rincian Pembayaran</h4>
+                            <p>Daftar tagihan yang dibayarkan dalam transaksi ini</p>
+                        </div>
+                    </div>
+
+                    <div id="detailDaftarTagihan" class="detail-billing-list"></div>
+                </section>
+
+                <!-- BUKTI PEMBAYARAN -->
+                <section class="detail-panel">
+                    <div class="detail-panel-heading">
+                        <div class="detail-panel-icon detail-icon-blue">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div>
+                            <h4>Bukti Pembayaran</h4>
+                            <p>Dokumen atau gambar bukti transfer dari orang tua</p>
+                        </div>
+                    </div>
+
+                    <div id="detailBuktiPembayaran" class="detail-proof-box">
+                        <div class="detail-proof-empty">
+                            <i class="fas fa-image"></i>
+                            <strong>Bukti belum tersedia</strong>
+                            <span>Belum ada dokumen yang dapat ditampilkan.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CATATAN ORANG TUA -->
+                <section class="detail-note-card detail-note-parent">
+                    <div class="detail-note-heading">
+                        <span class="detail-note-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </span>
+                        <div>
+                            <h4>Catatan Orang Tua</h4>
+                            <span>Pesan yang disertakan saat pengajuan</span>
+                        </div>
+                    </div>
+                    <p id="detailCatatanOrangtua" class="detail-catatan">
+                        Tidak ada catatan.
+                    </p>
+                </section>
+
+                <!-- CATATAN VERIFIKASI -->
+                <section class="detail-note-card detail-note-admin"
+                         id="blokCatatanAdmin" hidden>
+                    <div class="detail-note-heading">
+                        <span class="detail-note-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </span>
+                        <div>
+                            <h4>Catatan Verifikasi</h4>
+                            <span>Keterangan dari petugas pemeriksa</span>
+                        </div>
+                    </div>
+                    <p id="detailCatatanAdmin" class="detail-catatan"></p>
+                </section>
+
+                <!-- FOOTER ACTION -->
+                <div class="detail-actions" id="detailActions">
+                    <div class="detail-action-caption">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Pastikan seluruh informasi telah diperiksa sebelum memproses pengajuan.</span>
+                    </div>
+
+                    <div class="detail-action-buttons">
+                        <button type="button"
+                                class="btn-tolak-pengajuan"
+                                id="btnBukaTolak">
+                            <i class="fas fa-times-circle"></i>
+                            <span>Tolak Pengajuan</span>
+                        </button>
+
+                        <button type="button"
+                                class="btn-setujui-pengajuan"
+                                id="btnBukaSetujui">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Setujui Pembayaran</span>
+                            <i class="fas fa-arrow-right detail-action-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL KONFIRMASI -->
+<div class="pengajuan-modal-overlay modal-konfirmasi-overlay" id="modalKonfirmasiPengajuan">
+    <div class="pengajuan-modal modal-konfirmasi">
+
+        <div class="pengajuan-modal-header">
+            <div>
+                <span class="modal-eyebrow">KONFIRMASI</span>
+                <h3 id="judulKonfirmasi">Setujui Pembayaran?</h3>
+            </div>
+            <button type="button" class="btn-tutup-modal" data-close-konfirmasi>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="pengajuan-modal-body">
+            <p id="pesanKonfirmasi">
+                Pastikan bukti dan rincian pembayaran sudah sesuai.
+            </p>
+
+            <div id="blokAlasanPenolakan" hidden>
+                <label for="catatanPenolakan">Alasan Penolakan</label>
+                <textarea
+                    id="catatanPenolakan"
+                    rows="4"
+                    placeholder="Tuliskan alasan penolakan secara jelas..."
+                ></textarea>
+            </div>
+
+            <div class="konfirmasi-actions">
+                <button type="button" class="btn-batal-konfirmasi" data-close-konfirmasi>
+                    Batal
+                </button>
+                <button type="button" id="btnKonfirmasiPengajuan">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/sections/bendahara/pengajuan_online.js') }}"></script>
