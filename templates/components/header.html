@@ -1,187 +1,374 @@
 <!-- Header Atas - Gaya SaaS Modern -->
-<header class="header">
+
+<!-- =========================================
+     PREMIUM SAAS HEADER
+========================================= -->
+<header class="header" id="adminHeader">
+
+  <!-- BAGIAN KIRI -->
   <div class="header-left">
-    <button class="toggle-sidebar" id="toggleSidebar">
+
+    <button
+      type="button"
+      class="toggle-sidebar"
+      id="toggleSidebar"
+      aria-label="Buka atau tutup sidebar"
+      title="Menu navigasi"
+    >
       <i class="fas fa-bars"></i>
     </button>
-    <h2 class="page-title">Dashboard</h2>
+
+    <div class="header-heading">
+      <h2 class="page-title">Dashboard</h2>
+      <div class="page-subtitle">
+        <span class="subtitle-dot"></span>
+        <span>Panel Administrasi Sekolah</span>
+      </div>
+    </div>
+
   </div>
-  <div class="header-right d-flex align-items-center gap-3">
+
+  <!-- BAGIAN KANAN -->
+  <div class="header-right">
+
+    <!-- STATUS SISTEM -->
+    <div class="system-status" title="Status tampilan sistem">
+      <span class="system-status-dot"></span>
+      <span>Workspace</span>
+    </div>
+
     <!-- PEMILIH TAHUN PELAJARAN -->
     {% if g.sistem_mode != 'absensi' %}
     <div class="tahun-pemilih">
+
       <form action="{{ url_for('umum.ganti_tahun') }}" method="POST">
-        <div class="custom-select">
-          <select name="tahun_pelajaran" onchange="this.form.submit()">
-            {% set daftar_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all() %}
-            {% for tp in daftar_tahun %}
-            <option value="{{ tp.kode }}" {{ 'selected' if g.tahun_pelajaran == tp.kode else '' }}>
-              {% set potong = tp.nama.replace('Tahun Pelajaran ', '').split(' - ') %}
-              {% if potong | length == 2 %}
-                {% set nomor_semester = potong[1].replace('Semester ', '') %}
-                {% set nama_semester = 'Ganjil' if nomor_semester == '1' else 'Genap' %}
-                {{ potong[0] }} - {{ nama_semester }}
-              {% else %}
-                {{ tp.nama }}
-              {% endif %}
-            </option>
-            {% endfor %}
-          </select>
+
+        <div class="academic-select-wrap">
+          <span class="academic-icon">
+            <i class="far fa-calendar-alt"></i>
+          </span>
+
+          <div class="custom-select">
+            <select
+              name="tahun_pelajaran"
+              aria-label="Pilih tahun pelajaran"
+              onchange="this.form.submit()"
+            >
+              {% set daftar_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all() %}
+
+              {% for tp in daftar_tahun %}
+                <option
+                  value="{{ tp.kode }}"
+                  {{ 'selected' if g.tahun_pelajaran == tp.kode else '' }}
+                >
+                  {% set potong = tp.nama.replace('Tahun Pelajaran ', '').split(' - ') %}
+
+                  {% if potong | length == 2 %}
+                    {% set nomor_semester = potong[1].replace('Semester ', '') %}
+                    {% set nama_semester = 'Ganjil' if nomor_semester == '1' else 'Genap' %}
+                    {{ potong[0] }} - {{ nama_semester }}
+                  {% else %}
+                    {{ tp.nama }}
+                  {% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
         </div>
+
       </form>
+
     </div>
     {% endif %}
 
-    <!-- Notifikasi -->
-    <button class="notification-btn">
-      <i class="fas fa-bell"></i>
+    <!-- PEMISAH -->
+    <div class="header-divider"></div>
+
+    <!-- NOTIFIKASI -->
+    <button
+      type="button"
+      class="notification-btn"
+      aria-label="Notifikasi"
+      title="Notifikasi"
+    >
+      <i class="far fa-bell"></i>
       <span class="notification-badge">3</span>
+      <span class="notification-pulse"></span>
     </button>
 
-    <!-- Profil Pengguna -->
+    <!-- PEMISAH -->
+    <div class="header-divider profile-divider"></div>
+
+    <!-- PROFIL PENGGUNA -->
     <div class="user-profile" id="userProfileBtn">
-      <div class="user-avatar">
-        {% set nama_pengguna = session.get('user_name') or session.get('absensi_user_name', 'Pengguna') %}
-        {% set foto = session.get('foto_profil') %}
-        {% if foto %}
-          <img src="{{ url_for('tampilkan_foto_profil', filename=foto) }}" 
+
+      {% set nama_pengguna = session.get('user_name') or session.get('absensi_user_name', 'Pengguna') %}
+      {% set foto = session.get('foto_profil') %}
+
+      <button
+        type="button"
+        class="user-profile-trigger"
+        id="userProfileTrigger"
+        aria-label="Buka menu profil pengguna"
+        aria-expanded="false"
+        aria-controls="userDropdown"
+      >
+
+        <div class="user-avatar">
+          {% if foto %}
+            <img
+              src="{{ url_for('tampilkan_foto_profil', filename=foto) }}"
               alt="Foto Profil"
-              onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_pengguna | inisial_avatar }}';">
-        {% else %}
-          {{ nama_pengguna | inisial_avatar }}
-        {% endif %}
-      </div>
-      <div class="user-info">
-        <div class="user-name">
-          {{ (session.get('user_name') or session.get('absensi_user_name', 'Pengguna')) | nama_singkat_dropdown }}
-        </div>
-        <div class="user-role">
-          {% set aktif = session.get('halaman_aktif') | default('utama') %}
-          {% if aktif == 'absensi' %}
-            Guru
-          {% elif aktif == 'bendahara' %}
-            Bendahara
-          {% elif aktif == 'admin_sistem' %}
-            Admin Sistem
-          {% elif aktif == 'wali_kelas' %}
-            Wali Kelas
-          {% elif aktif == 'waka_kurikulum' %}
-            Waka Kurikulum
-          {% elif aktif == 'waka_kesiswaan' %}
-            Waka Kesiswaan
-          {% elif aktif == 'pembina_ekskul' %}
-            Pembina Ekstrakurikuler
+              onerror="this.style.display='none'; this.parentElement.classList.add('avatar-fallback');"
+            >
+            <span class="avatar-initial">
+              {{ nama_pengguna | inisial_avatar }}
+            </span>
           {% else %}
-            {{ session.get('jabatan') or session.get('role', 'Pengguna Sistem') }}
+            {{ nama_pengguna | inisial_avatar }}
           {% endif %}
         </div>
-      </div>
-      <i class="fas fa-chevron-down text-muted"></i>
 
-      <!-- DROPDOWN MENU PROFIL -->
+        <div class="user-info">
+          <div class="user-name">
+            {{ nama_pengguna | nama_singkat_dropdown }}
+          </div>
+
+          <div class="user-role">
+            {% set aktif = session.get('halaman_aktif') | default('utama') %}
+
+            {% if aktif == 'absensi' %}
+              Guru
+            {% elif aktif == 'bendahara' %}
+              Bendahara
+            {% elif aktif == 'admin_sistem' %}
+              Admin Sistem
+            {% elif aktif == 'wali_kelas' %}
+              Wali Kelas
+            {% elif aktif == 'waka_kurikulum' %}
+              Waka Kurikulum
+            {% elif aktif == 'waka_kesiswaan' %}
+              Waka Kesiswaan
+            {% elif aktif == 'pembina_ekskul' %}
+              Pembina Ekstrakurikuler
+            {% else %}
+              {{ session.get('jabatan') or session.get('role', 'Pengguna Sistem') }}
+            {% endif %}
+          </div>
+        </div>
+
+        <i class="fas fa-chevron-down profile-chevron"></i>
+
+      </button>
+
+      <!-- DROPDOWN PROFIL -->
       <div class="user-dropdown" id="userDropdown">
+
         <div class="dropdown-header">
+
           <div class="dropdown-avatar">
             {% if foto %}
-              <img src="{{ url_for('tampilkan_foto_profil', filename=foto) }}"
-                  alt="Foto Profil"
-                  onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_pengguna | inisial_avatar }}';">
+              <img
+                src="{{ url_for('tampilkan_foto_profil', filename=foto) }}"
+                alt="Foto Profil"
+                onerror="this.style.display='none'; this.parentElement.classList.add('avatar-fallback');"
+              >
+              <span class="avatar-initial">
+                {{ nama_pengguna | inisial_avatar }}
+              </span>
             {% else %}
               {{ nama_pengguna | inisial_avatar }}
             {% endif %}
           </div>
-          <div class="user-mail">
-            <div class="dropdown-name">{{ session.get('user_name', 'Pengguna') }}</div>
+
+          <div class="dropdown-user-details">
+            <div class="dropdown-name">{{ nama_pengguna }}</div>
+
             <div class="dropdown-email">
               {% if session.get('email') %}
                 {{ session.get('email') }}
               {% elif session.get('no_hp') or session.get('nomor_hp') or session.get('telepon') %}
                 {{ session.get('no_hp') or session.get('nomor_hp') or session.get('telepon') }}
+              {% else %}
+                Pengguna Sistem
               {% endif %}
             </div>
           </div>
+
+          <span class="dropdown-account-label">
+            <i class="fas fa-shield-alt"></i>
+            Account
+          </span>
+
         </div>
+
+        <div class="dropdown-section-label">PENGATURAN AKUN</div>
+
         <ul class="dropdown-menu">
-          <!-- ✅ BIODATA → otomatis pilih rute sesuai sistem -->
+
           <li>
             {% if g.sistem_mode == 'absensi' %}
-              <a href="{{ url_for('absensi_profil.biodata') }}"><i class="fas fa-user"></i> Account</a>
+              <a href="{{ url_for('absensi_profil.biodata') }}">
             {% else %}
-              <a href="{{ url_for('profil.biodata') }}"><i class="fas fa-user"></i> Account</a>
+              <a href="{{ url_for('profil.biodata') }}">
             {% endif %}
+                <span class="dropdown-item-icon">
+                  <i class="far fa-user"></i>
+                </span>
+                <span class="dropdown-item-text">
+                  <strong>Account</strong>
+                  <small>Lihat informasi profil</small>
+                </span>
+                <i class="fas fa-chevron-right dropdown-item-arrow"></i>
+              </a>
           </li>
 
-          <!-- ✅ UBAH AKUN → otomatis pilih rute sesuai sistem -->
           <li>
             {% if g.sistem_mode == 'absensi' %}
-              <a href="{{ url_for('absensi_profil.ubah_akun') }}"><i class="fas fa-cog"></i> Manage Account</a>
+              <a href="{{ url_for('absensi_profil.ubah_akun') }}">
             {% else %}
-              <a href="{{ url_for('profil.ubah_akun') }}"><i class="fas fa-cog"></i> Manage Account</a>
+              <a href="{{ url_for('profil.ubah_akun') }}">
             {% endif %}
+                <span class="dropdown-item-icon">
+                  <i class="fas fa-sliders-h"></i>
+                </span>
+                <span class="dropdown-item-text">
+                  <strong>Manage Account</strong>
+                  <small>Kelola pengaturan akun</small>
+                </span>
+                <i class="fas fa-chevron-right dropdown-item-arrow"></i>
+              </a>
           </li>
+
         </ul>
+
         <div class="dropdown-logout">
-          <a href="{% if g.sistem_mode == 'absensi' %}{{ url_for('absensi.logout_absensi') }}{% else %}{{ url_for('login.logout') }}{% endif %}" 
-            class="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Logout
+          <a
+            href="{% if g.sistem_mode == 'absensi' %}{{ url_for('absensi.logout_absensi') }}{% else %}{{ url_for('login.logout') }}{% endif %}"
+            class="logout-btn"
+          >
+            <span class="logout-icon">
+              <i class="fas fa-sign-out-alt"></i>
+            </span>
+            <span>Logout</span>
+            <i class="fas fa-arrow-right logout-arrow"></i>
           </a>
         </div>
+
+        <div class="dropdown-footer">
+          <i class="fas fa-lock"></i>
+          Secure account session
+        </div>
+
       </div>
+
     </div>
+
   </div>
+
 </header>
 
+
 <script>
-const userProfileBtn = document.getElementById('userProfileBtn');
-const userDropdown = document.getElementById('userDropdown');
 
-// ✅ HANYA BUKA/TUTUP saat klik pada tombol profil
-userProfileBtn.addEventListener('click', function(e) {
-    e.stopPropagation(); // ❗ PENTING: JANGAN sampai ikut ke pengecekkan luar
-    this.classList.toggle('open');
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =====================================================
+    // DROPDOWN PROFIL PENGGUNA
+    // =====================================================
+
+    const userProfile = document.getElementById('userProfileBtn');
+    const userProfileTrigger = document.getElementById('userProfileTrigger');
+    const userDropdown = document.getElementById('userDropdown');
+
+    function tutupDropdownProfil() {
+        if (!userProfile || !userProfileTrigger) return;
+
+        userProfile.classList.remove('open');
+        userProfileTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function bukaDropdownProfil() {
+        if (!userProfile || !userProfileTrigger) return;
+
+        userProfile.classList.add('open');
+        userProfileTrigger.setAttribute('aria-expanded', 'true');
+    }
+
+    if (userProfile && userProfileTrigger && userDropdown) {
+
+        userProfileTrigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            const sedangTerbuka = userProfile.classList.contains('open');
+
+            if (sedangTerbuka) {
+                tutupDropdownProfil();
+            } else {
+                bukaDropdownProfil();
+            }
+        });
+
+        // Klik di dalam dropdown tidak menutup menu.
+        userDropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // Klik di luar area profil menutup dropdown.
+        document.addEventListener('click', function (e) {
+            if (!userProfile.contains(e.target)) {
+                tutupDropdownProfil();
+            }
+        });
+
+        // Tutup dropdown dengan tombol Escape.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                tutupDropdownProfil();
+            }
+        });
+    }
+
+
+    // =====================================================
+    // KONTROL SIDEBAR
+    // =====================================================
+
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const mainSidebar = document.getElementById('mainSidebar');
+
+    if (toggleBtn && mainSidebar) {
+
+        toggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            mainSidebar.classList.toggle('active');
+        });
+
+        // Klik di dalam sidebar tidak menutup sidebar.
+        mainSidebar.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // Klik di luar sidebar dan tombol toggle menutup sidebar.
+        document.addEventListener('click', function (e) {
+            if (
+                !mainSidebar.contains(e.target) &&
+                !toggleBtn.contains(e.target)
+            ) {
+                mainSidebar.classList.remove('active');
+            }
+        });
+
+        // Escape juga menutup sidebar.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                mainSidebar.classList.remove('active');
+            }
+        });
+    }
+
 });
 
-// ✅ TUTUP JIKA DIKLIK DI LUAR AREA
-document.addEventListener('click', function(e) {
-    // Cek: klik di luar tombol DAN di luar dropdown? → tutup
-    if (!userProfileBtn.contains(e.target)) {
-        userProfileBtn.classList.remove('open');
-    }
-});
-
-// ✅ KLIK DI DALAM DROPDOWN → JANGAN TUTUP
-userDropdown.addEventListener('click', function(e) {
-    // Kalau yang diklik adalah link Logout → biarkan berjalan normal
-    if (e.target.closest('.logout-btn')) {
-        // JANGAN batalkan klik → biarkan pindah halaman
-        return;
-    }
-    // Selain itu → tutup dropdown
-    e.stopPropagation();
-});
-
-// === KONTROL BUKA TUTUP SIDEBAR ===
-const toggleBtn = document.getElementById('toggleSidebar');
-const mainSidebar = document.getElementById('mainSidebar');
-
-if (toggleBtn && mainSidebar) {
-  // Buka / Tutup saat tombol diklik
-  toggleBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    mainSidebar.classList.toggle('active');
-  });
-
-  // Tutup jika klik di luar sidebar
-  document.addEventListener('click', function(e) {
-    // Cek: klik di luar tombol DAN di luar sidebar → tutup
-    if (!mainSidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-      mainSidebar.classList.remove('active');
-    }
-  });
-
-  // Cegah tertutup saat mengklik bagian dalam sidebar
-  mainSidebar.addEventListener('click', function(e) {
-    e.stopPropagation();
-  });
-}
 </script>

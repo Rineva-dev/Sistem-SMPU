@@ -1,465 +1,661 @@
+
 {% extends "layout.html" %}
-{% block title %}Biodata{% endblock %}
+
+{% block title %}Biodata Guru{% endblock %}
+
 {% block content %}
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profil/biodata.css') }}">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
-<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
-<div class="biodata-container">
+{% set nama_lengkap = ((guru.gelar_depan or '') ~ ' ' ~ (guru.nama or '') ~ ' ' ~ (guru.gelar_belakang or '')).strip() %}
+{% set foto_url = url_for('tampilkan_foto_profil', filename=guru.foto_profil) if guru.foto_profil else '' %}
 
-  <!-- ✅ HEADER HP -->
-  <header class="hp-fixed-header">
-    <a href="{{ session.get('kembali_ke') or url_for('profil.biodata') }}" class="header-kembali-btn">
-      <i class="fas fa-chevron-left"></i>
-    </a>
-    <h1 class="header-judul-halaman">Akun</h1>
-    <a href="{% if g.sistem_mode == 'absensi' %}{{ url_for('absensi.logout_absensi') }}{% else %}{{ url_for('login.logout') }}{% endif %}" class="header-keluar-btn" title="Keluar">
-      <i class="fas fa-sign-out-alt"></i>
-    </a>
-  </header>
+<div class="biodata-page">
 
-  <!-- ✅ PROFIL BAGIAN ATAS — KHUSUS HP -->
-  <div class="hp-profile-section">
-    <div class="hp-profile-avatar" id="avatarWrapper">
-      {% set nama_lengkap = ((guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '')) %}
-      {% if guru.foto_profil %}
-        <img id="fotoProfil" src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
-             alt="Foto Profil"
-             onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
-      {% else %}
-        <span id="fotoProfil">{{ nama_lengkap | inisial_avatar }}</span>
-      {% endif %}
-      <!-- Tombol edit foto di pojok foto -->
-      <button type="button" class="hp-btn-edit-foto" id="btnGantiFoto" title="Ubah Foto">
-        <i class="fas fa-camera"></i>
-      </button>
-    </div>
-    <h3 class="hp-profile-name">
-      {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
-    </h3>
-    <p class="hp-profile-email">{{ guru.email or 'Belum diisi' }}</p>
-  </div>
+    <!-- HEADER KHUSUS HP -->
+    <header class="hp-fixed-header">
+        <a href="{{ session.get('kembali_ke') or url_for('profil.biodata') }}"
+           class="hp-header-back" aria-label="Kembali">
+            <i data-lucide="arrow-left"></i>
+        </a>
 
-  <!-- ✅ DAFTAR MENU INFORMASI — KHUSUS HP -->
-  <div class="hp-menu-list">
-    <div class="hp-menu-group">
-      <div class="hp-menu-item">
-        <i class="fas fa-id-card hp-menu-icon"></i>
-        <span class="hp-menu-label">ID Guru</span>
-        <span class="hp-menu-value">{{ guru.id }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-user hp-menu-icon"></i>
-        <span class="hp-menu-label">NIK</span>
-        <span class="hp-menu-value">{{ guru.nik or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-venus-mars hp-menu-icon"></i>
-        <span class="hp-menu-label">Jenis Kelamin</span>
-        <span class="hp-menu-value">{{ guru.jenis_kelamin or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-birthday-cake hp-menu-icon"></i>
-        <span class="hp-menu-label">TTL</span>
-        <span class="hp-menu-value">{{ guru.tempat_lahir or '-' }}, {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-ring hp-menu-icon"></i>
-        <span class="hp-menu-label">Status Pernikahan</span>
-        <span class="hp-menu-value">{{ guru.status_pernikahan or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-graduation-cap hp-menu-icon"></i>
-        <span class="hp-menu-label">Pendidikan</span>
-        <span class="hp-menu-value">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-certificate hp-menu-icon"></i>
-        <span class="hp-menu-label">Sertifikasi</span>
-        <span class="hp-menu-value">{% if guru.sertifikasi %}<i class="fas fa-check-circle text-success"></i> Bersertifikasi{% else %}<i class="fa fa-times-circle text-danger"></i> Belum{% endif %}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-briefcase hp-menu-icon"></i>
-        <span class="hp-menu-label">Jabatan</span>
-        <span class="hp-menu-value">{{ guru.jabatan }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-tasks hp-menu-icon"></i>
-        <span class="hp-menu-label">Tugas Tambahan</span>
-        <span class="hp-menu-value">{{ guru.tugas_tambahan or 'Tidak ada' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-phone-alt hp-menu-icon"></i>
-        <span class="hp-menu-label">Nomor HP</span>
-        <span class="hp-menu-value">{{ guru.no_hp or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item">
-        <i class="fas fa-envelope hp-menu-icon"></i>
-        <span class="hp-menu-label">Email</span>
-        <span class="hp-menu-value">{{ guru.email or 'Belum diisi' }}</span>
-      </div>
-      <div class="hp-menu-item hp-menu-full">
-        <div class="title-addres">
-          <i class="fas fa-home hp-menu-icon"></i>
-          <span class="hp-menu-label">Alamat</span>
+        <div class="hp-header-title">
+            <span>ACCOUNT CENTER</span>
+            <strong>Biodata Saya</strong>
         </div>
-        <span class="hp-menu-value">{{ guru.alamat or 'Belum diisi' }}</span>
-      </div>
-    </div>
 
-    <!-- Tombol Edit Biodata -->
-    <div class="hp-menu-group">
-      <button type="button" class="hp-edit-btn" id="btnEdit">
-        <i class="fas fa-pen"></i> Ubah Biodata
-      </button>
-    </div>
-  </div>
+        <a href="{{ url_for('absensi.logout_absensi') if g.sistem_mode == 'absensi' else url_for('login.logout') }}"
+           class="hp-header-logout" aria-label="Keluar">
+            <i data-lucide="log-out"></i>
+        </a>
+    </header>
 
-  <!-- ✅ TAMPILAN KOMPUTER — TETAP SEPERTI SEKARANG -->
-  <div class="desktop-layout">
-    <div class="profile-sidebar">
-      <div class="profile-avatar" id="avatarWrapperDesktop">
-        {% set nama_lengkap = ((guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '')) %}
-        {% if guru.foto_profil %}
-          <img src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
-               alt="Foto Profil"
-               onerror="this.style.display='none'; this.parentElement.innerHTML='{{ nama_lengkap | inisial_avatar }}';">
-        {% else %}
-          <span>{{ nama_lengkap | inisial_avatar }}</span>
-        {% endif %}
-      </div>
-      <h3 class="profile-name">
-        {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
-      </h3>
-      <div class="profile-id">ID: {{ guru.id }}</div>
-      <p class="profile-role">{{ nama_halaman_aktif }}</p>
-      <div class="status-badge">
-        {{ '🟢 Aktif' if guru.status == 'Aktif' else '🔴 Tidak Aktif' }}
-      </div>
-      <div class="sidebar-actions">
-        <button type="button" class="sidebar-btn foto" id="btnGantiFotoDesktop">
-          <i class="fas fa-camera"></i> Foto
-        </button>
-        <button type="button" class="sidebar-btn edit" id="btnEditDesktop">
-          <i class="fas fa-pen"></i> Edit
-        </button>
-      </div>
-    </div>
+    <!-- PAGE INTRO -->
+    <section class="bp-page-heading">
+        <div>
+            <div class="bp-eyebrow">
+                <span class="bp-eyebrow-dot"></span>
+                PERSONAL WORKSPACE
+            </div>
+            <h1>Profil & Biodata</h1>
+            <p>Kelola informasi pribadi dan identitas kepegawaian Anda dalam satu tempat.</p>
+        </div>
 
-    <div class="info-card">
-      <h4><i class="fas fa-address-card"></i> Informasi Pribadi</h4>
-      <div class="info-grid">
-        <div class="info-group">
-          <div class="info-label">Nama Lengkap</div>
-          <div class="info-value">
-            {{ (guru.gelar_depan ~ ' ' if guru.gelar_depan else '') ~ guru.nama ~ (' ' ~ guru.gelar_belakang if guru.gelar_belakang else '') }}
-          </div>
+        <div class="bp-heading-decoration">
+            <div class="bp-decoration-orb orb-one"></div>
+            <div class="bp-decoration-orb orb-two"></div>
+            <i data-lucide="user-round-check"></i>
         </div>
-        <div class="info-group">
-          <div class="info-label">ID Guru</div>
-          <div class="info-value">{{ guru.id }}</div>
+    </section>
+
+    <!-- MAIN LAYOUT -->
+    <main class="bp-main-layout">
+
+        <!-- PROFILE HERO -->
+        <section class="bp-profile-card">
+            <div class="bp-profile-cover">
+                <div class="bp-cover-pattern"></div>
+                <div class="bp-cover-label">
+                    <i data-lucide="shield-check"></i>
+                    PERSONAL PROFILE
+                </div>
+                <div class="bp-cover-decoration"></div>
+            </div>
+
+            <div class="bp-profile-content">
+                <div class="bp-avatar-column">
+                    <button type="button" class="bp-avatar-wrapper" id="avatarWrapper"
+                            aria-label="Lihat foto profil">
+                        {% if foto_url %}
+                            <img src="{{ foto_url }}" id="fotoProfil" alt="Foto profil">
+                        {% else %}
+                            <div class="bp-avatar-initials" id="fotoProfil">
+                                {{ inisial_avatar }}
+                            </div>
+                        {% endif %}
+                    </button>
+
+                    <button type="button" class="bp-avatar-camera" id="btnGantiFoto"
+                            aria-label="Ganti foto profil">
+                        <i data-lucide="camera"></i>
+                    </button>
+                </div>
+
+                <div class="bp-profile-identity">
+                    <div class="bp-profile-status">
+                        <span class="bp-status-dot"></span>
+                        {{ 'AKUN AKTIF' if guru.status == 'Aktif' else 'AKUN TIDAK AKTIF' }}
+                    </div>
+
+                    <h2>{{ nama_lengkap or 'Nama Guru' }}</h2>
+                    <p class="bp-profile-email">{{ guru.email or 'Email belum diisi' }}</p>
+
+                    <div class="bp-profile-meta">
+                        <span><i data-lucide="fingerprint"></i> ID {{ guru.id }}</span>
+                        <span><i data-lucide="briefcase-business"></i> {{ nama_halaman_aktif }}</span>
+                    </div>
+                </div>
+
+                <div class="bp-profile-actions">
+                    <button type="button" class="bp-btn bp-btn-light" id="btnEdit">
+                        <i data-lucide="square-pen"></i>
+                        <span>Edit Profil</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bp-profile-bottom">
+                <div class="bp-profile-bottom-item">
+                    <span class="bp-bottom-icon"><i data-lucide="badge-check"></i></span>
+                    <div>
+                        <strong>Identitas Guru</strong>
+                        <small>Informasi kepegawaian</small>
+                    </div>
+                </div>
+                <div class="bp-profile-bottom-item">
+                    <span class="bp-bottom-icon"><i data-lucide="lock-keyhole"></i></span>
+                    <div>
+                        <strong>Data Pribadi</strong>
+                        <small>Informasi akun terlindungi</small>
+                    </div>
+                </div>
+                <div class="bp-profile-bottom-note">
+                    <i data-lucide="sparkles"></i>
+                    <span>Pastikan data Anda selalu diperbarui.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- INFORMATION SECTION -->
+        <section class="bp-information-section">
+
+            <div class="bp-section-heading">
+                <div>
+                    <span class="bp-section-kicker">PROFILE DETAILS</span>
+                    <h3>Informasi Akun</h3>
+                    <p>Ringkasan informasi pribadi dan data kepegawaian Anda.</p>
+                </div>
+                <span class="bp-info-count">
+                    <i data-lucide="layers"></i>
+                    3 Kategori
+                </span>
+            </div>
+
+            <div class="bp-info-grid">
+
+                <!-- PERSONAL -->
+                <article class="bp-info-card bp-card-personal">
+                    <div class="bp-card-heading">
+                        <div class="bp-card-icon icon-emerald">
+                            <i data-lucide="user-round"></i>
+                        </div>
+                        <div>
+                            <span>01 / PERSONAL</span>
+                            <h4>Identitas Pribadi</h4>
+                        </div>
+                    </div>
+
+                    <div class="bp-info-list">
+                        <div class="bp-info-item">
+                            <span>ID Guru</span>
+                            <strong>{{ guru.id or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>NIK</span>
+                            <strong>{{ guru.nik or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Jenis Kelamin</span>
+                            <strong>{{ guru.jenis_kelamin or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Tempat Lahir</span>
+                            <strong>{{ guru.tempat_lahir or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Tanggal Lahir</span>
+                            <strong>{{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Status Pernikahan</span>
+                            <strong>{{ guru.status_pernikahan or '-' }}</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- EMPLOYMENT -->
+                <article class="bp-info-card bp-card-employment">
+                    <div class="bp-card-heading">
+                        <div class="bp-card-icon icon-violet">
+                            <i data-lucide="briefcase-business"></i>
+                        </div>
+                        <div>
+                            <span>02 / EMPLOYMENT</span>
+                            <h4>Informasi Kepegawaian</h4>
+                        </div>
+                    </div>
+
+                    <div class="bp-info-list">
+                        <div class="bp-info-item">
+                            <span>Pendidikan Terakhir</span>
+                            <strong>{{ guru.pendidikan_terakhir or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Sertifikasi</span>
+                            <strong class="bp-certification">
+                                {% if guru.sertifikasi %}
+                                    <i data-lucide="check-circle-2"></i> Sudah Sertifikasi
+                                {% else %}
+                                    <i data-lucide="circle-x"></i> Belum Sertifikasi
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Jabatan</span>
+                            <strong>{{ guru.jabatan or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Tugas Tambahan</span>
+                            <strong>{{ guru.tugas_tambahan or '-' }}</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- CONTACT -->
+                <article class="bp-info-card bp-card-contact">
+                    <div class="bp-card-heading">
+                        <div class="bp-card-icon icon-orange">
+                            <i data-lucide="contact-round"></i>
+                        </div>
+                        <div>
+                            <span>03 / CONTACT</span>
+                            <h4>Kontak & Alamat</h4>
+                        </div>
+                    </div>
+
+                    <div class="bp-info-list">
+                        <div class="bp-info-item">
+                            <span>Nomor Handphone</span>
+                            <strong>{{ guru.no_hp or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item">
+                            <span>Email</span>
+                            <strong class="bp-break-word">{{ guru.email or '-' }}</strong>
+                        </div>
+                        <div class="bp-info-item bp-address-item">
+                            <span>Alamat Lengkap</span>
+                            <strong>{{ guru.alamat or '-' }}</strong>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- BOTTOM NOTE -->
+        <div class="bp-security-note">
+            <div class="bp-security-icon">
+                <i data-lucide="shield-check"></i>
+            </div>
+            <div>
+                <strong>Informasi akun Anda</strong>
+                <p>Jaga kerahasiaan informasi pribadi dan pastikan data yang tercantum selalu benar.</p>
+            </div>
+            <i data-lucide="arrow-up-right" class="bp-note-arrow"></i>
         </div>
-        <div class="info-group">
-          <div class="info-label">NIK</div>
-          <div class="info-value {{ 'empty' if not guru.nik }}">{{ guru.nik or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Jenis Kelamin</div>
-          <div class="info-value {{ 'empty' if not guru.jenis_kelamin }}">{{ guru.jenis_kelamin or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Tempat, Tanggal Lahir</div>
-          <div class="info-value">
-            {{ guru.tempat_lahir or '-' }}, 
-            {{ guru.tanggal_lahir.strftime('%d %B %Y') if guru.tanggal_lahir else '-' }}
-          </div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Status Pernikahan</div>
-          <div class="info-value {{ 'empty' if not guru.status_pernikahan }}">{{ guru.status_pernikahan or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Pendidikan Terakhir</div>
-          <div class="info-value {{ 'empty' if not guru.pendidikan_terakhir }}">{{ guru.pendidikan_terakhir or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Sertifikasi</div>
-          <div class="info-value">
-            {% if guru.sertifikasi %}
-              <i class="fas fa-check-circle text-success"></i> Bersertifikasi
-            {% else %}
-              <i class="fas fa-times-circle text-danger"></i> Belum Bersertifikasi
-            {% endif %}
-          </div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Jabatan</div>
-          <div class="info-value">{{ guru.jabatan }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Tugas Tambahan</div>
-          <div class="info-value {{ 'empty' if not guru.tugas_tambahan }}">{{ guru.tugas_tambahan or 'Tidak ada' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Nomor HP</div>
-          <div class="info-value {{ 'empty' if not guru.no_hp }}">{{ guru.no_hp or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group">
-          <div class="info-label">Email</div>
-          <div class="info-value {{ 'empty' if not guru.email }}">{{ guru.email or 'Belum diisi' }}</div>
-        </div>
-        <div class="info-group full">
-          <div class="info-label">Alamat Lengkap</div>
-          <div class="info-value {{ 'empty' if not guru.alamat }}">{{ guru.alamat or 'Belum diisi' }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
+
+    </main>
 </div>
 
-<!-- ========================================== -->
-<!-- MODAL LIHAT FOTO BESAR -->
-<!-- ========================================== -->
+<!-- =====================================================
+     MODAL 1 — PHOTO PREVIEW
+===================================================== -->
 <div class="view-modal" id="viewModal">
-  <button class="btn-tutup" id="btnTutupFoto">&times;</button>
-  <img src="" alt="Foto Besar" class="view-foto" id="viewFoto">
+    <div class="view-modal-content bp-photo-modal">
+
+        <div class="bp-photo-topbar">
+            <div class="bp-photo-heading">
+                <span class="bp-photo-icon">
+                    <i data-lucide="image"></i>
+                </span>
+                <div>
+                    <strong>Foto Profil</strong>
+                    <small>Pratinjau foto akun Anda</small>
+                </div>
+            </div>
+
+            <button type="button" class="bp-photo-close" id="btnTutupFoto"
+                    aria-label="Tutup pratinjau">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <div class="bp-photo-stage">
+            <div class="bp-photo-orbit bp-photo-orbit-one"></div>
+            <div class="bp-photo-orbit bp-photo-orbit-two"></div>
+            <div class="bp-photo-sparkle sparkle-one"></div>
+            <div class="bp-photo-sparkle sparkle-two"></div>
+
+            <div class="bp-photo-frame">
+                <img src="" id="viewFoto" alt="Foto profil">
+            </div>
+
+            <div class="bp-photo-caption">
+                <span class="bp-photo-caption-dot"></span>
+                PROFILE IMAGE
+            </div>
+        </div>
+
+        <div class="bp-photo-footer">
+            <div class="bp-photo-footer-info">
+                <i data-lucide="shield-check"></i>
+                <span>Foto profil ditampilkan secara privat.</span>
+            </div>
+            <button type="button" class="bp-photo-done" id="btnTutupFotoFooter">
+                Tutup
+                <i data-lucide="check"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
-<!-- ========================================== -->
-<!-- INPUT FILE & MODAL CROP FOTO -->
-<!-- ========================================== -->
-<input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+<!-- =====================================================
+     INPUT FOTO
+===================================================== -->
+<input type="file" id="fileInput"
+       accept="image/jpeg,image/png,image/webp" hidden>
+
+
+<!-- =====================================================
+     MODAL 2 — CROP PHOTO
+===================================================== -->
 <div class="modal-overlay" id="cropModal">
-  <div class="modal-box">
-    <div class="modal-header">Sesuaikan Foto Profil</div>
-    <div class="modal-body">
-      <div class="crop-container">
-        <img id="cropImage" src="" alt="Pratinjau Foto">
-      </div>
+    <div class="modal-box bp-modal bp-crop-modal">
+
+        <!-- FIXED HEADER -->
+        <div class="bp-modal-header">
+            <div class="bp-modal-heading">
+                <div class="bp-modal-heading-icon bp-icon-mint">
+                    <i data-lucide="scan-face"></i>
+                </div>
+
+                <div class="bp-modal-heading-text">
+                    <div class="bp-modal-eyebrow">
+                        <span class="bp-live-indicator"></span>
+                        PROFILE CUSTOMIZATION
+                    </div>
+                    <h3>Sesuaikan Foto Profil</h3>
+                    <p>Atur komposisi foto agar terlihat lebih profesional.</p>
+                </div>
+            </div>
+
+            <button type="button" class="bp-modal-close" id="btnBatalFoto"
+                    aria-label="Tutup modal">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <!-- SCROLLABLE BODY -->
+        <div class="bp-modal-body">
+            <div class="bp-modal-intro-card">
+                <div class="bp-intro-icon">
+                    <i data-lucide="lightbulb"></i>
+                </div>
+                <div>
+                    <strong>Tips foto profil</strong>
+                    <p>Posisikan wajah di tengah area pemotongan. Gunakan foto dengan pencahayaan yang cukup.</p>
+                </div>
+            </div>
+
+            <div class="bp-crop-workspace">
+                <div class="bp-crop-workspace-heading">
+                    <div>
+                        <span class="bp-workspace-label">IMAGE WORKSPACE</span>
+                        <h4>Area Penyesuaian</h4>
+                    </div>
+                    <span class="bp-crop-ratio">
+                        <i data-lucide="crop"></i>
+                        1 : 1
+                    </span>
+                </div>
+
+                <div class="crop-container">
+                    <img src="" id="cropImage" alt="Sesuaikan foto profil">
+                </div>
+
+                <div class="bp-crop-hint">
+                    <i data-lucide="move"></i>
+                    <span>Geser foto untuk mengatur posisi. Gunakan scroll atau kontrol Cropper untuk memperbesar.</span>
+                </div>
+            </div>
+
+            <div class="bp-modal-trust">
+                <span><i data-lucide="shield-check"></i> Aman</span>
+                <span><i data-lucide="image-check"></i> Pratinjau langsung</span>
+                <span><i data-lucide="sparkles"></i> Hasil optimal</span>
+            </div>
+        </div>
+
+        <!-- FIXED FOOTER -->
+        <div class="bp-modal-footer">
+            <div class="bp-footer-message">
+                <i data-lucide="info"></i>
+                <span>Pastikan posisi foto sudah sesuai.</span>
+            </div>
+
+            <div class="bp-footer-actions">
+                <button type="button" class="bp-btn bp-btn-cancel"
+                        id="btnBatalFotoFooter">
+                    Batal
+                </button>
+
+                <button type="button" class="bp-btn bp-btn-save"
+                        id="btnSimpanFoto">
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Simpan Foto</span>
+                </button>
+            </div>
+        </div>
+
     </div>
-    <div class="modal-footer">
-      <button class="btn batal" id="btnBatalFoto">Batal</button>
-      <button class="btn simpan" id="btnSimpanFoto"><i class="fas fa-check"></i> Simpan Foto</button>
-    </div>
-  </div>
 </div>
-<form id="formUploadFoto" method="post" action="{{ url_for('profil.ubah_foto') }}">
-  <input type="hidden" name="foto_data" id="fotoData">
+
+
+<!-- =====================================================
+     FORM UPLOAD FOTO
+===================================================== -->
+<form id="formUploadFoto"
+      action="{{ url_for('profil.ubah_foto') }}"
+      method="POST" hidden>
+    <input type="hidden" name="foto_data" id="fotoData">
 </form>
 
-<!-- ========================================== -->
-<!-- MODAL EDIT BIODATA -->
-<!-- ========================================== -->
+<!-- =====================================================
+     MODAL 3 — EDIT BIODATA
+===================================================== -->
 <div class="modal-overlay" id="editModal">
-  <form id="formEdit" method="post" action="{{ url_for('profil.edit_biodata') }}">
-    <div class="modal-box">
-      <div class="modal-header"><i class="fas fa-pen"></i> Ubah Biodata</div>
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Gelar Depan</label>
-            <input type="text" name="gelar_depan" value="{{ guru.gelar_depan or '' }}" placeholder="Contoh: Dr.">
-          </div>
-          <div class="form-group">
-            <label>Gelar Belakang</label>
-            <input type="text" name="gelar_belakang" value="{{ guru.gelar_belakang or '' }}" placeholder="Contoh: S.Pd., M.Pd.">
-          </div>
-          <div class="form-group full">
-            <label>NIK</label>
-            <input type="text" name="nik" value="{{ guru.nik or '' }}" placeholder="16 Digit NIK"
-                   pattern="[0-9]{16}" title="NIK harus 16 digit angka"
-                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-          </div>
+    <div class="modal-box bp-modal bp-edit-modal">
 
-          {# === PENDIDIKAN TERAKHIR — DROPDOWN === #}
-          <div class="form-group">
-            <label>Pendidikan Terakhir</label>
-            <select name="pendidikan_terakhir">
-              <option value="">Pilih Pendidikan</option>
-              <option value="SD" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SD' else '' }}>SD / Sederajat</option>
-              <option value="SMP" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMP' else '' }}>SMP / Sederajat</option>
-              <option value="SMA" {{ 'selected' if guru and guru.pendidikan_terakhir == 'SMA' else '' }}>SMA / SMK / Sederajat</option>
-              <option value="D1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D1' else '' }}>Diploma I (D1)</option>
-              <option value="D2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D2' else '' }}>Diploma II (D2)</option>
-              <option value="D3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'D3' else '' }}>Diploma III (D3)</option>
-              <option value="S1" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S1' else '' }}>Sarjana / S1 / D4</option>
-              <option value="S2" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S2' else '' }}>Magister / S2</option>
-              <option value="S3" {{ 'selected' if guru and guru.pendidikan_terakhir == 'S3' else '' }}>Doktor / S3</option>
-            </select>
-          </div>
+        <form action="{{ url_for('profil.edit_biodata') }}" method="POST"
+              class="bp-edit-form">
 
-          {# === STATUS PERNIKAHAN — DROPDOWN === #}
-          <div class="form-group">
-            <label>Status Pernikahan</label>
-            <select name="status_pernikahan">
-              <option value="">Pilih Status</option>
-              <option value="Belum Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Belum Menikah' else '' }}>Belum Menikah</option>
-              <option value="Menikah" {{ 'selected' if guru and guru.status_pernikahan == 'Menikah' else '' }}>Menikah</option>
-              <option value="Cerai Hidup" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Hidup' else '' }}>Cerai Hidup</option>
-              <option value="Cerai Mati" {{ 'selected' if guru and guru.status_pernikahan == 'Cerai Mati' else '' }}>Cerai Mati</option>
-            </select>
-          </div>
+            <!-- FIXED HEADER -->
+            <div class="bp-modal-header">
+                <div class="bp-modal-heading">
+                    <div class="bp-modal-heading-icon bp-icon-violet">
+                        <i data-lucide="user-round-pen"></i>
+                    </div>
 
-          <div class="form-group">
-            <label>Nomor HP</label>
-            <input type="text" name="no_hp" value="{{ guru.no_hp or '' }}" placeholder="08xxxxxxxxx"
-                   pattern="[0-9]{8,13}" title="Hanya angka, 8-13 digit"
-                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" value="{{ guru.email or '' }}" placeholder="nama@domain.com">
-          </div>
-          <div class="form-group full">
-            <label>Alamat Lengkap</label>
-            <textarea name="alamat" placeholder="Masukkan alamat lengkap" rows="3">{{ guru.alamat or '' }}</textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn batal" id="btnBatalEdit">Batal</button>
-        <button type="submit" class="btn simpan"><i class="fas fa-check"></i> Simpan Perubahan</button>
-      </div>
+                    <div class="bp-modal-heading-text">
+                        <div class="bp-modal-eyebrow">
+                            <span class="bp-live-indicator"></span>
+                            ACCOUNT MANAGEMENT
+                        </div>
+                        <h3>Perbarui Biodata</h3>
+                        <p>Kelola informasi pribadi dan kontak kepegawaian Anda.</p>
+                    </div>
+                </div>
+
+                <button type="button" class="bp-modal-close" id="btnBatalEdit"
+                        aria-label="Tutup modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- SCROLLABLE BODY -->
+            <div class="bp-modal-body bp-edit-body">
+
+                <!-- PROFILE MINI CARD -->
+                <div class="bp-edit-profile-summary">
+                    <div class="bp-summary-avatar">
+                        {% if foto_url %}
+                            <img src="{{ foto_url }}" alt="Foto profil">
+                        {% else %}
+                            <span>{{ inisial_avatar }}</span>
+                        {% endif %}
+                        <span class="bp-summary-online"></span>
+                    </div>
+
+                    <div class="bp-summary-info">
+                        <span>EDIT PERSONAL INFORMATION</span>
+                        <strong>{{ nama_lengkap or 'Nama Guru' }}</strong>
+                        <small>ID Guru: {{ guru.id }}</small>
+                    </div>
+
+                    <div class="bp-summary-decoration">
+                        <i data-lucide="fingerprint"></i>
+                    </div>
+                </div>
+
+                <!-- SECTION PERSONAL -->
+                <section class="bp-edit-section">
+                    <div class="bp-edit-section-heading">
+                        <div class="bp-edit-section-icon bp-icon-mint">
+                            <i data-lucide="user-round"></i>
+                        </div>
+                        <div>
+                            <span>SECTION 01</span>
+                            <h4>Identitas & Pendidikan</h4>
+                            <p>Informasi dasar identitas pribadi Anda.</p>
+                        </div>
+                    </div>
+
+                    <div class="bp-form-grid">
+                        <div class="bp-form-group">
+                            <label for="gelar_depan">
+                                Gelar Depan
+                                <span class="bp-optional">Opsional</span>
+                            </label>
+                            <div class="bp-input-wrap">
+                                <i data-lucide="graduation-cap"></i>
+                                <input type="text" id="gelar_depan" name="gelar_depan"
+                                       value="{{ guru.gelar_depan or '' }}"
+                                       placeholder="Contoh: Dr.">
+                            </div>
+                        </div>
+
+                        <div class="bp-form-group">
+                            <label for="gelar_belakang">
+                                Gelar Belakang
+                                <span class="bp-optional">Opsional</span>
+                            </label>
+                            <div class="bp-input-wrap">
+                                <i data-lucide="award"></i>
+                                <input type="text" id="gelar_belakang" name="gelar_belakang"
+                                       value="{{ guru.gelar_belakang or '' }}"
+                                       placeholder="Contoh: M.Pd.">
+                            </div>
+                        </div>
+
+                        <div class="bp-form-group bp-form-full">
+                            <label for="nik">
+                                Nomor Induk Kependudukan
+                                <span class="bp-required">16 digit</span>
+                            </label>
+                            <div class="bp-input-wrap">
+                                <i data-lucide="fingerprint"></i>
+                                <input type="text" id="nik" name="nik"
+                                       value="{{ guru.nik or '' }}"
+                                       inputmode="numeric" maxlength="16"
+                                       pattern="[0-9]{16}"
+                                       placeholder="Masukkan 16 digit NIK">
+                            </div>
+                            <small class="bp-field-hint">Pastikan NIK sesuai dengan KTP Anda.</small>
+                        </div>
+
+                        <div class="bp-form-group">
+                            <label for="pendidikan_terakhir">Pendidikan Terakhir</label>
+                            <div class="bp-input-wrap bp-select-wrap">
+                                <i data-lucide="book-open"></i>
+                                <select id="pendidikan_terakhir" name="pendidikan_terakhir">
+                                    {% for p in ['SD','SMP','SMA','D1','D2','D3','S1','S2','S3'] %}
+                                    <option value="{{ p }}" {% if guru.pendidikan_terakhir == p %}selected{% endif %}>{{ p }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="bp-form-group">
+                            <label for="status_pernikahan">Status Pernikahan</label>
+                            <div class="bp-input-wrap bp-select-wrap">
+                                <i data-lucide="heart"></i>
+                                <select id="status_pernikahan" name="status_pernikahan">
+                                    {% for s in ['Belum Menikah','Menikah','Cerai Hidup','Cerai Mati'] %}
+                                    <option value="{{ s }}" {% if guru.status_pernikahan == s %}selected{% endif %}>{{ s }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION CONTACT -->
+                <section class="bp-edit-section">
+                    <div class="bp-edit-section-heading">
+                        <div class="bp-edit-section-icon bp-icon-blue">
+                            <i data-lucide="contact-round"></i>
+                        </div>
+                        <div>
+                            <span>SECTION 02</span>
+                            <h4>Informasi Kontak</h4>
+                            <p>Informasi yang dapat digunakan untuk menghubungi Anda.</p>
+                        </div>
+                    </div>
+
+                    <div class="bp-form-grid">
+                        <div class="bp-form-group">
+                            <label for="no_hp">Nomor Handphone</label>
+                            <div class="bp-input-wrap">
+                                <i data-lucide="smartphone"></i>
+                                <input type="tel" id="no_hp" name="no_hp"
+                                       value="{{ guru.no_hp or '' }}"
+                                       inputmode="numeric" pattern="[0-9]{8,13}"
+                                       maxlength="13"
+                                       placeholder="08xxxxxxxxxx">
+                            </div>
+                        </div>
+
+                        <div class="bp-form-group">
+                            <label for="email">Alamat Email</label>
+                            <div class="bp-input-wrap">
+                                <i data-lucide="mail"></i>
+                                <input type="email" id="email" name="email"
+                                       value="{{ guru.email or '' }}"
+                                       placeholder="nama@email.com">
+                            </div>
+                        </div>
+
+                        <div class="bp-form-group bp-form-full">
+                            <label for="alamat">Alamat Lengkap</label>
+                            <div class="bp-input-wrap bp-textarea-wrap">
+                                <i data-lucide="map-pin"></i>
+                                <textarea id="alamat" name="alamat" rows="3"
+                                          placeholder="Masukkan alamat lengkap tempat tinggal Anda">{{ guru.alamat or '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INFORMATION NOTE -->
+                <div class="bp-edit-note">
+                    <div class="bp-edit-note-icon">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div>
+                        <strong>Privasi dan keamanan data</strong>
+                        <p>Informasi yang Anda perbarui akan digunakan untuk kebutuhan administrasi dan kepegawaian sekolah.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FIXED FOOTER -->
+            <div class="bp-modal-footer">
+                <div class="bp-footer-message">
+                    <i data-lucide="info"></i>
+                    <span>Periksa kembali data sebelum menyimpan.</span>
+                </div>
+
+                <div class="bp-footer-actions">
+                    <button type="button" class="bp-btn bp-btn-cancel"
+                            id="btnBatalEditFooter">
+                        Batal
+                    </button>
+
+                    <button type="submit" class="bp-btn bp-btn-save">
+                        <i data-lucide="save"></i>
+                        <span>Simpan Perubahan</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
     </div>
-  </form>
 </div>
 
-<script>
-  // ==========================================
-  // LIHAT FOTO BESAR
-  // ==========================================
-  const avatarWrapper = document.getElementById('avatarWrapper');
-  const avatarWrapperDesktop = document.getElementById('avatarWrapperDesktop');
-  const viewModal = document.getElementById('viewModal');
-  const viewFoto = document.getElementById('viewFoto');
-  const btnTutupFoto = document.getElementById('btnTutupFoto');
 
-  function tampilkanFotoBesar(e, elemen) {
-    // JANGAN jalankan kalau sedang buka modal crop / edit
-    if (cropModal && cropModal.classList.contains('show')) return;
-    if (editModal && editModal.classList.contains('show')) return;
-    
-    const imgAvatar = elemen.querySelector('#fotoProfil') || elemen.querySelector('img');
-    if (imgAvatar && imgAvatar.tagName === 'IMG' && imgAvatar.src) {
-      e.preventDefault();
-      e.stopPropagation(); // 🔗 Hentikan agar tidak ke elemen induk
-      viewFoto.src = imgAvatar.src;
-      viewModal.classList.add('show');
-    }
-  }
-
-  if (avatarWrapper) {
-    avatarWrapper.addEventListener('click', (e) => tampilkanFotoBesar(e, avatarWrapper));
-  }
-  if (avatarWrapperDesktop) {
-    avatarWrapperDesktop.addEventListener('click', (e) => tampilkanFotoBesar(e, avatarWrapperDesktop));
-  }
-
-  btnTutupFoto.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    viewModal.classList.remove('show');
-  });
-  // Klik latar belakang untuk tutup
-  viewModal.addEventListener('click', (e) => {
-    if (e.target === viewModal) {
-      viewModal.classList.remove('show');
-    }
-  });
-
-  // ==========================================
-  // GANTI FOTO
-  // ==========================================
-  const btnGantiFoto = document.getElementById('btnGantiFoto');
-  const btnGantiFotoDesktop = document.getElementById('btnGantiFotoDesktop');
-  const fileInput = document.getElementById('fileInput');
-  const cropModal = document.getElementById('cropModal');
-  const cropImage = document.getElementById('cropImage');
-  const btnBatalFoto = document.getElementById('btnBatalFoto');
-  const btnSimpanFoto = document.getElementById('btnSimpanFoto');
-  const fotoData = document.getElementById('fotoData');
-  const formUploadFoto = document.getElementById('formUploadFoto');
-  let cropper;
-
-  function bukaPilihFoto(e) {
-    e.preventDefault();
-    e.stopPropagation(); // 🔗 Kunci agar tidak ikut buka foto besar
-    fileInput.click();
-  }
-
-  if (btnGantiFoto) btnGantiFoto.addEventListener('click', bukaPilihFoto);
-  if (btnGantiFotoDesktop) btnGantiFotoDesktop.addEventListener('click', bukaPilihFoto);
-
-  fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      cropImage.src = evt.target.result;
-      cropModal.classList.add('show');
-      setTimeout(() => {
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(cropImage, {
-          aspectRatio: 1,
-          viewMode: 1,
-          dragMode: 'move',
-          autoCropArea: 0.9,
-          restore: false,
-          guides: true,
-          center: true,
-          highlight: false,
-          cropBoxMovable: true,
-          cropBoxResizable: true,
-          toggleDragModeOnDblclick: false,
-        });
-      }, 100);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  btnBatalFoto.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    cropModal.classList.remove('show');
-    fileInput.value = '';
-    if (cropper) { cropper.destroy(); cropper = null; }
-  });
-
-  btnSimpanFoto.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!cropper) return;
-    const canvas = cropper.getCroppedCanvas({ 
-      width: 400, 
-      height: 400, 
-      imageSmoothingEnabled: true, 
-      imageSmoothingQuality: 'high' 
-    });
-    fotoData.value = canvas.toDataURL('image/jpeg', 0.9);
-    formUploadFoto.submit();
-  });
-
-  // ==========================================
-  // EDIT BIODATA
-  // ==========================================
-  const btnEdit = document.getElementById('btnEdit');
-  const btnEditDesktop = document.getElementById('btnEditDesktop');
-  const editModal = document.getElementById('editModal');
-  const btnBatalEdit = document.getElementById('btnBatalEdit');
-
-  function bukaEditBiodata(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    editModal.classList.add('show');
-  }
-
-  if (btnEdit) btnEdit.addEventListener('click', bukaEditBiodata);
-  if (btnEditDesktop) btnEditDesktop.addEventListener('click', bukaEditBiodata);
-
-  btnBatalEdit.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    editModal.classList.remove('show');
-  });
-</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="{{ url_for('static', filename='js/profil/biodata.js') }}"></script>
 {% endblock %}
