@@ -138,224 +138,512 @@
         </div>
     </section>
 
-    <!-- INVOICE GROUPS -->
-    {% set daftar_kelompok = {} %}
+    <!-- INVOICE TAB WRAPPER -->
+    <div class="invoice-tab-wrapper">
 
-    {% for tagihan in daftar_tagihan %}
-        {% if tagihan.nama.startswith('Ekstrakurikuler - ') %}
-            {% set nama_kelompok = 'Ekstrakurikuler' %}
-        {% elif tagihan.nama.startswith('Peminatan - ') or tagihan.nama.startswith('Kelas Peminatan - ') %}
-            {% set nama_kelompok = 'Kelas Peminatan' %}
-        {% else %}
-            {% set nama_kelompok = tagihan.nama.split(' - ')[0] %}
-        {% endif %}
+        <!-- TAB NAVIGATION -->
+        <div class="invoice-tab-nav">
+            
+            <button type="button"
+                    class="invoice-tab-btn active"
+                    data-tab="rincian-tagihan">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Rincian Tagihan</span>
+            </button>
 
-        {% if nama_kelompok not in daftar_kelompok %}
-            {% set _ = daftar_kelompok.update({
-                nama_kelompok: {
-                    'rincian': [],
-                    'subtotal': 0,
-                    'jumlah': 0,
-                    'dibayar': 0,
-                    'sisa': 0
-                }
-            }) %}
-        {% endif %}
+            <button type="button"
+                    class="invoice-tab-btn"
+                    data-tab="riwayat-pembayaran">
+                <i class="fas fa-wallet"></i>
+                <span>Riwayat Pembayaran</span>
+            </button>
 
-        {% set _ = daftar_kelompok[nama_kelompok].rincian.append(tagihan) %}
-        {% set _ = daftar_kelompok[nama_kelompok].update({
-            'subtotal': daftar_kelompok[nama_kelompok].subtotal + tagihan.nominal,
-            'jumlah': daftar_kelompok[nama_kelompok].jumlah + 1,
-            'dibayar': daftar_kelompok[nama_kelompok].dibayar + (tagihan.sudah_dibayar or 0),
-            'sisa': daftar_kelompok[nama_kelompok].sisa + (tagihan.sisa_tagihan if tagihan.sisa_tagihan is not none else tagihan.nominal)
-        }) %}
-    {% endfor %}
+            <button type="button"
+                    class="invoice-tab-btn"
+                    data-tab="riwayat-transaksi">
+                <i class="fas fa-arrow-right-arrow-left"></i>
+                <span>Riwayat Transaksi</span>
+            </button>
 
-    <div class="invoice-list-heading">
-        <div>
-            <span class="section-kicker">INVOICE DIRECTORY</span>
-            <h4>Daftar Rincian Tagihan</h4>
-            <p>Tagihan dikelompokkan berdasarkan jenis pembayaran.</p>
         </div>
-        <div class="invoice-count-badge">
-            <i class="fas fa-list-check"></i>
-            {{ daftar_tagihan|length }} Tagihan
-        </div>
-    </div>
 
-    <div class="invoice-groups">
+        <!-- TAB CONTENT -->
+        <div class="invoice-tab-content">
 
-        {% for nama_kelompok, kelompok in daftar_kelompok.items() %}
-            {% set kelompok_id = loop.index %}
-            {% set persentase_kelompok = (kelompok.dibayar / kelompok.subtotal * 100)|round|int if kelompok.subtotal > 0 else 0 %}
+            <!-- ==========================================
+                TAB 1: RINCIAN TAGIHAN
+            =========================================== -->
+            <div class="invoice-tab-pane active" id="rincian-tagihan">
 
-            <section class="invoice-category-card">
+                {% set daftar_kelompok = {} %}
 
-                <button class="invoice-category-header"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#invoiceGroup{{ kelompok_id }}"
-                        aria-expanded="{{ 'true' if loop.first else 'false' }}">
+                {% for tagihan in daftar_tagihan %}
+                    {% if tagihan.nama.startswith('Ekstrakurikuler - ') %}
+                        {% set nama_kelompok = 'Ekstrakurikuler' %}
+                    {% elif tagihan.nama.startswith('Peminatan - ') or tagihan.nama.startswith('Kelas Peminatan - ') %}
+                        {% set nama_kelompok = 'Kelas Peminatan' %}
+                    {% else %}
+                        {% set nama_kelompok = tagihan.nama.split(' - ')[0] %}
+                    {% endif %}
 
-                    <div class="category-left">
-                        <div class="category-icon category-icon-{{ kelompok_id % 5 }}">
-                            {% if 'SPP' in nama_kelompok|upper %}
-                                <i class="fas fa-school"></i>
-                            {% elif 'EKSTRA' in nama_kelompok|upper %}
-                                <i class="fas fa-futbol"></i>
-                            {% elif 'PEMINATAN' in nama_kelompok|upper %}
-                                <i class="fas fa-book-open"></i>
-                            {% elif 'PEMBANGUNAN' in nama_kelompok|upper %}
-                                <i class="fas fa-building"></i>
-                            {% else %}
-                                <i class="fas fa-receipt"></i>
-                            {% endif %}
-                        </div>
+                    {% if nama_kelompok not in daftar_kelompok %}
+                        {% set _ = daftar_kelompok.update({
+                            nama_kelompok: {
+                                'rincian': [],
+                                'subtotal': 0,
+                                'jumlah': 0,
+                                'dibayar': 0,
+                                'sisa': 0
+                            }
+                        }) %}
+                    {% endif %}
 
-                        <div class="category-title">
-                            <h5>{{ nama_kelompok }}</h5>
-                            <span>{{ kelompok.jumlah }} item tagihan</span>
-                        </div>
+                    {% set _ = daftar_kelompok[nama_kelompok].rincian.append(tagihan) %}
+                    {% set _ = daftar_kelompok[nama_kelompok].update({
+                        'subtotal': daftar_kelompok[nama_kelompok].subtotal + tagihan.nominal,
+                        'jumlah': daftar_kelompok[nama_kelompok].jumlah + 1,
+                        'dibayar': daftar_kelompok[nama_kelompok].dibayar + (tagihan.sudah_dibayar or 0),
+                        'sisa': daftar_kelompok[nama_kelompok].sisa + (tagihan.sisa_tagihan if tagihan.sisa_tagihan is not none else tagihan.nominal)
+                    }) %}
+                {% endfor %}
+
+
+                <div class="invoice-list-heading">
+                    <div>
+                        <span class="section-kicker">INVOICE DIRECTORY</span>
+                        <h4>Daftar Rincian Tagihan</h4>
+                        <p>Tagihan dikelompokkan berdasarkan jenis pembayaran.</p>
                     </div>
 
-                    <div class="category-middle">
-                        <div class="category-amount">{{ format_rupiah(kelompok.subtotal) }}</div>
-                        <div class="category-progress">
-                            <div style="width: {{ [persentase_kelompok, 100]|min }}%"></div>
-                        </div>
-                        <span>{{ persentase_kelompok }}% terbayar</span>
+                    <div class="invoice-count-badge">
+                        <i class="fas fa-list-check"></i>
+                        {{ daftar_tagihan|length }} Tagihan
                     </div>
+                </div>
 
-                    <div class="category-right">
-                        {% if kelompok.sisa <= 0 %}
-                            <span class="category-status status-complete"><i class="fas fa-check-circle"></i> Lunas</span>
-                        {% elif kelompok.dibayar > 0 %}
-                            <span class="category-status status-partial">Sebagian</span>
-                        {% else %}
-                            <span class="category-status status-pending">Belum Bayar</span>
-                        {% endif %}
-                        <i class="fas fa-chevron-down category-chevron"></i>
-                    </div>
-                </button>
 
-                <div class="collapse {{ 'show' if loop.first else '' }}"
-                     id="invoiceGroup{{ kelompok_id }}">
+                <div class="invoice-groups">
 
-                    <div class="category-table-wrap">
-                        <div class="category-table-toolbar">
-                            <span><i class="fas fa-table-list"></i> Rincian transaksi</span>
-                            <span class="table-hint">Geser tabel ke samping jika diperlukan</span>
+                    {% for nama_kelompok, kelompok in daftar_kelompok.items() %}
+                        {% set kelompok_id = loop.index %}
+                        {% set persentase_kelompok = (kelompok.dibayar / kelompok.subtotal * 100)|round|int if kelompok.subtotal > 0 else 0 %}
+
+                        <section class="invoice-category-card">
+
+                            <button class="invoice-category-header"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#invoiceGroup{{ kelompok_id }}"
+                                    aria-expanded="{{ 'true' if loop.first else 'false' }}">
+
+                                <div class="category-left">
+
+                                    <div class="category-icon category-icon-{{ kelompok_id % 5 }}">
+                                        {% if 'SPP' in nama_kelompok|upper %}
+                                            <i class="fas fa-school"></i>
+                                        {% elif 'EKSTRA' in nama_kelompok|upper %}
+                                            <i class="fas fa-futbol"></i>
+                                        {% elif 'PEMINATAN' in nama_kelompok|upper %}
+                                            <i class="fas fa-book-open"></i>
+                                        {% elif 'PEMBANGUNAN' in nama_kelompok|upper %}
+                                            <i class="fas fa-building"></i>
+                                        {% else %}
+                                            <i class="fas fa-receipt"></i>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="category-title">
+                                        <h5>{{ nama_kelompok }}</h5>
+                                        <span>{{ kelompok.jumlah }} item tagihan</span>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="category-middle">
+                                    <div class="category-amount">
+                                        {{ format_rupiah(kelompok.subtotal) }}
+                                    </div>
+
+                                    <div class="category-progress">
+                                        <div style="width: {{ [persentase_kelompok, 100]|min }}%"></div>
+                                    </div>
+
+                                    <span>{{ persentase_kelompok }}% terbayar</span>
+                                </div>
+
+
+                                <div class="category-right">
+                                    {% if kelompok.sisa <= 0 %}
+                                        <span class="category-status status-complete">
+                                            <i class="fas fa-check-circle"></i> Lunas
+                                        </span>
+                                    {% elif kelompok.dibayar > 0 %}
+                                        <span class="category-status status-partial">Sebagian</span>
+                                    {% else %}
+                                        <span class="category-status status-pending">Belum Bayar</span>
+                                    {% endif %}
+
+                                    <i class="fas fa-chevron-down category-chevron"></i>
+                                </div>
+
+                            </button>
+
+
+                            <div class="collapse {{ 'show' if loop.first else '' }}"
+                                id="invoiceGroup{{ kelompok_id }}">
+
+                                <div class="category-table-wrap">
+
+                                    <div class="category-table-toolbar">
+                                        <span>
+                                            <i class="fas fa-table-list"></i>
+                                            Rincian transaksi
+                                        </span>
+                                        <span class="table-hint">
+                                            Geser tabel ke samping jika diperlukan
+                                        </span>
+                                    </div>
+
+
+                                    <div class="table-responsive">
+                                        <table class="invoice-table">
+
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-number">No.</th>
+                                                    <th>Nama Tagihan</th>
+                                                    <th>Periode</th>
+                                                    <th class="text-end">Nominal</th>
+                                                    <th class="text-end">Dibayar</th>
+                                                    <th class="text-end">Sisa</th>
+                                                    <th class="text-center">Status</th>
+                                                </tr>
+                                            </thead>
+
+
+                                            <tbody id="isiTabel-{{ kelompok_id }}">
+
+                                                {% for rinci in kelompok.rincian %}
+                                                    {% set sudah = rinci.sudah_dibayar or 0 %}
+                                                    {% set sisa = rinci.sisa_tagihan if rinci.sisa_tagihan is not none else rinci.nominal %}
+
+                                                    {% if sisa <= 0 or rinci.status|string|lower in ['lunas', 'sudah lunas'] %}
+                                                        {% set status_label = 'Lunas' %}
+                                                        {% set status_class = 'invoice-status-paid' %}
+                                                    {% elif sudah > 0 or rinci.status|string|lower in ['sebagian', 'dibayar sebagian'] %}
+                                                        {% set status_label = 'Sebagian' %}
+                                                        {% set status_class = 'invoice-status-partial' %}
+                                                    {% else %}
+                                                        {% set status_label = 'Belum Bayar' %}
+                                                        {% set status_class = 'invoice-status-unpaid' %}
+                                                    {% endif %}
+
+
+                                                    {% if rinci.nama.startswith('Ekstrakurikuler - ') %}
+                                                        {% set nama_tampil = rinci.nama.replace('Ekstrakurikuler - ', '') %}
+                                                    {% elif rinci.nama.startswith('Kelas Peminatan - ') %}
+                                                        {% set nama_tampil = rinci.nama.replace('Kelas Peminatan - ', '') %}
+                                                    {% elif rinci.nama.startswith('Peminatan - ') %}
+                                                        {% set nama_tampil = rinci.nama.replace('Peminatan - ', '') %}
+                                                    {% else %}
+                                                        {% set nama_tampil = rinci.nama %}
+                                                    {% endif %}
+
+
+                                                    <tr
+                                                        data-id="{{ rinci.id }}"
+                                                        data-nominal="{{ rinci.nominal }}"
+                                                        data-dibayar="{{ rinci.sudah_dibayar or 0 }}"
+                                                        data-sisa="{{ rinci.sisa_tagihan if rinci.sisa_tagihan is not none else rinci.nominal }}"
+                                                        data-status="{{ rinci.status }}"
+                                                        data-kelompok="{{ nama_kelompok }}"
+                                                    >
+
+                                                        <td class="col-number">{{ loop.index }}</td>
+
+                                                        <td>
+                                                            <div class="invoice-name-cell">
+                                                                <span class="invoice-name-icon">
+                                                                    <i class="fas fa-file-lines"></i>
+                                                                </span>
+                                                                <span>{{ nama_tampil }}</span>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>
+                                                            <span class="invoice-period">{{ rinci.waktu }}</span>
+                                                        </td>
+
+                                                        <td class="text-end amount-cell">
+                                                            {{ format_rupiah(rinci.nominal) }}
+                                                        </td>
+
+                                                        <td class="text-end amount-paid">
+                                                            {{ format_rupiah(sudah) }}
+                                                        </td>
+
+                                                        <td class="text-end amount-remaining">
+                                                            {{ format_rupiah(sisa) }}
+                                                        </td>
+
+                                                        <td class="text-center">
+                                                            <span class="invoice-status {{ status_class }}">
+                                                                {{ status_label }}
+                                                            </span>
+                                                        </td>
+
+                                                    </tr>
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+
+                                    <div class="invoice-table-footer">
+
+                                        <div class="table-showing">
+                                            Menampilkan
+
+                                            <select class="ukuran-tampil"
+                                                    data-target="isiTabel-{{ kelompok_id }}">
+                                                <option value="5" selected>5</option>
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="all">Semua</option>
+                                            </select>
+
+                                            data
+                                        </div>
+
+
+                                        <div class="paginasi-wrapper"
+                                            data-target="isiTabel-{{ kelompok_id }}"
+                                            data-perhalaman="5">
+
+                                            <button type="button"
+                                                    class="btn-sebelum"
+                                                    aria-label="Sebelumnya">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </button>
+
+                                            <div class="daftar-nomor"></div>
+
+                                            <button type="button"
+                                                    class="btn-sesudah"
+                                                    aria-label="Berikutnya">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </section>
+
+                    {% else %}
+
+                        <div class="invoice-empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <h5>Belum Ada Tagihan</h5>
+                            <p>Belum terdapat data tagihan untuk siswa ini.</p>
                         </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ==========================================
+                TAB 2: RIWAYAT PEMBAYARAN
+            =========================================== -->
+            <div class="invoice-tab-pane" id="riwayat-pembayaran">
+
+                <div class="invoice-list-heading">
+                    <div>
+                        <span class="section-kicker">PAYMENT HISTORY</span>
+                        <h4>Riwayat Pembayaran</h4>
+                        <p>Seluruh pembayaran yang sudah tercatat untuk siswa ini.</p>
+                    </div>
+                </div>
+
+
+                {% if riwayat_pembayaran %}
+
+                    <div class="category-table-wrap invoice-history-wrap">
 
                         <div class="table-responsive">
                             <table class="invoice-table">
+
                                 <thead>
                                     <tr>
-                                        <th class="col-number">No.</th>
-                                        <th>Nama Tagihan</th>
+                                        <th>Tanggal Pembayaran</th>
+                                        <th>Jenis Tagihan</th>
                                         <th>Periode</th>
-                                        <th class="text-end">Nominal</th>
-                                        <th class="text-end">Dibayar</th>
-                                        <th class="text-end">Sisa</th>
-                                        <th class="text-center">Status</th>
+                                        <th>Metode</th>
+                                        <th>Nominal</th>
+                                        <th>Keterangan</th>
                                     </tr>
                                 </thead>
 
-                                <tbody id="isiTabel-{{ kelompok_id }}">
-                                    {% for rinci in kelompok.rincian %}
-                                        {% set sudah = rinci.sudah_dibayar or 0 %}
-                                        {% set sisa = rinci.sisa_tagihan if rinci.sisa_tagihan is not none else rinci.nominal %}
+                                <tbody>
+                                    {% for bayar, tagihan in riwayat_pembayaran %}
+                                    <tr>
+                                        <td>{{ bayar.tanggal_bayar.strftime('%d/%m/%Y %H:%M') if bayar.tanggal_bayar else '-' }}</td>
+                                        <td>{{ tagihan.jenis.nama if tagihan.jenis else 'Jenis tidak ditemukan' }}</td>
+                                        <td>
+                                            {{ tagihan.bulan or tagihan.tahun_pelajaran or '-' }}
+                                        </td>
+                                        <td>{{ bayar.metode or '-' }}</td>
+                                        <td class="text-end">Rp {{ "{:,.0f}".format(bayar.jumlah_bayar or 0) }}</td>
+                                        <td>{{ bayar.keterangan or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
 
-                                        {% if sisa <= 0 or rinci.status|string|lower in ['lunas', 'sudah lunas'] %}
-                                            {% set status_label = 'Lunas' %}
-                                            {% set status_class = 'invoice-status-paid' %}
-                                        {% elif sudah > 0 or rinci.status|string|lower in ['sebagian', 'dibayar sebagian'] %}
-                                            {% set status_label = 'Sebagian' %}
-                                            {% set status_class = 'invoice-status-partial' %}
-                                        {% else %}
-                                            {% set status_label = 'Belum Bayar' %}
-                                            {% set status_class = 'invoice-status-unpaid' %}
-                                        {% endif %}
+                            </table>
+                        </div>
 
-                                        {% if rinci.nama.startswith('Ekstrakurikuler - ') %}
-                                            {% set nama_tampil = rinci.nama.replace('Ekstrakurikuler - ', '') %}
-                                        {% elif rinci.nama.startswith('Kelas Peminatan - ') %}
-                                            {% set nama_tampil = rinci.nama.replace('Kelas Peminatan - ', '') %}
-                                        {% elif rinci.nama.startswith('Peminatan - ') %}
-                                            {% set nama_tampil = rinci.nama.replace('Peminatan - ', '') %}
-                                        {% else %}
-                                            {% set nama_tampil = rinci.nama %}
-                                        {% endif %}
+                    </div>
 
-                                        <tr data-id="{{ rinci.id }}"
-                                            data-nominal="{{ rinci.nominal }}"
-                                            data-dibayar="{{ sudah }}"
-                                            data-sisa="{{ sisa }}"
-                                            data-status="{{ status_label }}"
-                                            data-kelompok="{{ nama_kelompok }}">
+                {% else %}
 
-                                            <td class="col-number">{{ loop.index }}</td>
+                    <div class="invoice-empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h5>Belum Ada Riwayat Pembayaran</h5>
+                        <p>Belum ada pembayaran yang tercatat untuk siswa ini.</p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ==========================================
+                TAB 3: RIWAYAT TRANSAKSI
+            =========================================== -->
+            <div class="invoice-tab-pane" id="riwayat-transaksi">
+
+                <div class="invoice-list-heading">
+                    <div>
+                        <span class="section-kicker">TRANSACTION HISTORY</span>
+                        <h4>Riwayat Transaksi</h4>
+                        <p>Seluruh pengajuan transaksi pembayaran milik siswa ini.</p>
+                    </div>
+                </div>
+
+
+                {% if riwayat_transaksi %}
+
+                    <div class="category-table-wrap invoice-history-wrap">
+
+                        <div class="table-responsive">
+                            <table class="invoice-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Kode Transaksi</th>
+                                        <th>Tanggal Pengajuan</th>
+                                        <th>Metode</th>
+                                        <th class="text-end">Total Transaksi</th>
+                                        <th class="text-center">Status</th>
+                                        <th>Catatan</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for trx in riwayat_transaksi %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+
                                             <td>
-                                                <div class="invoice-name-cell">
-                                                    <span class="invoice-name-icon"><i class="fas fa-file-lines"></i></span>
-                                                    <span>{{ nama_tampil }}</span>
-                                                </div>
+                                                <strong>{{ trx.kode_transaksi or '-' }}</strong>
                                             </td>
-                                            <td><span class="invoice-period">{{ rinci.waktu }}</span></td>
-                                            <td class="text-end amount-cell">{{ format_rupiah(rinci.nominal) }}</td>
-                                            <td class="text-end amount-paid">{{ format_rupiah(sudah) }}</td>
-                                            <td class="text-end amount-remaining">{{ format_rupiah(sisa) }}</td>
+
+                                            <td>
+                                                {% if trx.diajukan_pada %}
+                                                    {{ trx.diajukan_pada.strftime('%d/%m/%Y %H:%M') }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                {{ trx.metode or '-' }}
+                                            </td>
+
+                                            <td class="text-end amount-cell">
+                                                {{ format_rupiah(trx.total_diajukan or 0) }}
+                                            </td>
+
                                             <td class="text-center">
-                                                <span class="invoice-status {{ status_class }}">{{ status_label }}</span>
+                                                {% set status = (trx.status or '')|lower %}
+
+                                                {% if status in ['disetujui', 'diterima', 'berhasil', 'approved'] %}
+                                                    <span class="invoice-status invoice-status-paid">
+                                                        Disetujui
+                                                    </span>
+                                                {% elif status in ['ditolak', 'rejected'] %}
+                                                    <span class="invoice-status invoice-status-unpaid">
+                                                        Ditolak
+                                                    </span>
+                                                {% else %}
+                                                    <span class="invoice-status invoice-status-partial">
+                                                        Menunggu Verifikasi
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                {{ trx.catatan_admin or trx.catatan_orangtua or '-' }}
                                             </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
+
                             </table>
                         </div>
 
-                        <div class="invoice-table-footer">
-                            <div class="table-showing">
-                                Menampilkan
-                                <select class="ukuran-tampil" data-target="isiTabel-{{ kelompok_id }}">
-                                    <option value="5" selected>5</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="all">Semua</option>
-                                </select>
-                                data
-                            </div>
-
-                            <div class="paginasi-wrapper"
-                                 data-target="isiTabel-{{ kelompok_id }}"
-                                 data-perhalaman="5">
-                                <button type="button" class="btn-sebelum" aria-label="Sebelumnya">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="daftar-nomor"></div>
-                                <button type="button" class="btn-sesudah" aria-label="Berikutnya">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
                     </div>
-                </div>
-            </section>
-        {% else %}
-            <div class="invoice-empty-state">
-                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
-                <h5>Belum Ada Tagihan</h5>
-                <p>Belum terdapat data tagihan untuk siswa ini.</p>
+
+                {% else %}
+
+                    <div class="invoice-empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h5>Belum Ada Riwayat Transaksi</h5>
+                        <p>Belum ada pengajuan transaksi pembayaran untuk siswa ini.</p>
+                    </div>
+
+                {% endif %}
+
             </div>
-        {% endfor %}
 
+        </div>
     </div>
+    <!-- END INVOICE TAB WRAPPER -->
+
 </div>
+<!-- END INVOICE ADMIN PAGE -->
 
 
-<!-- =====================================================
-     MODAL PEMBAYARAN
-===================================================== -->
+<!-- =========================================================
+     PREMIUM PAYMENT WORKSPACE — ADMIN / BENDAHARA
+========================================================= -->
+
 <div class="modal fade invoice-payment-modal"
      id="modalPembayaran"
      tabindex="-1"
@@ -364,142 +652,470 @@
      data-bs-backdrop="static"
      data-bs-keyboard="false">
 
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable payment-workspace-dialog">
+        <div class="modal-content payment-workspace-modal">
 
-            <div class="payment-modal-header">
-                <div>
-                    <div class="modal-eyebrow"><span></span> PAYMENT CENTER</div>
-                    <h4 id="judulModalPembayaran">Proses Pembayaran</h4>
-                    <p>Pilih tagihan dan masukkan nominal pembayaran siswa.</p>
+            <!-- HEADER -->
+            <div class="payment-workspace-header">
+
+                <div class="payment-header-orb payment-orb-one"></div>
+                <div class="payment-header-orb payment-orb-two"></div>
+                <div class="payment-header-grid"></div>
+
+                <div class="payment-header-content">
+
+                    <div class="payment-brand">
+                        <div class="payment-brand-icon">
+                            <i class="fas fa-wallet"></i>
+                            <span class="payment-brand-pulse"></span>
+                        </div>
+
+                        <div class="payment-heading">
+                            <div class="payment-eyebrow">
+                                <span></span>
+                                FINANCE MANAGEMENT
+                            </div>
+
+                            <h4 id="judulModalPembayaran">
+                                Proses Pembayaran
+                            </h4>
+
+                            <p>
+                                Catat dan kelola transaksi pembayaran siswa.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="payment-header-actions">
+
+                        <span class="payment-secure-label">
+                            <i class="fas fa-shield-halved"></i>
+                            Transaksi Aman
+                        </span>
+
+                        <button type="button"
+                                class="payment-modal-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Tutup">
+                            <i class="fas fa-times"></i>
+                        </button>
+
+                    </div>
                 </div>
-                <button type="button" class="payment-modal-close" data-bs-dismiss="modal" aria-label="Tutup">
-                    <i class="fas fa-times"></i>
-                </button>
+
+                <div class="payment-header-bottom">
+                    <span>
+                        <i class="fas fa-sparkles"></i>
+                        ADMINISTRASI KEUANGAN SEKOLAH
+                    </span>
+
+                    <span class="payment-reference">
+                        <i class="fas fa-circle"></i>
+                        MANUAL PAYMENT
+                    </span>
+                </div>
             </div>
 
+
+            <!-- STUDENT PROFILE -->
             <div class="payment-student-strip">
-                <div class="payment-student-avatar"><i class="fas fa-user-graduate"></i></div>
-                <div class="payment-student-info">
-                    <span>PEMBAYARAN SISWA</span>
-                    <strong>{{ siswa.nama }}</strong>
-                    <small>{{ siswa.nisn }} <span>•</span> {{ nama_kelas }}</small>
+
+                <div class="payment-student-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                    <span></span>
                 </div>
-                <input type="hidden" id="idSiswaTerpilih" value="{{ siswa.id }}">
-                <div class="payment-secure-label"><i class="fas fa-shield-halved"></i> Transaksi Aman</div>
+
+                <div class="payment-student-info">
+                    <span class="student-caption">STUDENT PROFILE</span>
+                    <strong>{{ siswa.nama }}</strong>
+
+                    <small>
+                        <span><i class="fas fa-id-card"></i> {{ siswa.nisn }}</span>
+                        <span class="student-separator">•</span>
+                        <span><i class="fas fa-school"></i> {{ nama_kelas }}</span>
+                    </small>
+                </div>
+
+                <input type="hidden"
+                       id="idSiswaTerpilih"
+                       value="{{ siswa.id }}">
+
+                <div class="payment-student-status">
+                    <i class="fas fa-check-circle"></i>
+                    Siswa Terpilih
+                </div>
+
             </div>
 
+
+            <!-- BODY -->
             <div class="modal-body payment-modal-body">
 
-                <div class="payment-section-heading">
-                    <div>
-                        <span class="section-kicker">STEP 01</span>
-                        <h5>Pilih Tagihan</h5>
-                        <p>Tentukan tagihan yang akan dibayarkan.</p>
+                <!-- PROGRESS -->
+                <div class="payment-progress">
+
+                    <div class="payment-progress-item is-active">
+                        <span class="payment-progress-number">01</span>
+                        <span class="payment-progress-label">Pilih Tagihan</span>
                     </div>
-                    <label class="select-all-control">
-                        <input type="checkbox" id="pilihSemuaBelumLunas">
-                        <span class="select-all-box"><i class="fas fa-check"></i></span>
-                        Pilih semua
-                    </label>
+
+                    <span class="payment-progress-line"></span>
+
+                    <div class="payment-progress-item is-active">
+                        <span class="payment-progress-number">02</span>
+                        <span class="payment-progress-label">Detail Pembayaran</span>
+                    </div>
+
+                    <span class="payment-progress-line"></span>
+
+                    <div class="payment-progress-item">
+                        <span class="payment-progress-number">03</span>
+                        <span class="payment-progress-label">Konfirmasi</span>
+                    </div>
+
                 </div>
 
-                <div id="wadahDaftarTagihan" class="payment-invoice-list">
-                    <div class="payment-empty-placeholder">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <span>Menyiapkan daftar tagihan...</span>
-                    </div>
-                </div>
 
+                <!-- SECTION: BILL SELECTION -->
+                <section class="payment-workspace-section">
+
+                    <div class="payment-section-heading">
+
+                        <div class="payment-section-title">
+                            <div class="payment-section-icon payment-icon-bill">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+
+                            <div>
+                                <span class="payment-section-overline">STEP 01</span>
+                                <h5>Pilih Tagihan</h5>
+                                <p>Tentukan satu atau beberapa tagihan yang akan dibayarkan.</p>
+                            </div>
+                        </div>
+
+                        <label class="payment-select-all">
+                            <input type="checkbox" id="pilihSemuaBelumLunas">
+
+                            <span class="payment-custom-check">
+                                <i class="fas fa-check"></i>
+                            </span>
+
+                            <span>Pilih semua</span>
+                        </label>
+
+                    </div>
+
+
+                    <!-- BILL CONTAINER -->
+                    <div class="payment-bill-container">
+
+                        <div class="payment-bill-top">
+
+                            <div>
+                                <strong>
+                                    <i class="fas fa-layer-group"></i>
+                                    Rincian Tagihan
+                                </strong>
+
+                                <small>
+                                    Pilih tagihan sesuai pembayaran yang diterima.
+                                </small>
+                            </div>
+
+                            <span class="payment-bill-badge">
+                                <i class="fas fa-list-check"></i>
+                                TAGIHAN SISWA
+                            </span>
+
+                        </div>
+
+                        <div id="wadahDaftarTagihan"
+                             class="payment-invoice-list">
+
+                            <div class="payment-empty-placeholder">
+                                <div class="payment-empty-icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+
+                                <strong>Menyiapkan daftar tagihan</strong>
+                                <span>Silakan tunggu sebentar...</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- TOTAL PANEL -->
                 <div class="payment-total-panel">
-                    <div>
-                        <span class="total-panel-label">TOTAL TAGIHAN DIPILIH</span>
+
+                    <div class="payment-total-content">
+                        <span class="payment-total-caption">
+                            <i class="fas fa-calculator"></i>
+                            TOTAL TAGIHAN DIPILIH
+                        </span>
+
                         <strong id="totalDipilih">Rp0</strong>
-                    </div>
-                    <div class="total-panel-icon"><i class="fas fa-calculator"></i></div>
-                </div>
 
-                <div class="payment-section-heading payment-step-two">
-                    <div>
-                        <span class="section-kicker">STEP 02</span>
-                        <h5>Detail Pembayaran</h5>
-                        <p>Lengkapi informasi transaksi pembayaran.</p>
-                    </div>
-                </div>
-
-                <div class="payment-form-grid">
-
-                    <div class="payment-form-field payment-field-full">
-                        <label for="uangDiterima">Nominal Dibayarkan <span>*</span></label>
-                        <div class="payment-input-money">
-                            <span>Rp</span>
-                            <input type="text" id="uangDiterima" inputmode="numeric"
-                                   placeholder="0" autocomplete="off">
-                        </div>
-                        <small class="field-hint">Nominal akan dialokasikan otomatis ke tagihan yang dipilih.</small>
+                        <small>
+                            Total sisa tagihan yang akan dibayarkan.
+                        </small>
                     </div>
 
-                    <div class="payment-form-field">
-                        <label for="metodeBayar">Metode Pembayaran <span>*</span></label>
-                        <div class="payment-select-wrap">
+                    <div class="payment-total-decoration">
+                        <div class="payment-total-icon">
                             <i class="fas fa-wallet"></i>
-                            <select id="metodeBayar">
-                                <option value="">Pilih metode pembayaran</option>
-                                <option value="Tunai">Tunai</option>
-                                <option value="Transfer Bank">Transfer Bank</option>
-                                <option value="Dompet Digital">Dompet Digital</option>
-                            </select>
-                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
-                    </div>
-
-                    <div class="payment-form-field">
-                        <label for="tanggalJamBayar">Tanggal dan Waktu <span>*</span></label>
-                        <div class="payment-date-wrap">
-                            <i class="fas fa-calendar-days"></i>
-                            <input type="datetime-local" id="tanggalJamBayar">
-                        </div>
-                    </div>
-
-                    <div class="payment-form-field payment-field-full">
-                        <label for="catatanBayar">Catatan <small>(Opsional)</small></label>
-                        <textarea id="catatanBayar" rows="3"
-                                  placeholder="Tambahkan catatan pembayaran jika diperlukan..."></textarea>
+                        <span>PAYMENT SUMMARY</span>
                     </div>
 
                 </div>
 
-                <div class="payment-allocation-note">
-                    <i class="fas fa-circle-info"></i>
-                    <div>
-                        <strong>Sistem alokasi otomatis</strong>
-                        <p>Nominal pembayaran akan dialokasikan secara berurutan pada tagihan yang dipilih. Pembayaran sebagian tetap diperbolehkan.</p>
+
+                <!-- SECTION: PAYMENT DETAIL -->
+                <section class="payment-workspace-section payment-detail-section">
+
+                    <div class="payment-section-heading">
+
+                        <div class="payment-section-title">
+                            <div class="payment-section-icon payment-icon-detail">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+
+                            <div>
+                                <span class="payment-section-overline">STEP 02</span>
+                                <h5>Informasi Pembayaran</h5>
+                                <p>Lengkapi detail transaksi pembayaran siswa.</p>
+                            </div>
+                        </div>
+
+                        <span class="payment-section-index">02 / 03</span>
+
                     </div>
+
+
+                    <div class="payment-form-grid">
+
+                        <!-- NOMINAL -->
+                        <div class="payment-form-field payment-field-full">
+
+                            <label for="uangDiterima">
+                                NOMINAL DIBAYARKAN
+                                <span class="payment-required">*</span>
+                            </label>
+
+                            <div class="payment-input-shell payment-input-highlight">
+
+                                <span class="payment-input-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+
+                                <span class="payment-currency">Rp</span>
+
+                                <input type="text"
+                                       id="uangDiterima"
+                                       inputmode="numeric"
+                                       placeholder="Masukkan nominal pembayaran"
+                                       autocomplete="off">
+
+                                <span class="payment-input-suffix">
+                                    IDR
+                                </span>
+
+                            </div>
+
+                            <small class="payment-field-hint">
+                                <i class="fas fa-circle-info"></i>
+                                Nominal akan dialokasikan otomatis ke tagihan yang dipilih.
+                            </small>
+
+                        </div>
+
+
+                        <!-- PAYMENT METHOD -->
+                        <div class="payment-form-field">
+
+                            <label for="metodeBayar">
+                                METODE PEMBAYARAN
+                                <span class="payment-required">*</span>
+                            </label>
+
+                            <div class="payment-input-shell payment-select-shell">
+
+                                <span class="payment-input-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </span>
+
+                                <select id="metodeBayar">
+                                    <option value="">Pilih metode pembayaran</option>
+                                    <option value="Tunai">Tunai</option>
+                                    <option value="Transfer Bank">Transfer Bank</option>
+                                    <option value="Dompet Digital">Dompet Digital</option>
+                                </select>
+
+                                <i class="fas fa-chevron-down payment-select-arrow"></i>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DATE -->
+                        <div class="payment-form-field">
+
+                            <label for="tanggalJamBayar">
+                                TANGGAL DAN WAKTU
+                                <span class="payment-required">*</span>
+                            </label>
+
+                            <div class="payment-input-shell">
+
+                                <span class="payment-input-icon">
+                                    <i class="fas fa-calendar-days"></i>
+                                </span>
+
+                                <input type="datetime-local"
+                                       id="tanggalJamBayar">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NOTE -->
+                        <div class="payment-form-field payment-field-full">
+
+                            <label for="catatanBayar">
+                                CATATAN TAMBAHAN
+                                <span class="payment-optional">OPSIONAL</span>
+                            </label>
+
+                            <div class="payment-note-shell">
+
+                                <span class="payment-note-icon">
+                                    <i class="fas fa-pen"></i>
+                                </span>
+
+                                <textarea id="catatanBayar"
+                                          rows="3"
+                                          placeholder="Tuliskan catatan tambahan jika diperlukan..."></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- NOTICE -->
+                <div class="payment-allocation-notice">
+
+                    <div class="payment-notice-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong>Sistem alokasi pembayaran otomatis</strong>
+                        <p>
+                            Pembayaran akan dialokasikan secara berurutan pada tagihan
+                            yang dipilih. Pembayaran sebagian tetap diperbolehkan.
+                        </p>
+                    </div>
+
+                    <span class="payment-notice-decoration">SECURE</span>
+
                 </div>
 
             </div>
 
+
+            <!-- FOOTER -->
             <div class="payment-modal-footer">
-                <div class="footer-secure-note">
-                    <i class="fas fa-lock"></i>
-                    Data transaksi akan tersimpan di sistem
+
+                <div class="payment-footer-security">
+                    <span class="payment-footer-lock">
+                        <i class="fas fa-lock"></i>
+                    </span>
+
+                    <span>
+                        <strong>Secure transaction</strong>
+                        <small>Data pembayaran tercatat di sistem.</small>
+                    </span>
                 </div>
+
                 <div class="payment-footer-actions">
-                    <button type="button" class="payment-cancel-btn" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="payment-submit-btn" id="btnSimpanPembayaran">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Simpan Pembayaran</span>
-                        <i class="fas fa-arrow-right submit-arrow"></i>
+
+                    <button type="button"
+                            class="payment-cancel-btn"
+                            data-bs-dismiss="modal">
+                        Batal
                     </button>
+
+                    <button type="button"
+                            class="payment-submit-btn"
+                            id="btnSimpanPembayaran">
+
+                        <span class="payment-submit-icon">
+                            <i class="fas fa-check"></i>
+                        </span>
+
+                        <span>Simpan Pembayaran</span>
+
+                        <i class="fas fa-arrow-right payment-submit-arrow"></i>
+
+                    </button>
+
                 </div>
+
             </div>
 
         </div>
     </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+        // =====================================================
+    // INVOICE TABS
+    // =====================================================
+
+    const invoiceTabButtons = document.querySelectorAll('.invoice-tab-btn');
+    const invoiceTabPanes = document.querySelectorAll('.invoice-tab-pane');
+
+    invoiceTabButtons.forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            const targetTab = this.dataset.tab;
+
+            // Hapus status aktif dari seluruh tombol
+            invoiceTabButtons.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Hapus status aktif dari seluruh konten
+            invoiceTabPanes.forEach(pane => {
+                pane.classList.remove('active');
+            });
+
+            // Aktifkan tombol yang dipilih
+            this.classList.add('active');
+
+            // Tampilkan konten tab yang dipilih
+            const targetPane = document.getElementById(targetTab);
+
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
+
+        });
+
+    });
 
     const modalElement = document.getElementById('modalPembayaran');
     const btnBayar = document.getElementById('btnBayarSiswa');

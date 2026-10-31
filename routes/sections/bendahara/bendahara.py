@@ -1309,6 +1309,32 @@ def rincian_tagihan(kode):
     nama_kelas = riwayat_pertama.kelas.nama_kelas if riwayat_pertama.kelas else '-'
     tahun_ajaran = tp_awal.nama.replace('Tahun Pelajaran ', '').split(' - ')[0] if tp_awal else f"{angkatan_masuk}/{int(angkatan_masuk)+1}"
 
+    # ==========================================
+    # RIWAYAT PEMBAYARAN SISWA
+    # Pembayaran yang sudah tercatat pada tagihan
+    # ==========================================
+    riwayat_pembayaran = (
+        db.session.query(RiwayatPembayaran, TagihanSiswa)
+        .join(
+            TagihanSiswa,
+            RiwayatPembayaran.tagihan_id == TagihanSiswa.id
+        )
+        .filter(TagihanSiswa.siswa_id == siswa.id)
+        .order_by(RiwayatPembayaran.tanggal_bayar.desc())
+        .all()
+    )
+
+    # ==========================================
+    # RIWAYAT TRANSAKSI SISWA
+    # Pengajuan pembayaran online
+    # ==========================================
+    riwayat_transaksi = (
+        PengajuanPembayaran.query
+        .filter_by(siswa_id=siswa.id)
+        .order_by(PengajuanPembayaran.diajukan_pada.desc())
+        .all()
+    )
+
     return render_template ('index.html',
                             active_page='rincian_tagihan',
                             halaman_aktif='bendahara',
@@ -1320,7 +1346,10 @@ def rincian_tagihan(kode):
                             daftar_tagihan=daftar_tagihan,
                             nama_kelas=nama_kelas,
                             total_semua=format_rupiah(total_semua),
-                            format_rupiah=format_rupiah)
+                            format_rupiah=format_rupiah,
+                            riwayat_pembayaran=riwayat_pembayaran,
+                            riwayat_transaksi=riwayat_transaksi,
+                            )
 
 @bendahara_bp.route('/simpan-pembayaran', methods=['POST'])
 def simpan_pembayaran():
