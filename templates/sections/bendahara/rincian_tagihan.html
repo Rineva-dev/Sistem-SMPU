@@ -1,714 +1,1169 @@
-<div class="page-header mb-4">
-    <h3><i class="fas fa-file-invoice"></i> Rincian Tagihan Pembayaran</h3>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('bendahara.spp_siswa') }}">Daftar Tagihan Siswa</a></li>
-            <li class="breadcrumb-item active">Rincian Tagihan</li>
-        </ol>
-    </nav>
-</div>
+<div class="invoice-admin-page">
 
-<!-- DATA SISWA -->
-<div class="data-siswa">
-    <div class="d-flex align-items-center gap-4">
-        <div class="lingkar-ikon"><i class="fas fa-user-graduate"></i></div>
-        <div class="d-flex gap-3 flex-grow-1 flex-wrap">
-            <div class="kotak-data-mini"><span>NISN</span><strong>{{ siswa.nisn }}</strong></div>
-            <div class="kotak-data-mini"><span>Nama Lengkap</span><strong>{{ siswa.nama }}</strong></div>
-            <div class="kotak-data-mini"><span>Kelas</span><strong>{{ nama_kelas }}</strong></div>
-            <div class="kotak-data-mini"><span>Tahun</span><strong>{{ tahun_ajaran }}</strong></div>
-        </div>
-        <button class="btn btn-success" id="btnBayarSiswa">
-            <i class="fas fa-money-bill-wave me-2"></i>Pembayaran
-        </button>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>Rincian Tagihan</h5>
-        <span class="fw-bold fs-6">TOTAL KESELURUHAN: {{ total_semua }}</span>
-    </div>
-    <div class="card-body">
-        {% set daftar_kelompok = {} %}
-        {% for tagihan in daftar_tagihan %}
-            {% if tagihan.nama.startswith('Ekstrakurikuler - ') %}
-                {% set nama_kelompok = 'Ekstrakurikuler' %}
-            {% elif tagihan.nama.startswith('Peminatan - ') or tagihan.nama.startswith('Kelas Peminatan - ') %}
-                {% set nama_kelompok = 'Kelas Peminatan' %}
-            {% else %}
-                {% set nama_kelompok = tagihan.nama.split(' - ')[0] %}
-            {% endif %}
-            {% if nama_kelompok not in daftar_kelompok %}
-                {% set _ = daftar_kelompok.update({nama_kelompok: {'rincian': [], 'subtotal':0, 'jumlah':0}}) %}
-            {% endif %}
-            {% set _ = daftar_kelompok[nama_kelompok].rincian.append(tagihan) %}
-            {% set _ = daftar_kelompok[nama_kelompok].update({
-                'subtotal': daftar_kelompok[nama_kelompok].subtotal + tagihan.nominal,
-                'jumlah': daftar_kelompok[nama_kelompok].jumlah +1
-            }) %}
-        {% endfor %}
-
-        {% if daftar_kelompok %}
-        {% for nama_kelompok, data in daftar_kelompok.items() %}
-        {% set kelompok_id = loop.index %}
-        <div class="card mb-3 shadow-sm border-0">
-            <div class="card-header d-flex align-items-center justify-content-between py-2"
-                data-bs-toggle="collapse" data-bs-target="#blok-{{ kelompok_id }}" style="cursor:pointer;">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-chevron-down"></i>
-                    <h6 class="mb-0 fw-bold">{{ nama_kelompok }}</h6>
-                    <span class="badge bg-light text-dark rounded-pill">{{ data.jumlah }} rincian</span>
-                </div>
-                <div class="text-end fw-bold">
-                    {{ format_rupiah(data.subtotal) }}
-                    {% if data.subtotal >0 %}<span class="ms-1 badge bg-dark">Belum Lunas</span>
-                    {% else %}<span class="ms-1 badge bg-success">Lunas</span>{% endif %}
-                </div>
+    <!-- PAGE HEADING -->
+    <div class="invoice-heading">
+        <div>
+            <div class="invoice-eyebrow">
+                <span class="eyebrow-dot"></span>
+                FINANCE MANAGEMENT
             </div>
-            <div id="blok-{{ kelompok_id }}" class="collapse show">
-                <div class="card-body p-2">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th width="40">No</th>
-                                    <th>Keterangan / Periode</th>
-                                    <th class="text-end" style="width: 160px;">Nominal Tagihan</th>
-                                    <th class="text-end" style="width: 160px;">Sudah Dibayar</th>
-                                    <th class="text-end" style="width: 160px;">Sisa Tagihan</th>
-                                    <th class="text-center" style="width: 280px;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="isiTabel-{{ kelompok_id }}" class="isi-paginasi">
-                                {% for rinci in data.rincian %}
-                                {% set nama_tampil = rinci.nama %}
-                                {% if rinci.nama.startswith('Ekstrakurikuler - ') %}
-                                    {% set nama_tampil = rinci.nama | replace('Ekstrakurikuler - ', '') %}
-                                {% elif rinci.nama.startswith('Kelas Peminatan - ') %}
-                                    {% set nama_tampil = rinci.nama | replace('Kelas Peminatan - ', '') %}
-                                {% elif rinci.nama.startswith('Peminatan - ') %}
-                                    {% set nama_tampil = rinci.nama | replace('Peminatan - ', '') %}
-                                {% endif %}
-                                <tr data-tagihan-id="{{ rinci.id }}" data-id="{{ rinci.id }}" data-kelompok="{{ nama_kelompok }}">
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ nama_tampil }} — {{ rinci.waktu }}</td>
-                                    <td class="text-end">{{ format_rupiah(rinci.nominal) }}</td>
-                                    <td class="text-end fw-bold text-success">{{ format_rupiah(rinci.sudah_dibayar or 0) }}</td>
-                                    <td class="text-end fw-bold {% if rinci.sisa_tagihan == 0 %}text-success{% else %}text-danger{% endif %}">
-                                        {{ format_rupiah(rinci.sisa_tagihan if rinci.sisa_tagihan is not none else rinci.nominal) }}
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge {% if rinci.status=='Lunas' %}bg-success{% elif rinci.status=='Sebagian' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                                            {{ rinci.status }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- ✅ BARIS SEJAJAR: PILIHAN (KIRI) + PAGINASI (KANAN) -->
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <!-- KIRI: PILIHAN JUMLAH DATA -->
-                        <div class="d-flex align-items-center gap-2">
-                            <small class="text-muted">Tampilkan:</small>
-                            <select class="form-select form-select-sm ukuran-tampil" data-target="isiTabel-{{ kelompok_id }}" style="width: auto;">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="0">Semua</option>
-                            </select>
-                        </div>
+            <h2>Rincian Tagihan Siswa</h2>
+            <p>Kelola tagihan, pantau pembayaran, dan periksa riwayat kewajiban siswa.</p>
+        </div>
 
-                        <!-- KANAN: TOMBOL HALAMAN -->
-                        <div class="d-flex align-items-center gap-2 paginasi-wrapper" data-target="isiTabel-{{ kelompok_id }}" data-perhalaman="5">
-                            <button class="btn btn-sm btn-outline-primary btn-sebelum">&lt;</button>
-                            <div class="d-flex gap-1 daftar-nomor"></div>
-                            <button class="btn btn-sm btn-outline-primary btn-sesudah">&gt;</button>
-                        </div>
-                    </div>
+        <div class="invoice-heading-actions">
+            <a href="{{ url_for('bendahara.spp_siswa') }}" class="invoice-back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
+            <button type="button" class="invoice-primary-btn" id="btnBayarSiswa">
+                <i class="fas fa-wallet"></i>
+                <span>Buat Pembayaran</span>
+                <i class="fas fa-arrow-right btn-arrow"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- STUDENT PROFILE -->
+    <section class="student-hero">
+        <div class="student-hero-decoration"></div>
+
+        <div class="student-profile">
+            <div class="student-avatar">
+                <i class="fas fa-user-graduate"></i>
+                <span class="avatar-online"></span>
+            </div>
+
+            <div class="student-profile-info">
+                <span class="student-profile-label">PROFIL SISWA</span>
+                <h3>{{ siswa.nama }}</h3>
+                <div class="student-profile-meta">
+                    <span><i class="fas fa-id-card"></i> {{ siswa.nisn }}</span>
+                    <span><i class="fas fa-users"></i> {{ nama_kelas }}</span>
+                    <span><i class="fas fa-calendar-alt"></i> {{ tahun_ajaran }}</span>
                 </div>
             </div>
         </div>
-        {% endfor %}
+
+        <div class="student-hero-side">
+            <span class="hero-side-label">STATUS DATA</span>
+            <span class="student-active-status">
+                <span></span> Data Tagihan
+            </span>
+        </div>
+    </section>
+
+    <!-- FINANCIAL SUMMARY -->
+    {% set total_tagihan = namespace(value=0) %}
+    {% set total_dibayar = namespace(value=0) %}
+    {% set total_sisa = namespace(value=0) %}
+
+    {% for tagihan in daftar_tagihan %}
+        {% set sudah = tagihan.sudah_dibayar or 0 %}
+        {% set sisa = tagihan.sisa_tagihan if tagihan.sisa_tagihan is not none else tagihan.nominal %}
+        {% set total_tagihan.value = total_tagihan.value + tagihan.nominal %}
+        {% set total_dibayar.value = total_dibayar.value + sudah %}
+        {% set total_sisa.value = total_sisa.value + sisa %}
+    {% endfor %}
+
+    <section class="invoice-summary-grid">
+
+        <div class="summary-card summary-total">
+            <div class="summary-card-top">
+                <div class="summary-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <span class="summary-caption">TOTAL TAGIHAN</span>
+            </div>
+            <div class="summary-value">{{ format_rupiah(total_tagihan.value) }}</div>
+            <div class="summary-foot">
+                <span class="summary-foot-icon"><i class="fas fa-layer-group"></i></span>
+                Seluruh kewajiban siswa
+            </div>
+            <div class="summary-watermark"><i class="fas fa-file-invoice"></i></div>
+        </div>
+
+        <div class="summary-card summary-paid">
+            <div class="summary-card-top">
+                <div class="summary-icon"><i class="fas fa-check-double"></i></div>
+                <span class="summary-caption">SUDAH DIBAYAR</span>
+            </div>
+            <div class="summary-value">{{ format_rupiah(total_dibayar.value) }}</div>
+            <div class="summary-foot">
+                <span class="summary-foot-icon"><i class="fas fa-check"></i></span>
+                Akumulasi pembayaran
+            </div>
+            <div class="summary-watermark"><i class="fas fa-circle-check"></i></div>
+        </div>
+
+        <div class="summary-card summary-remaining">
+            <div class="summary-card-top">
+                <div class="summary-icon"><i class="fas fa-hourglass-half"></i></div>
+                <span class="summary-caption">SISA TAGIHAN</span>
+            </div>
+            <div class="summary-value">{{ format_rupiah(total_sisa.value) }}</div>
+            <div class="summary-foot">
+                <span class="summary-foot-icon"><i class="fas fa-clock"></i></span>
+                Menunggu pelunasan
+            </div>
+            <div class="summary-watermark"><i class="fas fa-wallet"></i></div>
+        </div>
+
+    </section>
+
+    <!-- PAYMENT PROGRESS -->
+    {% if total_tagihan.value > 0 %}
+        {% set persentase_bayar = (total_dibayar.value / total_tagihan.value * 100)|round|int %}
+    {% else %}
+        {% set persentase_bayar = 0 %}
+    {% endif %}
+
+    <section class="payment-progress-card">
+        <div class="progress-heading">
+            <div>
+                <span class="section-kicker">PAYMENT OVERVIEW</span>
+                <h4>Progres Pembayaran</h4>
+                <p>Ringkasan penyelesaian seluruh tagihan siswa.</p>
+            </div>
+            <div class="progress-percentage">{{ persentase_bayar }}<small>%</small></div>
+        </div>
+
+        <div class="invoice-progress-track">
+            <div class="invoice-progress-fill"
+                 style="width: {{ [persentase_bayar, 100]|min }}%">
+            </div>
+        </div>
+
+        <div class="progress-legend">
+            <span><i class="legend-dot paid-dot"></i> Terbayar <strong>{{ format_rupiah(total_dibayar.value) }}</strong></span>
+            <span><i class="legend-dot remaining-dot"></i> Belum terbayar <strong>{{ format_rupiah(total_sisa.value) }}</strong></span>
+        </div>
+    </section>
+
+    <!-- INVOICE GROUPS -->
+    {% set daftar_kelompok = {} %}
+
+    {% for tagihan in daftar_tagihan %}
+        {% if tagihan.nama.startswith('Ekstrakurikuler - ') %}
+            {% set nama_kelompok = 'Ekstrakurikuler' %}
+        {% elif tagihan.nama.startswith('Peminatan - ') or tagihan.nama.startswith('Kelas Peminatan - ') %}
+            {% set nama_kelompok = 'Kelas Peminatan' %}
         {% else %}
-        <div class="text-center py-4 text-muted">
-            <i class="fas fa-clipboard-list fa-3x mb-2"></i>
-            <p>Belum ada jenis pembayaran yang diatur.</p>
-        </div>
+            {% set nama_kelompok = tagihan.nama.split(' - ')[0] %}
         {% endif %}
+
+        {% if nama_kelompok not in daftar_kelompok %}
+            {% set _ = daftar_kelompok.update({
+                nama_kelompok: {
+                    'rincian': [],
+                    'subtotal': 0,
+                    'jumlah': 0,
+                    'dibayar': 0,
+                    'sisa': 0
+                }
+            }) %}
+        {% endif %}
+
+        {% set _ = daftar_kelompok[nama_kelompok].rincian.append(tagihan) %}
+        {% set _ = daftar_kelompok[nama_kelompok].update({
+            'subtotal': daftar_kelompok[nama_kelompok].subtotal + tagihan.nominal,
+            'jumlah': daftar_kelompok[nama_kelompok].jumlah + 1,
+            'dibayar': daftar_kelompok[nama_kelompok].dibayar + (tagihan.sudah_dibayar or 0),
+            'sisa': daftar_kelompok[nama_kelompok].sisa + (tagihan.sisa_tagihan if tagihan.sisa_tagihan is not none else tagihan.nominal)
+        }) %}
+    {% endfor %}
+
+    <div class="invoice-list-heading">
+        <div>
+            <span class="section-kicker">INVOICE DIRECTORY</span>
+            <h4>Daftar Rincian Tagihan</h4>
+            <p>Tagihan dikelompokkan berdasarkan jenis pembayaran.</p>
+        </div>
+        <div class="invoice-count-badge">
+            <i class="fas fa-list-check"></i>
+            {{ daftar_tagihan|length }} Tagihan
+        </div>
     </div>
-</div>
 
-<div class="mt-3">
-    <a href="{{ url_for('bendahara.spp_siswa') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
-    </a>
-</div>
+    <div class="invoice-groups">
 
-<input type="hidden" id="idSiswaTerpilih" value="{{ siswa.id }}">
+        {% for nama_kelompok, kelompok in daftar_kelompok.items() %}
+            {% set kelompok_id = loop.index %}
+            {% set persentase_kelompok = (kelompok.dibayar / kelompok.subtotal * 100)|round|int if kelompok.subtotal > 0 else 0 %}
 
-<!-- MODAL PEMBAYARAN -->
-<div class="modal fade" id="modalPembayaran" tabindex="-1" aria-labelledby="judulModalBayar" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="judulModalBayar">
-                    <i class="fas fa-money-bill-wave me-2"></i>Buat Pembayaran
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
+            <section class="invoice-category-card">
 
-            <div class="modal-body pembayaran">
-                <div class="alert alert-light border mb-3 px-3 py-2 rounded-3 shadow-sm">
-                    <div class="d-flex align-items-center flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-user-graduate text-primary"></i>
-                            <div>
-                                <small class="text-muted d-block">Nama Lengkap</small>
-                                <strong class="text-dark">{{ siswa.nama }}</strong>
-                            </div>
+                <button class="invoice-category-header"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#invoiceGroup{{ kelompok_id }}"
+                        aria-expanded="{{ 'true' if loop.first else 'false' }}">
+
+                    <div class="category-left">
+                        <div class="category-icon category-icon-{{ kelompok_id % 5 }}">
+                            {% if 'SPP' in nama_kelompok|upper %}
+                                <i class="fas fa-school"></i>
+                            {% elif 'EKSTRA' in nama_kelompok|upper %}
+                                <i class="fas fa-futbol"></i>
+                            {% elif 'PEMINATAN' in nama_kelompok|upper %}
+                                <i class="fas fa-book-open"></i>
+                            {% elif 'PEMBANGUNAN' in nama_kelompok|upper %}
+                                <i class="fas fa-building"></i>
+                            {% else %}
+                                <i class="fas fa-receipt"></i>
+                            {% endif %}
                         </div>
-                        <span class="vr"></span>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-id-card text-success"></i>
-                            <div>
-                                <small class="text-muted d-block">NISN</small>
-                                <strong class="text-dark">{{ siswa.nisn }}</strong>
-                            </div>
+
+                        <div class="category-title">
+                            <h5>{{ nama_kelompok }}</h5>
+                            <span>{{ kelompok.jumlah }} item tagihan</span>
                         </div>
-                        <span class="vr"></span>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fas fa-school text-info"></i>
-                            <div>
-                                <small class="text-muted d-block">Kelas</small>
-                                <strong class="text-dark">{{ nama_kelas }}</strong>
+                    </div>
+
+                    <div class="category-middle">
+                        <div class="category-amount">{{ format_rupiah(kelompok.subtotal) }}</div>
+                        <div class="category-progress">
+                            <div style="width: {{ [persentase_kelompok, 100]|min }}%"></div>
+                        </div>
+                        <span>{{ persentase_kelompok }}% terbayar</span>
+                    </div>
+
+                    <div class="category-right">
+                        {% if kelompok.sisa <= 0 %}
+                            <span class="category-status status-complete"><i class="fas fa-check-circle"></i> Lunas</span>
+                        {% elif kelompok.dibayar > 0 %}
+                            <span class="category-status status-partial">Sebagian</span>
+                        {% else %}
+                            <span class="category-status status-pending">Belum Bayar</span>
+                        {% endif %}
+                        <i class="fas fa-chevron-down category-chevron"></i>
+                    </div>
+                </button>
+
+                <div class="collapse {{ 'show' if loop.first else '' }}"
+                     id="invoiceGroup{{ kelompok_id }}">
+
+                    <div class="category-table-wrap">
+                        <div class="category-table-toolbar">
+                            <span><i class="fas fa-table-list"></i> Rincian transaksi</span>
+                            <span class="table-hint">Geser tabel ke samping jika diperlukan</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-number">No.</th>
+                                        <th>Nama Tagihan</th>
+                                        <th>Periode</th>
+                                        <th class="text-end">Nominal</th>
+                                        <th class="text-end">Dibayar</th>
+                                        <th class="text-end">Sisa</th>
+                                        <th class="text-center">Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="isiTabel-{{ kelompok_id }}">
+                                    {% for rinci in kelompok.rincian %}
+                                        {% set sudah = rinci.sudah_dibayar or 0 %}
+                                        {% set sisa = rinci.sisa_tagihan if rinci.sisa_tagihan is not none else rinci.nominal %}
+
+                                        {% if sisa <= 0 or rinci.status|string|lower in ['lunas', 'sudah lunas'] %}
+                                            {% set status_label = 'Lunas' %}
+                                            {% set status_class = 'invoice-status-paid' %}
+                                        {% elif sudah > 0 or rinci.status|string|lower in ['sebagian', 'dibayar sebagian'] %}
+                                            {% set status_label = 'Sebagian' %}
+                                            {% set status_class = 'invoice-status-partial' %}
+                                        {% else %}
+                                            {% set status_label = 'Belum Bayar' %}
+                                            {% set status_class = 'invoice-status-unpaid' %}
+                                        {% endif %}
+
+                                        {% if rinci.nama.startswith('Ekstrakurikuler - ') %}
+                                            {% set nama_tampil = rinci.nama.replace('Ekstrakurikuler - ', '') %}
+                                        {% elif rinci.nama.startswith('Kelas Peminatan - ') %}
+                                            {% set nama_tampil = rinci.nama.replace('Kelas Peminatan - ', '') %}
+                                        {% elif rinci.nama.startswith('Peminatan - ') %}
+                                            {% set nama_tampil = rinci.nama.replace('Peminatan - ', '') %}
+                                        {% else %}
+                                            {% set nama_tampil = rinci.nama %}
+                                        {% endif %}
+
+                                        <tr data-id="{{ rinci.id }}"
+                                            data-nominal="{{ rinci.nominal }}"
+                                            data-dibayar="{{ sudah }}"
+                                            data-sisa="{{ sisa }}"
+                                            data-status="{{ status_label }}"
+                                            data-kelompok="{{ nama_kelompok }}">
+
+                                            <td class="col-number">{{ loop.index }}</td>
+                                            <td>
+                                                <div class="invoice-name-cell">
+                                                    <span class="invoice-name-icon"><i class="fas fa-file-lines"></i></span>
+                                                    <span>{{ nama_tampil }}</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="invoice-period">{{ rinci.waktu }}</span></td>
+                                            <td class="text-end amount-cell">{{ format_rupiah(rinci.nominal) }}</td>
+                                            <td class="text-end amount-paid">{{ format_rupiah(sudah) }}</td>
+                                            <td class="text-end amount-remaining">{{ format_rupiah(sisa) }}</td>
+                                            <td class="text-center">
+                                                <span class="invoice-status {{ status_class }}">{{ status_label }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="invoice-table-footer">
+                            <div class="table-showing">
+                                Menampilkan
+                                <select class="ukuran-tampil" data-target="isiTabel-{{ kelompok_id }}">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="all">Semua</option>
+                                </select>
+                                data
+                            </div>
+
+                            <div class="paginasi-wrapper"
+                                 data-target="isiTabel-{{ kelompok_id }}"
+                                 data-perhalaman="5">
+                                <button type="button" class="btn-sebelum" aria-label="Sebelumnya">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="daftar-nomor"></div>
+                                <button type="button" class="btn-sesudah" aria-label="Berikutnya">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </section>
+        {% else %}
+            <div class="invoice-empty-state">
+                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                <h5>Belum Ada Tagihan</h5>
+                <p>Belum terdapat data tagihan untuk siswa ini.</p>
+            </div>
+        {% endfor %}
 
-                <div class="d-flex align-items-center justify-content-between mb-2 px-2">
-                    <h6 class="mb-0 fw-semibold">Pilih Tagihan Akan Dibayar</h6>
-                    <label class="form-check fw-normal">
-                        <input class="form-check-input" type="checkbox" id="pilihSemuaBelumLunas">
-                        Pilih Semua Belum Lunas
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL PEMBAYARAN
+===================================================== -->
+<div class="modal fade invoice-payment-modal"
+     id="modalPembayaran"
+     tabindex="-1"
+     aria-labelledby="judulModalPembayaran"
+     aria-hidden="true"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="payment-modal-header">
+                <div>
+                    <div class="modal-eyebrow"><span></span> PAYMENT CENTER</div>
+                    <h4 id="judulModalPembayaran">Proses Pembayaran</h4>
+                    <p>Pilih tagihan dan masukkan nominal pembayaran siswa.</p>
+                </div>
+                <button type="button" class="payment-modal-close" data-bs-dismiss="modal" aria-label="Tutup">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="payment-student-strip">
+                <div class="payment-student-avatar"><i class="fas fa-user-graduate"></i></div>
+                <div class="payment-student-info">
+                    <span>PEMBAYARAN SISWA</span>
+                    <strong>{{ siswa.nama }}</strong>
+                    <small>{{ siswa.nisn }} <span>•</span> {{ nama_kelas }}</small>
+                </div>
+                <input type="hidden" id="idSiswaTerpilih" value="{{ siswa.id }}">
+                <div class="payment-secure-label"><i class="fas fa-shield-halved"></i> Transaksi Aman</div>
+            </div>
+
+            <div class="modal-body payment-modal-body">
+
+                <div class="payment-section-heading">
+                    <div>
+                        <span class="section-kicker">STEP 01</span>
+                        <h5>Pilih Tagihan</h5>
+                        <p>Tentukan tagihan yang akan dibayarkan.</p>
+                    </div>
+                    <label class="select-all-control">
+                        <input type="checkbox" id="pilihSemuaBelumLunas">
+                        <span class="select-all-box"><i class="fas fa-check"></i></span>
+                        Pilih semua
                     </label>
                 </div>
 
-                <div class="daftar-modal-wrapper border rounded mb-3" id="wadahDaftarTagihan">
+                <div id="wadahDaftarTagihan" class="payment-invoice-list">
+                    <div class="payment-empty-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Menyiapkan daftar tagihan...</span>
+                    </div>
                 </div>
 
-                                <div class="row mt-4 g-3">
-                    <!-- BARIS 1: Total Dibayar ← → Nominal Uang Diterima -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-medium">Total Jumlah Dibayar</label>
-                        <input type="text" class="form-control form-control-sm bg-light fw-bold text-end text-success" id="totalDipilih" readonly value="Rp 0">
+                <div class="payment-total-panel">
+                    <div>
+                        <span class="total-panel-label">TOTAL TAGIHAN DIPILIH</span>
+                        <strong id="totalDipilih">Rp0</strong>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-medium">Nominal Uang Diterima / Bayar Sekarang</label>
-                        <input type="text" class="form-control form-control-sm fw-bold text-end text-success" id="uangDiterima" placeholder="Contoh: 1000000">
+                    <div class="total-panel-icon"><i class="fas fa-calculator"></i></div>
+                </div>
+
+                <div class="payment-section-heading payment-step-two">
+                    <div>
+                        <span class="section-kicker">STEP 02</span>
+                        <h5>Detail Pembayaran</h5>
+                        <p>Lengkapi informasi transaksi pembayaran.</p>
+                    </div>
+                </div>
+
+                <div class="payment-form-grid">
+
+                    <div class="payment-form-field payment-field-full">
+                        <label for="uangDiterima">Nominal Dibayarkan <span>*</span></label>
+                        <div class="payment-input-money">
+                            <span>Rp</span>
+                            <input type="text" id="uangDiterima" inputmode="numeric"
+                                   placeholder="0" autocomplete="off">
+                        </div>
+                        <small class="field-hint">Nominal akan dialokasikan otomatis ke tagihan yang dipilih.</small>
                     </div>
 
-                    <!-- BARIS 2: Metode Pembayaran ← → Tanggal & Jam -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-medium">Metode Pembayaran</label>
-                        <div class="custom-select modal-bayar-select">
-                            <select id="metodeBayar" required>
-                                <option value="">-- Pilih Metode --</option>
-                                <option value="Tunai">💵 Tunai</option>
-                                <option value="Transfer Bank">🏦 Transfer Bank</option>
-                                <option value="Dompet Digital">📱 Dompet Digital</option>
+                    <div class="payment-form-field">
+                        <label for="metodeBayar">Metode Pembayaran <span>*</span></label>
+                        <div class="payment-select-wrap">
+                            <i class="fas fa-wallet"></i>
+                            <select id="metodeBayar">
+                                <option value="">Pilih metode pembayaran</option>
+                                <option value="Tunai">Tunai</option>
+                                <option value="Transfer Bank">Transfer Bank</option>
+                                <option value="Dompet Digital">Dompet Digital</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-medium">
-                            <i class="fas fa-calendar-check text-primary me-1"></i> Tanggal & Jam Pembayaran
-                        </label>
-                        <div class="custom-date">
-                            <input type="datetime-local" id="tanggalJamBayar" required>
+                            <i class="fas fa-chevron-down select-arrow"></i>
                         </div>
                     </div>
 
-                    <!-- BARIS 3: Catatan → Penuh Lebar -->
-                    <div class="col-12">
-                        <label class="form-label fw-medium">Catatan Tambahan (Opsional)</label>
-                        <textarea class="form-control form-control-sm" id="catatanBayar" rows="2" placeholder="Contoh: Pembayaran kemarin, bayar bertahap, dll"></textarea>
+                    <div class="payment-form-field">
+                        <label for="tanggalJamBayar">Tanggal dan Waktu <span>*</span></label>
+                        <div class="payment-date-wrap">
+                            <i class="fas fa-calendar-days"></i>
+                            <input type="datetime-local" id="tanggalJamBayar">
+                        </div>
                     </div>
+
+                    <div class="payment-form-field payment-field-full">
+                        <label for="catatanBayar">Catatan <small>(Opsional)</small></label>
+                        <textarea id="catatanBayar" rows="3"
+                                  placeholder="Tambahkan catatan pembayaran jika diperlukan..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="payment-allocation-note">
+                    <i class="fas fa-circle-info"></i>
+                    <div>
+                        <strong>Sistem alokasi otomatis</strong>
+                        <p>Nominal pembayaran akan dialokasikan secara berurutan pada tagihan yang dipilih. Pembayaran sebagian tetap diperbolehkan.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="payment-modal-footer">
+                <div class="footer-secure-note">
+                    <i class="fas fa-lock"></i>
+                    Data transaksi akan tersimpan di sistem
+                </div>
+                <div class="payment-footer-actions">
+                    <button type="button" class="payment-cancel-btn" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="payment-submit-btn" id="btnSimpanPembayaran">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Simpan Pembayaran</span>
+                        <i class="fas fa-arrow-right submit-arrow"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-success" id="btnSimpanPembayaran">
-                    <i class="fas fa-save me-1"></i> Simpan Pembayaran Terpilih
-                </button>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-// IKON BUKA TUTUP
-document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el=>{
-    el.addEventListener('shown.bs.collapse',()=>el.querySelector('i').classList.toggle('fa-chevron-down',false)||el.querySelector('i').classList.toggle('fa-chevron-up',true))
-    el.addEventListener('hidden.bs.collapse',()=>el.querySelector('i').classList.toggle('fa-chevron-up',false)||el.querySelector('i').classList.toggle('fa-chevron-down',true))
-})
+document.addEventListener('DOMContentLoaded', function () {
 
-document.addEventListener('DOMContentLoaded', function(){
+    const modalElement = document.getElementById('modalPembayaran');
+    const btnBayar = document.getElementById('btnBayarSiswa');
 
-    const inputTglJam = document.getElementById('tanggalJamBayar');
-    if(inputTglJam){
-        inputTglJam.value = ambilWaktuSekarang();
+    if (!modalElement || !btnBayar) return;
+
+    const modalPembayaran = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    const wadahDaftar = document.getElementById('wadahDaftarTagihan');
+    const pilihSemua = document.getElementById('pilihSemuaBelumLunas');
+    const totalDipilih = document.getElementById('totalDipilih');
+    const uangDiterima = document.getElementById('uangDiterima');
+    const metodeBayar = document.getElementById('metodeBayar');
+    const tanggalJamBayar = document.getElementById('tanggalJamBayar');
+    const catatanBayar = document.getElementById('catatanBayar');
+    const btnSimpan = document.getElementById('btnSimpanPembayaran');
+
+    let daftarTagihanTerpilih = [];
+    let rincianSimpan = [];
+
+    // =====================================================
+    // FORMAT RUPIAH
+    // =====================================================
+
+    function formatRupiah(angka) {
+        return 'Rp' + new Intl.NumberFormat('id-ID', {
+            maximumFractionDigits: 0
+        }).format(Number(angka) || 0);
     }
 
-    let nilaiAngkaSimpan = 0;
-    function formatRupiah(angka){
-        return new Intl.NumberFormat('id-ID', {
-            style:'currency',
-            currency:'IDR',
-            minimumFractionDigits:0,
-            maximumFractionDigits:0
-        }).format(angka).replace(/Rp\s*/g, 'Rp ');
-    }
-
-    function ambilAngkaMurni(teks){
-        if(!teks) return 0;
-        let bersih = String(teks).replace(/[^\d]/g, '');
-        return bersih ? Number(bersih) : 0;
-    }
-
-    function resetStatusSemua(){
-        document
-            .querySelectorAll('#wadahDaftarTagihan .status-info')
-            .forEach(el => {
-                el.textContent = "Belum diproses";
-                el.className = "badge bg-secondary status-info";
-            });
+    function ambilAngkaMurni(nilai) {
+        return Number(String(nilai).replace(/[^\d]/g, '')) || 0;
     }
 
     function ambilWaktuSekarang() {
         const sekarang = new Date();
-        const thn = sekarang.getFullYear();
-        const bln = String(sekarang.getMonth() + 1).padStart(2, '0');
-        const tgl = String(sekarang.getDate()).padStart(2, '0');
-        const jam = String(sekarang.getHours()).padStart(2, '0');
-        const mnt = String(sekarang.getMinutes()).padStart(2, '0');
-        return `${thn}-${bln}-${tgl}T${jam}:${mnt}`;
+        const offset = sekarang.getTimezoneOffset() * 60000;
+        return new Date(sekarang.getTime() - offset)
+            .toISOString()
+            .slice(0, 16);
     }
 
-
-    // === FUNGSI PAGINASI UTAMA ===
-    function inisialisasiPaginasi(nav){
-        const idTabel = nav.getAttribute('data-target');
-        const perHalamanDefault = parseInt(nav.getAttribute('data-perhalaman') || 5);
-        const baris = document.querySelectorAll(`#${idTabel} tr`);
-        let halamanSekarang = 1;
-        let perHalaman = perHalamanDefault;
-        let jumlahHalaman = perHalaman === 0 ? 1 : Math.ceil(baris.length / perHalaman);
-
-        const daftarNomorEl = nav.querySelector('.daftar-nomor');
-        const btnSebelum = nav.querySelector('.btn-sebelum');
-        const btnSesudah = nav.querySelector('.btn-sesudah');
-        const pemilihJumlah = document.querySelector(`.ukuran-tampil[data-target="${idTabel}"]`);
-
-        // Set nilai awal di select sesuai default
-        if(pemilihJumlah){
-            pemilihJumlah.value = perHalamanDefault;
-        }
-
-        function buatDaftarNomor(){
-            if(perHalaman === 0){
-                daftarNomorEl.innerHTML = '<span class="text-muted small">Semua data</span>';
-                return;
-            }
-            daftarNomorEl.innerHTML = '';
-            let tampil = [];
-            if(jumlahHalaman <=5){for(let i=1;i<=jumlahHalaman;i++) tampil.push(i);}
-            else{
-                if(halamanSekarang <=3) tampil=[1,2,3,4,'...',jumlahHalaman];
-                else if(halamanSekarang >= jumlahHalaman -2) tampil=[1,'...',jumlahHalaman-3,jumlahHalaman-2,jumlahHalaman-1,jumlahHalaman];
-                else tampil=[1,'...',halamanSekarang-1,halamanSekarang,halamanSekarang+1,'...',jumlahHalaman];
-            }
-            tampil.forEach(item=>{
-                if(item === '...'){let span=document.createElement('span');span.className='titik-pemisah ms-1 me-1';span.textContent='...';daftarNomorEl.appendChild(span);}
-                else{let btn=document.createElement('button');btn.className='btn btn-sm nomor-halaman';btn.textContent=item;if(item===halamanSekarang){btn.classList.remove('btn-outline-secondary');btn.classList.add('btn-primary','text-white');}else btn.addEventListener('click',()=>{halamanSekarang=parseInt(item);tampilHalaman();});daftarNomorEl.appendChild(btn);}
-            })
-        }
-
-        function tampilHalaman(){
-            if(perHalaman === 0){
-                baris.forEach(b=>b.style.display='');
-                halamanSekarang = 1;
-            } else {
-                let mulai = (halamanSekarang - 1) * perHalaman;
-                let akhir = mulai + perHalaman;
-                baris.forEach((b,urut)=>{b.style.display=(urut >= mulai && urut < akhir) ? '' : 'none';});
-            }
-            buatDaftarNomor();
-            btnSebelum.disabled = (perHalaman === 0) || (halamanSekarang <= 1);
-            btnSesudah.disabled = (perHalaman === 0) || (halamanSekarang >= jumlahHalaman);
-        }
-
-        // Ubah jumlah per halaman
-        if(pemilihJumlah){
-            pemilihJumlah.addEventListener('change', function(){
-                perHalaman = parseInt(this.value);
-                halamanSekarang = 1;
-                jumlahHalaman = perHalaman === 0 ? 1 : Math.ceil(baris.length / perHalaman);
-                tampilHalaman();
-            });
-        }
-
-        btnSebelum.addEventListener('click',()=>{halamanSekarang--;tampilHalaman();});
-        btnSesudah.addEventListener('click',()=>{halamanSekarang++;tampilHalaman();});
-        tampilHalaman();
+    function escapeText(value) {
+        return String(value ?? '');
     }
 
-    // Jalankan untuk setiap blok paginasi
-    document.querySelectorAll('.paginasi-wrapper').forEach(nav=>{
-        inisialisasiPaginasi(nav);
-    });
+    // =====================================================
+    // PAGINATION
+    // =====================================================
 
+    function inisialisasiPaginasi(nav) {
+        const target = document.getElementById(nav.dataset.target);
+        if (!target) return;
 
-    // === MODAL PEMBAYARAN ===
-    const btnBayarSiswa = document.getElementById('btnBayarSiswa');
-    const modalPembayaran = new bootstrap.Modal(document.getElementById('modalPembayaran'), {
-        backdrop: 'static', keyboard: false
-    });
-    const wadahDaftar = document.getElementById('wadahDaftarTagihan');
-    const pilihSemuaCek = document.getElementById('pilihSemuaBelumLunas');
-    const totalTagihanSemua = document.getElementById('totalDipilih');
-    const uangDiterima = document.getElementById('uangDiterima');
+        const rows = Array.from(target.querySelectorAll('tr'));
+        const sebelumnya = nav.querySelector('.btn-sebelum');
+        const sesudah = nav.querySelector('.btn-sesudah');
+        const daftarNomor = nav.querySelector('.daftar-nomor');
 
-    function hitungTotalTerpilih(){
-        let total = 0;
-        document
-            .querySelectorAll('#wadahDaftarTagihan .cek-tagihan:checked')
-            .forEach(c => {
-                total += Number(c.value) || 0;
+        let perHalaman = Number(nav.dataset.perhalaman) || 5;
+        let halamanAktif = 1;
+
+        const selectUkuran = document.querySelector(
+            `.ukuran-tampil[data-target="${nav.dataset.target}"]`
+        );
+
+        function render() {
+            const totalHalaman = perHalaman === Infinity
+                ? 1
+                : Math.max(1, Math.ceil(rows.length / perHalaman));
+
+            halamanAktif = Math.min(halamanAktif, totalHalaman);
+
+            rows.forEach((row, index) => {
+                row.style.display =
+                    perHalaman === Infinity ||
+                    (index >= (halamanAktif - 1) * perHalaman &&
+                     index < halamanAktif * perHalaman)
+                    ? ''
+                    : 'none';
             });
 
-        totalTagihanSemua.value = formatRupiah(total);
+            daftarNomor.replaceChildren();
 
-        if (total === 0) {
-            uangDiterima.value = '';
-            nilaiAngkaSimpan = 0;
-            resetStatusSemua();
-            return;
-        }
+            for (let i = 1; i <= totalHalaman; i++) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = i;
 
-        let nominalSekarang = ambilAngkaMurni(uangDiterima.value);
-
-        if (nominalSekarang > total) {
-            nominalSekarang = total;
-            uangDiterima.value = formatRupiah(nominalSekarang);
-            nilaiAngkaSimpan = nominalSekarang;
-        }
-        else if (nominalSekarang > 0) {
-            nilaiAngkaSimpan = nominalSekarang;
-            uangDiterima.value = formatRupiah(nominalSekarang);
-        }
-        else {
-            uangDiterima.value = '';
-            nilaiAngkaSimpan = 0;
-        }
-
-        resetStatusSemua();
-        if (nilaiAngkaSimpan > 0) {
-            prosesBagiPembayaran(nilaiAngkaSimpan);
-        }
-    }
-
-    function prosesBagiPembayaran(jumlahBayar){
-        console.log("✅ PROSES HITUNG =", jumlahBayar);
-        const daftarCek = document.querySelectorAll('#wadahDaftarTagihan .cek-tagihan:checked');
-        let sisaUang = Number(jumlahBayar) || 0;
-        let rincianSimpan = [];
-
-        daftarCek.forEach(cek => {
-            const baris = cek.closest('tr');
-            if (!baris) return;
-
-            // ✅ SISA TAGIHAN = nilai yang harus dibayar sekarang
-            const sisaTagihanSekarang = Number(cek.value) || 0;
-            // ✅ NILAI ASLI & SUDAH DIBAYAR untuk dikirim ke server
-            const nominalAsli = Number(baris.dataset.nominalAsli) || 0;
-            const sudahDibayarSebelumnya = nominalAsli - sisaTagihanSekarang;
-
-            let dibayar = 0;
-            let sisaTagih = sisaTagihanSekarang;
-
-            if (sisaUang <= 0) {
-                dibayar = 0;
-                sisaTagih = sisaTagihanSekarang;
-            } 
-            // ✅ Kalau bayar >= sisa → LUNAS!
-            else if (sisaUang >= sisaTagihanSekarang) {
-                dibayar = sisaTagihanSekarang;
-                sisaTagih = 0;
-                sisaUang -= sisaTagihanSekarang;
-                baris.querySelector('td:last-child .status-info').textContent = "✅ Lunas";
-                baris.querySelector('td:last-child .status-info').className = "badge bg-success status-info";
-            } 
-            // ✅ Kalau bayar sebagian dari sisa → Sebagian
-            else {
-                dibayar = sisaUang;
-                sisaTagih = sisaTagihanSekarang - dibayar;
-                sisaUang = 0;
-                baris.querySelector('td:last-child .status-info').textContent = `⚠️ Sebagian (${formatRupiah(dibayar)})`;
-                baris.querySelector('td:last-child .status-info').className = "badge bg-warning text-dark status-info";
-            }
-
-            // ✅ Yang dikirim ke server = TOTAL yang sudah dibayar keseluruhan
-            rincianSimpan.push({
-                id: baris.dataset.id,
-                nominal_asli: nominalAsli,
-                dibayar: sudahDibayarSebelumnya + dibayar, // total dibayar keseluruhan
-                sisa_hutang: sisaTagih
-            });
-        });
-
-        return rincianSimpan;
-    }
-
-    btnBayarSiswa.addEventListener('click',function(){
-        wadahDaftar.innerHTML='';
-        let kumpulKelompok={};
-
-        document.querySelectorAll('table tbody tr').forEach(tr=>{
-            let statusEl=tr.querySelector('span.badge');
-            // ✅ LEWATI YANG SUDAH LUNAS SEPENUHNYA
-            if(!statusEl || statusEl.textContent.trim()==='Lunas' || statusEl.textContent.trim()==='Sudah Lunas') return;
-
-            let namaKelompok=tr.dataset.kelompok||'Lainnya';
-            let keterangan=tr.cells[1].textContent.trim();
-
-            // ✅ BACA SISA TAGIHAN, BUKAN NOMINAL PENUH
-            let sisaTeks = tr.cells[4].textContent.trim(); // kolom Sisa Tagihan
-            let sisaAngka = Number(sisaTeks.replace(/[^0-9]/g,'')) || 0;
-
-            // ✅ BACA NOMINAL ASLI JUGA UNTUK REFERENSI
-            let nominalTeks = tr.cells[2].textContent.trim();
-            let nominalAngka = Number(nominalTeks.replace(/[^0-9]/g,'')) || 0;
-
-            let idTagihan=tr.dataset.tagihanId;
-
-            if(!kumpulKelompok[namaKelompok]) kumpulKelompok[namaKelompok]=[];
-            kumpulKelompok[namaKelompok].push({
-                id: idTagihan,
-                keterangan: keterangan,
-                nomTeks: sisaTeks,        // ✅ TAMPILKAN SISA DI MODAL
-                nom: sisaAngka,           // ✅ DIHITUNG BERDASARKAN SISA
-                nominalAsli: nominalAngka // ✅ NILAI ASLI TETAP DIKIRIM KE SERVER
-            });
-        });
-
-        if(Object.keys(kumpulKelompok).length===0){alert('Semua tagihan sudah lunas!');return;}
-
-        let nomorKel=1;
-        for(let namaK in kumpulKelompok){
-            let daftar=kumpulKelompok[namaK];
-            let idK='kel-'+nomorKel++;
-            let htmlKel=`
-            <div class="card kelompok-modal mb-1 border">
-                <div class="card-header d-flex align-items-center justify-content-between" data-bs-toggle="collapse" data-bs-target="#${idK}">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-chevron-down"></i>
-                        <h6 class="mb-0 fw-semibold">${namaK}</h6>
-                        <span class="badge bg-secondary">${daftar.length} tagihan</span>
-                    </div>
-                    <label class="form-check mb-0">
-                        <input type="checkbox" class="form-check-input pilih-semua-kelompok" data-kel="${idK}"> Pilih Semua
-                    </label>
-                </div>
-                <div id="${idK}" class="collapse">
-                    <div class="p-2">
-                        <table class="table table-sm mb-0">
-                            <thead><tr>
-                                <th width="40">Pilih</th>
-                                <th>Keterangan</th>
-                                <th width="140" class="text-end">Sisa Tagihan</th>
-                                <th width="200" class="text-center">Status</th>
-                            </tr></thead>
-                            <tbody>`;
-                            daftar.forEach(item=>{
-                                htmlKel+=`<tr data-id="${item.id}" data-nominal-asli="${item.nominalAsli}">
-                                    <td class="text-center"><input type="checkbox" class="form-check-input cek-tagihan" value="${item.nom}"></td>
-                                    <td>${item.keterangan}</td>
-                                    <td class="text-end fw-bold">${item.nomTeks}</td>
-                                    <td class="text-center"><span class="badge bg-secondary status-info">Belum diproses</span></td>
-                                </tr>`;
-                            });
-                htmlKel+=`</tbody></table></div></div></div>`;
-                wadahDaftar.innerHTML+=htmlKel;
-        }
-
-        modalPembayaran.show();
-
-        const elTglJam = document.getElementById('tanggalJamBayar');
-        if(elTglJam){
-            elTglJam.value = ambilWaktuSekarang();
-        }
-
-        document.getElementById('tanggalJamBayar').value = ambilWaktuSekarang();
-
-        window.initCustomSelect = function(selectWrapper){
-            if(!selectWrapper || selectWrapper.classList.contains('sudah-dibuat')) return;
-            selectWrapper.classList.add('sudah-dibuat');
-            const selectAsli = selectWrapper.querySelector('select');
-            const daftarOpsi = Array.from(selectAsli.options);
-            selectWrapper.innerHTML = `
-                <div class="custom-select__trigger"><span class="custom-select__selected">-- Pilih Metode --</span><div class="custom-select__arrow"></div></div>
-                <div class="custom-select__options">${daftarOpsi.map(opt=>`<div class="custom-select__option" data-nilai="${opt.value}">${opt.text}</div>`).join('')}</div>
-            `;
-            selectWrapper.appendChild(selectAsli);
-            const trigger = selectWrapper.querySelector('.custom-select__trigger');
-            const tampilPilih = selectWrapper.querySelector('.custom-select__selected');
-            const daftarPilihan = selectWrapper.querySelector('.custom-select__options');
-            const semuaPilihan = selectWrapper.querySelectorAll('.custom-select__option');
-            trigger.addEventListener('click',e=>{
-                e.stopPropagation();
-                const ukuran = selectWrapper.getBoundingClientRect();
-                const ruangBawah = window.innerHeight - ukuran.bottom;
-                selectWrapper.classList.toggle('open', !(ruangBawah<220) || (daftarPilihan.style.top='auto',daftarPilihan.style.bottom='calc(100%+6px)',daftarPilihan.style.maxHeight=(ukuran.top-10)+'px'));
-                if(selectWrapper.classList.contains('open') && ruangBawah>=220){
-                    daftarPilihan.style.top='calc(100%+6px)';daftarPilihan.style.bottom='auto';daftarPilihan.style.maxHeight='220px';
+                if (i === halamanAktif) {
+                    button.classList.add('active');
                 }
-            });
-            semuaPilihan.forEach(i=>i.addEventListener('click',e=>{e.stopPropagation();tampilPilih.textContent=i.textContent;selectAsli.value=i.dataset.nilai;semuaPilihan.forEach(x=>x.classList.remove('selected'));i.classList.add('selected');selectWrapper.classList.remove('open');}));
-            document.addEventListener('click',()=>selectWrapper.classList.remove('open'));
-        };
 
-        document.querySelectorAll('.pilih-semua-kelompok').forEach(cekKel=>{
-            cekKel.addEventListener('change',function(){
-                document.querySelectorAll(`#${this.dataset.kel} .cek-tagihan`).forEach(c=>c.checked=this.checked);
-                hitungTotalTerpilih();
-            })
+                button.addEventListener('click', function () {
+                    halamanAktif = i;
+                    render();
+                });
+
+                daftarNomor.appendChild(button);
+            }
+
+            sebelumnya.disabled = halamanAktif <= 1;
+            sesudah.disabled = halamanAktif >= totalHalaman;
+        }
+
+        sebelumnya.addEventListener('click', function () {
+            if (halamanAktif > 1) {
+                halamanAktif--;
+                render();
+            }
         });
-        wadahDaftar.addEventListener('change',e=>{if(e.target.classList.contains('cek-tagihan')) hitungTotalTerpilih();});
+
+        sesudah.addEventListener('click', function () {
+            const totalHalaman = perHalaman === Infinity
+                ? 1
+                : Math.max(1, Math.ceil(rows.length / perHalaman));
+
+            if (halamanAktif < totalHalaman) {
+                halamanAktif++;
+                render();
+            }
+        });
+
+        if (selectUkuran) {
+            selectUkuran.addEventListener('change', function () {
+                perHalaman = this.value === 'all'
+                    ? Infinity
+                    : Number(this.value);
+
+                halamanAktif = 1;
+                nav.dataset.perhalaman = this.value;
+                render();
+            });
+        }
+
+        render();
+    }
+
+    document.querySelectorAll('.paginasi-wrapper').forEach(inisialisasiPaginasi);
+
+    // =====================================================
+    // COLLAPSE ICON
+    // =====================================================
+
+    document.querySelectorAll(
+        '.invoice-category-header[data-bs-toggle="collapse"]'
+    ).forEach(header => {
+
+        const targetSelector = header.getAttribute('data-bs-target');
+        const target = document.querySelector(targetSelector);
+
+        if (!target) return;
+
+        target.addEventListener('show.bs.collapse', function () {
+            header.setAttribute('aria-expanded', 'true');
+        });
+
+        target.addEventListener('hide.bs.collapse', function () {
+            header.setAttribute('aria-expanded', 'false');
+        });
+
     });
 
-    pilihSemuaCek.addEventListener('change',function(){
-        document.querySelectorAll('.cek-tagihan,.pilih-semua-kelompok').forEach(c=>c.checked=this.checked);
+    // =====================================================
+    // RESET MODAL
+    // =====================================================
+
+    function resetModal() {
+        daftarTagihanTerpilih = [];
+        rincianSimpan = [];
+
+        wadahDaftar.replaceChildren();
+
+        const placeholder = document.createElement('div');
+        placeholder.className = 'payment-empty-placeholder';
+        placeholder.textContent = 'Pilih tagihan untuk memulai pembayaran.';
+        wadahDaftar.appendChild(placeholder);
+
+        pilihSemua.checked = false;
+        totalDipilih.textContent = 'Rp0';
+        uangDiterima.value = '';
+        metodeBayar.value = '';
+        tanggalJamBayar.value = ambilWaktuSekarang();
+        catatanBayar.value = '';
+
+        btnSimpan.disabled = false;
+        btnSimpan.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>Simpan Pembayaran</span>
+            <i class="fas fa-arrow-right submit-arrow"></i>
+        `;
+    }
+
+    modalElement.addEventListener('hidden.bs.modal', resetModal);
+
+    // =====================================================
+    // MEMBANGUN DAFTAR TAGIHAN DI MODAL
+    // =====================================================
+
+    function buatElemen(tag, className, text) {
+        const element = document.createElement(tag);
+
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+
+        return element;
+    }
+
+    function buatDaftarTagihan() {
+
+        const kelompok = new Map();
+
+        document.querySelectorAll('.invoice-table tbody tr[data-id]')
+            .forEach(row => {
+
+                const id = row.dataset.id;
+                const nominal = Number(row.dataset.nominal) || 0;
+                const sudahDibayar = Number(row.dataset.dibayar) || 0;
+                const sisa = Number(row.dataset.sisa) || 0;
+                const status = row.dataset.status || '';
+                const namaKelompok = row.dataset.kelompok || 'Lainnya';
+
+                if (!id || sisa <= 0 ||
+                    status.toLowerCase() === 'lunas') {
+                    return;
+                }
+
+                const namaTagihan =
+                    row.querySelector('.invoice-name-cell span:last-child')
+                        ?.textContent.trim() || 'Tagihan';
+
+                const periode =
+                    row.querySelector('.invoice-period')
+                        ?.textContent.trim() || '-';
+
+                if (!kelompok.has(namaKelompok)) {
+                    kelompok.set(namaKelompok, []);
+                }
+
+                kelompok.get(namaKelompok).push({
+                    id,
+                    nama: namaTagihan,
+                    periode,
+                    nominal,
+                    sudah_dibayar: sudahDibayar,
+                    sisa,
+                    kelompok: namaKelompok
+                });
+            });
+
+        if (kelompok.size === 0) {
+            const empty = buatElemen('div', 'payment-empty-placeholder');
+
+            const icon = buatElemen('i', 'fas fa-circle-check');
+            const text = buatElemen(
+                'span',
+                '',
+                'Semua tagihan siswa sudah lunas.'
+            );
+
+            empty.append(icon, text);
+            wadahDaftar.replaceChildren(empty);
+            return false;
+        }
+
+        wadahDaftar.replaceChildren();
+
+        let indexKelompok = 0;
+
+        kelompok.forEach((tagihan, namaKelompok) => {
+
+            indexKelompok++;
+
+            const group = buatElemen('div', 'payment-group');
+            const heading = buatElemen('div', 'payment-group-heading');
+            const label = buatElemen('label');
+
+            const checkboxKelompok = document.createElement('input');
+            checkboxKelompok.type = 'checkbox';
+            checkboxKelompok.className = 'pilih-semua-kelompok';
+            checkboxKelompok.dataset.group = String(indexKelompok);
+
+            const nama = buatElemen('span', '', namaKelompok);
+            const jumlah = buatElemen(
+                'small',
+                '',
+                `${tagihan.length} tagihan`
+            );
+
+            label.append(checkboxKelompok, nama);
+            heading.append(label, jumlah);
+
+            group.appendChild(heading);
+
+            tagihan.forEach(item => {
+
+                const row = buatElemen('div', 'payment-invoice-row');
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'payment-invoice-check cek-tagihan';
+
+                checkbox.value = String(item.sisa);
+                checkbox.dataset.id = item.id;
+                checkbox.dataset.nominal = String(item.nominal);
+                checkbox.dataset.dibayar = String(item.sudah_dibayar);
+                checkbox.dataset.sisa = String(item.sisa);
+                checkbox.dataset.nama = item.nama;
+                checkbox.dataset.periode = item.periode;
+                checkbox.dataset.group = String(indexKelompok);
+
+                const detail = buatElemen('div', 'payment-invoice-detail');
+                const namaTagihan = buatElemen(
+                    'div',
+                    'payment-invoice-name',
+                    item.nama
+                );
+
+                const meta = buatElemen(
+                    'div',
+                    'payment-invoice-meta',
+                    `${item.periode} · ${item.kelompok}`
+                );
+
+                detail.append(namaTagihan, meta);
+
+                const amount = buatElemen('div', 'payment-invoice-amount');
+                amount.textContent = formatRupiah(item.sisa);
+
+                const small = buatElemen(
+                    'small',
+                    '',
+                    `Nominal awal ${formatRupiah(item.nominal)}`
+                );
+
+                amount.appendChild(small);
+
+                row.append(checkbox, detail, amount);
+                group.appendChild(row);
+
+                checkbox.addEventListener('change', function () {
+                    row.classList.toggle('is-selected', this.checked);
+                    perbaruiStatusKelompok(indexKelompok);
+                    hitungTotalTerpilih();
+                });
+            });
+
+            checkboxKelompok.addEventListener('change', function () {
+                group.querySelectorAll('.cek-tagihan').forEach(cb => {
+                    cb.checked = this.checked;
+                    cb.closest('.payment-invoice-row')
+                        ?.classList.toggle('is-selected', this.checked);
+                });
+
+                hitungTotalTerpilih();
+                perbaruiStatusPilihSemua();
+            });
+
+            wadahDaftar.appendChild(group);
+        });
+
+        return true;
+    }
+
+    // =====================================================
+    // CHECKBOX GROUP
+    // =====================================================
+
+    function perbaruiStatusKelompok(groupId) {
+
+        const groupCheckbox = wadahDaftar.querySelector(
+            `.pilih-semua-kelompok[data-group="${groupId}"]`
+        );
+
+        const checkboxes = wadahDaftar.querySelectorAll(
+            `.cek-tagihan[data-group="${groupId}"]`
+        );
+
+        if (!groupCheckbox) return;
+
+        const total = checkboxes.length;
+        const checked = Array.from(checkboxes)
+            .filter(cb => cb.checked).length;
+
+        groupCheckbox.checked = total > 0 && checked === total;
+        groupCheckbox.indeterminate = checked > 0 && checked < total;
+    }
+
+    function perbaruiStatusPilihSemua() {
+
+        const checkboxes = wadahDaftar.querySelectorAll('.cek-tagihan');
+        const checked = Array.from(checkboxes)
+            .filter(cb => cb.checked).length;
+
+        pilihSemua.checked =
+            checkboxes.length > 0 && checked === checkboxes.length;
+
+        pilihSemua.indeterminate =
+            checked > 0 && checked < checkboxes.length;
+    }
+
+    pilihSemua.addEventListener('change', function () {
+
+        const semua = wadahDaftar.querySelectorAll('.cek-tagihan');
+
+        semua.forEach(cb => {
+            cb.checked = this.checked;
+            cb.closest('.payment-invoice-row')
+                ?.classList.toggle('is-selected', this.checked);
+        });
+
+        wadahDaftar.querySelectorAll('.pilih-semua-kelompok')
+            .forEach(cb => {
+                cb.checked = pilihSemua.checked;
+                cb.indeterminate = false;
+            });
+
         hitungTotalTerpilih();
     });
 
-    uangDiterima.addEventListener('input', function () {
-        const input = this;
-        const cursor = input.selectionStart;
-        const angka = ambilAngkaMurni(input.value);
-        nilaiAngkaSimpan = angka;
+    // =====================================================
+    // HITUNG TOTAL DAN ALOKASI
+    // =====================================================
 
-        if (!angka) {
-            input.value = '';
-            nilaiAngkaSimpan = 0;
-            resetStatusSemua();
-            return;
+    function hitungTotalTerpilih() {
+
+        const checkboxes = Array.from(
+            wadahDaftar.querySelectorAll('.cek-tagihan:checked')
+        );
+
+        const total = checkboxes.reduce((sum, cb) => {
+            return sum + Number(cb.dataset.sisa || cb.value || 0);
+        }, 0);
+
+        totalDipilih.textContent = formatRupiah(total);
+
+        const nominalInput = ambilAngkaMurni(uangDiterima.value);
+
+        if (checkboxes.length === 0) {
+            uangDiterima.value = '';
+        } else if (nominalInput > total) {
+            uangDiterima.value = total.toLocaleString('id-ID');
         }
 
-        const jumlahDipilih = document.querySelectorAll('#wadahDaftarTagihan .cek-tagihan:checked').length;
-        if (jumlahDipilih === 0) {
-            alert("Pilih dulu tagihan yang akan dibayar!");
-            input.value = '';
-            nilaiAngkaSimpan = 0;
-            resetStatusSemua();
-            return;
-        }
+        perbaruiStatusPilihSemua();
+        hitungAlokasi();
+    }
 
-        const totalTagih = ambilAngkaMurni(totalTagihanSemua.value);
-        if (angka > totalTagih) {
-            alert("Jumlah bayar lebih besar dari total tagihan!");
-            input.value = formatRupiah(totalTagih);
-            nilaiAngkaSimpan = totalTagih;
-            prosesBagiPembayaran(totalTagih);
-            input.setSelectionRange(input.value.length, input.value.length);
-            return;
-        }
+    function hitungAlokasi() {
 
-        const sebelumCursor = input.value.substring(0, cursor);
-        const digitSebelumCursor = (sebelumCursor.match(/\d/g) || []).length;
-        const hasilFormat = formatRupiah(angka);
-        input.value = hasilFormat;
+        rincianSimpan = [];
 
-        let digitDitemukan = 0;
-        let posisiCursor = hasilFormat.length;
-        for (let i = 0; i < hasilFormat.length; i++) {
-            if (/\d/.test(hasilFormat[i])) {
-                digitDitemukan++;
-                if (digitDitemukan >= digitSebelumCursor) {
-                    posisiCursor = i + 1;
-                    break;
-                }
+        const checkboxes = Array.from(
+            wadahDaftar.querySelectorAll('.cek-tagihan:checked')
+        );
+
+        let sisaPembayaran = ambilAngkaMurni(uangDiterima.value);
+
+        checkboxes.forEach(cb => {
+
+            const nominalAsli = Number(cb.dataset.nominal) || 0;
+            const sudahDibayar = Number(cb.dataset.dibayar) || 0;
+            const sisaTagihan = Number(cb.dataset.sisa) || 0;
+
+            const dibayar = Math.min(sisaPembayaran, sisaTagihan);
+            const totalDibayar = sudahDibayar + dibayar;
+            const sisaHutang = Math.max(0, sisaTagihan - dibayar);
+
+            if (dibayar > 0) {
+                rincianSimpan.push({
+                    id: cb.dataset.id,
+                    nominal_asli: nominalAsli,
+                    dibayar: totalDibayar,
+                    sisa_hutang: sisaHutang
+                });
             }
+
+            sisaPembayaran -= dibayar;
+        });
+    }
+
+    // =====================================================
+    // INPUT NOMINAL
+    // =====================================================
+
+    uangDiterima.addEventListener('input', function () {
+
+        const nilaiSebelumnya = ambilAngkaMurni(this.value);
+
+        const checkboxes = Array.from(
+            wadahDaftar.querySelectorAll('.cek-tagihan:checked')
+        );
+
+        const total = checkboxes.reduce((sum, cb) => {
+            return sum + Number(cb.dataset.sisa || 0);
+        }, 0);
+
+        let nominal = nilaiSebelumnya;
+
+        if (nominal > total) {
+            nominal = total;
         }
-        input.setSelectionRange(posisiCursor, posisiCursor);
-        prosesBagiPembayaran(angka);
+
+        this.value = nominal > 0
+            ? nominal.toLocaleString('id-ID')
+            : '';
+
+        hitungAlokasi();
     });
 
-    document.getElementById('btnSimpanPembayaran').addEventListener('click', async function(){
-        let jumlahBayar = nilaiAngkaSimpan;
-        if(jumlahBayar===0) jumlahBayar=ambilAngkaMurni(uangDiterima.value);
+    // =====================================================
+    // BUKA MODAL
+    // =====================================================
 
-        let rincianSimpan = prosesBagiPembayaran(jumlahBayar);
-        let adaBayar = rincianSimpan.some(d=>d.dibayar>0);
-        if(!adaBayar){alert('Masukkan nominal uang yang diterima!');return;}
-        
-        let metode=document.getElementById('metodeBayar').value;
-        let catatan=document.getElementById('catatanBayar').value.trim();
-        let tanggaljam = document.getElementById('tanggalJamBayar').value;
-        
-        if(!metode){alert('Pilih metode pembayaran!');return;}
-        if(!tanggaljam){alert('Tanggal & jam pembayaran wajib diisi!');return;}
+    btnBayar.addEventListener('click', function () {
 
-        let tanggal_bayar = tanggaljam;
-        if (tanggaljam.includes('T')) {
-            const bagian = tanggaljam.split('T');
-            tanggal_bayar = bagian[0];
-            jam_bayar = bagian[1];
-        } else {
-            tanggal_bayar = tanggaljam;
-            jam_bayar = "00:00";
-        }
+        resetModal();
 
-        const id_siswa = document.getElementById('idSiswaTerpilih')?.value || '';
-        if (!id_siswa) {
-            alert('ID Siswa tidak ditemukan, silakan muat ulang halaman!');
+        const berhasil = buatDaftarTagihan();
+
+        if (!berhasil) {
+            // Modal tetap dapat dibuka agar bendahara melihat
+            // informasi bahwa semua tagihan telah lunas.
+            modalPembayaran.show();
             return;
         }
+
+        modalPembayaran.show();
+    });
+
+    // =====================================================
+    // SIMPAN PEMBAYARAN
+    // =====================================================
+
+    btnSimpan.addEventListener('click', async function () {
+
+        const nominal = ambilAngkaMurni(uangDiterima.value);
+        const metode = metodeBayar.value;
+        const tanggaljam = tanggalJamBayar.value;
+
+        const checkboxes = wadahDaftar.querySelectorAll('.cek-tagihan:checked');
+
+        const totalDipilihAngka = Array.from(checkboxes).reduce(
+            (sum, cb) => sum + Number(cb.dataset.sisa || 0),
+            0
+        );
+
+        if (checkboxes.length === 0) {
+            alert('Silakan pilih minimal satu tagihan.');
+            return;
+        }
+
+        if (!nominal || nominal <= 0) {
+            alert('Masukkan nominal pembayaran terlebih dahulu.');
+            uangDiterima.focus();
+            return;
+        }
+
+        if (nominal > totalDipilihAngka) {
+            alert('Nominal pembayaran melebihi total tagihan yang dipilih.');
+            return;
+        }
+
+        if (!metode) {
+            alert('Silakan pilih metode pembayaran.');
+            metodeBayar.focus();
+            return;
+        }
+
+        if (!tanggaljam) {
+            alert('Tanggal dan waktu pembayaran wajib diisi.');
+            tanggalJamBayar.focus();
+            return;
+        }
+
+        hitungAlokasi();
+
+        if (rincianSimpan.length === 0) {
+            alert('Tidak ada alokasi pembayaran yang dapat disimpan.');
+            return;
+        }
+
+        const [tanggal_bayar, jam_bayar] = tanggaljam.split('T');
+
+        const dataPembayaran = {
+            id_siswa: document.getElementById('idSiswaTerpilih').value,
+            rincian: rincianSimpan,
+            metode_bayar: metode,
+            catatan: catatanBayar.value.trim(),
+            tanggal_bayar: tanggal_bayar,
+            jam_bayar: jam_bayar,
+            tanggal_lengkap: tanggaljam
+        };
+
+        const csrfToken =
+            document.querySelector('meta[name="csrf-token"]')?.content ||
+            document.querySelector('input[name="csrf_token"]')?.value ||
+            '';
+
+        const teksAwal = btnSimpan.innerHTML;
+
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = `
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Menyimpan Pembayaran...</span>
+        `;
 
         try {
-            const res = await fetch('/bendahara/simpan-pembayaran', {
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+
+            const response = await fetch('/bendahara/simpan-pembayaran', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id_siswa: id_siswa,
-                    rincian: rincianSimpan,
-                    metode_bayar: metode,
-                    catatan: catatan,
-                    tanggal_bayar: tanggal_bayar,
-                    jam_bayar: jam_bayar,
-                    tanggal_lengkap: tanggaljam
-                })
+                headers,
+                body: JSON.stringify(dataPembayaran)
             });
 
-            const hasil = await res.json();
-            
-            if (hasil.sukses) {
-                alert(`✅ ${hasil.pesan}`);
-                modalPembayaran.hide();
-                location.reload();
-            } else {
-                alert(`❌ Gagal: ${hasil.pesan}`);
+            const hasil = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    hasil.pesan || hasil.message || 'Terjadi kesalahan saat menyimpan pembayaran.'
+                );
             }
-        } catch (err) {
-            console.error('Error simpan:', err);
-            alert('Terjadi kesalahan jaringan saat menyimpan pembayaran!');
+
+            if (hasil.sukses) {
+
+                alert(hasil.pesan || 'Pembayaran berhasil disimpan!');
+
+                modalPembayaran.hide();
+
+                window.location.reload();
+
+            } else {
+
+                alert(hasil.pesan || 'Pembayaran gagal disimpan.');
+
+                btnSimpan.disabled = false;
+                btnSimpan.innerHTML = teksAwal;
+            }
+
+        } catch (error) {
+
+            console.error('Kesalahan pembayaran:', error);
+
+            alert(error.message || 'Tidak dapat menghubungi server.');
+
+            btnSimpan.disabled = false;
+            btnSimpan.innerHTML = teksAwal;
         }
+
     });
 
-    window.addEventListener('resize',()=>document.querySelectorAll('.custom-select.open').forEach(el=>el.classList.remove('open')));
+    // =====================================================
+    // INISIALISASI AWAL
+    // =====================================================
+
+    tanggalJamBayar.value = ambilWaktuSekarang();
+
 });
 </script>
