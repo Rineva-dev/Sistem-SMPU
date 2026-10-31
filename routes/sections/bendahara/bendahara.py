@@ -150,11 +150,6 @@ def cari_kode_tp_per_bulan(bulan, tahun):
 
 
 def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_akhir):
-    print(f"  -> Masuk Fungsi: id={id_siswa} angkatan={angkatan_masuk}")
-    """
-    Kembalikan: (daftar_tagihan, total_angka_murni)
-    ✅ MEMBACA STATUS LUNAS/BELUM DARI DATABASE TagihanSiswa
-    """
 
     daftar_tagihan_terperinci = []
 
@@ -419,7 +414,6 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
                         })
 
     total_murni = sum(t['nominal'] for t in daftar_tagihan_terperinci)
-    print(f"[CEK PUSAT] Siswa:{id_siswa} | Jumlah:{len(daftar_tagihan_terperinci)} | Total:{total_murni}")
     
     return daftar_tagihan_terperinci, total_murni
 

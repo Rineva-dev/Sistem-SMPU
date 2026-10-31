@@ -462,27 +462,113 @@
 
             </div>
 
-
             <!-- ==========================================
                 TAB 2: RIWAYAT PEMBAYARAN
             =========================================== -->
             <div class="invoice-tab-pane" id="riwayat-pembayaran">
 
-                <div class="invoice-list-heading">
+                <div class="invoice-list-heading history-heading">
                     <div>
                         <span class="section-kicker">PAYMENT HISTORY</span>
                         <h4>Riwayat Pembayaran</h4>
-                        <p>Seluruh pembayaran yang sudah tercatat untuk siswa ini.</p>
+                        <p>Telusuri dan pantau seluruh pembayaran yang sudah tercatat.</p>
                     </div>
-                </div>
 
+                    {% if riwayat_pembayaran %}
+                    <div class="history-total-badge">
+                        <i class="fas fa-receipt"></i>
+                        <span>{{ riwayat_pembayaran|length }} Catatan</span>
+                    </div>
+                    {% endif %}
+                </div>
 
                 {% if riwayat_pembayaran %}
 
+                    <!-- FILTER TOOLBAR -->
+                    <div class="history-filter-panel">
+
+                        <div class="history-filter-heading">
+                            <div>
+                                <span class="history-filter-title">
+                                    <i class="fas fa-sliders"></i>
+                                    Filter Riwayat
+                                </span>
+                                <small>Temukan transaksi berdasarkan informasi pembayaran.</small>
+                            </div>
+
+                            <button type="button" id="historyResetFilter" class="history-reset-btn">
+                                <i class="fas fa-rotate-left"></i>
+                                Reset
+                            </button>
+                        </div>
+
+                        <div class="history-filter-grid">
+
+                            <!-- SEARCH -->
+                            <div class="history-filter-field history-search-field">
+                                <label for="historySearch">PENCARIAN</label>
+
+                                <div class="history-input-shell">
+                                    <i class="fas fa-search"></i>
+                                    <input type="search"
+                                        id="historySearch"
+                                        placeholder="Cari jenis tagihan, periode, nominal..."
+                                        autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- MONTH -->
+                            <div class="history-filter-field">
+                                <label for="historyMonth">BULAN PEMBAYARAN</label>
+
+                                <div class="history-input-shell">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="month" id="historyMonth">
+                                </div>
+                            </div>
+
+                            <!-- METHOD -->
+                            <div class="history-filter-field">
+                                <label for="historyMethod">METODE PEMBAYARAN</label>
+
+                                <div class="history-input-shell">
+                                    <i class="fas fa-credit-card"></i>
+                                    <select id="historyMethod">
+                                        <option value="">Semua Metode</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="history-filter-footer">
+                            <span>
+                                <i class="fas fa-circle-info"></i>
+                                Bulan dan rentang tanggal mengacu pada tanggal pembayaran.
+                            </span>
+
+                            <span id="historyFilterStatus">Menampilkan semua transaksi</span>
+                        </div>
+
+                    </div>
+
+                    <!-- TABLE -->
                     <div class="category-table-wrap invoice-history-wrap">
 
+                        <div class="category-table-toolbar">
+                            <span>
+                                <i class="fas fa-table-list"></i>
+                                Daftar pembayaran
+                            </span>
+
+                            <span class="table-hint">
+                                Geser tabel ke samping jika diperlukan
+                            </span>
+                        </div>
+
                         <div class="table-responsive">
-                            <table class="invoice-table">
+
+                            <table class="invoice-table history-table">
 
                                 <thead>
                                     <tr>
@@ -490,27 +576,85 @@
                                         <th>Jenis Tagihan</th>
                                         <th>Periode</th>
                                         <th>Metode</th>
-                                        <th>Nominal</th>
+                                        <th class="text-end">Nominal</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
 
-                                <tbody>
+                                <tbody id="historyPaymentBody">
+
                                     {% for bayar, tagihan in riwayat_pembayaran %}
-                                    <tr>
-                                        <td>{{ bayar.tanggal_bayar.strftime('%d/%m/%Y %H:%M') if bayar.tanggal_bayar else '-' }}</td>
-                                        <td>{{ tagihan.jenis.nama if tagihan.jenis else 'Jenis tidak ditemukan' }}</td>
-                                        <td>
-                                            {{ tagihan.bulan or tagihan.tahun_pelajaran or '-' }}
-                                        </td>
-                                        <td>{{ bayar.metode or '-' }}</td>
-                                        <td class="text-end">Rp {{ "{:,.0f}".format(bayar.jumlah_bayar or 0) }}</td>
-                                        <td>{{ bayar.keterangan or '-' }}</td>
-                                    </tr>
+
+                                        {% set tanggal_iso = bayar.tanggal_bayar.strftime('%Y-%m-%d') if bayar.tanggal_bayar else '' %}
+                                        {% set bulan_iso = bayar.tanggal_bayar.strftime('%Y-%m') if bayar.tanggal_bayar else '' %}
+                                        {% set metode_bayar = bayar.metode or '-' %}
+                                        {% set nominal_bayar = bayar.jumlah_bayar or 0 %}
+
+                                        <tr
+                                            data-date="{{ tanggal_iso }}"
+                                            data-month="{{ bulan_iso }}"
+                                            data-method="{{ metode_bayar|lower }}"
+                                            data-amount="{{ nominal_bayar }}"
+                                        >
+
+                                            <td data-label="Tanggal Pembayaran">
+                                                <div class="history-date-cell">
+                                                    <i class="far fa-calendar"></i>
+                                                    <span>
+                                                        {{ bayar.tanggal_bayar.strftime('%d/%m/%Y %H:%M') if bayar.tanggal_bayar else '-' }}
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td data-label="Jenis Tagihan">
+                                                <strong class="history-bill-name">
+                                                    {{ tagihan.jenis.nama if tagihan.jenis else 'Jenis tidak ditemukan' }}
+                                                </strong>
+                                            </td>
+
+                                            <td data-label="Periode">
+                                                <span class="invoice-period">
+                                                    {{ tagihan.bulan or tagihan.tahun_pelajaran or '-' }}
+                                                </span>
+                                            </td>
+
+                                            <td data-label="Metode">
+                                                <span class="history-method">
+                                                    {{ metode_bayar }}
+                                                </span>
+                                            </td>
+
+                                            <td data-label="Nominal" class="text-end amount-cell">
+                                                Rp {{ "{:,.0f}".format(nominal_bayar) }}
+                                            </td>
+
+                                            <td data-label="Keterangan">
+                                                <span class="history-note">
+                                                    {{ bayar.keterangan or '-' }}
+                                                </span>
+                                            </td>
+
+                                        </tr>
+
                                     {% endfor %}
+
                                 </tbody>
 
                             </table>
+
+                        </div>
+
+                        <!-- FILTER EMPTY STATE -->
+                        <div class="history-filter-empty" id="historyFilterEmpty" hidden>
+                            <div class="empty-icon">
+                                <i class="fas fa-magnifying-glass"></i>
+                            </div>
+                            <h5>Transaksi Tidak Ditemukan</h5>
+                            <p>Tidak ada pembayaran yang sesuai dengan pencarian atau filter yang dipilih.</p>
+                            <button type="button" id="historyEmptyReset">
+                                <i class="fas fa-rotate-left"></i>
+                                Hapus Filter
+                            </button>
                         </div>
 
                     </div>
@@ -528,6 +672,7 @@
                 {% endif %}
 
             </div>
+
 
 
             <!-- ==========================================
@@ -1116,6 +1261,218 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     });
+
+    // =====================================================
+    // FILTER & SEARCH RIWAYAT PEMBAYARAN
+    // =====================================================
+
+    const historyBody = document.getElementById('historyPaymentBody');
+
+    if (historyBody) {
+
+        const historyRows = Array.from(
+            historyBody.querySelectorAll('tr[data-date]')
+        );
+
+        const searchInput = document.getElementById('historySearch');
+        const monthInput = document.getElementById('historyMonth');
+        const methodSelect = document.getElementById('historyMethod');
+
+        const resetButton = document.getElementById('historyResetFilter');
+        const emptyResetButton = document.getElementById('historyEmptyReset');
+
+        const visibleCount = document.getElementById('historyVisibleCount');
+        const visibleTotal = document.getElementById('historyVisibleTotal');
+        const filterStatus = document.getElementById('historyFilterStatus');
+        const emptyState = document.getElementById('historyFilterEmpty');
+
+        // -------------------------------------------------
+        // FORMAT RUPIAH
+        // -------------------------------------------------
+
+        function formatHistoryRupiah(value) {
+            return 'Rp' + new Intl.NumberFormat('id-ID', {
+                maximumFractionDigits: 0
+            }).format(Number(value) || 0);
+        }
+
+        // -------------------------------------------------
+        // ISI PILIHAN METODE PEMBAYARAN
+        // -------------------------------------------------
+
+        if (methodSelect) {
+
+            const daftarMetode = [
+                ...new Set(
+                    historyRows
+                        .map(row => row.dataset.method)
+                        .filter(method => method && method !== '-')
+                )
+            ].sort();
+
+            daftarMetode.forEach(method => {
+
+                const row = historyRows.find(
+                    item => item.dataset.method === method
+                );
+
+                const namaMetode =
+                    row?.querySelector('td:nth-child(4)')
+                        ?.textContent.trim() || method;
+
+                const option = document.createElement('option');
+
+                option.value = method;
+                option.textContent = namaMetode;
+
+                methodSelect.appendChild(option);
+
+            });
+
+        }
+
+        // -------------------------------------------------
+        // PROSES FILTER
+        // -------------------------------------------------
+
+        function filterRiwayatPembayaran() {
+
+            const keyword = searchInput?.value
+                .trim()
+                .toLocaleLowerCase('id-ID') || '';
+
+            const selectedMonth = monthInput?.value || '';
+            const selectedMethod = methodSelect?.value || '';
+
+            let jumlahTampil = 0;
+            let totalTampil = 0;
+
+            historyRows.forEach(row => {
+
+                const tanggal = row.dataset.date || '';
+                const bulan = row.dataset.month || '';
+                const metode = row.dataset.method || '';
+
+                const nominal = Number(row.dataset.amount) || 0;
+
+                const teksBaris = row.textContent
+                    .toLocaleLowerCase('id-ID');
+
+                const cocokKeyword =
+                    !keyword || teksBaris.includes(keyword);
+
+                const cocokBulan =
+                    !selectedMonth || bulan === selectedMonth;
+
+                const cocokMetode =
+                    !selectedMethod || metode === selectedMethod;
+
+                const tampil =
+                    cocokKeyword &&
+                    cocokBulan &&
+                    cocokMetode;
+
+                row.hidden = !tampil;
+
+                if (tampil) {
+                    jumlahTampil++;
+                    totalTampil += nominal;
+                }
+
+            });
+
+            // -------------------------------------------------
+            // UPDATE SUMMARY
+            // -------------------------------------------------
+
+            if (visibleCount) {
+                visibleCount.textContent = jumlahTampil;
+            }
+
+            if (visibleTotal) {
+                visibleTotal.textContent =
+                    formatHistoryRupiah(totalTampil);
+            }
+
+            // -------------------------------------------------
+            // EMPTY STATE
+            // -------------------------------------------------
+
+            if (emptyState) {
+                emptyState.hidden = jumlahTampil > 0;
+            }
+
+            // -------------------------------------------------
+            // STATUS FILTER
+            // -------------------------------------------------
+
+            if (filterStatus) {
+
+                const sedangFilter = Boolean(
+                    keyword || selectedMonth || selectedMethod
+                );
+
+                filterStatus.textContent = sedangFilter
+                    ? `Menampilkan ${jumlahTampil} dari ${historyRows.length} transaksi`
+                    : 'Menampilkan semua transaksi';
+
+            }
+
+        }
+
+        // -------------------------------------------------
+        // EVENT INPUT
+        // -------------------------------------------------
+
+        [searchInput, monthInput, methodSelect]
+            .filter(Boolean)
+            .forEach(input => {
+
+                input.addEventListener(
+                    'input',
+                    filterRiwayatPembayaran
+                );
+
+                input.addEventListener(
+                    'change',
+                    filterRiwayatPembayaran
+                );
+
+            });
+
+        // -------------------------------------------------
+        // RESET FILTER
+        // -------------------------------------------------
+
+        function resetFilterRiwayat() {
+
+            if (searchInput) searchInput.value = '';
+            if (monthInput) monthInput.value = '';
+            if (methodSelect) methodSelect.value = '';
+
+            filterRiwayatPembayaran();
+
+        }
+
+        resetButton?.addEventListener(
+            'click',
+            resetFilterRiwayat
+        );
+
+        emptyResetButton?.addEventListener(
+            'click',
+            resetFilterRiwayat
+        );
+
+        // -------------------------------------------------
+        // INISIALISASI
+        // -------------------------------------------------
+
+        filterRiwayatPembayaran();
+
+    }
+
+
 
     const modalElement = document.getElementById('modalPembayaran');
     const btnBayar = document.getElementById('btnBayarSiswa');
