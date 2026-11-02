@@ -996,6 +996,12 @@
       display: none;
     }
 
+    .bp-cover-label {
+      left: 124px;
+      font-size: 8px;
+      font-weight: 700;
+    }
+
     .biodata-page {
         padding: 0 14px 30px;
         overflow: visible;
@@ -1095,7 +1101,7 @@
     }
 
     .bp-profile-cover {
-        height: 112px;
+        height: 70px;
         padding: 16px;
     }
 
@@ -1245,6 +1251,8 @@
 
     .bp-info-item {
         padding: 12px 0;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     .bp-info-item > span {
@@ -1283,6 +1291,7 @@
 
     .bp-info-list {
         column-gap: 13px;
+        display: block;
     }
 
     .bp-profile-meta span {
