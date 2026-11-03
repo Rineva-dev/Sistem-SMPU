@@ -150,6 +150,10 @@
     {% include "sections/bendahara/pengaturan_pembayaran.html" %}
 {% endif %}
 
+{% if active_page == "atur_gaji" and halaman_aktif == "bendahara" %}
+    {% include "sections/bendahara/atur_gaji.html" %}
+{% endif %}
+
 {% if active_page == "data_ekskul" %}
     {% include "ekstrakurikuler/ekstrakurikuler.html" %}
 {% endif %}

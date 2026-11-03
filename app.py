@@ -389,6 +389,7 @@ from routes.mapel.data_mapel import mapel_bp
 from routes.sections.tu.laporan_administrasi import laporan_admin_bp
 from routes.sections.admin.dashboard_admin import dashboard_admin_bp
 from routes.sections.bendahara.bendahara import bendahara_bp
+from routes.sections.bendahara.atur_gaji import atur_gaji_bp
 from routes.siswa.naik_kelas import naik_kelas_bp
 
 # --- ✅ BLUEPRINT SISTEM ABSENSI GURU ---
@@ -423,6 +424,7 @@ app.register_blueprint(mapel_bp)
 app.register_blueprint(laporan_admin_bp)
 app.register_blueprint(dashboard_admin_bp)
 app.register_blueprint(bendahara_bp)
+app.register_blueprint(atur_gaji_bp)
 app.register_blueprint(data_ekskul_bp)
 app.register_blueprint(data_peminatan_bp)
 app.register_blueprint(absensi_bp)

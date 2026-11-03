@@ -331,7 +331,7 @@ class Siswa(db.Model):
     
     def __repr__(self):
         return f"<Siswa {self.nama} - Tingkat {self.tingkat}>"
-    
+
 # ==========================================
 # ✅ TABEL RIWAYAT KELAS
 # ==========================================

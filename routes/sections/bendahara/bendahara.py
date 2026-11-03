@@ -418,7 +418,6 @@ def hitung_dan_dapat_total_tagihan(id_siswa, angkatan_masuk, tgl_mulai, batas_ak
     return daftar_tagihan_terperinci, total_murni
 
 # === FUNGSI: PASTIKAN TAGIHAN SUDAH ADA DI TABEL TagihanSiswa ===
-
 def pastikan_tagihan_tercatat(
     id_siswa,
     angkatan_masuk,
