@@ -1,309 +1,307 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/jabatan/bendahara/atur_gaji.css') }}">
+      href="{{ url_for('static', filename='css/jabatan/bendahara/atur_gaji.css') }}">
+
 <div class="payroll-page">
 
-    <!-- Decorative Background -->
-    <div class="payroll-decoration payroll-decoration-one"></div>
-    <div class="payroll-decoration payroll-decoration-two"></div>
+    <div class="payroll-bg-orb orb-one"></div>
+    <div class="payroll-bg-orb orb-two"></div>
+    <div class="payroll-bg-grid"></div>
 
-    <!-- PAGE HEADER -->
+    <!-- HERO -->
     <section class="payroll-hero">
+        <div class="hero-glow"></div>
+        <div class="hero-ring hero-ring-one"></div>
+        <div class="hero-ring hero-ring-two"></div>
 
-        <div class="payroll-hero-content">
+        <div class="hero-content">
+            <div class="hero-topline">
+                <div class="hero-breadcrumb">
+                    <span>Keuangan</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <strong>Penggajian</strong>
+                </div>
 
-            <div class="payroll-breadcrumb">
-                <span>Keuangan</span>
-                <i class="fas fa-chevron-right"></i>
-                <span>Penggajian</span>
+                <div class="hero-system-badge">
+                    <span class="live-indicator"></span>
+                    PAYROLL MANAGEMENT
+                </div>
             </div>
 
-            <div class="payroll-heading">
-                <div>
-                    <div class="payroll-eyebrow">
-                        <span class="payroll-live-dot"></span>
-                        PAYROLL MANAGEMENT SYSTEM
+            <div class="hero-main">
+                <div class="hero-copy">
+                    <div class="hero-kicker">
+                        <span class="kicker-line"></span>
+                        FINANCE WORKSPACE
                     </div>
 
-                    <h1>Penggajian Guru</h1>
+                    <h1>
+                        Penggajian
+                        <span>Guru.</span>
+                    </h1>
 
                     <p>
-                        Kelola komponen, perhitungan, dan penerbitan
-                        rincian gaji seluruh guru dalam satu tempat.
+                        Kelola rincian kompensasi, tunjangan, potongan,
+                        dan administrasi penggajian guru dalam satu
+                        ruang kerja yang terintegrasi.
                     </p>
-                </div>
 
-                <div class="payroll-hero-icon">
-                    <div class="payroll-icon-orbit orbit-one"></div>
-                    <div class="payroll-icon-orbit orbit-two"></div>
-                    <i class="fas fa-wallet"></i>
-                    <span class="payroll-sparkle sparkle-one">✦</span>
-                    <span class="payroll-sparkle sparkle-two">✧</span>
-                </div>
-            </div>
-
-            <div class="payroll-hero-footer">
-                <div class="payroll-period-info">
-                    <div class="payroll-period-icon">
-                        <i class="far fa-calendar-alt"></i>
-                    </div>
-
-                    <div>
-                        <small>PERIODE PENGGAJIAN</small>
-                        <strong>
-                            {{ periode_label | default('Periode belum dipilih') }}
-                        </strong>
+                    <div class="hero-meta">
+                        <div class="hero-period-icon">
+                            <i class="far fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <small>PERIODE AKTIF</small>
+                            <strong>{{ periode_label | default('Periode belum dipilih') }}</strong>
+                        </div>
+                        <span class="hero-meta-divider"></span>
+                        <div class="hero-period-status">
+                            <span></span>
+                            {{ status_periode | default('Menunggu proses') }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="payroll-period-status">
-                    <span class="payroll-status-indicator"></span>
-                    {{ status_periode | default('Menunggu proses') }}
+                <div class="hero-visual">
+                    <div class="hero-visual-orbit orbit-a"></div>
+                    <div class="hero-visual-orbit orbit-b"></div>
+                    <div class="hero-visual-card">
+                        <div class="hero-visual-card-top">
+                            <span>PAYROLL</span>
+                            <i class="fas fa-ellipsis"></i>
+                        </div>
+                        <div class="hero-wallet-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="hero-visual-caption">
+                            <small>NET PAYROLL</small>
+                            <strong>Management</strong>
+                        </div>
+                        <div class="hero-visual-bars">
+                            <span></span><span></span><span></span>
+                            <span></span><span></span><span></span>
+                            <span></span><span></span><span></span>
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <span class="hero-float-icon float-icon-one">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <span class="hero-float-icon float-icon-two">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    <span class="hero-sparkle sparkle-a">✦</span>
+                    <span class="hero-sparkle sparkle-b">✧</span>
                 </div>
             </div>
-
         </div>
     </section>
-
 
     <!-- STATISTICS -->
     <section class="payroll-stats">
 
-        <div class="payroll-stat-card stat-total-guru">
-            <div class="payroll-stat-top">
-                <div class="payroll-stat-icon">
-                    <i class="fas fa-users"></i>
+        <article class="stat-card stat-card-guru">
+            <div class="stat-card-head">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <span class="stat-chip">PERSONNEL</span>
+            </div>
+            <div class="stat-main">
+                <div class="stat-number">{{ total_guru | default(0) }}</div>
+                <span class="stat-unit">Guru terdaftar</span>
+            </div>
+            <div class="stat-foot">
+                <span>Total data guru dalam sistem</span>
+                <i class="fas fa-arrow-up-right-from-square"></i>
+            </div>
+            <div class="stat-watermark"><i class="fas fa-users"></i></div>
+        </article>
+
+        <article class="stat-card stat-card-total">
+            <div class="stat-card-head">
+                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                <span class="stat-chip">NET PAYROLL</span>
+            </div>
+            <div class="stat-main">
+                <span class="stat-currency">Rp</span>
+                <div class="stat-number stat-number-money">
+                    {{ "{:,.0f}".format(total_penggajian | default(0)) }}
                 </div>
-                <span class="payroll-stat-label">DATA GURU</span>
             </div>
-
-            <div class="payroll-stat-value">
-                {{ total_guru | default(0) }}
-                <small>Orang</small>
-            </div>
-
-            <div class="payroll-stat-bottom">
-                <span>Guru terdaftar dalam sistem</span>
-                <i class="fas fa-arrow-right"></i>
-            </div>
-
-            <div class="payroll-stat-decoration"></div>
-        </div>
-
-
-        <div class="payroll-stat-card stat-total-gaji">
-            <div class="payroll-stat-top">
-                <div class="payroll-stat-icon">
-                    <i class="fas fa-money-bill-wave"></i>
-                </div>
-                <span class="payroll-stat-label">TOTAL PENGGAJIAN</span>
-            </div>
-
-            <div class="payroll-stat-value payroll-currency">
-                Rp {{ "{:,.0f}".format(total_penggajian | default(0)) }}
-            </div>
-
-            <div class="payroll-stat-bottom">
+            <div class="stat-foot">
                 <span>Akumulasi gaji bersih periode ini</span>
-                <i class="fas fa-arrow-right"></i>
+                <i class="fas fa-arrow-up-right-from-square"></i>
             </div>
+            <div class="stat-watermark"><i class="fas fa-money-bill-wave"></i></div>
+        </article>
 
-            <div class="payroll-stat-decoration"></div>
-        </div>
-
-
-        <div class="payroll-stat-card stat-draft">
-            <div class="payroll-stat-top">
-                <div class="payroll-stat-icon">
-                    <i class="fas fa-file-circle-exclamation"></i>
-                </div>
-                <span class="payroll-stat-label">BELUM DITERBITKAN</span>
+        <article class="stat-card stat-card-draft">
+            <div class="stat-card-head">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <span class="stat-chip">PENDING</span>
             </div>
-
-            <div class="payroll-stat-value">
-                {{ total_draft | default(0) }}
-                <small>Guru</small>
+            <div class="stat-main">
+                <div class="stat-number">{{ total_draft | default(0) }}</div>
+                <span class="stat-unit">Belum diterbitkan</span>
             </div>
-
-            <div class="payroll-stat-bottom">
-                <span>Menunggu pemeriksaan dan penerbitan</span>
-                <i class="fas fa-arrow-right"></i>
+            <div class="stat-progress">
+                <span style="width: {{ (total_draft / total_guru * 100) if total_guru else 0 }}%"></span>
             </div>
-
-            <div class="payroll-stat-decoration"></div>
-        </div>
-
-
-        <div class="payroll-stat-card stat-published">
-            <div class="payroll-stat-top">
-                <div class="payroll-stat-icon">
-                    <i class="fas fa-circle-check"></i>
-                </div>
-                <span class="payroll-stat-label">SUDAH DITERBITKAN</span>
+            <div class="stat-foot">
+                <span>Menunggu pemeriksaan</span>
+                <i class="fas fa-arrow-up-right-from-square"></i>
             </div>
+            <div class="stat-watermark"><i class="fas fa-file-circle-exclamation"></i></div>
+        </article>
 
-            <div class="payroll-stat-value">
-                {{ total_terbit | default(0) }}
-                <small>Guru</small>
+        <article class="stat-card stat-card-published">
+            <div class="stat-card-head">
+                <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+                <span class="stat-chip">COMPLETED</span>
             </div>
-
-            <div class="payroll-stat-bottom">
-                <span>Slip gaji sudah tersedia</span>
-                <i class="fas fa-arrow-right"></i>
+            <div class="stat-main">
+                <div class="stat-number">{{ total_terbit | default(0) }}</div>
+                <span class="stat-unit">Sudah diterbitkan</span>
             </div>
-
-            <div class="payroll-stat-decoration"></div>
-        </div>
+            <div class="stat-progress">
+                <span style="width: {{ (total_terbit / total_guru * 100) if total_guru else 0 }}%"></span>
+            </div>
+            <div class="stat-foot">
+                <span>Slip gaji telah tersedia</span>
+                <i class="fas fa-arrow-up-right-from-square"></i>
+            </div>
+            <div class="stat-watermark"><i class="fas fa-file-circle-check"></i></div>
+        </article>
 
     </section>
 
+    <!-- WORKSPACE -->
+    <section class="payroll-workspace">
 
-    <!-- MAIN TOOLBAR -->
-    <section class="payroll-main-card">
-
-        <div class="payroll-section-heading">
-
-            <div>
-                <div class="payroll-section-eyebrow">
+        <div class="workspace-heading">
+            <div class="workspace-title">
+                <div class="workspace-icon">
                     <i class="fas fa-layer-group"></i>
-                    PAYROLL WORKSPACE
                 </div>
-
-                <h2>Daftar Penggajian Guru</h2>
-
-                <p>
-                    Atur nominal penerimaan, potongan, dan rincian
-                    gaji setiap guru.
-                </p>
+                <div>
+                    <div class="section-eyebrow">PAYROLL WORKSPACE</div>
+                    <h2>Daftar Penggajian</h2>
+                    <p>Kelola dan pantau rincian gaji seluruh guru.</p>
+                </div>
             </div>
 
-            <div class="payroll-heading-actions">
-
-                <button type="button"
-                        class="payroll-btn payroll-btn-outline"
-                        id="btnKomponenGaji">
-                    <i class="fas fa-sliders"></i>
-                    <span>Komponen Gaji</span>
-                </button>
-
-                <button type="button"
-                        class="payroll-btn payroll-btn-primary"
-                        id="btnRiwayatGaji">
-                    <i class="fas fa-clock-rotate-left"></i>
-                    <span>Riwayat Gaji</span>
-                </button>
-
+            <div class="workspace-period">
+                <span class="period-dot"></span>
+                <span>{{ periode_label }}</span>
             </div>
         </div>
 
-
-        <!-- FILTER BAR -->
-        <div class="payroll-filter-bar">
-
+        <!-- TOOLBAR -->
+        <div class="payroll-toolbar">
             <div class="payroll-search">
                 <i class="fas fa-search"></i>
-                <input type="text"
+                <input type="search"
                        id="payrollSearch"
-                       placeholder="Cari nama guru atau NIP...">
+                       placeholder="Cari nama guru atau NIP..."
+                       autocomplete="off">
                 <kbd>⌕</kbd>
             </div>
 
-            <div class="payroll-filter-group">
+            <div class="toolbar-filters">
+                <div class="filter-control">
+                    <i class="fas fa-filter"></i>
+                    <select id="filterStatus">
+                        <option value="">Semua Status</option>
+                        <option value="draft">Belum Diterbitkan</option>
+                        <option value="terbit">Sudah Diterbitkan</option>
+                    </select>
+                </div>
 
-                <select id="filterStatus" class="payroll-select">
-                    <option value="">Semua Status</option>
-                    <option value="draft">Belum Diterbitkan</option>
-                    <option value="terbit">Sudah Diterbitkan</option>
-                </select>
-
-                <select id="filterPeriode" class="payroll-select">
-                    <option value="">Semua Periode</option>
-                    {% for periode in daftar_periode | default([]) %}
-                    <option value="{{ periode.value }}"
-                        {% if periode.aktif %}selected{% endif %}>
-                        {{ periode.label }}
-                    </option>
-                    {% endfor %}
-                </select>
-
+                <div class="filter-control">
+                    <i class="far fa-calendar"></i>
+                    <select id="filterPeriode">
+                        {% for periode in daftar_periode | default([]) %}
+                        <option value="{{ periode.value }}"
+                            {% if periode.active %}selected{% endif %}>
+                            {{ periode.label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-
         </div>
 
-
         <!-- TABLE -->
-        <div class="payroll-table-wrapper">
-
+        <div class="payroll-table-container">
             <table class="payroll-table">
-
                 <thead>
                     <tr>
-                        <th class="col-number">NO</th>
-                        <th>GURU</th>
+                        <th class="th-number">NO.</th>
+                        <th>GURU / IDENTITAS</th>
                         <th>JABATAN</th>
-                        <th class="text-end">TOTAL PENERIMAAN</th>
-                        <th class="text-end">TOTAL POTONGAN</th>
-                        <th class="text-end">GAJI BERSIH</th>
+                        <th class="text-right">PENERIMAAN</th>
+                        <th class="text-right">POTONGAN</th>
+                        <th class="text-right">GAJI BERSIH</th>
                         <th>STATUS</th>
                         <th class="text-center">AKSI</th>
                     </tr>
                 </thead>
 
                 <tbody id="payrollTableBody">
-
                     {% for item in daftar_gaji | default([]) %}
-
-                    <tr class="payroll-table-row"
+                    <tr class="payroll-row"
                         data-nama="{{ item.guru.nama | lower }}"
-                        data-nip="{{ item.guru.nip | default('') }}"
+                        data-nip="{{ item.guru.nip | default('') | lower }}"
                         data-status="{{ item.status }}">
 
-                        <td class="col-number">
-                            {{ loop.index }}
-                        </td>
+                        <td class="td-number">{{ loop.index }}</td>
 
                         <td>
-                            <div class="payroll-teacher">
-                                <div class="payroll-avatar">
+                            <div class="teacher-cell">
+                                <div class="teacher-avatar">
                                     {{ item.guru.nama[:1] | upper }}
+                                    <span class="avatar-online"></span>
                                 </div>
-
-                                <div class="payroll-teacher-info">
+                                <div class="teacher-identity">
                                     <strong>{{ item.guru.nama }}</strong>
                                     <small>
-                                        {{ item.guru.nip | default('NIP belum tersedia') }}
+                                        <i class="far fa-id-card"></i>
+                                        {{ item.guru.nip or 'NIP belum tersedia' }}
                                     </small>
                                 </div>
                             </div>
                         </td>
 
                         <td>
-                            <span class="payroll-position">
-                                {{ item.guru.jabatan | default('Guru') }}
+                            <span class="teacher-position">
+                                {{ item.guru.jabatan or 'Guru' }}
                             </span>
                         </td>
 
-                        <td class="text-end payroll-money">
+                        <td class="money-cell text-right">
                             Rp {{ "{:,.0f}".format(item.total_penerimaan | default(0)) }}
                         </td>
 
-                        <td class="text-end payroll-money payroll-deduction">
+                        <td class="money-cell deduction-cell text-right">
                             Rp {{ "{:,.0f}".format(item.total_potongan | default(0)) }}
                         </td>
 
-                        <td class="text-end">
-                            <strong class="payroll-net-salary">
+                        <td class="text-right">
+                            <strong class="net-pay">
                                 Rp {{ "{:,.0f}".format(item.gaji_bersih | default(0)) }}
                             </strong>
                         </td>
 
                         <td>
                             {% if item.status == 'terbit' %}
-                            <span class="payroll-badge payroll-badge-success">
+                            <span class="status-pill status-published">
                                 <i class="fas fa-check-circle"></i>
                                 Diterbitkan
                             </span>
                             {% else %}
-                            <span class="payroll-badge payroll-badge-warning">
+                            <span class="status-pill status-draft">
                                 <i class="fas fa-clock"></i>
                                 Draft
                             </span>
@@ -311,93 +309,400 @@
                         </td>
 
                         <td>
-                            <div class="payroll-row-actions">
+                            <div class="row-actions">
                                 <button type="button"
-                                        class="payroll-action-btn"
+                                        class="row-action-btn btn-edit-salary"
+                                        data-guru-id="{{ item.guru.id }}"
                                         title="Atur rincian gaji"
-                                        data-guru-id="{{ item.guru.id }}">
-                                    <i class="fas fa-pen-to-square"></i>
+                                        aria-label="Atur rincian gaji">
+                                    <i class="fas fa-pen"></i>
                                 </button>
 
                                 <button type="button"
-                                        class="payroll-action-btn"
+                                        class="row-action-btn btn-view-salary"
+                                        data-guru-id="{{ item.guru.id }}"
                                         title="Lihat rincian"
-                                        data-guru-id="{{ item.guru.id }}">
+                                        aria-label="Lihat rincian">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </td>
-
                     </tr>
 
                     {% else %}
-
                     <tr>
                         <td colspan="8">
-                            <div class="payroll-empty-state">
-                                <div class="payroll-empty-icon">
+                            <div class="table-empty">
+                                <div class="empty-illustration">
                                     <i class="fas fa-file-invoice-dollar"></i>
                                 </div>
-
-                                <h3>Belum Ada Data Penggajian</h3>
-
-                                <p>
-                                    Data penggajian guru akan muncul
-                                    setelah periode dan data gaji disiapkan.
-                                </p>
+                                <h3>Belum Ada Data Guru</h3>
+                                <p>Data guru belum tersedia untuk ditampilkan.</p>
                             </div>
                         </td>
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
 
-
-        <!-- TABLE FOOTER -->
         <div class="payroll-table-footer">
-
-            <div class="payroll-table-info">
-                Menampilkan
-                <strong>{{ daftar_gaji | default([]) | length }}</strong>
-                data guru
+            <div class="table-count">
+                <span class="count-indicator"></span>
+                Menampilkan <strong id="payrollVisibleCount">{{ daftar_gaji | length }}</strong>
+                dari <strong>{{ daftar_gaji | length }}</strong> guru
             </div>
-
-            <div class="payroll-table-note">
+            <div class="table-security">
                 <i class="fas fa-shield-halved"></i>
-                Data penggajian tersimpan secara aman
+                Data tersimpan dalam sistem
             </div>
-
         </div>
-
     </section>
 
-
-    <!-- BOTTOM INFORMATION -->
-    <section class="payroll-information">
-
-        <div class="payroll-info-icon">
-            <i class="fas fa-lightbulb"></i>
-        </div>
-
-        <div class="payroll-info-content">
-            <strong>Informasi Pengelolaan Gaji</strong>
+    <!-- INFO STRIP -->
+    <section class="payroll-info-strip">
+        <div class="info-strip-icon"><i class="fas fa-lightbulb"></i></div>
+        <div>
+            <strong>Pengelolaan penggajian yang lebih terstruktur</strong>
             <p>
-                Pastikan seluruh komponen penerimaan dan potongan
-                telah diperiksa sebelum menerbitkan rincian gaji.
-                Slip gaji yang telah diterbitkan akan tersimpan
-                sebagai arsip periode terkait.
+                Periksa setiap komponen penerimaan dan potongan sebelum
+                menerbitkan rincian gaji. Pastikan nominal sesuai dengan
+                ketentuan penggajian sekolah.
             </p>
         </div>
+        <div class="info-strip-decoration"><i class="fas fa-sparkles"></i></div>
+    </section>
 
-        <div class="payroll-info-decoration">
-            <i class="fas fa-sparkles"></i>
+</div>
+
+<!-- =====================================================
+     MODAL RINCIAN GAJI
+===================================================== -->
+
+<div class="payroll-modal" id="salaryModal" aria-hidden="true">
+
+    <div class="modal-backdrop" data-close-modal></div>
+
+    <section class="salary-modal-dialog"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="salaryModalTitle">
+
+        <!-- MODAL HEADER -->
+        <div class="salary-modal-header">
+
+            <div class="modal-heading-copy">
+                <div class="modal-kicker">
+                    <span></span>
+                    PAYROLL CONFIGURATION
+                </div>
+
+                <h2 id="salaryModalTitle">Atur Rincian Gaji</h2>
+
+                <p>
+                    Kelola komponen penerimaan dan potongan guru.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="modal-close-btn"
+                    data-close-modal
+                    aria-label="Tutup modal">
+                <i class="fas fa-xmark"></i>
+            </button>
+
         </div>
+
+
+        <!-- IDENTITAS GURU -->
+        <div class="modal-teacher-panel">
+
+            <div class="modal-teacher-avatar" id="modalTeacherAvatar">
+                G
+            </div>
+
+            <div class="modal-teacher-details">
+                <strong id="modalTeacherName">Nama Guru</strong>
+                <small id="modalTeacherNip">NIP belum tersedia</small>
+            </div>
+
+            <div class="modal-period-tag">
+                <i class="far fa-calendar"></i>
+                <span>{{ periode_label }}</span>
+            </div>
+
+        </div>
+
+
+        <!-- FORM GAJI -->
+        <form id="salaryForm"
+              method="POST"
+              action="{{ url_for('atur_gaji.index', bulan=bulan, tahun=tahun) }}">
+
+            <!-- HIDDEN DATA -->
+            <input type="hidden"
+                   name="guru_id"
+                   id="salaryGuruId">
+
+            <input type="hidden"
+                   name="bulan"
+                   value="{{ bulan }}">
+
+            <input type="hidden"
+                   name="tahun"
+                   value="{{ tahun }}">
+
+            <input type="hidden"
+                   name="komponen_json"
+                   id="komponenJson">
+
+
+            <!-- MODAL BODY -->
+            <div class="salary-modal-body">
+
+
+                <!-- =====================================
+                     KOMPONEN PENERIMAAN
+                ====================================== -->
+
+                <div class="salary-section-title">
+
+                    <div>
+                        <span class="section-index">01</span>
+
+                        <div>
+                            <h3>Komponen Penerimaan</h3>
+                            <p>
+                                Tambahkan seluruh pendapatan guru.
+                            </p>
+                        </div>
+                    </div>
+
+                    <span class="section-total-label">
+                        PENDAPATAN
+                    </span>
+
+                </div>
+
+
+                <!-- DAFTAR ITEM PENERIMAAN -->
+                <div class="salary-dynamic-list"
+                     id="penerimaanList"
+                     data-jenis="penerimaan">
+                </div>
+
+
+                <!-- TOMBOL TAMBAH PENERIMAAN -->
+                <button type="button"
+                        class="salary-add-item-btn"
+                        id="addPenerimaanBtn">
+
+                    <i class="fas fa-plus"></i>
+
+                    <span>Tambah Item Penerimaan</span>
+
+                </button>
+
+
+                <div class="salary-divider"></div>
+
+
+                <!-- =====================================
+                     KOMPONEN POTONGAN
+                ====================================== -->
+
+                <div class="salary-section-title deduction-title">
+
+                    <div>
+                        <span class="section-index">02</span>
+
+                        <div>
+                            <h3>Komponen Potongan</h3>
+                            <p>
+                                Tambahkan potongan yang berlaku.
+                            </p>
+                        </div>
+                    </div>
+
+                    <span class="section-total-label">
+                        POTONGAN
+                    </span>
+
+                </div>
+
+
+                <!-- DAFTAR ITEM POTONGAN -->
+                <div class="salary-dynamic-list"
+                     id="potonganList"
+                     data-jenis="potongan">
+                </div>
+
+
+                <!-- TOMBOL TAMBAH POTONGAN -->
+                <button type="button"
+                        class="salary-add-item-btn"
+                        id="addPotonganBtn">
+
+                    <i class="fas fa-plus"></i>
+
+                    <span>Tambah Item Potongan</span>
+
+                </button>
+
+
+                <div class="salary-divider"></div>
+
+
+                <!-- =====================================
+                     RINGKASAN PENGGAJIAN
+                ====================================== -->
+
+                <div class="salary-summary">
+
+                    <div class="summary-heading">
+
+                        <div>
+                            <span class="summary-eyebrow">
+                                PAYROLL SUMMARY
+                            </span>
+
+                            <h3>Ringkasan Penggajian</h3>
+                        </div>
+
+                        <div class="summary-shield">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOTAL PENERIMAAN -->
+                    <div class="summary-row">
+
+                        <span>Total Penerimaan</span>
+
+                        <strong id="summaryPenerimaan">
+                            Rp 0
+                        </strong>
+
+                    </div>
+
+
+                    <!-- TOTAL POTONGAN -->
+                    <div class="summary-row summary-deduction">
+
+                        <span>Total Potongan</span>
+
+                        <strong id="summaryPotongan">
+                            Rp 0
+                        </strong>
+
+                    </div>
+
+
+                    <!-- GAJI BERSIH -->
+                    <div class="summary-net">
+
+                        <div>
+                            <small>TAKE HOME PAY</small>
+                            <span>Gaji Bersih</span>
+                        </div>
+
+                        <strong id="summaryBersih">
+                            Rp 0
+                        </strong>
+
+                    </div>
+
+
+                    <!-- PERINGATAN -->
+                    <p class="summary-warning"
+                       id="salaryWarning"
+                       hidden>
+
+                        <i class="fas fa-triangle-exclamation"></i>
+
+                        Total potongan melebihi total penerimaan.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 MODAL FOOTER
+            ====================================== -->
+
+            <div class="salary-modal-footer">
+
+                <div class="modal-footer-note">
+
+                    <i class="fas fa-lock"></i>
+
+                    Perubahan akan disimpan ke database.
+
+                </div>
+
+
+                <div class="modal-footer-actions">
+
+                    <button type="button"
+                            class="modal-cancel-btn"
+                            data-close-modal>
+
+                        Batal
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="modal-save-btn"
+                            id="salarySaveBtn">
+
+                        <i class="fas fa-floppy-disk"></i>
+
+                        Simpan Rincian Gaji
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
 
     </section>
 
 </div>
+
+
+<!-- =====================================================
+     TOAST NOTIFICATION
+===================================================== -->
+
+<div class="payroll-toast"
+     id="payrollToast"
+     role="status">
+
+    <div class="toast-icon">
+        <i class="fas fa-circle-check"></i>
+    </div>
+
+    <div>
+        <strong id="toastTitle">Informasi</strong>
+        <p id="toastMessage">Pesan</p>
+    </div>
+
+</div>
+
+<script>
+    window.PAYROLL_CONFIG = {
+        bulan: {{ bulan | tojson }},
+        tahun: {{ tahun | tojson }},
+        dataUrl: {{ url_for('atur_gaji.data_gaji_guru', guru_id='__GURU_ID__') | tojson }}
+    };
+</script>
+
+<script src="{{ url_for('static', filename='js/sections/bendahara/atur_gaji.js') }}"></script>

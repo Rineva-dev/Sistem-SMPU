@@ -808,8 +808,69 @@ class GajiGuru(db.Model):
         db.UniqueConstraint('guru_id', 'bulan', 'tahun', name='_gaji_bulan_tahun_unik'),
     )
 
+    detail_komponen = db.relationship(
+        'DetailGajiGuru',
+        back_populates='gaji',
+        cascade='all, delete-orphan',
+        lazy='selectin',
+        order_by='DetailGajiGuru.urutan'
+    )
+
     def __repr__(self):
         return f"<GajiGuru {self.guru.nama} - {self.bulan}/{self.tahun}: Rp {self.gaji_bersih:,}>"
+
+# ==========================================
+# DETAIL KOMPONEN GAJI GURU (DINAMIS)
+# ==========================================
+class DetailGajiGuru(db.Model):
+    __tablename__ = 'detail_gaji_guru'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    gaji_id = db.Column(
+        db.Integer,
+        db.ForeignKey('gaji_guru.id', ondelete='CASCADE'),
+        nullable=False,
+        index=True
+    )
+
+    jenis = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    nama_item = db.Column(
+        db.String(120),
+        nullable=False
+    )
+
+    nominal = db.Column(
+        db.Numeric(14, 2),
+        nullable=False,
+        default=0
+    )
+
+    urutan = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    )
+
+    gaji = db.relationship(
+        'GajiGuru',
+        back_populates='detail_komponen'
+    )
+
+    __table_args__ = (
+        db.CheckConstraint(
+            "jenis IN ('penerimaan', 'potongan')",
+            name='check_jenis_detail_gaji'
+        ),
+    )
 
 # ==========================================
 # ✅ TABEL 1: PENGATURAN JAM KERJA ABSENSI
