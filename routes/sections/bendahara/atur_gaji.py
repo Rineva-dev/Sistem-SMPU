@@ -442,20 +442,6 @@ def index():
             str(guru.id).strip()
         )
 
-        print("\n--- PEMERIKSAAN GURU ---")
-        print("NAMA:", guru.nama)
-        print("ID GURU:", repr(guru.id))
-        print("DATA GAJI DITEMUKAN:", data is not None)
-
-        if data:
-            print("ID GAJI:", data.id)
-
-            detail_debug = DetailGajiGuru.query.filter_by(
-                gaji_id=data.id
-            ).all()
-
-            print("DETAIL DITEMUKAN:", len(detail_debug))
-
         total_penerimaan = Decimal('0')
         total_potongan = Decimal('0')
         gaji_bersih = Decimal('0')
