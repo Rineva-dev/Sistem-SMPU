@@ -1,444 +1,1623 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-* {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --salary-primary: #087b59;
+    --salary-primary-dark: #075c45;
+    --salary-primary-light: #eaf7f1;
+    --salary-gold: #d6a64d;
+    --salary-text: #172b25;
+    --salary-muted: #83928c;
+    --salary-border: #e8efeb;
+    --salary-background: #f4f8f6;
+    --salary-white: #ffffff;
+    --salary-red: #dc6262;
+}
+
+.rincian-gaji-wrapper,
+.salary-page {
     font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
+    color: var(--salary-text);
+}
+
+.salary-page *,
+.salary-page *::before,
+.salary-page *::after {
     box-sizing: border-box;
 }
 
-.rincian-gaji-wrapper {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 20px;
+
+/* =========================
+   MOBILE HEADER
+========================= */
+
+.salary-mobile-header {
+    display: none;
 }
 
-/* ===== FILTER ===== */
-.filter-bar {
+/* =========================
+   INTRO
+========================= */
+
+.salary-intro {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.filter-dropdown {
-    padding: 10px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    background: white;
-    font-size: 14px;
-    min-width: 160px;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 16px;
-    color: #374151;
-    cursor: pointer;
-}
-
-/* ===== KARTU SLIP GAJI — GAYA RESI ===== */
-.slip-gaji-container {
-    background: #f3f4f6;
-    padding: 24px;
-    border-radius: 16px;
-}
-.slip-gaji-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 40px 36px;
-    box-shadow: 0 4px 24px rgba(17, 24, 39, 0.06);
+    justify-content: space-between;
+    align-items: center;
     position: relative;
     overflow: hidden;
+    min-height: 190px;
+    padding: 35px 42px;
+    border-radius: 24px;
+    background: linear-gradient(115deg, #063f32 0%, #087b59 65%, #11936a 100%);
+    box-shadow: 0 15px 35px rgba(4, 83, 59, .15);
+    color: white;
 }
-.slip-gaji-card::before {
+
+.salary-intro::before {
     content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    right: 85px;
+    top: -150px;
+}
+
+.salary-intro::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 50%;
+    right: -35px;
+    bottom: -155px;
+}
+
+.salary-intro-content {
+    position: relative;
+    z-index: 2;
+}
+
+.salary-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #b8e9d5;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d9bd78;
+    box-shadow: 0 0 0 4px rgba(217,189,120,.16);
+}
+
+.salary-intro h1 {
+    font-size: clamp(25px, 4vw, 35px);
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -1.1px;
+    color: white;
+    margin: 0 0 10px;
+}
+
+.salary-intro p {
+    max-width: 480px;
+    color: rgba(255,255,255,.72);
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.salary-intro-icon {
+    width: 108px;
+    height: 108px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 35px;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 30px;
+    background: rgba(255,255,255,.11);
+    backdrop-filter: blur(12px);
+    color: #f0d89c;
+    font-size: 42px;
+    transform: rotate(-7deg);
+}
+
+.salary-intro-icon span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: 12px;
+    right: 12px;
+    border-radius: 50%;
+    background: #d9bd78;
+}
+
+/* =========================
+   FILTER PANEL
+========================= */
+
+.salary-filter-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 22px 26px;
+    margin: 24px 0;
+    border: 1px solid var(--salary-border);
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 5px 20px rgba(24, 57, 43, .035);
+}
+
+.filter-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    flex-shrink: 0;
+}
+
+.filter-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--salary-primary-light);
+    color: var(--salary-primary);
+    font-size: 17px;
+}
+
+.filter-heading strong,
+.filter-heading span {
+    display: block;
+}
+
+.filter-heading strong {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--salary-text);
+}
+
+.filter-heading span {
+    margin-top: 5px;
+    font-size: 11px;
+    color: var(--salary-muted);
+}
+
+.salary-filter-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-field {
+    min-width: 155px;
+}
+
+.filter-field label {
+    display: block;
+    margin: 0 0 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #87968f;
+}
+
+.filter-select-wrap {
+    position: relative;
+}
+
+.filter-select-wrap > i:first-child {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--salary-primary);
+    pointer-events: none;
+}
+
+.filter-select-wrap select {
+    width: 100%;
+    height: 42px;
+    padding: 0 32px;
+    border: 1px solid #e4ece7;
+    border-radius: 10px;
+    outline: none;
+    background: #fbfdfc;
+    color: var(--salary-text);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    appearance: none;
+    transition: .2s ease;
+}
+
+.filter-select-wrap select:focus {
+    border-color: var(--salary-primary);
+    box-shadow: 0 0 0 3px rgba(8,123,89,.09);
+}
+
+.filter-select-wrap select:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.filter-select-wrap .select-arrow {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #899891;
+    pointer-events: none;
+}
+
+/* =========================
+   DOCUMENT
+========================= */
+
+.salary-document {
+    position: relative;
+    overflow: hidden;
+    padding: 36px 42px 24px;
+    border: 1px solid #e9efeb;
+    border-radius: 22px;
+    background: white;
+    box-shadow: 0 15px 45px rgba(29, 61, 46, .065);
+}
+
+.document-top-line {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #1e40af 0%, #3b82f6 50%, #10b981 100%);
+    height: 5px;
+    background: linear-gradient(
+        90deg,
+        #075c45 0%,
+        #0a9369 55%,
+        #d6a64d 100%
+    );
 }
 
-/* ===== HEADER SLIP ===== */
-.slip-header {
+/* =========================
+   DOCUMENT HEADER
+========================= */
+
+.document-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.school-brand {
+    display: flex;
+    align-items: center;
     gap: 16px;
 }
-.brand-section {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-.logo-box {
-    width: 52px;
-    height: 52px;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-    border-radius: 10px;
+
+.school-logo {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 24px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #087b59, #064c3b);
+    color: #f5d99b;
+    font-size: 25px;
+    box-shadow: 0 7px 16px rgba(8,123,89,.18);
 }
-.nama-perusahaan {
+
+.school-logo {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.school-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 12px;
+    display: block;
+}
+
+.school-overline {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+    color: var(--salary-primary);
+}
+
+.school-identity h2 {
+    margin: 0;
+    color: #173a2e;
     font-size: 17px;
-    font-weight: 700;
-    color: #111827;
-    letter-spacing: 0.3px;
-}
-.alamat-perusahaan {
-    font-size: 12px;
-    color: #6b7280;
-    margin-top: 2px;
-}
-.periode-box {
-    text-align: right;
-    padding: 10px 16px;
-    background: #eff6ff;
-    border-radius: 10px;
-    border: 1px solid #bfdbfe;
-}
-.label-periode {
-    display: block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #1d4ed8;
-    font-weight: 600;
-}
-.nilai-periode {
-    display: block;
-    font-size: 15px;
-    font-weight: 700;
-    color: #1e40af;
-    margin-top: 2px;
+    line-height: 1.4;
+    font-weight: 900;
+    letter-spacing: -.4px;
 }
 
-/* ===== GARIS PEMISAH ===== */
-.garis-pemisah {
-    margin: 20px 0;
-    height: 2px;
-    background: repeating-linear-gradient(90deg, #e5e7eb, #e5e7eb 8px, transparent 8px, transparent 12px);
+.school-identity p {
+    margin: 4px 0 0;
+    color: #87968f;
+    font-size: 10px;
+    line-height: 1.5;
 }
-.garis-pemisah.tipis {
+
+.document-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 13px;
+    border: 1px solid #d9efe3;
+    border-radius: 30px;
+    background: #f0faf4;
+    color: #168052;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .6px;
+    white-space: nowrap;
+}
+
+.status-indicator {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #21a36c;
+    box-shadow: 0 0 0 3px rgba(33,163,108,.12);
+}
+
+.document-divider {
     height: 1px;
-    background: #e5e7eb;
-}
-.garis-pemisah.tebal {
-    height: 3px;
-    background: linear-gradient(90deg, #111827 0%, #4b5563 50%, #111827 100%);
-    border-radius: 2px;
-    margin: 24px 0;
+    margin: 27px 0;
+    background: linear-gradient(
+        90deg,
+        #e6eee9 0%,
+        #e6eee9 75%,
+        transparent 100%
+    );
 }
 
-/* ===== INFO PEGAWAI GRID ===== */
-.info-pegawai-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px 24px;
+/* =========================
+   DOCUMENT TITLE
+========================= */
+
+.document-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 26px;
 }
-.info-pegawai-item {
+
+.document-label {
+    color: var(--salary-primary);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.document-title h1 {
+    margin: 7px 0 5px;
+    color: #173a2e;
+    font-size: 29px;
+    font-weight: 900;
+    letter-spacing: -1.2px;
+}
+
+.document-title p {
+    margin: 0;
+    color: #89968f;
+    font-size: 11px;
+}
+
+.period-card {
+    min-width: 130px;
+    padding: 14px 18px;
+    text-align: right;
+    border: 1px solid #e8eee9;
+    border-radius: 14px;
+    background: #f7faf8;
+}
+
+.period-card span,
+.period-card strong,
+.period-card b {
+    display: block;
+}
+
+.period-card span {
+    color: #8b9992;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.period-card strong {
+    color: var(--salary-primary);
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.period-card b {
+    margin-top: 2px;
+    color: #60746a;
+    font-size: 11px;
+}
+
+/* =========================
+   EMPLOYEE PANEL
+========================= */
+
+.employee-panel {
+    padding: 21px 23px;
+    border: 1px solid #e9efeb;
+    border-radius: 15px;
+    background: #fbfdfc;
+}
+
+.employee-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 20px;
+}
+
+.section-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e9f5ef;
+    color: var(--salary-primary);
+    font-size: 14px;
+}
+
+.employee-panel-heading strong,
+.employee-panel-heading span {
+    display: block;
+}
+
+.employee-panel-heading strong {
+    color: #294538;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.employee-panel-heading span {
+    margin-top: 3px;
+    color: #91a097;
+    font-size: 10px;
+}
+
+.employee-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 19px 30px;
+}
+
+.employee-field {
     display: flex;
     flex-direction: column;
     gap: 2px;
-}
-.info-pegawai-item .label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #9ca3af;
-    font-weight: 500;
-}
-.info-pegawai-item .nilai {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1f2937;
+    min-width: 0;
 }
 
-/* ===== BAGIAN TABEL ===== */
-.bagian-tabel {
-    margin: 20px 0;
-}
-.judul-tabel {
-    font-size: 13px;
+.employee-field > span {
+    color: #92a097;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px dashed #e5e7eb;
-}
-.judul-tabel.penerimaan { color: #059669; }
-.judul-tabel.potongan { color: #dc2626; }
-
-.isi-tabel {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.baris-data {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 4px;
-    font-size: 14px;
-    color: #374151;
-}
-.baris-data:nth-child(even) {
-    background: #f9fafb;
-    border-radius: 4px;
-    padding: 6px 8px;
-}
-.baris-data .angka {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
+    letter-spacing: .6px;
 }
 
-.baris-total {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 14px;
-    margin-top: 8px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 15px;
-}
-.baris-total.penerimaan {
-    background: #f0fdf4;
-    color: #166534;
-}
-.baris-total.potongan {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-/* ===== GAJI BERSIH ===== */
-.bagian-bersih {
-    text-align: center;
-    padding: 24px;
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-    border-radius: 12px;
-    color: white;
-    margin: 8px 0;
-}
-.label-bersih {
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.85;
-}
-.nominal-bersih {
-    font-size: 32px;
-    font-weight: 800;
-    margin: 6px 0 4px;
-    font-variant-numeric: tabular-nums;
-}
-.terbilang {
+.employee-field > strong {
+    color: #273d32;
     font-size: 12px;
-    font-style: italic;
-    opacity: 0.8;
-    max-width: 480px;
-    margin: 0 auto;
+    font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
-/* ===== TANDA TANGAN ===== */
-.bagian-tanda-tangan {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 28px;
-}
-.tanda-tangan-kiri, .tanda-tangan-kanan {
-    text-align: center;
-    font-size: 13px;
-    color: #4b5563;
-}
-.nama-tanda {
-    border-top: 1px solid #9ca3af;
-    padding-top: 6px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-/* ===== FOOTER SLIP ===== */
-.slip-footer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 11px;
-    color: #9ca3af;
-    line-height: 1.5;
-    padding-top: 12px;
-    border-top: 1px dashed #e5e7eb;
-}
-
-/* ===== TOMBOL AKSI ===== */
-.tombol-aksi {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 24px;
-    flex-wrap: wrap;
-}
-.btn-cetak, .btn-unduh {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
+.employee-name > strong {
+    color: var(--salary-primary);
     font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+    font-weight: 800;
+}
+
+/* =========================
+   FINANCIAL SUMMARY
+========================= */
+
+.financial-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 22px 0 28px;
+}
+
+.summary-card {
+    min-width: 0;
+    padding: 19px 20px;
+    border: 1px solid;
+    border-radius: 15px;
+}
+
+.summary-income {
+    border-color: #d9eee2;
+    background: linear-gradient(135deg, #f4fcf7, #eaf8ef);
+}
+
+.summary-deduction {
+    border-color: #f2e4e2;
+    background: linear-gradient(135deg, #fff9f8, #fff1ef);
+}
+
+.summary-top {
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.25s ease;
-}
-.btn-cetak {
-    background: #1f2937;
-    color: white;
-}
-.btn-cetak:hover {
-    background: #111827;
-    transform: translateY(-1px);
-}
-.btn-unduh {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-.btn-unduh:hover {
-    background: #dbeafe;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-/* ===== KOSONG ===== */
-.kosong-container {
-    text-align: center;
-    padding: 60px 20px;
+.summary-top > span {
+    font-size: 10px;
+    font-weight: 800;
+    color: #6c8175;
+}
+
+.summary-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    font-size: 11px;
+}
+
+.summary-income .summary-icon {
+    background: #d9f0e2;
+    color: #168052;
+}
+
+.summary-deduction .summary-icon {
+    background: #fae4e1;
+    color: #d35b52;
+}
+
+.summary-card > strong {
+    display: block;
+    font-size: clamp(17px, 2.5vw, 22px);
+    line-height: 1.4;
+    font-weight: 900;
+    letter-spacing: -.7px;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+
+.summary-income > strong {
+    color: #08774f;
+}
+
+.summary-deduction > strong {
+    color: #c9544d;
+}
+
+.summary-card > small {
+    display: block;
+    color: #89988f;
+    font-size: 9px;
+}
+
+/* =========================
+   COMPONENT SECTION
+========================= */
+
+.component-section {
+    margin-top: 27px;
+}
+
+.component-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 14px;
+}
+
+.component-heading-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.component-icon {
+    width: 37px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 13px;
+}
+
+.income-icon {
+    color: #168052;
+    background: #eaf7ef;
+}
+
+.deduction-icon {
+    color: #d15a53;
+    background: #fff0ee;
+}
+
+.component-heading h3 {
+    margin: 0;
+    color: #294538;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.component-heading p {
+    margin: 4px 0 0;
+    color: #96a39c;
+    font-size: 10px;
+}
+
+.component-count {
+    padding: 6px 10px;
+    border: 1px solid #e8efeb;
+    border-radius: 20px;
+    background: #f8faf9;
+    color: #819087;
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.component-list {
+    overflow: hidden;
+    border: 1px solid #edf1ee;
+    border-radius: 13px;
     background: white;
-    border-radius: 16px;
-    border: 2px dashed #e5e7eb;
-    color: #6b7280;
 }
-.kosong-container i {
-    color: #d1d5db;
-    margin-bottom: 16px;
+
+.component-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 47px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f3f1;
 }
-.kosong-container h4 {
+
+.component-row:last-child {
+    border-bottom: none;
+}
+
+.component-row:nth-child(even) {
+    background: #fbfdfc;
+}
+
+.component-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: #50645a;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.component-name > span:last-child {
+    overflow-wrap: anywhere;
+}
+
+.component-bullet {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.income-bullet {
+    background: #28a66e;
+}
+
+.deduction-bullet {
+    background: #df726a;
+}
+
+.component-row > strong {
+    flex-shrink: 0;
+    color: #334b3e;
+    font-size: 11px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.component-empty {
+    padding: 17px;
+    color: #a0aaa4;
+    font-size: 11px;
+    text-align: center;
+}
+
+.component-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 14px 17px;
+    border-radius: 11px;
+}
+
+.component-total > span {
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.component-total > strong {
+    font-size: 13px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.income-total {
+    color: #08774f;
+    background: #edf8f1;
+}
+
+.deduction-total {
+    color: #c9544d;
+    background: #fff2f0;
+}
+
+/* =========================
+   NET SALARY
+========================= */
+
+.net-salary-panel {
+    position: relative;
+    overflow: hidden;
+    margin-top: 32px;
+    padding: 27px 30px;
+    border-radius: 18px;
+    background: linear-gradient(120deg, #063f32 0%, #087b59 65%, #0b9066 100%);
+    color: white;
+    box-shadow: 0 12px 26px rgba(5, 94, 65, .16);
+}
+
+.net-salary-top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.net-salary-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 13px;
+    background: rgba(255,255,255,.12);
+    color: #f4d99c;
     font-size: 18px;
-    color: #374151;
-    margin-bottom: 8px;
 }
-.kosong-container p {
+
+.net-salary-top span {
+    display: block;
+    color: #bce8d5;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+
+.net-salary-top h3 {
+    margin: 5px 0 0;
+    color: white;
     font-size: 14px;
+    font-weight: 700;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 640px) {
-    .slip-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    .periode-box {
-        text-align: center;
-    }
-    .info-pegawai-grid {
-        grid-template-columns: 1fr;
-    }
-    .bagian-tanda-tangan {
-        flex-direction: column;
-        gap: 24px;
-    }
-    .nominal-bersih {
-        font-size: 24px;
-    }
-    .tombol-aksi {
-        flex-direction: column;
-    }
-    .btn-cetak, .btn-unduh {
-        width: 100%;
-        justify-content: center;
-    }
+.net-salary-amount {
+    position: relative;
+    z-index: 2;
+    margin-top: 10px;
+    color: #ffffff;
+    font-size: clamp(26px, 4.5vw, 38px);
+    line-height: 1.3;
+    font-weight: 900;
+    letter-spacing: -1.2px;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
 }
 
-/* ===== CETAK ===== */
-@media print {
-    @page {
-        size: A4;
-        margin: 12mm;
-    }
-    .filter-bar, .tombol-aksi {
-        display: none !important;
-    }
-    .rincian-gaji-wrapper {
-        padding: 0;
-    }
-    .slip-gaji-container {
-        padding: 0;
-        background: white;
-    }
-    .slip-gaji-card {
-        box-shadow: none;
-        padding: 20px 0;
-    }
+.net-salary-description {
+    position: relative;
+    z-index: 2;
+    margin-top: 4px;
+    color: rgba(255,255,255,.68);
+    font-size: 10px;
+    line-height: 1.6;
 }
 
-.hp-fixed-header {
-    display: none;
+.net-salary-decoration {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    pointer-events: none;
 }
+
+.decoration-one {
+    width: 230px;
+    height: 230px;
+    right: -60px;
+    top: -115px;
+}
+
+.decoration-two {
+    width: 155px;
+    height: 155px;
+    right: 40px;
+    bottom: -115px;
+}
+
+/* =========================
+   VERIFICATION
+========================= */
+
+.verification-panel {
+    display: flex;
+    gap: 14px;
+    margin-top: 22px;
+    padding: 18px;
+    border: 1px solid #e8efeb;
+    border-radius: 13px;
+    background: #fafcfb;
+}
+
+.verification-icon {
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 11px;
+    background: #edf6f0;
+    color: var(--salary-primary);
+    font-size: 16px;
+}
+
+.verification-content {
+    min-width: 0;
+}
+
+.verification-content > strong {
+    display: block;
+    color: #345345;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.verification-content > p {
+    margin: 0 0 12px;
+    color: #8a9990;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.verification-code {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 12px;
+    border: 1px dashed #cdded3;
+    border-radius: 9px;
+    background: white;
+}
+
+.verification-code span {
+    color: #94a197;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.verification-code strong {
+    color: var(--salary-primary);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.document-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 17px;
+    border-top: 1px solid #edf1ee;
+}
+
+.document-footer span {
+    color: #a0aaa4;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.document-footer span:first-child {
+    letter-spacing: 1px;
+}
+
+/* =========================
+   ACTION BUTTON
+========================= */
+
+.salary-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 22px;
+}
+
+.btn-print {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 210px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #087b59, #075c45);
+    box-shadow: 0 7px 17px rgba(8,123,89,.17);
+    color: white;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.btn-print:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 23px rgba(8,123,89,.23);
+}
+
+.btn-print:active {
+    transform: scale(.98);
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.salary-empty {
+    padding: 65px 25px;
+    border: 1px solid #e9efeb;
+    border-radius: 22px;
+    background: white;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(29,61,46,.035);
+}
+
+.empty-illustration {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 23px;
+}
+
+.empty-circle {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #dcefe4;
+    border-radius: 28px;
+    background: linear-gradient(145deg, #f1faf4, #e5f5eb);
+    color: var(--salary-primary);
+    font-size: 34px;
+    transform: rotate(-5deg);
+}
+
+.empty-decoration {
+    position: absolute;
+    border-radius: 50%;
+    background: #d6a64d;
+}
+
+.empty-dot-one {
+    width: 9px;
+    height: 9px;
+    margin-left: 110px;
+    margin-top: -60px;
+}
+
+.empty-dot-two {
+    width: 6px;
+    height: 6px;
+    margin-left: -105px;
+    margin-top: 55px;
+    background: #8bc7a6;
+}
+
+.empty-dot-three {
+    width: 5px;
+    height: 5px;
+    margin-left: 95px;
+    margin-top: 65px;
+    background: #8bc7a6;
+}
+
+.empty-eyebrow {
+    color: var(--salary-primary);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.salary-empty h2 {
+    margin: 10px 0;
+    color: #244637;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.salary-empty p {
+    max-width: 400px;
+    margin: 0 auto;
+    color: #89978f;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* =========================
+   RESPONSIVE TABLET
+========================= */
 
 @media (max-width: 768px) {
+
+    .salary-page {
+        width: min(100% - 28px, 650px);
+        padding: 80px 0 40px;
+    }
+
+    .salary-mobile-header {
+        position: fixed;
+        z-index: 950;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 17px;
+        background: rgba(255,255,255,.91);
+        border-bottom: 1px solid rgba(225,235,229,.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
     .page-header,
     .header {
         display: none !important;
     }
 
-    .hp-fixed-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        padding: 0 16px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        z-index: 950;
-    }
-
-    .header-judul-halaman {
-        font-size: 17px;
-        font-weight: 600;
-        color: #00152a;
-        margin: 0;
-        letter-spacing: 0.3px;
-    }
-
-    .header-keluar-btn {
-        width: 32px;
-        height: 32px;
+    .salary-back,
+    .salary-logout {
+        width: 35px;
+        height: 35px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #f87171;
-        font-size: 18px;
+        border-radius: 11px;
         text-decoration: none;
-        border-radius: 10px;
-        transition: all 0.2s ease;
+        background: #f0f7f3;
+        color: var(--salary-primary);
+        font-size: 14px;
     }
 
-    .header-keluar-btn:active {
-        background: rgba(220, 38, 38, 0.25);
-        transform: scale(0.94);
+    .salary-logout {
+        background: #fff1ef;
+        color: #d65b52;
     }
 
-    .rincian-gaji-wrapper {
-        padding: 40px 0 70px 0 !important;
+    .salary-mobile-title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
     }
+
+    .salary-mobile-title strong {
+        color: #203c30;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .salary-mobile-title span {
+        color: #91a097;
+        font-size: 9px;
+    }
+
+    .salary-intro {
+        min-height: 155px;
+        padding: 27px 25px;
+        border-radius: 19px;
+    }
+
+    .salary-intro-icon {
+        width: 75px;
+        height: 75px;
+        margin-right: 8px;
+        border-radius: 22px;
+        font-size: 30px;
+    }
+
+    .salary-intro p {
+        max-width: 340px;
+        font-size: 11px;
+    }
+
+    .salary-filter-panel {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 18px;
+        padding: 19px;
+        border-radius: 16px;
+    }
+
+    .salary-filter-controls {
+        width: 100%;
+    }
+
+    .filter-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .salary-document {
+        padding: 29px 25px 22px;
+        border-radius: 18px;
+    }
+
+}
+
+/* =========================
+   RESPONSIVE MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+    .salary-page {
+        width: calc(100% - 22px);
+        padding-top: 74px;
+        padding-bottom: 35px;
+    }
+
+    .salary-intro {
+        min-height: 145px;
+        padding: 23px 19px;
+        border-radius: 17px;
+    }
+
+    .salary-intro h1 {
+        font-size: 23px;
+    }
+
+    .salary-intro p {
+        max-width: 235px;
+        font-size: 10px;
+    }
+
+    .salary-eyebrow {
+        font-size: 8px;
+        letter-spacing: 1.5px;
+    }
+
+    .salary-intro-icon {
+        width: 55px;
+        height: 55px;
+        margin-right: 0;
+        border-radius: 16px;
+        font-size: 22px;
+    }
+
+    .salary-filter-panel {
+        margin: 15px 0;
+        padding: 16px;
+    }
+
+    .filter-heading span {
+        font-size: 9px;
+    }
+
+    .salary-filter-controls {
+        gap: 8px;
+    }
+
+    .filter-field label {
+        font-size: 9px;
+    }
+
+    .filter-select-wrap select {
+        height: 40px;
+        padding-left: 29px;
+        font-size: 11px;
+    }
+
+    .filter-select-wrap > i:first-child {
+        left: 10px;
+        font-size: 10px;
+    }
+
+    .filter-select-wrap .select-arrow {
+        right: 9px;
+        font-size: 9px;
+    }
+
+    .salary-document {
+        padding: 23px 16px 18px;
+        border-radius: 16px;
+    }
+
+    .document-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .school-logo {
+        width: 45px;
+        height: 45px;
+        border-radius: 13px;
+        font-size: 20px;
+    }
+
+    .school-brand {
+        gap: 11px;
+    }
+
+    .school-identity h2 {
+        font-size: 13px;
+    }
+
+    .school-identity p {
+        font-size: 9px;
+    }
+
+    .school-overline {
+        font-size: 8px;
+    }
+
+    .document-status {
+        padding: 7px 10px;
+        font-size: 8px;
+    }
+
+    .document-divider {
+        margin: 20px 0;
+    }
+
+    .document-title {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .document-title h1 {
+        font-size: 25px;
+    }
+
+    .document-title p {
+        max-width: 190px;
+        font-size: 9px;
+        line-height: 1.6;
+    }
+
+    .period-card {
+        min-width: 90px;
+        padding: 11px 10px;
+        border-radius: 11px;
+    }
+
+    .period-card span {
+        font-size: 7px;
+    }
+
+    .period-card strong {
+        font-size: 13px;
+    }
+
+    .period-card b {
+        font-size: 10px;
+    }
+
+    .employee-panel {
+        padding: 16px;
+    }
+
+    .employee-grid {
+        gap: 16px 12px;
+    }
+
+    .employee-field > span {
+        font-size: 8px;
+    }
+
+    .employee-field > strong {
+        font-size: 10px;
+    }
+
+    .employee-name > strong {
+        font-size: 12px;
+    }
+
+    .financial-summary {
+        gap: 9px;
+        margin: 16px 0 24px;
+    }
+
+    .summary-card {
+        padding: 13px 11px;
+        border-radius: 12px;
+    }
+
+    .summary-top {
+        align-items: flex-start;
+        margin-bottom: 11px;
+    }
+
+    .summary-top > span {
+        font-size: 9px;
+    }
+
+    .summary-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 9px;
+    }
+
+    .summary-card > strong {
+        font-size: 14px;
+        letter-spacing: -.5px;
+    }
+
+    .summary-card > small {
+        font-size: 8px;
+        line-height: 1.5;
+    }
+
+    .component-heading {
+        align-items: flex-start;
+    }
+
+    .component-heading h3 {
+        font-size: 11px;
+    }
+
+    .component-heading p {
+        font-size: 9px;
+    }
+
+    .component-count {
+        padding: 5px 7px;
+        font-size: 8px;
+    }
+
+    .component-row {
+        min-height: 43px;
+        padding: 11px 10px;
+        gap: 9px;
+    }
+
+    .component-name {
+        gap: 7px;
+        font-size: 9px;
+    }
+
+    .component-row > strong {
+        font-size: 9px;
+    }
+
+    .component-total {
+        padding: 12px 11px;
+    }
+
+    .component-total > span {
+        font-size: 9px;
+    }
+
+    .component-total > strong {
+        font-size: 10px;
+    }
+
+    .net-salary-panel {
+        margin-top: 25px;
+        padding: 22px 18px;
+        border-radius: 15px;
+    }
+
+    .net-salary-amount {
+        font-size: 25px;
+    }
+
+    .net-salary-top h3 {
+        font-size: 12px;
+    }
+
+    .net-salary-description {
+        font-size: 9px;
+    }
+
+    .verification-panel {
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .verification-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .verification-code {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .verification-code strong {
+        text-align: left;
+    }
+
+    .document-footer {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .document-footer span {
+        font-size: 7px;
+    }
+
+    .salary-empty {
+        padding: 48px 18px;
+    }
+
+    .salary-empty h2 {
+        font-size: 19px;
+    }
+
+    .salary-empty p {
+        font-size: 10px;
+    }
+
+    .btn-print {
+        width: 100%;
+    }
+
+}
+
+/* =========================
+   PRINT / A4
+========================= */
+
+@media print {
+
+    @page {
+        size: A4 portrait;
+        margin: 12mm;
+    }
+
+    html,
+    body {
+        background: white !important;
+    }
+
+    .salary-mobile-header,
+    .salary-intro,
+    .salary-filter-panel,
+    .salary-actions,
+    .page-header,
+    .header,
+    .sidebar,
+    nav {
+        display: none !important;
+    }
+
+    .salary-page {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .salary-document {
+        overflow: visible;
+        padding: 20px 22px;
+        border: 1px solid #e2e8e4;
+        border-radius: 0;
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    .document-top-line {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .summary-income,
+    .summary-deduction,
+    .net-salary-panel,
+    .income-total,
+    .deduction-total,
+    .school-logo,
+    .section-icon,
+    .component-icon,
+    .verification-icon,
+    .period-card {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .component-row,
+    .component-section,
+    .employee-panel,
+    .financial-summary,
+    .verification-panel,
+    .net-salary-panel {
+        break-inside: avoid;
+    }
+
+    .document-footer {
+        margin-top: 18px;
+    }
+
 }

@@ -796,7 +796,18 @@ class GajiGuru(db.Model):
     gaji_bersih = db.Column(db.Numeric(12,2), default=0)
     
     # Status & Bukti
-    status = db.Column(db.String(20), default='dibayar')  # dibayar / belum
+    # Status Pembayaran
+    status = db.Column(db.String(20), default='dibayar')
+
+    # Status Penerbitan Slip Gaji
+    status_penerbitan = db.Column(
+        db.String(20),
+        nullable=False,
+        default='draft',
+        server_default='draft'
+    )
+
+    # Bukti Pembayaran
     tanggal_dibayar = db.Column(db.Date)
     kode_verifikasi = db.Column(db.String(20))
 

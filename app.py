@@ -395,6 +395,7 @@ from routes.siswa.naik_kelas import naik_kelas_bp
 # --- ✅ BLUEPRINT SISTEM ABSENSI GURU ---
 from routes.absensi.absensi import absensi_bp
 from routes.absensi.absensi_guru import absensi_guru_bp
+from routes.absensi.rincian_gaji import rincian_gaji_bp
 from routes.absensi.monitoring_absensi import monitoring_bp
 from routes.profil import profil_bp
 
@@ -429,6 +430,7 @@ app.register_blueprint(data_ekskul_bp)
 app.register_blueprint(data_peminatan_bp)
 app.register_blueprint(absensi_bp)
 app.register_blueprint(absensi_guru_bp, url_prefix='/absensi-guru')
+app.register_blueprint(rincian_gaji_bp)
 app.register_blueprint(monitoring_bp)
 app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)

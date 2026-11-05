@@ -895,6 +895,242 @@
     box-shadow: 0 0 0 3px rgba(30,139,86,.08);
 }
 
+
+/* =========================================================
+   PAYROLL ARCHIVE — NAVIGASI 5 BULAN
+   ========================================================= */
+
+.payroll-archive {
+    position: relative;
+    margin: 0 0 19px;
+    padding: 18px 20px;
+    border: 1px solid #e7eee9;
+    border-radius: 15px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(17, 132, 94, .045), transparent 35%),
+        #ffffff;
+    box-shadow: 0 4px 16px rgba(25, 55, 39, .025);
+}
+
+.payroll-archive-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.payroll-archive-header h3 {
+    margin: 0;
+    color: #294536;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -.2px;
+}
+
+.payroll-archive-header p {
+    margin: 5px 0 0;
+    color: #93a198;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.archive-period-info {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border: 1px solid #e3eee7;
+    border-radius: 20px;
+    background: #f5faf6;
+    color: #5b876d;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.payroll-archive-navigation {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.archive-period-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    min-width: 0;
+}
+
+.archive-period-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 0;
+    min-height: 66px;
+    padding: 10px 5px;
+    border: 1px solid #e9efeb;
+    border-radius: 11px;
+    background: #fbfcfb;
+    color: #718379;
+    text-align: center;
+    text-decoration: none !important;
+    transition: all .25s ease;
+}
+
+.archive-period-item:hover {
+    transform: translateY(-2px);
+    border-color: #a9d5ba;
+    background: #f3faf5;
+    color: #087653;
+}
+
+.archive-period-month {
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.archive-period-item.active {
+    border-color: #087653;
+    background: linear-gradient(145deg, #087653, #07563f);
+    color: #ffffff;
+    box-shadow: 0 5px 13px rgba(8, 118, 83, .17);
+}
+
+.archive-period-item.active .archive-period-month {
+    color: #ffffff;
+}
+
+.archive-period-item.active i {
+    font-size: 10px;
+    color: #b9f0d0;
+}
+
+.archive-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 37px;
+    padding: 0 11px;
+    border: 1px solid #e5ece7;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #668071;
+    font-size: 9px;
+    font-weight: 650;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: all .25s ease;
+}
+
+.archive-nav-btn:hover {
+    border-color: #a8d4b8;
+    background: #f1f8f3;
+    color: #087653;
+}
+
+.archive-nav-btn.disabled {
+    opacity: .35;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+    .payroll-archive-navigation {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .archive-period-list {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .archive-nav-btn {
+        grid-row: 2;
+    }
+
+    .archive-nav-btn:last-child {
+        justify-self: end;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .payroll-archive {
+        padding: 15px 12px;
+        border-radius: 13px;
+    }
+
+    .payroll-archive-header {
+        margin-bottom: 12px;
+    }
+
+    .payroll-archive-header h3 {
+        font-size: 11px;
+    }
+
+    .payroll-archive-header p {
+        font-size: 8px;
+    }
+
+    .archive-period-info {
+        padding: 5px 8px;
+        font-size: 7px;
+    }
+
+    .archive-period-list {
+        gap: 5px;
+    }
+
+    .archive-period-item {
+        min-height: 57px;
+        padding: 8px 2px;
+        border-radius: 9px;
+    }
+
+    .archive-period-month {
+        font-size: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .archive-period-item.active i {
+        font-size: 9px;
+    }
+
+    .archive-nav-btn {
+        min-height: 35px;
+        padding: 0 9px;
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .archive-period-list {
+        gap: 4px;
+    }
+
+    .archive-period-item {
+        min-height: 52px;
+        padding: 6px 1px;
+    }
+
+    .archive-period-month {
+        font-size: 7px;
+    }
+
+    .archive-nav-btn {
+        gap: 5px;
+        padding: 0 7px;
+        font-size: 7px;
+    }
+}
+
+
 /* TABLE */
 
 .payroll-table-container {
@@ -2019,10 +2255,6 @@ body.payroll-modal-open {
         width: 100%;
     }
 
-    .toolbar-filters {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
 
     .filter-control select {
         width: 100%;
@@ -2475,5 +2707,1238 @@ body.payroll-modal-open {
 
     .salary-add-item-btn {
         min-height: 44px;
+    }
+}
+
+
+/* TOOLBAR — PENYESUAIAN LAYOUT BARU */
+
+.payroll-toolbar {
+    flex-wrap: wrap;
+}
+
+.toolbar-filters {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.payroll-current-period-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid #dcebe1;
+    border-radius: 9px;
+    background: #eff8f1;
+    color: #087653;
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    white-space: nowrap;
+    transition: all .25s ease;
+}
+
+.payroll-current-period-btn:hover {
+    transform: translateY(-2px);
+    border-color: #087653;
+    background: #087653;
+    color: #ffffff;
+    box-shadow: 0 5px 13px rgba(8, 118, 83, .15);
+}
+
+.payroll-current-period-btn i {
+    font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    .toolbar-filters {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        width: 100%;
+        gap: 8px;
+    }
+
+    .toolbar-filters .filter-control,
+    .toolbar-filters .payroll-current-period-btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .payroll-current-period-btn {
+        padding: 0 8px;
+        font-size: 8px;
+    }
+}
+
+/* =====================================================
+   AJAX TABLE LOADING
+   ===================================================== */
+
+.payroll-table-container {
+    position: relative;
+    transition: opacity .2s ease;
+}
+
+.payroll-table-container.table-loading {
+    opacity: .45;
+    pointer-events: none;
+}
+
+.payroll-table-container.table-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 28px;
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    border: 3px solid #dcebe1;
+    border-top-color: #087653;
+    border-radius: 50%;
+    animation: payrollTableSpin .7s linear infinite;
+}
+
+@keyframes payrollTableSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =====================================================
+   PAYROLL BULK PUBLISH
+===================================================== */
+
+.payroll-bulk-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 18px 0;
+    padding: 15px 18px;
+    background: #ffffff;
+    border: 1px solid #e7eee9;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(15, 55, 39, 0.035);
+}
+
+.bulk-selection-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bulk-selection-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #087653;
+    background: #e9f7ef;
+    font-size: 17px;
+}
+
+.bulk-selection-info strong,
+.bulk-selection-info span {
+    display: block;
+}
+
+.bulk-selection-info strong {
+    color: #172b25;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.bulk-selection-info span {
+    margin-top: 3px;
+    color: #84948c;
+    font-size: 11px;
+}
+
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.btn-bulk-publish,
+.btn-publish-all {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.btn-bulk-publish {
+    color: #ffffff;
+    background: #087653;
+}
+
+.btn-bulk-publish:hover:not(:disabled) {
+    background: #064b3b;
+    transform: translateY(-1px);
+}
+
+.btn-bulk-publish:disabled {
+    color: #9ba9a1;
+    background: #edf1ee;
+    cursor: not-allowed;
+}
+
+.btn-publish-all {
+    color: #087653;
+    background: #e9f7ef;
+    border: 1px solid #d4ebdd;
+}
+
+.btn-publish-all:hover {
+    color: #ffffff;
+    background: #087653;
+}
+
+.payroll-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #087653;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.th-select,
+.td-select {
+    width: 42px;
+    text-align: center !important;
+}
+
+.checkbox-placeholder {
+    color: #c4cec8;
+    font-size: 12px;
+}
+
+.btn-publish-single {
+    color: #087653 !important;
+    background: #e9f7ef !important;
+}
+
+.btn-publish-single:hover {
+    color: #ffffff !important;
+    background: #087653 !important;
+}
+
+.btn-publish-single:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+@media (max-width: 640px) {
+    .payroll-bulk-toolbar {
+        align-items: stretch;
+        padding: 13px;
+    }
+
+    .bulk-selection-info {
+        width: 100%;
+    }
+
+    .bulk-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .btn-bulk-publish,
+    .btn-publish-all {
+        min-height: 42px;
+        padding: 0 9px;
+        font-size: 11px;
+    }
+}
+
+/* STATUS BELUM DIATUR */
+.status-unset {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    color: #78877f;
+    background: #f0f3f1;
+    border: 1px solid #e2e8e4;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   PREMIUM PAYROLL VERIFICATION BUTTON
+========================================================= */
+
+.btn-verify-payroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 14px 9px 9px;
+    border: 1px solid #dce9e2;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #ffffff, #f6fbf8);
+    color: #174c3c;
+    cursor: pointer;
+    transition: all .25s ease;
+    font-family: inherit;
+    box-shadow: 0 3px 12px rgba(15, 60, 43, .045);
+}
+
+.btn-verify-payroll:hover {
+    border-color: #a9cfbb;
+    transform: translateY(-2px);
+    box-shadow: 0 9px 22px rgba(15, 60, 43, .11);
+}
+
+.verify-btn-icon {
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: linear-gradient(145deg, #e4f5eb, #d4ecdf);
+    color: #13734e;
+    font-size: 16px;
+}
+
+.verify-btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.verify-btn-text strong {
+    font-size: 12px;
+    font-weight: 800;
+    color: #194c3c;
+}
+
+.verify-btn-text small {
+    font-size: 10px;
+    color: #82968b;
+}
+
+.verify-btn-arrow {
+    margin-left: 5px;
+    font-size: 11px;
+    color: #8aa497;
+    transition: transform .2s ease;
+}
+
+.btn-verify-payroll:hover .verify-btn-arrow {
+    transform: translate(2px, -2px);
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.payroll-verify-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background: rgba(8, 22, 17, .62);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity .25s ease, visibility .25s ease;
+}
+
+.payroll-verify-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   MODAL CONTAINER
+========================================================= */
+
+.payroll-verify-modal {
+    width: 100%;
+    max-width: 590px;
+    max-height: min(90vh, 850px);
+
+    display: flex;
+    flex-direction: column;
+
+    background: #ffffff;
+    border-radius: 23px;
+    overflow: hidden;
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, .23),
+        0 5px 20px rgba(0, 0, 0, .08);
+
+    transform: translateY(22px) scale(.97);
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+}
+
+.payroll-verify-overlay.is-open .payroll-verify-modal {
+    transform: translateY(0) scale(1);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.verify-modal-header {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 23px 27px 27px;
+
+    background:
+        radial-gradient(circle at 90% 10%, rgba(255, 255, 255, .12), transparent 34%),
+        linear-gradient(135deg, #063d2d 0%, #0d5a40 58%, #13704d 100%);
+
+    color: #ffffff;
+}
+
+.verify-header-decoration {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    right: -65px;
+    bottom: -145px;
+
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 25px rgba(255, 255, 255, .035),
+        0 0 0 50px rgba(255, 255, 255, .025);
+
+    pointer-events: none;
+}
+
+.verify-header-top,
+.verify-brand,
+.verify-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.verify-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.verify-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.verify-brand-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .13);
+    border: 1px solid rgba(255, 255, 255, .17);
+
+    color: #d7f6e5;
+    font-size: 19px;
+}
+
+.verify-brand-label,
+.verify-brand-caption {
+    display: block;
+}
+
+.verify-brand-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.6px;
+    color: #d9f3e5;
+}
+
+.verify-brand-caption {
+    margin-top: 4px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, .65);
+}
+
+.verify-close-btn {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .09);
+
+    color: #ffffff;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.verify-close-btn:hover {
+    background: rgba(255, 255, 255, .2);
+    transform: rotate(90deg);
+}
+
+.verify-header-content {
+    margin-top: 27px;
+}
+
+.verify-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 10px;
+    border-radius: 30px;
+
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .13);
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #e2f8eb;
+}
+
+.verify-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #8ef0b3;
+    box-shadow: 0 0 9px #8ef0b3;
+}
+
+.verify-header-content h2 {
+    margin: 13px 0 7px;
+    font-size: 25px;
+    font-weight: 850;
+    letter-spacing: -.7px;
+    color: #ffffff;
+}
+
+.verify-header-content p {
+    max-width: 410px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, .72);
+}
+
+
+/* =========================================================
+   MODAL BODY
+========================================================= */
+
+.verify-modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    padding: 25px 27px;
+    background: #ffffff;
+}
+
+.verify-modal-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.verify-modal-body::-webkit-scrollbar-thumb {
+    background: #dce8e1;
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.verify-input-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.verify-input-heading label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #253c32;
+}
+
+.verify-input-heading > span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #168052;
+}
+
+.verify-code-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    padding: 5px 13px;
+
+    border: 1.5px solid #dfe9e3;
+    border-radius: 14px;
+    background: #f9fcfa;
+
+    transition: .2s ease;
+}
+
+.verify-code-input-wrapper:focus-within {
+    border-color: #23865c;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(35, 134, 92, .09);
+}
+
+.verify-code-icon {
+    color: #729181;
+    font-size: 16px;
+}
+
+.verify-code-input-wrapper input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+
+    padding: 13px 0;
+
+    border: 0;
+    outline: none;
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #194b39;
+    text-transform: uppercase;
+}
+
+.verify-code-input-wrapper input::placeholder {
+    color: #b4c3ba;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+
+.verify-clear-btn {
+    display: none;
+    padding: 5px;
+    border: 0;
+    background: transparent;
+    color: #a2b1a8;
+    cursor: pointer;
+}
+
+.verify-clear-btn.is-visible {
+    display: block;
+}
+
+.verify-input-hint {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 9px;
+
+    font-size: 10px;
+    color: #89988f;
+}
+
+.verify-input-hint i {
+    color: #75a68a;
+}
+
+
+/* =========================================================
+   FEEDBACK
+========================================================= */
+
+.verify-feedback {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+
+    margin-top: 15px;
+    padding: 12px 14px;
+
+    border-radius: 11px;
+    font-size: 11px;
+    font-weight: 650;
+    line-height: 1.6;
+}
+
+.verify-feedback.is-error {
+    color: #a52e3b;
+    background: #fff2f2;
+    border: 1px solid #ffd9dd;
+}
+
+.verify-feedback.is-success {
+    color: #176b46;
+    background: #effaf3;
+    border: 1px solid #d2efdd;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+.verify-submit-btn {
+    position: relative;
+
+    width: 100%;
+    min-height: 49px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    margin-top: 21px;
+    padding: 13px 17px;
+
+    border: 0;
+    border-radius: 13px;
+
+    background: linear-gradient(110deg, #075239, #11764f);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+    overflow: hidden;
+
+    box-shadow: 0 7px 17px rgba(8, 91, 59, .19);
+    transition: .25s ease;
+}
+
+.verify-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 11px 23px rgba(8, 91, 59, .25);
+}
+
+.verify-submit-btn:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
+.verify-submit-content {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.verify-submit-arrow {
+    position: absolute;
+    right: 17px;
+    transition: transform .2s;
+}
+
+.verify-submit-btn:hover .verify-submit-arrow {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   VERIFICATION RESULT
+========================================================= */
+
+.verify-result {
+    margin-top: 23px;
+    padding-top: 21px;
+    border-top: 1px solid #edf1ee;
+
+    animation: verifyResultIn .35s ease both;
+}
+
+@keyframes verifyResultIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verify-result-banner {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 15px;
+
+    border: 1px solid #d6efdf;
+    border-radius: 15px;
+
+    background: linear-gradient(120deg, #f0fbf4, #f9fdf9);
+}
+
+.verify-success-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+    background: #d9f5e3;
+    color: #16804c;
+    font-size: 17px;
+}
+
+.verify-success-label {
+    display: block;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #268354;
+}
+
+.verify-success-text h3 {
+    margin: 4px 0;
+    font-size: 13px;
+    font-weight: 850;
+    color: #174b34;
+}
+
+.verify-success-text p {
+    margin: 0;
+    font-size: 10px;
+    color: #779080;
+}
+
+.verify-valid-badge {
+    margin-left: auto;
+    padding: 6px 9px;
+
+    border-radius: 30px;
+    background: #dff5e7;
+    color: #16804c;
+
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .5px;
+    white-space: nowrap;
+}
+
+.verify-valid-badge i {
+    margin-right: 3px;
+}
+
+
+/* =========================================================
+   RESULT SECTIONS
+========================================================= */
+
+.verify-result-section {
+    margin-top: 21px;
+}
+
+.verify-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.verify-section-icon {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+    background: #edf5f0;
+    color: #26714d;
+    font-size: 13px;
+}
+
+.verify-section-icon.money-icon {
+    background: #edf2ff;
+    color: #456bc1;
+}
+
+.verify-section-title strong {
+    display: block;
+    font-size: 12px;
+    color: #263d32;
+}
+
+.verify-section-title small {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: #98a69d;
+}
+
+.verify-data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.verify-data-item {
+    min-width: 0;
+    padding: 12px 13px;
+
+    border: 1px solid #edf1ee;
+    border-radius: 11px;
+    background: #fbfcfb;
+}
+
+.verify-data-item.verify-data-full {
+    grid-column: 1 / -1;
+}
+
+.verify-data-item span {
+    display: block;
+    margin-bottom: 6px;
+
+    font-size: 9px;
+    font-weight: 700;
+    color: #89988f;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.verify-data-item strong {
+    display: block;
+    overflow-wrap: anywhere;
+
+    font-size: 12px;
+    font-weight: 800;
+    color: #273f33;
+}
+
+
+/* =========================================================
+   VERIFICATION CODE DISPLAY
+========================================================= */
+
+.verify-code-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 14px;
+    padding: 13px 15px;
+
+    border: 1px dashed #cbded1;
+    border-radius: 12px;
+    background: #f7fbf8;
+}
+
+.verify-code-result span {
+    display: block;
+    margin-bottom: 5px;
+
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #82988a;
+}
+
+.verify-code-result strong {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #14573a;
+    overflow-wrap: anywhere;
+}
+
+.verify-code-result > i {
+    color: #9ebdaa;
+    font-size: 23px;
+}
+
+
+/* =========================================================
+   FINANCIAL SUMMARY
+========================================================= */
+
+.verify-finance-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.verify-finance-item {
+    padding: 13px;
+
+    border: 1px solid #edf1ee;
+    border-radius: 11px;
+    background: #fbfcfb;
+}
+
+.verify-finance-item span {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 10px;
+    color: #8b9a91;
+}
+
+.verify-finance-item strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 850;
+    color: #294235;
+    overflow-wrap: anywhere;
+}
+
+.verify-net-pay {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 11px;
+    padding: 17px;
+
+    border-radius: 13px;
+    background: linear-gradient(120deg, #073e2e, #116447);
+    color: #ffffff;
+}
+
+.verify-net-pay span {
+    display: block;
+    margin-bottom: 5px;
+
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1.1px;
+    color: #a7d7bb;
+}
+
+.verify-net-pay > div > strong {
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.verify-net-pay > strong {
+    font-size: 19px;
+    font-weight: 900;
+    color: #ffffff;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.verify-result-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    margin-top: 15px;
+
+    font-size: 10px;
+    line-height: 1.6;
+    color: #84948a;
+}
+
+.verify-result-note i {
+    margin-top: 2px;
+    color: #27805a;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.verify-modal-footer {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 14px 27px;
+
+    border-top: 1px solid #edf1ee;
+    background: #fcfdfc;
+}
+
+.verify-footer-security {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    font-size: 9px;
+    font-weight: 700;
+    color: #94a39a;
+}
+
+.verify-footer-security i {
+    color: #438866;
+}
+
+.verify-footer-close {
+    padding: 9px 17px;
+
+    border: 1px solid #e2eae4;
+    border-radius: 9px;
+    background: #ffffff;
+
+    color: #53685b;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+
+    cursor: pointer;
+    transition: .2s;
+}
+
+.verify-footer-close:hover {
+    background: #f0f6f2;
+    border-color: #c6ddce;
+    color: #17583d;
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .btn-verify-payroll {
+        padding: 7px;
+        border-radius: 12px;
+    }
+
+    .verify-btn-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .verify-btn-text small {
+        display: none;
+    }
+
+    .verify-btn-arrow {
+        display: none;
+    }
+
+    .payroll-verify-overlay {
+        padding: 10px;
+        align-items: center;
+    }
+
+    .payroll-verify-modal {
+        max-height: 94dvh;
+        border-radius: 19px;
+    }
+
+    .verify-modal-header {
+        padding: 19px 19px 21px;
+    }
+
+    .verify-brand-icon {
+        width: 39px;
+        height: 39px;
+    }
+
+    .verify-header-content {
+        margin-top: 21px;
+    }
+
+    .verify-header-content h2 {
+        font-size: 21px;
+    }
+
+    .verify-modal-body {
+        padding: 20px 18px;
+    }
+
+    .verify-modal-footer {
+        padding: 12px 18px;
+    }
+
+    .verify-result-banner {
+        flex-wrap: wrap;
+    }
+
+    .verify-valid-badge {
+        margin-left: 52px;
+    }
+
+    .verify-net-pay {
+        padding: 14px;
+    }
+
+    .verify-net-pay > strong {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .verify-data-grid,
+    .verify-finance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .verify-data-item.verify-data-full {
+        grid-column: auto;
+    }
+
+    .verify-header-content h2 {
+        font-size: 19px;
+    }
+
+    .verify-footer-security {
+        font-size: 8px;
     }
 }

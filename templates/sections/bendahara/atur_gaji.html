@@ -100,6 +100,7 @@
         </div>
     </section>
 
+    
     <!-- STATISTICS -->
     <section class="payroll-stats">
 
@@ -109,7 +110,7 @@
                 <span class="stat-chip">PERSONNEL</span>
             </div>
             <div class="stat-main">
-                <div class="stat-number">{{ total_guru | default(0) }}</div>
+                <div class="stat-number" id="statTotalGuru">{{ total_guru | default(0) }}</div>
                 <span class="stat-unit">Guru terdaftar</span>
             </div>
             <div class="stat-foot">
@@ -126,7 +127,7 @@
             </div>
             <div class="stat-main">
                 <span class="stat-currency">Rp</span>
-                <div class="stat-number stat-number-money">
+                <div class="stat-number stat-number-money" id="statTotalPenggajian">
                     {{ "{:,.0f}".format(total_penggajian | default(0)) }}
                 </div>
             </div>
@@ -143,11 +144,11 @@
                 <span class="stat-chip">PENDING</span>
             </div>
             <div class="stat-main">
-                <div class="stat-number">{{ total_draft | default(0) }}</div>
+                <div class="stat-number" id="statTotalDraft">{{ total_draft | default(0) }}</div>
                 <span class="stat-unit">Belum diterbitkan</span>
             </div>
             <div class="stat-progress">
-                <span style="width: {{ (total_draft / total_guru * 100) if total_guru else 0 }}%"></span>
+                <span id="statProgressDraft" style="width: {{ (total_draft / total_guru * 100) if total_guru else 0 }}%"></span>
             </div>
             <div class="stat-foot">
                 <span>Menunggu pemeriksaan</span>
@@ -162,11 +163,11 @@
                 <span class="stat-chip">COMPLETED</span>
             </div>
             <div class="stat-main">
-                <div class="stat-number">{{ total_terbit | default(0) }}</div>
+                <div class="stat-number" id="statTotalTerbit">{{ total_terbit | default(0) }}</div>
                 <span class="stat-unit">Sudah diterbitkan</span>
             </div>
             <div class="stat-progress">
-                <span style="width: {{ (total_terbit / total_guru * 100) if total_guru else 0 }}%"></span>
+                <span id="statProgressTerbit" style="width: {{ (total_terbit / total_guru * 100) if total_guru else 0 }}%"></span>
             </div>
             <div class="stat-foot">
                 <span>Slip gaji telah tersedia</span>
@@ -176,6 +177,7 @@
         </article>
 
     </section>
+
 
     <!-- WORKSPACE -->
     <section class="payroll-workspace">
@@ -194,154 +196,188 @@
 
             <div class="workspace-period">
                 <span class="period-dot"></span>
-                <span>{{ periode_label }}</span>
+                <span id="workspacePeriodLabel">{{ periode_label }}</span>
             </div>
         </div>
 
         <!-- TOOLBAR -->
         <div class="payroll-toolbar">
+
             <div class="payroll-search">
                 <i class="fas fa-search"></i>
                 <input type="search"
-                       id="payrollSearch"
-                       placeholder="Cari nama guru atau NIP..."
-                       autocomplete="off">
-                <kbd>⌕</kbd>
+                    id="payrollSearch"
+                    placeholder="Cari nama guru atau NIP..."
+                    autocomplete="off">
             </div>
 
             <div class="toolbar-filters">
+
+                <button type="button"
+                        class="btn-verify-payroll"
+                        id="openPayrollVerification">
+
+                    <span class="verify-btn-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </span>
+
+                    <span class="verify-btn-text">
+                        <strong>Verifikasi Slip</strong>
+                        <small>Cek keaslian slip gaji</small>
+                    </span>
+
+                    <i class="fas fa-arrow-up-right-from-square verify-btn-arrow"></i>
+                </button>
+
                 <div class="filter-control">
                     <i class="fas fa-filter"></i>
                     <select id="filterStatus">
                         <option value="">Semua Status</option>
                         <option value="draft">Belum Diterbitkan</option>
                         <option value="terbit">Sudah Diterbitkan</option>
+                        <option value="belum_ada">Belum Diatur</option>
                     </select>
                 </div>
 
-                <div class="filter-control">
-                    <i class="far fa-calendar"></i>
-                    <select id="filterPeriode">
-                        {% for periode in daftar_periode | default([]) %}
-                        <option value="{{ periode.value }}"
-                            {% if periode.active %}selected{% endif %}>
-                            {{ periode.label }}
-                        </option>
-                        {% endfor %}
-                    </select>
+                <button type="button"
+                        id="btnBulanBerjalan"
+                        class="payroll-current-period-btn">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Bulan Berjalan</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        
+        <!-- BULK PUBLISH TOOLBAR -->
+        <div class="payroll-bulk-toolbar" id="payrollBulkToolbar">
+
+            <div class="bulk-selection-info">
+                <div class="bulk-selection-icon">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+
+                <div>
+                    <strong id="selectedPayrollCount">0 slip dipilih</strong>
+                    <span>Pilih slip Draft untuk diterbitkan</span>
                 </div>
             </div>
+
+            <div class="bulk-actions">
+
+                <button
+                    type="button"
+                    class="btn-bulk-publish"
+                    id="btnPublishSelected"
+                    disabled
+                >
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Terbitkan Terpilih</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-publish-all"
+                    id="btnPublishAll"
+                >
+                    <i class="fas fa-layer-group"></i>
+                    <span>Terbitkan Semua Draft</span>
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- NAVIGASI ARSIP 5 BULAN -->
+        <div class="payroll-archive">
+
+            <div class="payroll-archive-header">
+                <div>
+                    <h3>Arsip Penggajian</h3>
+                    <p>Pilih bulan untuk melihat rincian penggajian.</p>
+                </div>
+
+                <span class="archive-period-info">
+                    {{ daftar_periode|length }} Periode
+                </span>
+            </div>
+
+            <div class="payroll-archive-navigation">
+
+                <a href="{{ url_lebih_lama }}"
+                class="archive-nav-btn">
+                    <i class="fas fa-chevron-left"></i>
+                    <span>Lebih Lama</span>
+                </a>
+
+                <div class="archive-period-list">
+
+                    {% for periode in daftar_periode %}
+
+                    <a href="{{ periode.url }}"
+                    class="archive-period-item
+                    {% if periode.active %}active{% endif %}">
+
+                        <span class="archive-period-month">
+                            {{ format_bulan(periode.bulan) if false else periode.label }}
+                        </span>
+
+                        {% if periode.active %}
+                        <i class="fas fa-circle-check"></i>
+                        {% endif %}
+
+                    </a>
+
+                    {% endfor %}
+
+                </div>
+
+                <a href="{{ url_lebih_baru }}"
+                class="archive-nav-btn
+                {% if not ada_periode_lebih_baru %}disabled{% endif %}"
+                {% if not ada_periode_lebih_baru %}
+                aria-disabled="true"
+                tabindex="-1"
+                {% endif %}>
+                    <span>Lebih Baru</span>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+
+            </div>
+
         </div>
 
         <!-- TABLE -->
         <div class="payroll-table-container">
             <table class="payroll-table">
+                
                 <thead>
                     <tr>
-                        <th class="th-number">NO.</th>
-                        <th>GURU / IDENTITAS</th>
+                        <th class="th-select">
+                            <input
+                                type="checkbox"
+                                id="selectAllPayroll"
+                                class="payroll-checkbox"
+                                title="Pilih semua Draft"
+                                aria-label="Pilih semua Draft"
+                            >
+                        </th>
+                        <th>NO</th>
+                        <th>GURU</th>
                         <th>JABATAN</th>
-                        <th class="text-right">PENERIMAAN</th>
-                        <th class="text-right">POTONGAN</th>
-                        <th class="text-right">GAJI BERSIH</th>
+                        <th>PENERIMAAN</th>
+                        <th>POTONGAN</th>
+                        <th>GAJI BERSIH</th>
                         <th>STATUS</th>
-                        <th class="text-center">AKSI</th>
+                        <th>AKSI</th>
                     </tr>
                 </thead>
 
+
                 <tbody id="payrollTableBody">
-                    {% for item in daftar_gaji | default([]) %}
-                    <tr class="payroll-row"
-                        data-nama="{{ item.guru.nama | lower }}"
-                        data-nip="{{ item.guru.nip | default('') | lower }}"
-                        data-status="{{ item.status }}">
-
-                        <td class="td-number">{{ loop.index }}</td>
-
-                        <td>
-                            <div class="teacher-cell">
-                                <div class="teacher-avatar">
-                                    {{ item.guru.nama[:1] | upper }}
-                                    <span class="avatar-online"></span>
-                                </div>
-                                <div class="teacher-identity">
-                                    <strong>{{ item.guru.nama }}</strong>
-                                    <small>
-                                        <i class="far fa-id-card"></i>
-                                        {{ item.guru.nip or 'NIP belum tersedia' }}
-                                    </small>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td>
-                            <span class="teacher-position">
-                                {{ item.guru.jabatan or 'Guru' }}
-                            </span>
-                        </td>
-
-                        <td class="money-cell text-right">
-                            Rp {{ "{:,.0f}".format(item.total_penerimaan | default(0)) }}
-                        </td>
-
-                        <td class="money-cell deduction-cell text-right">
-                            Rp {{ "{:,.0f}".format(item.total_potongan | default(0)) }}
-                        </td>
-
-                        <td class="text-right">
-                            <strong class="net-pay">
-                                Rp {{ "{:,.0f}".format(item.gaji_bersih | default(0)) }}
-                            </strong>
-                        </td>
-
-                        <td>
-                            {% if item.status == 'terbit' %}
-                            <span class="status-pill status-published">
-                                <i class="fas fa-check-circle"></i>
-                                Diterbitkan
-                            </span>
-                            {% else %}
-                            <span class="status-pill status-draft">
-                                <i class="fas fa-clock"></i>
-                                Draft
-                            </span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            <div class="row-actions">
-                                <button type="button"
-                                        class="row-action-btn btn-edit-salary"
-                                        data-guru-id="{{ item.guru.id }}"
-                                        title="Atur rincian gaji"
-                                        aria-label="Atur rincian gaji">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-
-                                <button type="button"
-                                        class="row-action-btn btn-view-salary"
-                                        data-guru-id="{{ item.guru.id }}"
-                                        title="Lihat rincian"
-                                        aria-label="Lihat rincian">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {% else %}
-                    <tr>
-                        <td colspan="8">
-                            <div class="table-empty">
-                                <div class="empty-illustration">
-                                    <i class="fas fa-file-invoice-dollar"></i>
-                                </div>
-                                <h3>Belum Ada Data Guru</h3>
-                                <p>Data guru belum tersedia untuk ditampilkan.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                    {% include 'sections/bendahara/tabel_gaji_rows.html' %}
                 </tbody>
             </table>
         </div>
@@ -428,7 +464,7 @@
 
             <div class="modal-period-tag">
                 <i class="far fa-calendar"></i>
-                <span>{{ periode_label }}</span>
+                <span id="modalPeriodLabel">{{ periode_label }}</span>
             </div>
 
         </div>
@@ -445,12 +481,22 @@
                    id="salaryGuruId">
 
             <input type="hidden"
-                   name="bulan"
-                   value="{{ bulan }}">
+                    name="bulan"
+                    id="salaryBulan"
+                    value="{{ bulan }}">
 
             <input type="hidden"
-                   name="tahun"
-                   value="{{ tahun }}">
+                    name="tahun"
+                    id="salaryTahun"
+                    value="{{ tahun }}">
+
+            <input type="hidden"
+                   name="akhir_bulan"
+                   value="{{ request.args.get('akhir_bulan', sekarang.month) }}">
+
+            <input type="hidden"
+                   name="akhir_tahun"
+                   value="{{ request.args.get('akhir_tahun', sekarang.year) }}">
 
             <input type="hidden"
                    name="komponen_json"
@@ -697,12 +743,597 @@
 
 </div>
 
+<!-- =====================================================
+     PREMIUM PAYROLL VERIFICATION MODAL
+===================================================== -->
+
+<div class="payroll-verify-overlay"
+     id="payrollVerificationModal"
+     aria-hidden="true">
+
+    <div class="payroll-verify-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="verifyModalTitle">
+
+        <!-- HEADER -->
+        <div class="verify-modal-header">
+
+            <div class="verify-header-decoration"></div>
+
+            <div class="verify-header-top">
+
+                <div class="verify-brand">
+                    <div class="verify-brand-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <span class="verify-brand-label">
+                            PAYROLL SECURITY
+                        </span>
+
+                        <span class="verify-brand-caption">
+                            Document Authentication
+                        </span>
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="verify-close-btn"
+                        id="closePayrollVerification"
+                        aria-label="Tutup modal">
+
+                    <i class="fas fa-xmark"></i>
+                </button>
+
+            </div>
+
+            <div class="verify-header-content">
+                <div class="verify-header-badge">
+                    <span class="verify-live-dot"></span>
+                    SECURE VERIFICATION
+                </div>
+
+                <h2 id="verifyModalTitle">
+                    Verifikasi Slip Gaji
+                </h2>
+
+                <p>
+                    Pastikan keaslian dokumen penggajian
+                    melalui kode verifikasi resmi sekolah.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- BODY -->
+        <div class="verify-modal-body">
+
+            <!-- INPUT FORM -->
+            <form id="payrollVerificationForm">
+
+                <div class="verify-input-heading">
+                    <label for="verificationCodeInput">
+                        Kode Verifikasi
+                    </label>
+
+                    <span>
+                        <i class="fas fa-lock"></i>
+                        Secure Input
+                    </span>
+                </div>
+
+                <div class="verify-code-input-wrapper">
+
+                    <div class="verify-code-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+
+                    <input
+                        type="text"
+                        id="verificationCodeInput"
+                        maxlength="40"
+                        placeholder="SLP-202611-ABC123"
+                        autocomplete="off"
+                        autocapitalize="characters"
+                        spellcheck="false"
+                        required
+                    >
+
+                    <button type="button"
+                            id="clearVerificationCode"
+                            class="verify-clear-btn"
+                            title="Hapus kode">
+
+                        <i class="fas fa-circle-xmark"></i>
+                    </button>
+
+                </div>
+
+                <div class="verify-input-hint">
+                    <i class="fas fa-circle-info"></i>
+
+                    Masukkan kode yang tertera pada slip gaji guru.
+                </div>
+
+                <!-- ERROR / INFO MESSAGE -->
+                <div class="verify-feedback"
+                     id="verificationMessage"
+                     hidden>
+
+                    <i class="fas fa-circle-exclamation"></i>
+
+                    <span id="verificationMessageText"></span>
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit"
+                        class="verify-submit-btn"
+                        id="verificationSubmitBtn">
+
+                    <span class="verify-submit-content">
+                        <i class="fas fa-shield-check"></i>
+                        <span>Verifikasi Sekarang</span>
+                    </span>
+
+                    <i class="fas fa-arrow-right verify-submit-arrow"></i>
+
+                </button>
+
+            </form>
+
+
+            <!-- RESULT -->
+            <div class="verify-result"
+                 id="verificationResult"
+                 hidden>
+
+                <div class="verify-result-banner">
+
+                    <div class="verify-success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+
+                    <div class="verify-success-text">
+                        <span class="verify-success-label">
+                            AUTHENTICATION SUCCESSFUL
+                        </span>
+
+                        <h3>Slip Gaji Terverifikasi</h3>
+
+                        <p>
+                            Kode cocok dengan catatan penggajian sekolah.
+                        </p>
+                    </div>
+
+                    <div class="verify-valid-badge">
+                        <i class="fas fa-check-circle"></i>
+                        VALID
+                    </div>
+
+                </div>
+
+
+                <!-- IDENTITAS -->
+                <div class="verify-result-section">
+
+                    <div class="verify-section-title">
+                        <span class="verify-section-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </span>
+
+                        <div>
+                            <strong>Informasi Guru</strong>
+                            <small>Identitas pemilik slip gaji</small>
+                        </div>
+                    </div>
+
+                    <div class="verify-data-grid">
+
+                        <div class="verify-data-item verify-data-full">
+                            <span>Nama Guru</span>
+                            <strong id="verifyGuruName">-</strong>
+                        </div>
+
+                        <div class="verify-data-item">
+                            <span>NIP</span>
+                            <strong id="verifyGuruNip">-</strong>
+                        </div>
+
+                        <div class="verify-data-item">
+                            <span>Periode Penggajian</span>
+                            <strong id="verifyPeriod">-</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- KODE -->
+                <div class="verify-code-result">
+
+                    <div>
+                        <span>KODE VERIFIKASI RESMI</span>
+                        <strong id="verifyCode">-</strong>
+                    </div>
+
+                    <i class="fas fa-fingerprint"></i>
+
+                </div>
+
+
+                <!-- FINANCIAL SUMMARY -->
+                <div class="verify-result-section">
+
+                    <div class="verify-section-title">
+                        <span class="verify-section-icon money-icon">
+                            <i class="fas fa-wallet"></i>
+                        </span>
+
+                        <div>
+                            <strong>Ringkasan Penggajian</strong>
+                            <small>Informasi nominal slip gaji</small>
+                        </div>
+                    </div>
+
+                    <div class="verify-finance-grid">
+
+                        <div class="verify-finance-item">
+                            <span>Total Penerimaan</span>
+                            <strong id="verifyPenerimaan">Rp 0</strong>
+                        </div>
+
+                        <div class="verify-finance-item">
+                            <span>Total Potongan</span>
+                            <strong id="verifyPotongan">Rp 0</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="verify-net-pay">
+
+                        <div>
+                            <span>TAKE HOME PAY</span>
+                            <strong>Gaji Bersih</strong>
+                        </div>
+
+                        <strong id="verifyNetPay">Rp 0</strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="verify-result-note">
+                    <i class="fas fa-shield-halved"></i>
+
+                    <span>
+                        Dokumen ini telah berhasil dicocokkan
+                        dengan data penggajian resmi sekolah.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="verify-modal-footer">
+
+            <div class="verify-footer-security">
+                <i class="fas fa-lock"></i>
+
+                <span>
+                    Secure Payroll Verification
+                </span>
+            </div>
+
+            <button type="button"
+                    class="verify-footer-close"
+                    id="footerCloseVerification">
+
+                Tutup
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <script>
     window.PAYROLL_CONFIG = {
         bulan: {{ bulan | tojson }},
         tahun: {{ tahun | tojson }},
-        dataUrl: {{ url_for('atur_gaji.data_gaji_guru', guru_id='__GURU_ID__') | tojson }}
+        bulanSekarang: {{ sekarang.month | tojson }},
+        tahunSekarang: {{ sekarang.year | tojson }},
+        tableUrl: {{ url_for('atur_gaji.tabel_penggajian') | tojson }},
+        dataUrl: {{ url_for('atur_gaji.data_gaji_guru', guru_id='__GURU_ID__') | tojson }},
+        verifyUrl: {{ url_for('atur_gaji.verifikasi_slip_gaji') | tojson }}
     };
+
 </script>
 
 <script src="{{ url_for('static', filename='js/sections/bendahara/atur_gaji.js') }}"></script>
+
+<script>
+(() => {
+    'use strict';
+
+    const modal = document.getElementById('payrollVerificationModal');
+    const openBtn = document.getElementById('openPayrollVerification');
+    const closeBtn = document.getElementById('closePayrollVerification');
+    const footerCloseBtn = document.getElementById('footerCloseVerification');
+
+    const form = document.getElementById('payrollVerificationForm');
+    const input = document.getElementById('verificationCodeInput');
+    const clearBtn = document.getElementById('clearVerificationCode');
+    const submitBtn = document.getElementById('verificationSubmitBtn');
+
+    const message = document.getElementById('verificationMessage');
+    const messageText = document.getElementById('verificationMessageText');
+    const result = document.getElementById('verificationResult');
+
+    if (!modal || !form || !openBtn) return;
+
+    let previousFocus = null;
+
+    const money = value => {
+        const number = Number(value || 0);
+
+        return 'Rp ' + new Intl.NumberFormat('id-ID', {
+            maximumFractionDigits: 0
+        }).format(Number.isFinite(number) ? number : 0);
+    };
+
+    function openModal() {
+        previousFocus = document.activeElement;
+
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+
+        document.body.style.overflow = 'hidden';
+
+        setTimeout(() => input.focus(), 250);
+    }
+
+    function closeModal() {
+        resetVerification();
+
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+
+        document.body.style.overflow = '';
+
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+            previousFocus.focus();
+        }
+    }
+
+    function showMessage(text, type = 'error') {
+        messageText.textContent = text;
+
+        message.className = 'verify-feedback is-' + type;
+        message.hidden = false;
+    }
+
+    function hideMessage() {
+        message.hidden = true;
+        messageText.textContent = '';
+    }
+
+    function resetResult() {
+        result.hidden = true;
+    }
+
+    function resetVerification() {
+        input.value = '';
+        hideMessage();
+        resetResult();
+        clearBtn.classList.remove('is-visible');
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+            <span class="verify-submit-content">
+                <i class="fas fa-shield-check"></i>
+                <span>Verifikasi Sekarang</span>
+            </span>
+            <i class="fas fa-arrow-right verify-submit-arrow"></i>
+        `;
+    }
+
+    function setLoading(loading) {
+        submitBtn.disabled = loading;
+
+        if (loading) {
+            submitBtn.innerHTML = `
+                <span class="verify-submit-content">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Memeriksa Keaslian...</span>
+                </span>
+            `;
+        } else {
+            submitBtn.innerHTML = `
+                <span class="verify-submit-content">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Verifikasi Sekarang</span>
+                </span>
+                <i class="fas fa-arrow-right verify-submit-arrow"></i>
+            `;
+        }
+    }
+
+    function showVerificationResult(data) {
+
+        const guru = data.guru || {};
+        const periode = data.periode || {};
+        const keuangan = data.keuangan || {};
+
+        document.getElementById('verifyGuruName').textContent =
+            guru.nama || '-';
+
+        document.getElementById('verifyGuruNip').textContent =
+            guru.nip || '-';
+
+        document.getElementById('verifyPeriod').textContent =
+            periode.label || '-';
+
+        document.getElementById('verifyCode').textContent =
+            data.kode_verifikasi || '-';
+
+        document.getElementById('verifyPenerimaan').textContent =
+            money(keuangan.total_penerimaan);
+
+        document.getElementById('verifyPotongan').textContent =
+            money(keuangan.total_potongan);
+
+        document.getElementById('verifyNetPay').textContent =
+            money(keuangan.gaji_bersih);
+
+        result.hidden = false;
+    }
+
+    openBtn.addEventListener('click', openModal);
+
+    closeBtn.addEventListener('click', closeModal);
+    footerCloseBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', event => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (
+            event.key === 'Escape' &&
+            modal.classList.contains('is-open')
+        ) {
+            closeModal();
+        }
+    });
+
+    input.addEventListener('input', () => {
+        input.value = input.value.toUpperCase();
+
+        clearBtn.classList.toggle('is-visible', input.value.length > 0);
+
+        hideMessage();
+        resetResult();
+    });
+
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        input.focus();
+
+        clearBtn.classList.remove('is-visible');
+
+        hideMessage();
+        resetResult();
+    });
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        console.log('SUBMIT VERIFIKASI DIJALANKAN');
+
+        // Ambil langsung nilai input dari DOM
+        const code = document
+            .getElementById('verificationCodeInput')
+            .value
+            .trim()
+            .toUpperCase();
+
+        console.log('KODE INPUT:', code);
+        console.log('PANJANG KODE:', code.length);
+
+        if (!code) {
+            showMessage('Masukkan kode verifikasi terlebih dahulu.');
+            input.focus();
+            return;
+        }
+
+        hideMessage();
+        resetResult();
+        setLoading(true);
+
+        // Ambil konfigurasi URL dari PAYROLL_CONFIG
+        const config = window.PAYROLL_CONFIG || {};
+
+        if (!config.verifyUrl) {
+            setLoading(false);
+            showMessage('URL verifikasi belum dikonfigurasi.');
+            return;
+        }
+
+        try {
+            const url = new URL(config.verifyUrl, window.location.origin);
+
+            url.searchParams.set('kode', code);
+
+            console.log('URL VERIFIKASI:', url.toString());
+            console.log('MENGIRIM REQUEST KE BACKEND...');
+
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const responseText = await response.text();
+
+            let payload;
+
+            try {
+                payload = JSON.parse(responseText);
+            } catch (error) {
+                console.error('RESPONS SERVER BUKAN JSON:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    contentType: response.headers.get('content-type'),
+                    response: responseText.substring(0, 1500)
+                });
+
+                throw new Error(
+                    `Server tidak mengirim JSON (HTTP ${response.status}). Periksa Console untuk detail.`
+                );
+            }
+
+            if (!response.ok || !payload.success) {
+                throw new Error(
+                    payload.message || `Verifikasi gagal (HTTP ${response.status}).`
+                );
+            }
+
+            if (!payload.data) {
+                throw new Error('Data hasil verifikasi tidak tersedia.');
+            }
+
+            showVerificationResult(payload.data);
+
+            showMessage(
+                'Kode berhasil diverifikasi. Slip gaji dinyatakan valid.',
+                'success'
+            );
+
+            result.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+
+        } catch (error) {
+            showMessage(
+                error.message || 'Terjadi kesalahan saat memverifikasi slip gaji.'
+            );
+
+        } finally {
+            setLoading(false);
+        }
+    });
+
+})();
+</script>

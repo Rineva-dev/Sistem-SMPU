@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('payrollTableBody');
     const searchInput = document.getElementById('payrollSearch');
     const filterStatus = document.getElementById('filterStatus');
-    const filterPeriode = document.getElementById('filterPeriode');
 
     const modal = document.getElementById('salaryModal');
     const form = document.getElementById('salaryForm');
@@ -85,11 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
         titleEl.textContent = title;
         messageEl.textContent = message;
 
-        toast.classList.remove('show', 'toast-error');
+        toast.classList.remove('show', 'toast-error', 'toast-warning');
 
         if (type === 'error') {
             toast.classList.add('toast-error');
             icon.className = 'fas fa-circle-exclamation';
+
+        } else if (type === 'warning') {
+            toast.classList.add('toast-warning');
+            icon.className = 'fas fa-triangle-exclamation';
+
         } else {
             icon.className = 'fas fa-circle-check';
         }
@@ -145,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             empty.id = 'payrollNoResult';
 
             empty.innerHTML = `
-                <td colspan="8">
+                <td colspan="9">
                     <div class="table-empty">
                         <div class="empty-illustration">
                             <i class="fas fa-magnifying-glass"></i>
@@ -168,37 +172,388 @@ document.addEventListener('DOMContentLoaded', () => {
         if (count) {
             count.textContent = visible;
         }
+
+        updatePublishSelection();
     }
 
     searchInput?.addEventListener('input', filterTable);
     filterStatus?.addEventListener('change', filterTable);
 
+    
     // =====================================================
-    // FILTER PERIODE
+    // AJAX — RELOAD TABEL TANPA RELOAD HALAMAN
     // =====================================================
 
-    filterPeriode?.addEventListener('change', function () {
+    let tableLoading = false;
 
-        const value = this.value;
+    const archiveList = document.querySelector(
+        '.archive-period-list'
+    );
 
-        if (!value) return;
+    const archiveNavigation = document.querySelector(
+        '.payroll-archive-navigation'
+    );
 
-        const parts = value.split('-');
+    const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April',
+        'Mei', 'Juni', 'Juli', 'Agustus',
+        'September', 'Oktober', 'November', 'Desember'
+    ];
 
-        if (parts.length !== 2) return;
-
-        const year = Number(parts[0]);
-        const month = Number(parts[1]);
-
-        if (!year || month < 1 || month > 12) return;
+    function createPeriodUrl(bulan, tahun) {
 
         const url = new URL(window.location.href);
 
-        url.searchParams.set('tahun', year);
-        url.searchParams.set('bulan', month);
+        url.searchParams.set('bulan', bulan);
+        url.searchParams.set('tahun', tahun);
 
-        window.location.href = url.toString();
+        url.searchParams.set('akhir_bulan', bulan);
+        url.searchParams.set('akhir_tahun', tahun);
+
+        return url;
+    }
+
+    function updateArchiveNavigation(bulan, tahun) {
+
+        if (!archiveList || !archiveNavigation) return;
+
+        const indeksAkhir = tahun * 12 + bulan - 1;
+
+        const indeksSekarang =
+            config.tahunSekarang * 12 +
+            config.bulanSekarang - 1;
+
+        const indeksAwal = indeksAkhir - 4;
+
+        // Perbarui lima tombol periode
+        archiveList.innerHTML = '';
+
+        for (
+            let indeks = indeksAwal;
+            indeks <= indeksAkhir;
+            indeks++
+        ) {
+
+            const tahunItem = Math.floor(indeks / 12);
+
+            const bulanItem = (indeks % 12) + 1;
+
+            const link = document.createElement('a');
+
+            link.href = createPeriodUrl(
+                bulanItem,
+                tahunItem
+            ).toString();
+
+            link.className = 'archive-period-item';
+
+            const monthLabel = document.createElement('span');
+
+            monthLabel.className = 'archive-period-month';
+
+            monthLabel.textContent =
+                monthNames[bulanItem - 1] + ' ' + tahunItem;
+
+            link.appendChild(monthLabel);
+
+            // Periode yang sedang dipilih menjadi aktif
+            if (indeks === indeksAkhir) {
+
+                link.classList.add('active');
+
+                const icon = document.createElement('i');
+
+                icon.className = 'fas fa-circle-check';
+
+                link.appendChild(icon);
+            }
+
+            archiveList.appendChild(link);
+        }
+
+        // Perbarui tombol Lebih Lama dan Lebih Baru
+        const navButtons = archiveNavigation.querySelectorAll(
+            '.archive-nav-btn'
+        );
+
+        const tombolLama = navButtons[0];
+        const tombolBaru = navButtons[navButtons.length - 1];
+
+        const indeksLama = indeksAkhir - 5;
+
+        const indeksBaru = Math.min(
+            indeksAkhir + 5,
+            indeksSekarang
+        );
+
+        if (tombolLama) {
+
+            const bulanLama = (indeksLama % 12) + 1;
+
+            const tahunLama = Math.floor(indeksLama / 12);
+
+            tombolLama.href = createPeriodUrl(
+                bulanLama,
+                tahunLama
+            ).toString();
+
+        }
+
+        if (tombolBaru) {
+
+            const bulanBaru = (indeksBaru % 12) + 1;
+
+            const tahunBaru = Math.floor(indeksBaru / 12);
+
+            tombolBaru.href = createPeriodUrl(
+                bulanBaru,
+                tahunBaru
+            ).toString();
+
+            const disabled = indeksAkhir >= indeksSekarang;
+
+            tombolBaru.classList.toggle(
+                'disabled',
+                disabled
+            );
+
+            if (disabled) {
+
+                tombolBaru.setAttribute(
+                    'aria-disabled',
+                    'true'
+                );
+
+                tombolBaru.setAttribute(
+                    'tabindex',
+                    '-1'
+                );
+
+            } else {
+
+                tombolBaru.removeAttribute('aria-disabled');
+
+                tombolBaru.removeAttribute('tabindex');
+
+            }
+        }
+    }
+
+    async function loadPeriod(bulan, tahun, updateUrl = true) {
+
+        if (tableLoading) return;
+
+        tableLoading = true;
+
+        const tableContainer = document.querySelector(
+            '.payroll-table-container'
+        );
+
+        tableContainer?.classList.add('table-loading');
+
+        try {
+
+            const url = new URL(
+                config.tableUrl,
+                window.location.origin
+            );
+
+            url.searchParams.set('bulan', bulan);
+            url.searchParams.set('tahun', tahun);
+
+            
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Gagal memuat data penggajian.');
+            }
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message || 'Gagal memuat data.');
+            }
+
+            // Perbarui tabel
+            tableBody.innerHTML = result.html;
+
+            // Reset pilihan checkbox periode sebelumnya
+            if (selectAllPayroll) {
+                selectAllPayroll.checked = false;
+                selectAllPayroll.indeterminate = false;
+            }
+
+            // Perbarui statistik
+            const statistik = result.statistik;
+
+            const formatRupiah = new Intl.NumberFormat('id-ID', {
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('statTotalGuru').textContent =
+                statistik.total_guru;
+
+            document.getElementById('statTotalPenggajian').textContent =
+                formatRupiah.format(statistik.total_penggajian);
+
+            document.getElementById('statTotalDraft').textContent =
+                statistik.total_draft;
+
+            document.getElementById('statTotalTerbit').textContent =
+                statistik.total_terbit;
+
+            // Perbarui progress bar
+            const totalGuru = statistik.total_guru;
+
+            document.getElementById('statProgressDraft').style.width =
+                `${totalGuru ? (statistik.total_draft / totalGuru) * 100 : 0}%`;
+
+            document.getElementById('statProgressTerbit').style.width =
+                `${totalGuru ? (statistik.total_terbit / totalGuru) * 100 : 0}%`;
+
+
+            // Perbarui periode aktif
+            config.bulan = bulan;
+            config.tahun = tahun;
+
+            // Perbarui label periode pada workspace
+            const periodLabel = document.getElementById(
+                'workspacePeriodLabel'
+            );
+
+            if (periodLabel) {
+                periodLabel.textContent =
+                    monthNames[bulan - 1] + ' ' + tahun;
+            }
+
+            // Perbarui tampilan arsip lima bulan
+            updateArchiveNavigation(bulan, tahun);
+
+            // Terapkan kembali pencarian dan filter
+            filterTable();
+
+            // Perbarui URL tanpa reload halaman
+            if (updateUrl) {
+
+                const pageUrl = createPeriodUrl(
+                    bulan,
+                    tahun
+                );
+
+                window.history.pushState(
+                    {
+                        bulan,
+                        tahun
+                    },
+                    '',
+                    pageUrl.toString()
+                );
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            showToast(
+                'Gagal memuat tabel',
+                error.message,
+                'error'
+            );
+
+        } finally {
+
+            tableLoading = false;
+
+            tableContainer?.classList.remove('table-loading');
+
+        }
+    }
+
+    // =====================================================
+    // KLIK NAVIGASI ARSIP
+    // =====================================================
+
+    archiveNavigation?.addEventListener('click', event => {
+
+        const link = event.target.closest(
+            '.archive-period-item, .archive-nav-btn'
+        );
+
+        if (!link) return;
+
+        if (
+            link.classList.contains('disabled') ||
+            link.getAttribute('aria-disabled') === 'true'
+        ) {
+            event.preventDefault();
+            return;
+        }
+
+        event.preventDefault();
+
+        const url = new URL(
+            link.href,
+            window.location.origin
+        );
+
+        const bulan = Number(
+            url.searchParams.get('bulan')
+        );
+
+        const tahun = Number(
+            url.searchParams.get('tahun')
+        );
+
+        if (!bulan || !tahun) return;
+
+        loadPeriod(bulan, tahun);
     });
+
+    // =====================================================
+    // TOMBOL BULAN BERJALAN
+    // =====================================================
+
+    const btnBulanBerjalan = document.getElementById(
+        'btnBulanBerjalan'
+    );
+
+    btnBulanBerjalan?.addEventListener('click', function () {
+
+        loadPeriod(
+            config.bulanSekarang,
+            config.tahunSekarang
+        );
+
+    });
+
+    // =====================================================
+    // BROWSER BACK / FORWARD
+    // =====================================================
+
+    window.addEventListener('popstate', () => {
+
+        const url = new URL(window.location.href);
+
+        const bulan = Number(
+            url.searchParams.get('bulan')
+        );
+
+        const tahun = Number(
+            url.searchParams.get('tahun')
+        );
+
+        if (bulan && tahun) {
+
+            loadPeriod(bulan, tahun, false);
+
+        }
+
+    });
+
 
     // =====================================================
     // MODAL
@@ -581,11 +936,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOAD DATA GURU
     // =====================================================
 
-    async function loadTeacherSalary(guruId, readOnly = false) {
+    async function loadTeacherSalary(
+        guruId,
+        bulan,
+        tahun,
+        readOnly = false
+    ) {
 
         resetSalaryForm();
 
+        // Simpan identitas guru
         document.getElementById('salaryGuruId').value = guruId;
+
+        // Simpan periode sesuai baris tabel yang diklik
+        document.getElementById('salaryBulan').value = bulan;
+        document.getElementById('salaryTahun').value = tahun;
+
+        // Perbarui label periode pada modal
+        const periodLabel = document.getElementById('modalPeriodLabel');
+
+        if (periodLabel) {
+            periodLabel.textContent =
+                monthNames[bulan - 1] + ' ' + tahun;
+        }
 
         const nameEl = document.getElementById('modalTeacherName');
         const nipEl = document.getElementById('modalTeacherNip');
@@ -609,8 +982,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.origin
             );
 
-            url.searchParams.set('bulan', config.bulan);
-            url.searchParams.set('tahun', config.tahun);
+            url.searchParams.set('bulan', bulan);
+            url.searchParams.set('tahun', tahun);
 
             const response = await fetch(url.toString(), {
                 headers: {
@@ -730,10 +1103,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!guruId) return;
 
+        // Ambil periode dari baris tabel yang diklik
+        const row = button.closest('.payroll-row');
+
+        const bulan = Number(
+            row?.dataset.bulan || config.bulan
+        );
+
+        const tahun = Number(
+            row?.dataset.tahun || config.tahun
+        );
+
+        if (!bulan || !tahun) {
+            showToast(
+                'Periode tidak valid',
+                'Bulan dan tahun penggajian tidak ditemukan.',
+                'error'
+            );
+            return;
+        }
+
         activeTrigger = button;
 
         loadTeacherSalary(
             guruId,
+            bulan,
+            tahun,
             Boolean(viewButton)
         );
 
@@ -831,6 +1226,327 @@ document.addEventListener('DOMContentLoaded', () => {
             '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
     });
+
+    
+    // =====================================================
+    // PAYROLL PUBLISHING
+    // =====================================================
+
+    const selectAllPayroll = document.getElementById('selectAllPayroll');
+    const selectedPayrollCount = document.getElementById('selectedPayrollCount');
+    const btnPublishSelected = document.getElementById('btnPublishSelected');
+    const btnPublishAll = document.getElementById('btnPublishAll');
+
+    function getSelectedPayrollIds() {
+        return Array.from(
+            tableBody.querySelectorAll('.row-payroll-checkbox:checked')
+        ).map(checkbox => Number(checkbox.value));
+    }
+
+    function updatePublishSelection() {
+
+        const checkboxes = Array.from(
+            tableBody.querySelectorAll('.row-payroll-checkbox')
+        );
+
+        const selected = getSelectedPayrollIds();
+
+        if (selectedPayrollCount) {
+            selectedPayrollCount.textContent =
+                `${selected.length} slip dipilih`;
+        }
+
+        if (btnPublishSelected) {
+            btnPublishSelected.disabled = selected.length === 0;
+        }
+
+        if (selectAllPayroll) {
+
+            const visibleCheckboxes = checkboxes.filter(checkbox => {
+                const row = checkbox.closest('.payroll-row');
+
+                return row && !row.hidden;
+            });
+
+            const visibleSelected = visibleCheckboxes.filter(
+                checkbox => checkbox.checked
+            );
+
+            selectAllPayroll.checked =
+                visibleCheckboxes.length > 0 &&
+                visibleSelected.length === visibleCheckboxes.length;
+
+            selectAllPayroll.indeterminate =
+                visibleSelected.length > 0 &&
+                visibleSelected.length < visibleCheckboxes.length;
+        }
+    }
+
+    // -----------------------------------------------------
+    // CSRF TOKEN
+    // -----------------------------------------------------
+
+    function getPayrollCsrfToken() {
+        return (
+            document.querySelector('meta[name="csrf-token"]')?.content ||
+            document.querySelector('input[name="csrf_token"]')?.value ||
+            ''
+        );
+    }
+
+    async function payrollPost(url, payload = {}) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        const csrfToken = getPayrollCsrfToken();
+
+        if (csrfToken) {
+            headers['X-CSRFToken'] = csrfToken;
+        }
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || 'Permintaan gagal diproses.'
+            );
+        }
+
+        return result;
+    }
+
+    // -----------------------------------------------------
+    // PILIH SEMUA DRAFT YANG TERLIHAT
+    // -----------------------------------------------------
+
+    if (selectAllPayroll) {
+        selectAllPayroll.addEventListener('change', function () {
+            const checkboxes = tableBody.querySelectorAll(
+                '.row-payroll-checkbox'
+            );
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest('.payroll-row');
+
+                if (row && row.style.display !== 'none') {
+                    checkbox.checked = this.checked;
+                }
+            });
+
+            updatePublishSelection();
+        });
+    }
+
+    // Pilihan checkbox individual
+    if (tableBody) {
+        tableBody.addEventListener('change', function (event) {
+            if (
+                event.target.classList.contains(
+                    'row-payroll-checkbox'
+                )
+            ) {
+                updatePublishSelection();
+            }
+        });
+    }
+
+    // -----------------------------------------------------
+    // TERBITKAN SLIP TERPILIH
+    // -----------------------------------------------------
+
+    if (btnPublishSelected) {
+        btnPublishSelected.addEventListener('click', async function () {
+            const ids = getSelectedPayrollIds();
+
+            if (!ids.length) {
+                showToast(
+                    'Belum Ada Pilihan',
+                    'Pilih minimal satu slip gaji terlebih dahulu.',
+                    'warning'
+                );
+                return;
+            }
+
+            const konfirmasi = window.confirm(
+                `Terbitkan ${ids.length} slip gaji yang dipilih ` +
+                `untuk periode ${config.bulan}/${config.tahun}? ` +
+                `Slip yang sudah diterbitkan tidak dapat diedit.`
+            );
+
+            if (!konfirmasi) return;
+
+            const tombolAwal = this.innerHTML;
+
+            try {
+                this.disabled = true;
+                this.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+                const result = await payrollPost(
+                    '/bendahara/atur-gaji/terbitkan-terpilih',
+                    {
+                        gaji_ids: ids,
+                        bulan: config.bulan,
+                        tahun: config.tahun
+                    }
+                );
+
+                showToast(
+                    'Berhasil',
+                    result.message || 'Slip gaji berhasil diterbitkan.',
+                    'success'
+                );
+
+                await loadPeriod(
+                    config.bulan,
+                    config.tahun,
+                    false
+                );
+
+            } catch (error) {
+                showToast(
+                    'Gagal Menerbitkan',
+                    error.message,
+                    'error'
+                );
+
+            } finally {
+                this.innerHTML = tombolAwal;
+                updatePublishSelection();
+            }
+        });
+    }
+
+    // -----------------------------------------------------
+    // TERBITKAN SEMUA DRAFT
+    // -----------------------------------------------------
+
+    if (btnPublishAll) {
+        btnPublishAll.addEventListener('click', async function () {
+            const konfirmasi = window.confirm(
+                `Apakah Anda yakin ingin menerbitkan SEMUA slip ` +
+                `Draft pada periode ${config.bulan}/${config.tahun}? ` +
+                `Slip yang diterbitkan tidak dapat diedit kembali.`
+            );
+
+            if (!konfirmasi) return;
+
+            const tombolAwal = this.innerHTML;
+
+            try {
+                this.disabled = true;
+                this.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+                const result = await payrollPost(
+                    '/bendahara/atur-gaji/terbitkan-semua',
+                    {
+                        bulan: config.bulan,
+                        tahun: config.tahun
+                    }
+                );
+
+                showToast(
+                    'Berhasil',
+                    result.message || 'Slip gaji berhasil diterbitkan.',
+                    'success'
+                );
+
+                await loadPeriod(
+                    config.bulan,
+                    config.tahun,
+                    false
+                );
+
+            } catch (error) {
+                showToast(
+                    'Gagal Menerbitkan',
+                    error.message,
+                    'error'
+                );
+
+            } finally {
+                this.disabled = false;
+                this.innerHTML = tombolAwal;
+            }
+        });
+    }
+
+    // -----------------------------------------------------
+    // TERBITKAN SATU SLIP DARI TABEL
+    // -----------------------------------------------------
+
+    if (tableBody) {
+        tableBody.addEventListener('click', async function (event) {
+            const tombol = event.target.closest(
+                '.btn-publish-single'
+            );
+
+            if (!tombol) return;
+
+            const gajiId = Number(tombol.dataset.gajiId);
+
+            if (!gajiId) return;
+
+            const konfirmasi = window.confirm(
+                'Terbitkan slip gaji guru ini? ' +
+                'Slip yang sudah diterbitkan tidak dapat diedit kembali.'
+            );
+
+            if (!konfirmasi) return;
+
+            const tombolAwal = tombol.innerHTML;
+
+            try {
+                tombol.disabled = true;
+                tombol.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i>';
+
+                const result = await payrollPost(
+                    `/bendahara/atur-gaji/terbitkan/${gajiId}`,
+                    {
+                        bulan: config.bulan,
+                        tahun: config.tahun
+                    }
+                );
+
+                showToast(
+                    'Berhasil',
+                    result.message || 'Slip gaji berhasil diterbitkan.',
+                    'success'
+                );
+
+                await loadPeriod(
+                    config.bulan,
+                    config.tahun,
+                    false
+                );
+
+            } catch (error) {
+                tombol.disabled = false;
+                tombol.innerHTML = tombolAwal;
+
+                showToast(
+                    'Gagal Menerbitkan',
+                    error.message,
+                    'error'
+                );
+            }
+        });
+    }
+
+    // Inisialisasi checkbox
+    updatePublishSelection();
+
 
     // =====================================================
     // INIT
