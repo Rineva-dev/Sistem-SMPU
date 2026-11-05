@@ -684,7 +684,7 @@
 
 <!-- ✅ VARIABEL DARI SERVER → DIPAKAI OLEH FILE JS -->
 <script>
-const ABSENSI = {
+window.ABSENSI = {
     BATAS_TEPAT_WAKTU: "{{ jam_masuk_tepat }}",
     BATAS_TERLAMBAT: "{{ batas_terlambat }}",
     BATAS_TUTUP_ABSENSI: "{{ jam_tutup_absensi }}",
@@ -699,7 +699,7 @@ const ABSENSI = {
     URL_SCAN_QR_PROSES: "{{ url_for('absensi_guru.scan_qr_proses') }}"
 };
 
-const PAGINASI = {
+window.PAGINASI = {
         halaman_sekarang: {{ halaman_sekarang|default(1) }},
         per_halaman: {{ per_halaman|default(10) }},
         total_data: {{ total_data|default(0) }},

@@ -60,7 +60,7 @@ function ambilJamSaatIni() {
 }
 
 // --- CEK: SUDAH LEWAT BATAS WAKTU? ---
-const BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
+let BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
 function sudahLewatBatasWaktu() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
@@ -70,7 +70,7 @@ function tampilkanPeringatanAlfa() {
 }
 
 // --- CEK: BELUM JAM PULANG? ---
-const BATAS_PULANG = ABSENSI.BATAS_PULANG;
+let BATAS_PULANG = ABSENSI.BATAS_PULANG;
 function belumJamPulang() {
     const jamSaatIni = ambilJamSaatIni();
     return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
@@ -233,9 +233,30 @@ function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
 // ==========================================
 // INISIALISASI SETELAH HALAMAN SIAP
 // ==========================================
-document.addEventListener('DOMContentLoaded', function () {
+let intervalJamAbsensi = null;
+let elemenAbsensiTerinisialisasi = null;
+
+function initAbsensiHarian() {
+    const penandaHalaman = document.getElementById('filter-bulan');
+
+    if (!penandaHalaman) return;
+
+    // Jangan memasang event dua kali pada elemen yang sama.
+    if (elemenAbsensiTerinisialisasi === penandaHalaman) return;
+
+    elemenAbsensiTerinisialisasi = penandaHalaman;
+
+    // Ambil konfigurasi terbaru setiap halaman dibuka.
+    BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
+    BATAS_PULANG = ABSENSI.BATAS_PULANG;
+
     updateClock();
-    setInterval(updateClock, 1000);
+
+    if (intervalJamAbsensi) {
+        clearInterval(intervalJamAbsensi);
+    }
+
+    intervalJamAbsensi = setInterval(updateClock, 1000);
 
     // ==========================================
     // MODAL IZIN / SAKIT
@@ -729,4 +750,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+}
+
+// Jalankan saat halaman pertama kali dibuka.
+document.addEventListener('DOMContentLoaded', initAbsensiHarian);
+
+// Jalankan kembali ketika halaman dibuka melalui SPA.
+document.addEventListener('spa:page-loaded', initAbsensiHarian);
+
+// Bersihkan resource sebelum konten halaman diganti.
+document.addEventListener('spa:before-page-unload', function () {
+    if (intervalJamAbsensi) {
+        clearInterval(intervalJamAbsensi);
+        intervalJamAbsensi = null;
+    }
+
+    if (window._pemindaianAktifRef) {
+        window._pemindaianAktifRef.value = false;
+    }
+
+    if (window._aliranKamera) {
+        window._aliranKamera.getTracks().forEach(track => track.stop());
+        window._aliranKamera = null;
+    }
+
+    elemenAbsensiTerinisialisasi = null;
 });

@@ -28,7 +28,7 @@
   flex-direction: column;
   box-shadow: var(--shadow-lg);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   overflow: hidden;
 }
 
@@ -71,13 +71,19 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* BAGIAN MENU: SATU-SATUNYA YANG BISA DI-SCROLL */
 .sidebar-menu-wrapper {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 1rem 0;
-  scroll-behavior: smooth;
+
+  /* Mencegah browser menggeser posisi scroll otomatis */
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+
+  /* Tidak menganimasikan perubahan posisi scroll */
+  scroll-behavior: auto;
 }
 
 .sidebar-menu {
@@ -155,6 +161,7 @@ ul {
   font-weight: 500;
   transition: all 0.25s ease;
   position: relative;
+  box-sizing: border-box;
 }
 
 .menu-link:hover {

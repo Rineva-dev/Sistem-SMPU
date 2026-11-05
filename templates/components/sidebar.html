@@ -550,11 +550,13 @@
                   <span>Pengaturan Biaya</span>
                 </a>
               </li>
-              <a href="{{ url_for('atur_gaji.index') }}"
-                class="menu-link {% if active_page == 'atur_gaji' %}active{% endif %}">
-                  <i data-lucide="wallet"></i>
-                  <span>Pengaturan Gaji</span>
-              </a>
+              <li class="menu-item">
+                  <a href="{{ url_for('atur_gaji.index') }}"
+                    class="menu-link {% if active_page == 'atur_gaji' %}active{% endif %}">
+                      <i data-lucide="wallet"></i>
+                      <span>Pengaturan Gaji</span>
+                  </a>
+              </li>
             </ul>
           </div>
           {% endif %}

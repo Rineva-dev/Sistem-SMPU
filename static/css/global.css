@@ -66,3 +66,14 @@ table, th, td, button, input, select, .badge, .btn {
     box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
     outline: none;
 }
+
+/* SPA LOADING */
+
+#spa-content {
+    transition: opacity 0.15s ease;
+}
+
+#spa-content.spa-loading {
+    opacity: 0.45;
+    pointer-events: none;
+}
