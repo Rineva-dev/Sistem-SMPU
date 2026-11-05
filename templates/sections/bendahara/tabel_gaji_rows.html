@@ -27,7 +27,24 @@
     <td>
         <div class="teacher-cell">
             <div class="teacher-avatar">
-                {{ item.guru.nama[:1] | upper }}
+                <div class="teacher-avatar-image">
+                    {% if item.guru.foto_profil %}
+                        <img
+                            src="{{ url_for('tampilkan_foto_profil', filename=item.guru.foto_profil) }}"
+                            alt="Foto {{ item.guru.nama }}"
+                            loading="lazy"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <span class="teacher-avatar-fallback" style="display:none;">
+                            {{ item.guru.nama[:1] | upper }}
+                        </span>
+                    {% else %}
+                        <span class="teacher-avatar-fallback">
+                            {{ item.guru.nama[:1] | upper }}
+                        </span>
+                    {% endif %}
+                </div>
+
                 <span class="avatar-online"></span>
             </div>
             <div class="teacher-identity">

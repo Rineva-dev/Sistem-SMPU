@@ -966,9 +966,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 4px;
     min-width: 0;
-    min-height: 66px;
+    min-height: 40px;
     padding: 10px 5px;
     border: 1px solid #e9efeb;
     border-radius: 11px;
@@ -3941,4 +3941,71 @@ body.payroll-modal-open {
     .verify-footer-security {
         font-size: 8px;
     }
+}
+
+/* =========================================
+   PREMIUM TEACHER AVATAR
+========================================= */
+
+.teacher-avatar {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    flex-shrink: 0;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* AREA FOTO */
+.teacher-avatar-image {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    overflow: hidden;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #e0f4eb, #c8e8d9);
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 10px rgba(1, 71, 55, 0.12);
+}
+
+/* FOTO GURU */
+.teacher-avatar-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* INISIAL NAMA */
+.teacher-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    color: #014737;
+    background: linear-gradient(145deg, #e0f4eb, #c8e8d9);
+}
+
+/* INDIKATOR HIJAU DI LUAR FOTO */
+.teacher-avatar .avatar-online {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    right: -3px;
+    bottom: -2px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: #16a36a;
+    z-index: 5;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
