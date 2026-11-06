@@ -462,7 +462,10 @@
 
         if (!link) return;
 
-        // Khusus link menu sidebar
+        if (link.closest(".halaman-pemilih-wrapper")) {
+            return;
+        }
+
         const isSidebarMenu = link.matches(
             "#mainSidebar .sidebar-menu-wrapper a.menu-link"
         );
