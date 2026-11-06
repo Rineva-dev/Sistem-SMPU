@@ -287,7 +287,7 @@ def dashboard():
         AbsensiGuru.tanggal.desc()
     ).limit(5).all()
 
-    # ✅ AMBIL JAM DARI PENGATURAN
+    # AMBIL JAM DARI PENGATURAN
     jam = ambil_jam_pengaturan()
     jam_masuk_tepat = jam['jam_masuk_tepat']
     batas_terlambat = jam['batas_terlambat']
