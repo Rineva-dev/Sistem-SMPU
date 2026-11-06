@@ -154,7 +154,7 @@ def terbilang(angka):
         return "Nol Rupiah"
     satuan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan"]
     belasan = ["Sepuluh", "Sebelas", "Dua Belas", "Tiga Belas", "Empat Belas", "Lima Belas",
-               "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"]
+                "Enam Belas", "Tujuh Belas", "Delapan Belas", "Sembilan Belas"]
 
     def ubah(n):
         if n < 10: return satuan[n]
