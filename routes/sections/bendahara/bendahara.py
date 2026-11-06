@@ -817,10 +817,13 @@ def index():
     data_pemasukan = []
     data_pengeluaran = []
 
+    hari_ini = date.today()
+
     for i in range(5, -1, -1):
-        tgl_bulan = (date.today().replace(day=1) - timedelta(days=i*32))
-        bln = tgl_bulan.month
-        thn = tgl_bulan.year
+        # Mundur berdasarkan bulan kalender, termasuk pergantian tahun.
+        indeks_bulan = hari_ini.year * 12 + hari_ini.month - 1 - i
+        thn, bulan_nol = divmod(indeks_bulan, 12)
+        bln = bulan_nol + 1
         dlabel_bulan.append(f"{bulan_nama[bln-1]} {str(thn)[-2:]}")
 
         jumlah_masuk = 0

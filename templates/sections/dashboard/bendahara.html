@@ -1,250 +1,485 @@
+{% set pengeluaran_siap = pengeluaran_tersedia | default(false) %}
+{% set persen = [100, [0, persen_lunas_spp | default(0) | float] | max] | min %}
 
-<div class="dashboard-bendahara-page">
+<div
+    class="dashboard-bendahara-page"
+    data-expense-ready="{{ 'true' if pengeluaran_siap else 'false' }}"
+>
 
     <!-- HEADER -->
-    <header class="fin-header">
+    <header class="fin-header fin-enter">
         <div>
             <div class="fin-eyebrow">
-                <span class="fin-live-dot"></span>
-                FINANCIAL MANAGEMENT
+                <span class="fin-status-dot"></span>
+                SMP UNGGULAN HAMZANWADI
             </div>
-            <h2>Dashboard Keuangan</h2>
-            <p>Ringkasan dan kendali keuangan sekolah dalam satu tempat.</p>
+
+            <h1>
+                Dashboard Keuangan<span class="fin-title-dot">.</span>
+            </h1>
+
+            <p>
+                Selamat datang, {{ user_name | default('Bendahara', true) }}.
+                Mari kelola keuangan sekolah.
+            </p>
         </div>
-        <div class="fin-header-mark">
-            <i class="fas fa-wallet"></i>
+
+        <div class="fin-context">
+            <span>
+                <i class="far fa-calendar" aria-hidden="true"></i>
+                {{ tahun_ajaran | default('Tahun ajaran', true) }}
+            </span>
+
+            <small>
+                Semester {{ semester | default('—', true) }}
+            </small>
         </div>
     </header>
 
-    <!-- HERO SALDO -->
-    <section class="fin-balance-hero">
-        <div class="fin-hero-content">
-            <div class="fin-hero-label">
-                <span class="fin-hero-icon"><i class="fas fa-vault"></i></span>
-                <span>POSISI KAS SEKOLAH</span>
+    <!-- HERO -->
+    <section class="fin-hero fin-enter" aria-labelledby="finSaldoTitle">
+
+        <div class="fin-hero-light" aria-hidden="true"></div>
+        <div class="fin-hero-grid" aria-hidden="true"></div>
+
+        <div class="fin-hero-copy">
+            <div class="fin-hero-kicker">
+                <span>
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                </span>
+                RINGKASAN KAS SEKOLAH
             </div>
 
-            <p class="fin-balance-caption">Total saldo tersedia</p>
-            <h1>{{ saldo_tersedia | default('0') }}</h1>
+            <h2 id="finSaldoTitle">
+                {{ 'Saldo tersedia' if pengeluaran_siap else 'Penerimaan tercatat' }}
+            </h2>
 
-            <div class="fin-balance-note">
-                <span class="fin-note-icon"><i class="fas fa-shield-halved"></i></span>
-                Ringkasan saldo kas berdasarkan data keuangan yang tercatat
-            </div>
+            <p class="fin-balance">
+                {{ saldo_tersedia | default('Rp 0', true) }}
+            </p>
+
+            <p class="fin-hero-note">
+                {% if pengeluaran_siap %}
+                    Berdasarkan penerimaan dan pengeluaran yang tercatat.
+                {% else %}
+                    Berdasarkan data pembayaran; belum memperhitungkan pengeluaran.
+                {% endif %}
+            </p>
+
+            <a
+                href="/keuangan/laporan"
+                class="fin-button fin-button-light"
+            >
+                Lihat laporan
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
         </div>
 
         <div class="fin-hero-art" aria-hidden="true">
             <div class="fin-orbit fin-orbit-one"></div>
             <div class="fin-orbit fin-orbit-two"></div>
-            <div class="fin-hero-symbol"><i class="fas fa-chart-pie"></i></div>
-            <div class="fin-hero-glow"></div>
+
+            <div class="fin-glass-tile">
+                <i class="fas fa-chart-pie"></i>
+                <span>FINANCE</span>
+            </div>
+
+            <span class="fin-float-token fin-token-one">
+                <i class="fas fa-coins"></i>
+            </span>
+
+            <span class="fin-float-token fin-token-two">
+                <i class="fas fa-file-invoice"></i>
+            </span>
+
+            <span class="fin-art-star">✧</span>
         </div>
 
-        <div class="fin-hero-bottom">
-            <span><i class="fas fa-lock"></i> FINANCIAL OVERVIEW</span>
-            <span>SEKOLAH</span>
-        </div>
+        <footer class="fin-hero-footer">
+            <span>FINANCIAL OVERVIEW</span>
+            <span>Administrasi yang tertata, langkah yang terarah.</span>
+        </footer>
     </section>
 
-    <!-- STATISTIK UTAMA -->
-    <section class="fin-stats-grid">
+    <!-- STATISTIK -->
+    <section class="fin-stats-grid" aria-label="Statistik keuangan">
 
-        <article class="fin-stat-card fin-income">
-            <div class="fin-stat-top">
-                <div class="fin-stat-icon"><i class="fas fa-arrow-down"></i></div>
-                <span class="fin-stat-chip">PEMASUKAN</span>
+        <article class="fin-stat-card fin-income fin-enter">
+            <div class="fin-card-top">
+                <span class="fin-icon">
+                    <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                </span>
+
+                <span class="fin-chip">PENERIMAAN</span>
             </div>
-            <div class="fin-stat-main">
-                <span class="fin-stat-label">Masuk Bulan Ini</span>
-                <h3>{{ pemasukan_bulan_ini | default('0') }}</h3>
-            </div>
-            <div class="fin-stat-footer">
-                <i class="fas fa-circle-arrow-down"></i>
-                <span>Total penerimaan bulan berjalan</span>
-            </div>
-            <div class="fin-stat-accent"></div>
+
+            <h2>Masuk bulan ini</h2>
+
+            <p class="fin-stat-value">
+                {{ pemasukan_bulan_ini | default('Rp 0', true) }}
+            </p>
+
+            <p class="fin-card-caption">
+                Total pembayaran yang tercatat bulan ini
+            </p>
+
+            <span class="fin-card-ring" aria-hidden="true"></span>
         </article>
 
-        <article class="fin-stat-card fin-expense">
-            <div class="fin-stat-top">
-                <div class="fin-stat-icon"><i class="fas fa-arrow-up"></i></div>
-                <span class="fin-stat-chip">PENGELUARAN</span>
+        <article class="fin-stat-card fin-expense fin-enter">
+            <div class="fin-card-top">
+                <span class="fin-icon">
+                    <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                </span>
+
+                <span class="fin-chip">PENGELUARAN</span>
             </div>
-            <div class="fin-stat-main">
-                <span class="fin-stat-label">Keluar Bulan Ini</span>
-                <h3>{{ pengeluaran_bulan_ini | default('0') }}</h3>
-            </div>
-            <div class="fin-stat-footer">
-                <i class="fas fa-receipt"></i>
-                <span>Total pengeluaran bulan berjalan</span>
-            </div>
-            <div class="fin-stat-accent"></div>
+
+            <h2>Keluar bulan ini</h2>
+
+            {% if pengeluaran_siap %}
+                <p class="fin-stat-value">
+                    {{ pengeluaran_bulan_ini | default('Rp 0', true) }}
+                </p>
+
+                <p class="fin-card-caption">
+                    Total pengeluaran yang tercatat bulan ini
+                </p>
+            {% else %}
+                <p class="fin-stat-value fin-unavailable">
+                    Belum tersedia
+                </p>
+
+                <p class="fin-card-caption">
+                    Sumber data pengeluaran belum terhubung
+                </p>
+            {% endif %}
+
+            <span class="fin-card-ring" aria-hidden="true"></span>
         </article>
 
-        <article class="fin-stat-card fin-spp">
-            <div class="fin-stat-top">
-                <div class="fin-stat-icon"><i class="fas fa-graduation-cap"></i></div>
-                <span class="fin-stat-chip">PEMBAYARAN SPP</span>
+        <article class="fin-stat-card fin-spp fin-enter">
+            <div class="fin-card-top">
+                <span class="fin-icon">
+                    <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                </span>
+
+                <span class="fin-chip">PELUNASAN</span>
             </div>
-            <div class="fin-stat-main">
-                <span class="fin-stat-label">Persentase SPP Lunas</span>
-                <h3>{{ persen_lunas_spp | default('0') }}<small>%</small></h3>
+
+            <h2>Siswa dengan tagihan lunas</h2>
+
+            <p class="fin-stat-value">
+                {{ persen }}<small>%</small>
+            </p>
+
+            <div
+                class="fin-progress"
+                role="progressbar"
+                aria-label="Persentase siswa dengan tagihan lunas"
+                aria-valuenow="{{ persen }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+            >
+                <span style="width: {{ persen }}%"></span>
             </div>
-            <div class="fin-progress-track">
-                <span style="width: {{ persen_lunas_spp | default(0) }}%"></span>
-            </div>
-            <div class="fin-stat-footer">
-                <i class="fas fa-users"></i>
-                <span>Dari total siswa</span>
-            </div>
-            <div class="fin-stat-accent"></div>
+
+            <p class="fin-card-caption">
+                {{ jumlah_lunas | default(0) }}
+                dari {{ total_siswa | default(0) }} siswa
+                pada tahun ajaran terpilih
+            </p>
         </article>
 
     </section>
 
-    <!-- ANALISIS KEUANGAN -->
-    <section class="fin-main-grid">
+    <!-- GRAFIK DAN TRANSAKSI -->
+    <section class="fin-main-grid" aria-label="Analisis dan aktivitas">
 
-        <article class="fin-panel fin-chart-panel">
-            <div class="fin-panel-heading">
+        <article class="fin-panel fin-chart-panel fin-enter">
+
+            <header class="fin-panel-heading">
                 <div>
-                    <span class="fin-section-label">FINANCIAL ANALYTICS</span>
-                    <h3>Arus Keuangan</h3>
-                    <p>Perbandingan pemasukan dan pengeluaran selama 6 bulan terakhir.</p>
+                    <span class="fin-eyebrow">ANALISIS KEUANGAN</span>
+                    <h2>Arus keuangan</h2>
+
+                    <p>
+                        Riwayat penerimaan berdasarkan tanggal pembayaran.
+                    </p>
                 </div>
-                <div class="fin-heading-icon"><i class="fas fa-chart-line"></i></div>
+
+                <span class="fin-panel-icon">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                </span>
+            </header>
+
+            <div class="fin-chart-summary">
+                <div>
+                    <span>Total penerimaan periode</span>
+                    <strong data-fin-total>—</strong>
+                </div>
+
+                <span class="fin-period">
+                    <i class="far fa-calendar" aria-hidden="true"></i>
+                    6 bulan terakhir
+                </span>
             </div>
 
             <div class="fin-chart-toolbar">
-                <div class="fin-chart-legend">
-                    <span><i class="fin-legend-dot green"></i>Pemasukan</span>
-                    <span><i class="fin-legend-dot blue"></i>Pengeluaran</span>
-                </div>
-                <span class="fin-period-label"><i class="far fa-calendar"></i> 6 Bulan Terakhir</span>
-            </div>
+                <span>
+                    <b class="fin-dot fin-dot-green"></b>
+                    Pemasukan
+                </span>
 
-            <div class="fin-chart-container">
-                <canvas id="keuanganChart"></canvas>
-                <div class="fin-chart-empty" id="keuanganChartEmpty" hidden>
-                    <div class="fin-empty-graphic"><i class="fas fa-chart-area"></i></div>
-                    <strong>Belum ada data keuangan</strong>
-                    <span>Grafik akan muncul setelah data transaksi tersedia.</span>
-                </div>
-            </div>
-        </article>
-
-        <!-- TRANSAKSI -->
-        <article class="fin-panel fin-transactions-panel">
-            <div class="fin-panel-heading">
-                <div>
-                    <span class="fin-section-label">RECENT ACTIVITY</span>
-                    <h3>Transaksi Terbaru</h3>
-                    <p>Aktivitas keuangan yang tercatat.</p>
-                </div>
-                <a href="/keuangan/laporan" class="fin-heading-action" title="Lihat semua transaksi">
-                    <i class="fas fa-arrow-up-right-from-square"></i>
-                </a>
-            </div>
-
-            <div class="fin-transaction-list">
-                {% if daftar_transaksi %}
-                    {% for trx in daftar_transaksi %}
-                    <div class="fin-transaction">
-                        <div class="fin-transaction-icon {% if trx.jenis_trx == 'masuk' %}incoming{% else %}outgoing{% endif %}">
-                            <i class="fas {% if trx.jenis_trx == 'masuk' %}fa-arrow-down{% else %}fa-arrow-up{% endif %}"></i>
-                        </div>
-
-                        <div class="fin-transaction-detail">
-                            <strong>{{ trx.jenis_pembayaran }}</strong>
-                            <span>{{ trx.nama_siswa }}</span>
-                            <small><i class="far fa-clock"></i> {{ trx.tanggal_lengkap }}</small>
-                        </div>
-
-                        <div class="fin-transaction-value {% if trx.jenis_trx == 'masuk' %}incoming{% else %}outgoing{% endif %}">
-                            <strong>
-                                {% if trx.jenis_trx == 'masuk' %}+{% else %}-{% endif %}
-                                Rp {{ "{:,.0f}".format(trx.nominal).replace(",", ".") }}
-                            </strong>
-                            <small>{% if trx.jenis_trx == 'masuk' %}Pemasukan{% else %}Pengeluaran{% endif %}</small>
-                        </div>
-                    </div>
-                    {% endfor %}
+                {% if pengeluaran_siap %}
+                    <span>
+                        <b class="fin-dot fin-dot-blue"></b>
+                        Pengeluaran
+                    </span>
                 {% else %}
-                    <div class="fin-empty-state">
-                        <div><i class="fas fa-inbox"></i></div>
-                        <strong>Belum ada transaksi</strong>
-                        <span>Riwayat transaksi akan ditampilkan di sini.</span>
-                    </div>
+                    <span class="fin-chart-note">
+                        Pengeluaran belum terhubung
+                    </span>
                 {% endif %}
             </div>
 
-            <a href="/keuangan/laporan" class="fin-view-all">
-                Lihat semua transaksi <i class="fas fa-arrow-right"></i>
+            <div class="fin-chart-container">
+                <canvas
+                    id="keuanganChart"
+                    role="img"
+                    aria-label="Grafik keuangan enam bulan terakhir. Rincian tersedia pada tabel di bawah."
+                ></canvas>
+
+                <div
+                    class="fin-chart-state"
+                    id="keuanganChartEmpty"
+                    role="status"
+                >
+                    <span class="fin-state-icon">
+                        <i class="fas fa-chart-area" aria-hidden="true"></i>
+                    </span>
+
+                    <strong data-state-title>Menyiapkan grafik</strong>
+                    <p data-state-detail>Memuat data keuangan…</p>
+
+                    <button
+                        type="button"
+                        class="fin-button fin-button-outline"
+                        data-fin-retry
+                        hidden
+                    >
+                        Coba lagi
+                    </button>
+                </div>
+            </div>
+
+            <details class="fin-data-details">
+                <summary>Lihat angka per bulan</summary>
+
+                <div class="fin-table-scroll">
+                    <table>
+                        <caption>
+                            Ringkasan transaksi enam bulan terakhir
+                        </caption>
+
+                        <thead>
+                            <tr>
+                                <th scope="col">Bulan</th>
+                                <th scope="col">Pemasukan</th>
+
+                                {% if pengeluaran_siap %}
+                                    <th scope="col">Pengeluaran</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+
+                        <tbody data-fin-table></tbody>
+                    </table>
+                </div>
+            </details>
+
+            <noscript>
+                <p class="fin-noscript">
+                    Aktifkan JavaScript untuk melihat grafik dan tabel bulanan.
+                </p>
+            </noscript>
+        </article>
+
+        <article class="fin-panel fin-transactions-panel fin-enter">
+
+            <header class="fin-panel-heading">
+                <div>
+                    <span class="fin-eyebrow">AKTIVITAS TERBARU</span>
+                    <h2>Transaksi terbaru</h2>
+                    <p>Aktivitas pembayaran yang tercatat.</p>
+                </div>
+
+                <a
+                    href="/keuangan/laporan"
+                    class="fin-icon-link"
+                    aria-label="Buka laporan transaksi"
+                >
+                    <i
+                        class="fas fa-arrow-up-right-from-square"
+                        aria-hidden="true"
+                    ></i>
+                </a>
+            </header>
+
+            <div class="fin-transaction-list">
+
+                {% for trx in daftar_transaksi | default([], true) %}
+
+                    <div class="fin-transaction {% if trx.jenis_trx != 'masuk' %}is-outgoing{% endif %}">
+
+                        <span class="fin-trx-icon">
+                            <i
+                                class="fas {{ 'fa-arrow-down' if trx.jenis_trx == 'masuk' else 'fa-arrow-up' }}"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div class="fin-trx-detail">
+                            <strong>{{ trx.nama_siswa }}</strong>
+                            <span>{{ trx.jenis_pembayaran }}</span>
+                            <small>{{ trx.tanggal_lengkap }}</small>
+                        </div>
+
+                        <div class="fin-trx-value">
+                            <strong>
+                                {{ '+' if trx.jenis_trx == 'masuk' else '−' }}Rp
+                                {{ '{:,.0f}'.format(trx.nominal | default(0, true)).replace(',', '.') }}
+                            </strong>
+
+                            <span>
+                                {{ 'Pemasukan' if trx.jenis_trx == 'masuk' else 'Pengeluaran' }}
+                            </span>
+                        </div>
+                    </div>
+
+                {% else %}
+
+                    <div class="fin-empty">
+                        <span class="fin-state-icon">
+                            <i class="fas fa-inbox" aria-hidden="true"></i>
+                        </span>
+
+                        <strong>Belum ada transaksi</strong>
+
+                        <p>
+                            Pembayaran yang tercatat akan tampil di sini.
+                        </p>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/keuangan/laporan" class="fin-panel-link">
+                Lihat semua transaksi
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
             </a>
         </article>
 
     </section>
 
-    <!-- TAGIHAN DAN LAPORAN -->
-    <section class="fin-bottom-grid">
+    <!-- AKSES CEPAT -->
+    <section class="fin-bottom-grid" aria-label="Tagihan dan laporan">
 
-        <article class="fin-reminder-panel">
-            <div class="fin-bottom-icon reminder-icon">
-                <i class="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div class="fin-bottom-content">
-                <span class="fin-section-label">PAYMENT REMINDER</span>
-                <h3>Pembayaran Belum Lunas</h3>
-                <p>Pantau siswa yang masih memiliki tagihan pembayaran bulan ini.</p>
+        <article class="fin-action-card fin-reminder fin-enter">
+            <span class="fin-icon">
+                <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i>
+            </span>
 
-                <div class="fin-unpaid-number">
-                    <strong>{{ jumlah_belum_lunas | default('0') }}</strong>
-                    <span>siswa belum melunasi pembayaran</span>
-                </div>
+            <div>
+                <span class="fin-eyebrow">TINDAK LANJUT</span>
+                <h2>Pantau tagihan siswa</h2>
 
-                <a href="/bendahara/spp-siswa" class="fin-primary-action">
-                    Lihat Daftar Tagihan <i class="fas fa-arrow-right"></i>
+                <p class="fin-unpaid">
+                    <strong>{{ jumlah_belum_lunas | default(0) }}</strong>
+                    siswa belum lunas
+                </p>
+
+                <p>
+                    Periksa rincian tagihan siswa pada tahun ajaran terpilih.
+                </p>
+
+                <a
+                    href="{{ url_for('bendahara.spp_siswa') }}"
+                    class="fin-button fin-button-amber"
+                >
+                    Lihat daftar tagihan
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
-            <div class="fin-bottom-decoration"></div>
+
+            <span class="fin-action-decoration" aria-hidden="true"></span>
         </article>
 
-        <article class="fin-report-panel">
-            <div class="fin-bottom-icon report-icon">
-                <i class="fas fa-file-lines"></i>
-            </div>
-            <div class="fin-bottom-content">
-                <span class="fin-section-label">FINANCIAL REPORTS</span>
-                <h3>Laporan Keuangan</h3>
-                <p>Akses laporan untuk evaluasi dan pertanggungjawaban keuangan sekolah.</p>
+        <article class="fin-action-card fin-reports fin-enter">
+            <span class="fin-icon">
+                <i class="fas fa-file-alt" aria-hidden="true"></i>
+            </span>
+
+            <div>
+                <span class="fin-eyebrow">DOKUMENTASI</span>
+                <h2>Laporan, lebih terarah.</h2>
+
+                <p>
+                    Akses ringkasan keuangan untuk evaluasi dan
+                    pertanggungjawaban sekolah.
+                </p>
 
                 <div class="fin-report-links">
-                    <a href="/keuangan/laporan/bulan">
-                        <span class="fin-report-link-icon"><i class="fas fa-calendar-days"></i></span>
-                        <span>Laporan Bulanan</span>
-                        <i class="fas fa-chevron-right"></i>
+                    <a
+                        href="/keuangan/laporan/bulan"
+                        class="fin-button fin-button-outline"
+                    >
+                        <i class="far fa-calendar" aria-hidden="true"></i>
+                        Bulanan
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </a>
-                    <a href="/keuangan/laporan/tahun">
-                        <span class="fin-report-link-icon"><i class="fas fa-calendar-check"></i></span>
-                        <span>Laporan Tahunan</span>
-                        <i class="fas fa-chevron-right"></i>
+
+                    <a
+                        href="/keuangan/laporan/tahun"
+                        class="fin-button fin-button-outline"
+                    >
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                        Tahunan
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
             </div>
-            <div class="fin-bottom-decoration"></div>
+
+            <span class="fin-action-decoration" aria-hidden="true"></span>
         </article>
 
     </section>
 
-    <!-- DATA GRAFIK DARI BACKEND -->
+    <footer class="fin-page-footer">
+        <span>
+            Administrasi Keuangan · SMP Unggulan Hamzanwadi
+        </span>
+
+        <button
+            type="button"
+            class="fin-motion-button"
+            data-fin-motion
+            aria-pressed="false"
+        >
+            Jeda animasi
+        </button>
+    </footer>
+
+    <!-- ANGKA MENTAH UNTUK GRAFIK -->
     <script type="application/json" id="dbKeuanganData">
-    {
-        "labels": {{ dlabel_bulan | default([]) | tojson }},
-        "masuk": {{ data_pemasukan | default([]) | tojson }},
-        "keluar": {{ data_pengeluaran | default([]) | tojson }}
-    }
+        {{
+            {
+                'labels': dlabel_bulan | default([], true),
+                'masuk': data_pemasukan | default([], true),
+                'keluar': data_pengeluaran | default([], true)
+            } | tojson
+        }}
     </script>
 
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>

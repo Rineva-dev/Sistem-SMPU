@@ -1,208 +1,440 @@
-
 (() => {
     "use strict";
 
-    const CHART_JS_URL =
+    // Mencegah listener global terpasang berulang saat SPA.
+    const MODULE_KEY = "__emeraldFinanceDashboardV2";
+
+    if (window[MODULE_KEY]) {
+        window[MODULE_KEY].init();
+        return;
+    }
+
+    const CHART_URL =
         "https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js";
 
-    function loadChartJs() {
-        if (window.Chart) return Promise.resolve();
+    const ROOT_SELECTOR = ".dashboard-bendahara-page";
 
-        if (window.__bendaharaChartPromise) {
-            return window.__bendaharaChartPromise;
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    const rupiah = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+    });
+
+    let current = null;
+    let chartPromise = null;
+    let motionPaused = false;
+
+    try {
+        motionPaused =
+            sessionStorage.getItem("fin-motion-paused") === "true";
+    } catch (_) {
+        // Dashboard tetap berjalan jika sessionStorage tidak tersedia.
+    }
+
+    // ==========================================
+    // LOAD CHART.JS
+    // ==========================================
+
+    function loadChartJs() {
+        if (typeof window.Chart === "function") {
+            return Promise.resolve(window.Chart);
         }
 
-        window.__bendaharaChartPromise = new Promise((resolve, reject) => {
-            let script = document.querySelector(
-                'script[src*="chart.umd.min.js"]'
-            );
+        if (chartPromise) {
+            return chartPromise;
+        }
 
-            if (!script) {
-                script = document.createElement("script");
-                script.src = CHART_JS_URL;
-                script.async = true;
-                document.head.appendChild(script);
+        chartPromise = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+
+            script.src = CHART_URL;
+            script.async = true;
+            script.dataset.finChartLoader = "true";
+
+            let settled = false;
+
+            function finish(error) {
+                if (settled) return;
+                settled = true;
+
+                clearTimeout(timeout);
+
+                script.onload = null;
+                script.onerror = null;
+
+                if (error) {
+                    script.remove();
+                    reject(error);
+                    return;
+                }
+
+                resolve(window.Chart);
             }
 
-            if (window.Chart) {
-                resolve();
-                return;
-            }
+            const timeout = setTimeout(() => {
+                finish(
+                    new Error("Waktu memuat Chart.js habis.")
+                );
+            }, 15000);
 
-            script.addEventListener("load", resolve, { once: true });
-            script.addEventListener("error", () => {
-                reject(new Error("Chart.js gagal dimuat."));
-            }, { once: true });
+            script.onload = () => {
+                if (typeof window.Chart !== "function") {
+                    finish(
+                        new Error("Chart.js tidak tersedia.")
+                    );
+                    return;
+                }
+
+                finish();
+            };
+
+            script.onerror = () => {
+                finish(
+                    new Error(
+                        "Chart.js gagal dimuat. Periksa jaringan atau CSP."
+                    )
+                );
+            };
+
+            document.head.appendChild(script);
+        }).catch(error => {
+            // Izinkan percobaan ulang.
+            chartPromise = null;
+            throw error;
         });
 
-        return window.__bendaharaChartPromise;
+        return chartPromise;
+    }
+
+    // ==========================================
+    // UTILITAS
+    // ==========================================
+
+    function isCurrent(state) {
+        return (
+            current === state &&
+            state.root.isConnected
+        );
     }
 
     function formatRupiahRingkas(value) {
-        const nominal = Number(value) || 0;
+        const nominal = Number(value);
+        const absolute = Math.abs(nominal);
 
-        if (nominal >= 1_000_000_000) {
-            return "Rp " + (nominal / 1_000_000_000).toLocaleString(
-                "id-ID", { maximumFractionDigits: 1 }
-            ) + " M";
+        if (absolute >= 1_000_000_000) {
+            return "Rp " +
+                (nominal / 1_000_000_000).toLocaleString(
+                    "id-ID",
+                    { maximumFractionDigits: 1 }
+                ) +
+                " M";
         }
 
-        if (nominal >= 1_000_000) {
-            return "Rp " + (nominal / 1_000_000).toLocaleString(
-                "id-ID", { maximumFractionDigits: 1 }
-            ) + " jt";
+        if (absolute >= 1_000_000) {
+            return "Rp " +
+                (nominal / 1_000_000).toLocaleString(
+                    "id-ID",
+                    { maximumFractionDigits: 1 }
+                ) +
+                " jt";
         }
 
-        if (nominal >= 1_000) {
-            return "Rp " + (nominal / 1_000).toLocaleString(
-                "id-ID", { maximumFractionDigits: 0 }
-            ) + " rb";
+        if (absolute >= 1_000) {
+            return "Rp " +
+                (nominal / 1_000).toLocaleString(
+                    "id-ID",
+                    { maximumFractionDigits: 0 }
+                ) +
+                " rb";
         }
 
-        return "Rp " + nominal.toLocaleString("id-ID");
+        return rupiah.format(nominal);
     }
 
-    function formatRupiahLengkap(value) {
-        return "Rp " + (Number(value) || 0).toLocaleString("id-ID");
+    function showState(state, title, detail, allowRetry = false) {
+        state.canvas.hidden = true;
+        state.stateBox.hidden = false;
+
+        state.stateBox.querySelector(
+            "[data-state-title]"
+        ).textContent = title;
+
+        state.stateBox.querySelector(
+            "[data-state-detail]"
+        ).textContent = detail;
+
+        state.retryButton.hidden = !allowRetry;
     }
 
-    function buatGradient(context, warnaAtas, warnaBawah) {
-        const chart = context.chart;
-        const area = chart.chartArea;
+    // ==========================================
+    // VALIDASI DATA BACKEND
+    // ==========================================
 
-        if (!area) return warnaBawah;
+    function readData(root) {
+        const element = root.querySelector("#dbKeuanganData");
 
-        const gradient = chart.ctx.createLinearGradient(
-            0, area.top, 0, area.bottom
-        );
-
-        gradient.addColorStop(0, warnaAtas);
-        gradient.addColorStop(1, warnaBawah);
-
-        return gradient;
-    }
-
-    async function initDashboardBendahara() {
-        const root = document.querySelector(".dashboard-bendahara-page");
-
-        if (!root || root.dataset.chartInitialized === "true") return;
-
-        const canvas = root.querySelector("#keuanganChart");
-        const dataElement = root.querySelector("#dbKeuanganData");
-        const emptyState = root.querySelector("#keuanganChartEmpty");
-
-        if (!canvas || !dataElement) return;
-
-        let data;
-
-        try {
-            data = JSON.parse(dataElement.textContent || "{}");
-        } catch (error) {
-            console.error("Data grafik keuangan tidak valid:", error);
-            if (emptyState) emptyState.hidden = false;
-            return;
+        if (!element) {
+            throw new Error("Elemen data grafik tidak ditemukan.");
         }
 
-        const labels = Array.isArray(data.labels) ? data.labels : [];
-        const pemasukan = Array.isArray(data.masuk) ? data.masuk : [];
-        const pengeluaran = Array.isArray(data.keluar) ? data.keluar : [];
+        const source = JSON.parse(element.textContent);
 
-        const dataMasuk = pemasukan.map(value => Number(value) || 0);
-        const dataKeluar = pengeluaran.map(value => Number(value) || 0);
-
-        const adaData = labels.length > 0 && (
-            dataMasuk.some(value => value !== 0) ||
-            dataKeluar.some(value => value !== 0)
-        );
-
-        if (!adaData) {
-            canvas.style.display = "none";
-            if (emptyState) emptyState.hidden = false;
-            root.dataset.chartInitialized = "true";
-            return;
+        if (
+            !Array.isArray(source.labels) ||
+            !Array.isArray(source.masuk)
+        ) {
+            throw new Error("Format data grafik tidak valid.");
         }
 
-        try {
-            await loadChartJs();
+        const expenseReady =
+            root.dataset.expenseReady === "true";
 
-            // Pastikan halaman belum diganti ketika library sedang dimuat
-            if (!root.isConnected || !canvas.isConnected) return;
-
-            if (canvas._keuanganChart) {
-                canvas._keuanganChart.destroy();
+        function numericArray(values) {
+            if (
+                !Array.isArray(values) ||
+                values.length !== source.labels.length
+            ) {
+                throw new Error(
+                    "Jumlah bulan dan nilai grafik tidak sama."
+                );
             }
 
-            if (emptyState) emptyState.hidden = true;
-            canvas.style.display = "block";
+            return values.map(value => {
+                if (
+                    (
+                        typeof value !== "number" &&
+                        typeof value !== "string"
+                    ) ||
+                    String(value).trim() === ""
+                ) {
+                    throw new Error(
+                        "Nominal grafik harus berupa angka mentah."
+                    );
+                }
 
-            canvas._keuanganChart = new window.Chart(
-                canvas.getContext("2d"),
+                const number = Number(value);
+
+                if (!Number.isFinite(number)) {
+                    throw new Error(
+                        "Nominal grafik tidak valid: " + value
+                    );
+                }
+
+                return number;
+            });
+        }
+
+        return {
+            labels: source.labels.map(String),
+            masuk: numericArray(source.masuk),
+            keluar: expenseReady
+                ? numericArray(source.keluar)
+                : [],
+            expenseReady
+        };
+    }
+
+    // ==========================================
+    // RINGKASAN DAN TABEL
+    // ==========================================
+
+    function updateSummaryAndTable(state, data) {
+        const totalElement = state.root.querySelector(
+            "[data-fin-total]"
+        );
+
+        const tableBody = state.root.querySelector(
+            "[data-fin-table]"
+        );
+
+        const totalMasuk = data.masuk.reduce(
+            (total, nominal) => total + nominal,
+            0
+        );
+
+        totalElement.textContent = rupiah.format(totalMasuk);
+        tableBody.replaceChildren();
+
+        data.labels.forEach((label, index) => {
+            const row = document.createElement("tr");
+
+            const values = [
+                label,
+                rupiah.format(data.masuk[index])
+            ];
+
+            if (data.expenseReady) {
+                values.push(
+                    rupiah.format(data.keluar[index])
+                );
+            }
+
+            values.forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // ==========================================
+    // DATASET GRAFIK
+    // ==========================================
+
+    function createDataset(label, values, color, fillColor) {
+        return {
+            label,
+            data: values,
+
+            borderColor: color,
+            borderWidth: 2.5,
+
+            pointRadius: 3,
+            pointHoverRadius: 6,
+            pointBackgroundColor: color,
+            pointBorderColor: "#ffffff",
+            pointBorderWidth: 2,
+
+            fill: true,
+
+            // Garis lurus tidak menghasilkan lekukan
+            // yang seolah turun di bawah nol antarbulan.
+            tension: 0,
+
+            backgroundColor(context) {
+                const chart = context.chart;
+                const area = chart.chartArea;
+
+                if (!area) {
+                    return fillColor;
+                }
+
+                const gradient = chart.ctx.createLinearGradient(
+                    0,
+                    area.top,
+                    0,
+                    area.bottom
+                );
+
+                gradient.addColorStop(0, fillColor);
+                gradient.addColorStop(
+                    1,
+                    "rgba(255,255,255,0)"
+                );
+
+                return gradient;
+            }
+        };
+    }
+
+    // ==========================================
+    // RENDER GRAFIK
+    // ==========================================
+
+    async function renderChart(state) {
+        if (
+            state.loading ||
+            state.chart ||
+            !isCurrent(state)
+        ) {
+            return;
+        }
+
+        state.loading = true;
+
+        try {
+            const data = readData(state.root);
+
+            updateSummaryAndTable(state, data);
+
+            const hasData =
+                data.labels.length > 0 &&
+                [...data.masuk, ...data.keluar].some(
+                    value => value !== 0
+                );
+
+            if (!hasData) {
+                showState(
+                    state,
+                    "Belum ada data keuangan",
+                    "Tidak ada nominal transaksi pada periode enam bulan ini."
+                );
+
+                return;
+            }
+
+            showState(
+                state,
+                "Menyiapkan grafik",
+                "Memuat tampilan arus keuangan…"
+            );
+
+            const Chart = await loadChartJs();
+
+            // Pengguna mungkin sudah pindah halaman
+            // ketika CDN selesai dimuat.
+            if (!isCurrent(state)) return;
+
+            state.canvas.hidden = false;
+            state.stateBox.hidden = true;
+
+            const datasets = [
+                createDataset(
+                    "Pemasukan",
+                    data.masuk,
+                    "#079669",
+                    "rgba(7,150,105,.22)"
+                )
+            ];
+
+            if (data.expenseReady) {
+                datasets.push(
+                    createDataset(
+                        "Pengeluaran",
+                        data.keluar,
+                        "#5688df",
+                        "rgba(86,136,223,.16)"
+                    )
+                );
+            }
+
+            state.chart = new Chart(
+                state.canvas.getContext("2d"),
                 {
                     type: "line",
 
                     data: {
-                        labels,
-                        datasets: [
-                            {
-                                label: "Pemasukan",
-                                data: dataMasuk,
-                                borderColor: "#0ca678",
-                                backgroundColor: context => buatGradient(
-                                    context,
-                                    "rgba(12,166,120,.22)",
-                                    "rgba(12,166,120,.005)"
-                                ),
-                                borderWidth: 2.5,
-                                pointRadius: 3,
-                                pointHoverRadius: 6,
-                                pointBackgroundColor: "#0ca678",
-                                pointBorderColor: "#ffffff",
-                                pointBorderWidth: 2,
-                                fill: true,
-                                tension: 0.38
-                            },
-                            {
-                                label: "Pengeluaran",
-                                data: dataKeluar,
-                                borderColor: "#5688df",
-                                backgroundColor: context => buatGradient(
-                                    context,
-                                    "rgba(86,136,223,.16)",
-                                    "rgba(86,136,223,.005)"
-                                ),
-                                borderWidth: 2.5,
-                                pointRadius: 3,
-                                pointHoverRadius: 6,
-                                pointBackgroundColor: "#5688df",
-                                pointBorderColor: "#ffffff",
-                                pointBorderWidth: 2,
-                                fill: true,
-                                tension: 0.38
-                            }
-                        ]
+                        labels: data.labels,
+                        datasets
                     },
 
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        resizeDelay: 100,
+
+                        animation:
+                            reducedMotion.matches || motionPaused
+                                ? false
+                                : {
+                                    duration: 700,
+                                    easing: "easeOutQuart"
+                                },
 
                         interaction: {
                             mode: "index",
                             intersect: false
                         },
 
-                        animation: {
-                            duration: 850,
-                            easing: "easeOutQuart"
-                        },
-
                         layout: {
                             padding: {
-                                top: 8,
-                                right: 10,
-                                bottom: 0,
-                                left: 2
+                                top: 10,
+                                right: 10
                             }
                         },
 
@@ -212,35 +444,18 @@
                             },
 
                             tooltip: {
-                                backgroundColor: "#17392c",
-                                titleColor: "#d9f6e7",
+                                backgroundColor: "#123f30",
+                                titleColor: "#d9f3e3",
                                 bodyColor: "#ffffff",
-                                borderColor: "rgba(255,255,255,.12)",
-                                borderWidth: 1,
                                 padding: 13,
-                                cornerRadius: 11,
+                                cornerRadius: 10,
                                 displayColors: true,
-                                usePointStyle: true,
-                                boxWidth: 8,
-                                boxHeight: 8,
-
-                                titleFont: {
-                                    family: "Inter, Segoe UI, sans-serif",
-                                    size: 11,
-                                    weight: "700"
-                                },
-
-                                bodyFont: {
-                                    family: "Inter, Segoe UI, sans-serif",
-                                    size: 11,
-                                    weight: "500"
-                                },
 
                                 callbacks: {
                                     label(context) {
-                                        return " " + context.dataset.label +
+                                        return context.dataset.label +
                                             ": " +
-                                            formatRupiahLengkap(
+                                            rupiah.format(
                                                 context.parsed.y
                                             );
                                     }
@@ -253,15 +468,15 @@
                                 grid: {
                                     display: false
                                 },
+
                                 border: {
                                     display: false
                                 },
+
                                 ticks: {
-                                    color: "#87968e",
+                                    color: "#62796b",
                                     font: {
-                                        family: "Inter, Segoe UI, sans-serif",
-                                        size: 10,
-                                        weight: "600"
+                                        size: 11
                                     },
                                     maxRotation: 0,
                                     autoSkip: true
@@ -270,62 +485,234 @@
 
                             y: {
                                 beginAtZero: true,
+
                                 border: {
-                                    display: false,
-                                    dash: [3, 5]
+                                    display: false
                                 },
+
                                 grid: {
-                                    color: "rgba(139,157,146,.13)",
-                                    drawTicks: false
+                                    color: "#edf2ee"
                                 },
+
                                 ticks: {
-                                    color: "#93a198",
-                                    padding: 10,
-                                    maxTicksLimit: 6,
+                                    color: "#62796b",
+                                    maxTicksLimit: 5,
                                     font: {
-                                        family: "Inter, Segoe UI, sans-serif",
-                                        size: 9
+                                        size: 10
                                     },
                                     callback: formatRupiahRingkas
                                 }
-                            }
-                        },
-
-                        elements: {
-                            line: {
-                                borderCapStyle: "round",
-                                borderJoinStyle: "round"
                             }
                         }
                     }
                 }
             );
 
-            root.dataset.chartInitialized = "true";
-
-            console.log("Dashboard keuangan berhasil diinisialisasi.");
+            // Tetap tersedia untuk pemeriksaan lewat Console.
+            state.canvas._keuanganChart = state.chart;
 
         } catch (error) {
-            console.error("Gagal menampilkan grafik keuangan:", error);
-            if (emptyState) emptyState.hidden = false;
+            if (!isCurrent(state)) return;
+
+            if (state.chart) {
+                state.chart.destroy();
+                state.chart = null;
+            }
+
+            // Bersihkan jika constructor sempat
+            // mendaftarkan instance sebelum gagal.
+            const partialChart =
+                window.Chart?.getChart?.(state.canvas);
+
+            if (partialChart) {
+                partialChart.destroy();
+            }
+
+            delete state.canvas._keuanganChart;
+
+            showState(
+                state,
+                "Grafik belum bisa ditampilkan",
+                "Coba lagi. Jika tetap gagal, periksa data grafik dan koneksi.",
+                true
+            );
+
+            console.error(
+                "[Dashboard Bendahara]",
+                error
+            );
+
+        } finally {
+            state.loading = false;
         }
     }
 
-    // Initial page load
+    // ==========================================
+    // PENGATURAN ANIMASI
+    // ==========================================
+
+    function applyMotionPreference() {
+        if (!current) return;
+
+        const shouldPause =
+            motionPaused || reducedMotion.matches;
+
+        current.root.classList.toggle(
+            "fin-motion-paused",
+            shouldPause
+        );
+
+        const button = current.root.querySelector(
+            "[data-fin-motion]"
+        );
+
+        button.textContent = motionPaused
+            ? "Aktifkan animasi"
+            : "Jeda animasi";
+
+        button.setAttribute(
+            "aria-pressed",
+            String(motionPaused)
+        );
+
+        if (current.chart) {
+            current.chart.stop();
+
+            current.chart.options.animation = shouldPause
+                ? false
+                : {
+                    duration: 700,
+                    easing: "easeOutQuart"
+                };
+
+            current.chart.update("none");
+        }
+    }
+
+    // ==========================================
+    // CLEANUP SEBELUM PINDAH HALAMAN
+    // ==========================================
+
+    function cleanup() {
+        if (!current) return;
+
+        const previous = current;
+        current = null;
+
+        // Lepaskan listener tombol pada halaman lama.
+        previous.events.abort();
+
+        if (previous.chart) {
+            previous.chart.destroy();
+        }
+
+        delete previous.canvas._keuanganChart;
+    }
+
+    // ==========================================
+    // INITIALIZE
+    // ==========================================
+
+    function init() {
+        const root = document.querySelector(ROOT_SELECTOR);
+
+        if (
+            current?.root === root &&
+            root?.isConnected
+        ) {
+            return;
+        }
+
+        cleanup();
+
+        if (!root) return;
+
+        const canvas = root.querySelector("#keuanganChart");
+        const stateBox = root.querySelector("#keuanganChartEmpty");
+        const retryButton = root.querySelector("[data-fin-retry]");
+        const motionButton = root.querySelector("[data-fin-motion]");
+
+        if (
+            !canvas ||
+            !stateBox ||
+            !retryButton ||
+            !motionButton
+        ) {
+            return;
+        }
+
+        const state = {
+            root,
+            canvas,
+            stateBox,
+            retryButton,
+            chart: null,
+            loading: false,
+            events: new AbortController()
+        };
+
+        current = state;
+
+        retryButton.addEventListener(
+            "click",
+            () => renderChart(state),
+            {
+                signal: state.events.signal
+            }
+        );
+
+        motionButton.addEventListener(
+            "click",
+            () => {
+                motionPaused = !motionPaused;
+
+                try {
+                    sessionStorage.setItem(
+                        "fin-motion-paused",
+                        String(motionPaused)
+                    );
+                } catch (_) {
+                    // Preferensi tetap berlaku untuk halaman aktif.
+                }
+
+                applyMotionPreference();
+            },
+            {
+                signal: state.events.signal
+            }
+        );
+
+        applyMotionPreference();
+        renderChart(state);
+    }
+
+    window[MODULE_KEY] = {
+        init,
+        cleanup
+    };
+
+    document.addEventListener(
+        "spa:before-page-unload",
+        cleanup
+    );
+
+    document.addEventListener(
+        "spa:page-loaded",
+        init
+    );
+
+    reducedMotion.addEventListener(
+        "change",
+        applyMotionPreference
+    );
+
     if (document.readyState === "loading") {
         document.addEventListener(
             "DOMContentLoaded",
-            initDashboardBendahara,
+            init,
             { once: true }
         );
     } else {
-        initDashboardBendahara();
+        init();
     }
-
-    // SPA navigation
-    document.addEventListener(
-        "spa:page-loaded",
-        initDashboardBendahara
-    );
-
 })();
