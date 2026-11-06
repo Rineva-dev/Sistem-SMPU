@@ -1,81 +1,292 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123F32">
     <title>Login - Manajemen Guru SMP Unggulan Hamzanwadi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 
-    <div class="login-container">
-        <!-- Bagian Kiri: Informasi Sekolah -->
-        <div class="school-info">
-            <div class="logo-wrapper">
-                <!-- Logo lengkap sekolah -->
-                <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo SMP Unggulan Hamzanwadi" class="logo-sekolah">
-            </div>
-            <h2>Sistem Manajemen Guru</h2>
-            <div class="divider"></div>
-            <p class="desc">
-                Akses sistem pengelolaan data, jadwal mengajar, dan administrasi tenaga pendidik secara mudah, aman, dan terintegrasi.
-            </p>
-            <div class="copyright">&copy; 2026 SMP Unggulan Hamzanwadi</div>
-        </div>
-
-        <!-- Bagian Kanan: Form Login -->
-        <div class="login-form-section">
-            <div class="form-header">
-                <h3>Masuk ke Sistem</h3>
-                <p>Silakan masukkan Username dan kata sandi Anda</p>
-            </div>
-
-            <form id="formLogin" action="/proses-login" method="POST">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper">
-                        <i class="fa fa-user"></i>
-                        <input type="text" id="username" name="username" required placeholder="Masukkan username">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Kata Sandi</label>
-                    <div class="input-wrapper">
-                        <i class="fa fa-lock"></i>
-                        <input type="password" id="password" name="password" required placeholder="Masukkan kata sandi">
-                        <button type="button" class="toggle-password" onclick="lihatSandi()">
-                            <i id="iconMata" class="fa fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox"> Ingat Saya
-                    </label>
-                    <a href="#" class="forgot-pass">Lupa Kata Sandi?</a>
-                </div>
-
-                <button type="submit" class="btn-login">Masuk ke Sistem</button>
-            </form>
-
-            <div class="contact-info">
-                <p>Butuh bantuan? Hubungi bagian administrasi</p>
-                <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
-            </div>
-        </div>
+    <div class="login-background">
+        <span class="bg-orb bg-orb-one"></span>
+        <span class="bg-orb bg-orb-two"></span>
+        <span class="bg-grid"></span>
     </div>
 
+    <main class="login-shell">
+
+        <!-- PANEL IDENTITAS SEKOLAH -->
+        <section class="school-panel">
+
+            <div class="panel-glow panel-glow-one"></div>
+            <div class="panel-glow panel-glow-two"></div>
+            <div class="panel-ring panel-ring-one"></div>
+            <div class="panel-ring panel-ring-two"></div>
+
+            <div class="school-panel-content">
+
+                <div class="brand-topline">
+                    <div class="brand-indicator">
+                        <span class="indicator-dot"></span>
+                        PORTAL RESMI SEKOLAH
+                    </div>
+                    <span class="brand-year">EST. SMPU</span>
+                </div>
+
+                <div class="school-brand">
+                    <div class="logo-wrapper">
+                        <img
+                            src="{{ url_for('static', filename='img/logo1.png') }}"
+                            alt="Logo SMP Unggulan Hamzanwadi"
+                            class="logo-sekolah"
+                        >
+                    </div>
+
+                    <div class="brand-caption">
+                        <span>SMP UNGGULAN HAMZANWADI</span>
+                        <span class="brand-caption-line"></span>
+                        <span>LOMBOK TIMUR · NUSA TENGGARA BARAT</span>
+                    </div>
+                </div>
+
+                <div class="school-message">
+                    <span class="section-kicker">SMART SCHOOL MANAGEMENT</span>
+
+                    <h1>
+                        Mengelola dengan
+                        <span>Lebih Mudah.</span>
+                        Melayani dengan
+                        <span>Lebih Baik.</span>
+                    </h1>
+
+                    <p>
+                        Satu platform terintegrasi untuk mendukung pengelolaan
+                        data guru, kegiatan pembelajaran, dan administrasi
+                        sekolah secara efektif, aman, dan profesional.
+                    </p>
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">
+                            <i class="fa fa-shield"></i>
+                        </span>
+                        <div>
+                            <strong>Akses Terproteksi</strong>
+                            <small>Sistem akses pengguna yang aman</small>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-icon">
+                            <i class="fa fa-line-chart"></i>
+                        </span>
+                        <div>
+                            <strong>Data Terintegrasi</strong>
+                            <small>Pengelolaan dalam satu platform</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="school-panel-footer">
+                    <span>© 2026 SMP Unggulan Hamzanwadi</span>
+                    <span class="footer-status">
+                        <span></span> SYSTEM ONLINE
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PANEL FORM LOGIN -->
+        <section class="login-panel">
+
+            <div class="login-panel-top">
+                <div class="mini-brand">
+                    <span class="mini-brand-icon">
+                        <i class="fa fa-graduation-cap"></i>
+                    </span>
+                    <span>SMPU <b>HAMZANWADI</b></span>
+                </div>
+
+                <div class="secure-label">
+                    <i class="fa fa-lock"></i>
+                    SECURE LOGIN
+                </div>
+            </div>
+
+            <div class="login-content">
+
+                <div class="form-header">
+                    <span class="form-eyebrow">WELCOME BACK</span>
+                    <h2>Selamat Datang!</h2>
+                    <p>Silakan masuk menggunakan akun yang telah terdaftar.</p>
+                </div>
+
+                <form id="formLogin" action="/proses-login" method="POST">
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <i class="fa fa-user-o"></i>
+                            </span>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                required
+                                autocomplete="username"
+                                placeholder="Masukkan username Anda"
+                            >
+
+                            <span class="input-check">
+                                <i class="fa fa-check-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Kata Sandi</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <i class="fa fa-lock"></i>
+                            </span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="Masukkan kata sandi"
+                            >
+
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="Tampilkan kata sandi"
+                            >
+                                <i id="iconMata" class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="custom-checkbox">
+                                <i class="fa fa-check"></i>
+                            </span>
+                            <span>Ingat saya</span>
+                        </label>
+
+                        <a href="mailto:smpu@hamzanwadi.ac.id" class="forgot-pass">
+                            Butuh bantuan?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="btnLogin">
+                        <span class="btn-login-text">Masuk ke Sistem</span>
+                        <span class="btn-login-icon">
+                            <i class="fa fa-arrow-right"></i>
+                        </span>
+                    </button>
+
+                </form>
+
+                <div class="login-security">
+                    <span class="security-icon">
+                        <i class="fa fa-shield"></i>
+                    </span>
+                    <div>
+                        <strong>Privasi dan keamanan Anda terlindungi</strong>
+                        <small>Gunakan akun pribadi dan jangan bagikan kata sandi.</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="login-panel-footer">
+                <div class="contact-info">
+                    <span>Butuh bantuan administrasi?</span>
+                    <a href="tel:+6281929830033">
+                        <i class="fa fa-phone"></i> (62) 819-2983-0033
+                    </a>
+                </div>
+
+                <div class="footer-copyright">
+                    POWERED BY <strong>SMPU DIGITAL</strong>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
     <script>
-        function lihatSandi() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('iconMata');
-            input.type = input.type === 'password' ? 'text' : 'password';
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        }
+        (() => {
+            "use strict";
+
+            const passwordInput = document.getElementById("password");
+            const togglePassword = document.getElementById("togglePassword");
+            const iconMata = document.getElementById("iconMata");
+            const formLogin = document.getElementById("formLogin");
+            const btnLogin = document.getElementById("btnLogin");
+
+            // Tampilkan / sembunyikan kata sandi
+            togglePassword.addEventListener("click", () => {
+                const isPassword = passwordInput.type === "password";
+
+                passwordInput.type = isPassword ? "text" : "password";
+                iconMata.classList.toggle("fa-eye", !isPassword);
+                iconMata.classList.toggle("fa-eye-slash", isPassword);
+
+                togglePassword.setAttribute(
+                    "aria-label",
+                    isPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
+                );
+            });
+
+            // Efek tombol saat form dikirim.
+            // Form tetap dikirim normal ke backend Flask.
+            formLogin.addEventListener("submit", () => {
+                if (!formLogin.checkValidity()) return;
+
+                btnLogin.classList.add("is-loading");
+                btnLogin.querySelector(".btn-login-text").textContent = "Memproses...";
+                btnLogin.querySelector(".btn-login-icon").innerHTML =
+                    '<i class="fa fa-spinner fa-spin"></i>';
+
+                btnLogin.disabled = true;
+            });
+
+            // Efek input aktif
+            document.querySelectorAll(".input-wrapper input").forEach(input => {
+                const wrapper = input.closest(".input-wrapper");
+
+                const updateState = () => {
+                    wrapper.classList.toggle("has-value", input.value.length > 0);
+                };
+
+                input.addEventListener("input", updateState);
+                updateState();
+            });
+
+        })();
     </script>
 
 </body>
