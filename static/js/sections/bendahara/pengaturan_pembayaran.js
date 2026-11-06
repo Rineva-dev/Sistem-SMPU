@@ -1,168 +1,441 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const modalTambah = document.getElementById('modalTambah');
-    const formTambah = modalTambah ? modalTambah.querySelector('form') : null;
-    const btnTambahBaru = document.querySelector('[data-bs-target="#modalTambah"]');
-    const semuaBtnEdit = document.querySelectorAll('.btn-warning[title="Ubah"]');
-    const semuaBtnStatus = document.querySelectorAll('.btn-secondary[title="Nonaktifkan"], .btn-success[title="Aktifkan"]');
-    const nominalInput = document.getElementById('nominalInput');
-    const nominalAsli = document.getElementById('nominalAsli');
 
-    let modeEdit = false;
-    let idDataEdit = null;
+/* =========================================================
+   PREMIUM PAYMENT CONFIGURATION
+   SPA compatible
+========================================================= */
 
-    function formatRupiah(angka) {
-        let angkaBersih = angka.replace(/[^0-9]/g, '');
-        if (!angkaBersih) return '';
-        return 'Rp ' + angkaBersih.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
+(() => {
+    "use strict";
 
-    function isiNominalEdit(nilaiAngka) {
-        if (!nilaiAngka) {
-            nominalInput.value = '';
-            nominalAsli.value = '';
-            return;
+    function initPengaturanPembayaran() {
+        const halaman = document.querySelector(".pengaturan-pembayaran-page");
+        if (!halaman || halaman.dataset.initialized === "true") return;
+
+        halaman.dataset.initialized = "true";
+
+        const pilihAngkatan = halaman.querySelector("#pilihAngkatan");
+        const modalElement = halaman.querySelector("#modalTambah");
+
+        // ==========================================
+        // MODAL PORTAL — PINDAHKAN LANGSUNG KE BODY
+        // Agar tidak terpotong overflow / SPA container
+        // ==========================================
+        if (modalElement) {
+            const portal = document.createElement("div");
+            portal.className = "pengaturan-pembayaran-page pp-modal-portal";
+
+            document.body.appendChild(portal);
+            portal.appendChild(modalElement);
         }
-        nominalAsli.value = nilaiAngka;
-        nominalInput.value = formatRupiah(nilaiAngka);
-    }
-    window.isiNominalEdit = isiNominalEdit;
 
-    if (nominalInput && nominalAsli) {
-        nominalInput.addEventListener('input', function () {
-            let posKursor = this.selectionStart;
-            let nilaiAsli = this.value.replace(/[^0-9]/g, '');
-            let panjangSebelum = this.value.length;
+        // Elemen-elemen modal tetap bisa diakses
+        const formTarif = modalElement?.querySelector("#formTarif");
+        const pilihJenis = modalElement?.querySelector("#pilihJenisUtama");
+        const bagianKelompok = modalElement?.querySelector("#bagianKelompok");
+        const pilihKelompok = modalElement?.querySelector("#pilihKelompok");
+        const inputEditId = modalElement?.querySelector("#editTarifId");
+        const inputKode = modalElement?.querySelector("#kodeTarif");
+        const inputPola = modalElement?.querySelector("#polaWaktu");
+        const inputNominal = modalElement?.querySelector("#nominalInput");
+        const inputNominalAsli = modalElement?.querySelector("#nominalAsli");
+        const inputKeterangan = modalElement?.querySelector("#keteranganTarif");
+        const tombolSimpan = modalElement?.querySelector("#btnSimpanTarif");;
 
-            this.value = formatRupiah(this.value);
-            nominalAsli.value = nilaiAsli;
 
-            let panjangSesudah = this.value.length;
-            let selisih = panjangSesudah - panjangSebelum;
-            this.selectionStart = this.selectionEnd = posKursor + selisih;
-        });
-    }
+        // =====================================================
+        // DATA BACKEND
+        // =====================================================
 
-    if (btnTambahBaru && modalTambah) {
-        btnTambahBaru.addEventListener('click', function () {
-            modeEdit = false;
-            idDataEdit = null;
-            if (formTambah) formTambah.reset();
-            const judulModal = modalTambah.querySelector('.modal-title');
-            if (judulModal) judulModal.textContent = 'Tambah Tarif Baru';
+        function bacaJSON(id, fallback) {
+            const element = halaman.querySelector("#" + id);
 
-            if (nominalInput) nominalInput.value = '';
-            if (nominalAsli) nominalAsli.value = '';
+            if (!element) return fallback;
 
-            const oldEditId = formTambah.querySelector('[name="edit_id"]');
-            if (oldEditId) oldEditId.remove();
+            try {
+                return JSON.parse(element.textContent.trim());
+            } catch (error) {
+                console.error("Gagal membaca data:", id, error);
+                return fallback;
+            }
+        }
 
-            setTimeout(() => {
-                window.initCustomSelect(modalTambah.querySelectorAll('.custom-select'));
-            }, 100);
-        });
-    }
+        const semuaEkskul = bacaJSON("ppDataEkskul", []);
+        const semuaEkskulTahun = bacaJSON("ppDataEkskulTahun", []);
 
-    semuaBtnEdit.forEach(btn => {
-        btn.addEventListener('click', function () {
-            modeEdit = true;
-            const baris = this.closest('tr');
+        const semuaPeminatan = bacaJSON("ppDataPeminatan", []);
+        const semuaPeminatanTahun = bacaJSON("ppDataPeminatanTahun", []);
 
-            idDataEdit = baris.dataset.id;
-            const namaPenuh = baris.querySelector('td:nth-child(2)').textContent.trim();
-            const kode = baris.dataset.kode;
-            const pola = baris.dataset.pola;
-            const nominal = baris.querySelector('td:nth-child(4)').textContent.replace(/\D/g, '');
-            const keterangan = baris.dataset.keterangan;
+        const tahunDipilih = bacaJSON("ppTahunDipilih", "");
 
-            // Pisahkan nama jadi jenis utama + kelompok
-            let jenisUtama = namaPenuh;
-            let namaKelompok = '';
-            if(namaPenuh.includes(' - ')){
-                let bagian = namaPenuh.split(' - ', 1);
-                jenisUtama = bagian[0];
-                namaKelompok = namaPenuh.replace(bagian[0] + ' - ', '');
+        // =====================================================
+        // FORMAT RUPIAH
+        // =====================================================
+
+        function hanyaAngka(value) {
+            return String(value || "").replace(/\D/g, "");
+        }
+
+        function formatRupiah(value) {
+            const angka = hanyaAngka(value);
+
+            if (!angka) return "";
+
+            return angka.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function sinkronkanNominal() {
+            if (!inputNominal || !inputNominalAsli) return;
+
+            const angka = hanyaAngka(inputNominal.value);
+
+            inputNominal.value = formatRupiah(angka);
+            inputNominalAsli.value = angka;
+        }
+
+        if (inputNominal) {
+            inputNominal.addEventListener("input", sinkronkanNominal);
+
+            inputNominal.addEventListener("blur", sinkronkanNominal);
+        }
+
+        // =====================================================
+        // PILIH TAHUN PELAJARAN
+        // =====================================================
+
+        if (pilihAngkatan) {
+            pilihAngkatan.addEventListener("change", function () {
+                const tahun = this.value;
+
+                if (!tahun) {
+                    window.location.href = "/bendahara/pengaturan-pembayaran";
+                    return;
+                }
+
+                window.location.href =
+                    "/bendahara/pengaturan-pembayaran?angkatan=" +
+                    encodeURIComponent(tahun);
+            });
+        }
+
+        // =====================================================
+        // PILIH KELOMPOK EKSKUL / PEMINATAN
+        // =====================================================
+
+        function tampilkanKelompok(jenis, namaTerpilih = "") {
+            if (!bagianKelompok || !pilihKelompok) return;
+
+            pilihKelompok.innerHTML =
+                '<option value="">Pilih kelompok</option>';
+
+            if (!tahunDipilih) {
+                bagianKelompok.hidden = true;
+                pilihKelompok.required = false;
+                return;
             }
 
-            formTambah.querySelector('[name="jenis_utama"]').value = jenisUtama;
-            // Trigger event agar pilihan kelompok muncul
-            formTambah.querySelector('[name="jenis_utama"]').dispatchEvent(new Event('change'));
-            
-            // Isi pilihan kelompok setelah muncul
-            setTimeout(() => {
-                if(namaKelompok){
-                    formTambah.querySelector('[name="nama_kelompok"]').value = namaKelompok;
+            let namaList = [];
+            let tahunList = [];
+
+            if (jenis === "Ekstrakurikuler") {
+                namaList = semuaEkskul;
+                tahunList = semuaEkskulTahun;
+            } else if (jenis === "Kelas Peminatan") {
+                namaList = semuaPeminatan;
+                tahunList = semuaPeminatanTahun;
+            } else {
+                bagianKelompok.hidden = true;
+                pilihKelompok.required = false;
+                return;
+            }
+
+            const tersedia = namaList
+                .map((nama, index) => ({
+                    nama: nama,
+                    tahun: String(tahunList[index] || "").split("-")[0].trim()
+                }))
+                .filter(item => item.tahun === String(tahunDipilih))
+                .filter((item, index, array) =>
+                    array.findIndex(x => x.nama === item.nama) === index
+                );
+
+            tersedia.forEach(item => {
+                const option = document.createElement("option");
+
+                option.value = item.nama;
+                option.textContent = item.nama;
+
+                if (item.nama === namaTerpilih) {
+                    option.selected = true;
                 }
-            }, 50);
 
-            formTambah.querySelector('[name="kode"]').value = kode;
-            formTambah.querySelector('[name="pola_waktu"]').value = pola;
-            window.isiNominalEdit(nominal);
-            formTambah.querySelector('[name="keterangan"]').value = keterangan;
+                pilihKelompok.appendChild(option);
+            });
 
-            modalTambah.querySelector('.modal-title').textContent = 'Ubah Tarif';
-            bootstrap.Modal.getOrCreateInstance(modalTambah).show();
-        });
-    });
+            bagianKelompok.hidden = false;
+            pilihKelompok.required = true;
 
-    // === TOMBOL UBAH STATUS ===
-    semuaBtnStatus.forEach(btn => {
-        btn.addEventListener('click', function () {
-            const baris = this.closest('tr');
-            const id = baris.dataset.id;
-            const statusSekarang = this.getAttribute('title');
+            if (tersedia.length === 0) {
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = "Belum ada kelompok untuk tahun ini";
+                option.disabled = true;
+                pilihKelompok.appendChild(option);
+            }
+        }
 
-            if (!confirm(`Yakin ingin ${statusSekarang} jenis pembayaran ini?`)) return;
+        if (pilihJenis) {
+            pilihJenis.addEventListener("change", function () {
+                tampilkanKelompok(this.value);
+            });
+        }
 
-            // Kirim data ke server
-            fetch(`/bendahara/pengaturan-pembayaran/status/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+        // =====================================================
+        // RESET FORM
+        // =====================================================
+
+        function resetForm() {
+            if (!formTarif) return;
+
+            formTarif.reset();
+
+            if (inputEditId) inputEditId.value = "";
+
+            if (bagianKelompok) bagianKelompok.hidden = true;
+
+            if (pilihKelompok) {
+                pilihKelompok.innerHTML =
+                    '<option value="">Pilih kelompok</option>';
+                pilihKelompok.required = false;
+            }
+
+            if (inputNominal) inputNominal.value = "";
+            if (inputNominalAsli) inputNominalAsli.value = "";
+
+            if (tombolSimpan) {
+                tombolSimpan.disabled = false;
+                tombolSimpan.innerHTML =
+                    '<i class="fas fa-check"></i><span>Simpan Tarif</span>';
+            }
+
+            const judul = modalElement.querySelector("#modalTambahLabel");
+
+            if (judul) judul.textContent = "Tambah Tarif Baru";
+        }
+
+        // =====================================================
+        // MODAL TAMBAH
+        // =====================================================
+
+        if (modalElement) {
+            modalElement.addEventListener("show.bs.modal", function (event) {
+                const pemicu = event.relatedTarget;
+
+                if (pemicu && !pemicu.classList.contains("btnUbah")) {
+                    resetForm();
                 }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.sukses) {
-                    // Muat ulang halaman agar tabel terbaru
-                    window.location.reload();
-                } else {
-                    alert(data.pesan || 'Gagal mengubah status!');
+            });
+
+            modalElement.addEventListener("hidden.bs.modal", resetForm);
+        }
+
+        // =====================================================
+        // MODAL EDIT
+        // =====================================================
+
+        halaman.querySelectorAll(".btnUbah").forEach(button => {
+            button.addEventListener("click", function () {
+                const row = this.closest("tr");
+
+                if (!row || !modalElement || !formTarif) return;
+
+                resetForm();
+
+                const id = row.dataset.id || "";
+                const kode = row.dataset.kode || "";
+                const pola = row.dataset.pola || "";
+                const nama = row.dataset.nama || "";
+                const nominal = row.dataset.nominal || "";
+                const keterangan = row.dataset.keterangan || "";
+
+                if (inputEditId) inputEditId.value = id;
+                if (inputKode) inputKode.value = kode;
+                if (inputPola) inputPola.value = pola;
+                if (inputKeterangan) inputKeterangan.value = keterangan;
+
+                // Tentukan kategori berdasarkan nama tarif.
+                let kategori = nama;
+                let namaKelompok = "";
+
+                const kategoriList = [
+                    "Ekstrakurikuler",
+                    "Kelas Peminatan",
+                    "Pembangunan",
+                    "Seragam",
+                    "SPP",
+                    "Buku"
+                ];
+
+                const kategoriCocok = kategoriList.find(item =>
+                    nama === item || nama.startsWith(item + " - ")
+                );
+
+                if (kategoriCocok) {
+                    kategori = kategoriCocok;
+
+                    if (
+                        kategoriCocok === "Ekstrakurikuler" ||
+                        kategoriCocok === "Kelas Peminatan"
+                    ) {
+                        namaKelompok = nama.substring(
+                            kategoriCocok.length
+                        ).replace(/^\s*-\s*/, "");
+                    }
                 }
-            })
-            .catch(err => {
-                alert('Terjadi kesalahan koneksi!');
+
+                if (pilihJenis) {
+                    pilihJenis.value = kategori;
+
+                    if (
+                        kategori === "Ekstrakurikuler" ||
+                        kategori === "Kelas Peminatan"
+                    ) {
+                        tampilkanKelompok(kategori, namaKelompok);
+                    } else if (bagianKelompok) {
+                        bagianKelompok.hidden = true;
+                    }
+                }
+
+                if (inputNominal) {
+                    inputNominal.value = formatRupiah(nominal);
+                }
+
+                if (inputNominalAsli) {
+                    inputNominalAsli.value = hanyaAngka(nominal);
+                }
+
+                const judul = modalElement.querySelector("#modalTambahLabel");
+
+                if (judul) judul.textContent = "Ubah Tarif Pembayaran";
+
+                if (tombolSimpan) {
+                    tombolSimpan.innerHTML =
+                        '<i class="fas fa-save"></i><span>Simpan Perubahan</span>';
+                }
+
+                if (window.bootstrap && window.bootstrap.Modal) {
+                    window.bootstrap.Modal
+                        .getOrCreateInstance(modalElement)
+                        .show();
+                }
             });
         });
-    });
 
-    if (formTambah) {
-        formTambah.addEventListener('submit', function (e) {
+        // =====================================================
+        // VALIDASI NOMINAL SEBELUM SUBMIT
+        // =====================================================
 
-            const nilaiNominal = nominalAsli.value;
-            const nominal = parseInt(nilaiNominal);
-            const kode = this.kode.value.trim();
+        if (formTarif) {
+            formTarif.addEventListener("submit", function (event) {
+                sinkronkanNominal();
 
-            if (!kode) {
-                alert('Kode unik tidak boleh kosong!');
-                e.preventDefault();
-                return;
-            }
-            if (isNaN(nominal) || nominal <= 0) {
-                alert('Nominal harus berupa angka positif!');
-                e.preventDefault();
-                return;
-            }
+                const nominal = inputNominalAsli
+                    ? inputNominalAsli.value
+                    : "";
 
-            if (modeEdit && idDataEdit) {
-                let inputId = formTambah.querySelector('[name="edit_id"]');
-                if (!inputId) {
-                    inputId = document.createElement('input');
-                    inputId.type = 'hidden';
-                    inputId.name = 'edit_id';
-                    formTambah.appendChild(inputId);
+                if (!nominal || Number(nominal) <= 0) {
+                    event.preventDefault();
+
+                    if (inputNominal) {
+                        inputNominal.focus();
+                        inputNominal.classList.add("pp-input-invalid");
+
+                        setTimeout(() => {
+                            inputNominal.classList.remove("pp-input-invalid");
+                        }, 1800);
+                    }
+
+                    alert("Nominal pembayaran harus lebih besar dari nol.");
+                    return;
                 }
-                inputId.value = idDataEdit;
-            }
+
+                if (tombolSimpan) {
+                    tombolSimpan.disabled = true;
+                    tombolSimpan.innerHTML =
+                        '<i class="fas fa-spinner fa-spin"></i><span>Menyimpan...</span>';
+                }
+            });
+        }
+
+        // =====================================================
+        // AKTIF / NONAKTIFKAN TARIF
+        // =====================================================
+
+        halaman.querySelectorAll(".pp-toggle-btn").forEach(link => {
+            link.addEventListener("click", async function (event) {
+                event.preventDefault();
+
+                const url = this.href;
+                const judul = this.getAttribute("title") || "Ubah status";
+                const row = this.closest("tr");
+
+                if (!url || this.dataset.processing === "true") return;
+
+                const konfirmasi = window.confirm(
+                    "Apakah Anda yakin ingin " +
+                    judul.toLowerCase() +
+                    " tarif " +
+                    (row?.dataset.nama || "ini") +
+                    "?"
+                );
+
+                if (!konfirmasi) return;
+
+                this.dataset.processing = "true";
+                this.style.opacity = ".55";
+                this.style.pointerEvents = "none";
+
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Server merespons " + response.status);
+                    }
+
+                    window.location.reload();
+
+                } catch (error) {
+                    console.error("Gagal mengubah status tarif:", error);
+
+                    alert(
+                        "Gagal mengubah status tarif. Silakan coba kembali."
+                    );
+
+                    this.dataset.processing = "false";
+                    this.style.opacity = "";
+                    this.style.pointerEvents = "";
+                }
+            });
         });
+
+        console.log(
+            "%c PAYMENT CONFIGURATION READY ",
+            "background:#08785a;color:#fff;padding:6px 10px;border-radius:5px;font-weight:bold"
+        );
     }
-});
+
+    // Inisialisasi saat script pertama kali dimuat.
+    initPengaturanPembayaran();
+
+    // Inisialisasi kembali setelah navigasi SPA.
+    document.addEventListener(
+        "spa:page-loaded",
+        initPengaturanPembayaran
+    );
+
+})();

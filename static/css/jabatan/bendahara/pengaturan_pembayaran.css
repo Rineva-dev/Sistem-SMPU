@@ -1,291 +1,1464 @@
-/* ==========================================
-   HALAMAN PENGATURAN TARIF PEMBAYARAN
-   ========================================== */
-.page-header h3 {
-  margin: 0;
-  font-weight: 600;
-  color: #2d3748;
+
+/* =========================================================
+   PREMIUM PAYMENT CONFIGURATION
+   Scoped stylesheet — aman untuk halaman lain
+========================================================= */
+
+.pengaturan-pembayaran-page {
+    --pp-green: #08785a;
+    --pp-green-dark: #064e3b;
+    --pp-green-soft: #eaf7f1;
+    --pp-ink: #172b25;
+    --pp-muted: #81918a;
+    --pp-line: #e9efeb;
+    --pp-surface: #ffffff;
+    --pp-bg: #f7faf8;
+    --pp-radius: 20px;
+    color: var(--pp-ink);
+    font-family: inherit;
+    animation: ppPageIn .55s cubic-bezier(.2,.7,.2,1) both;
 }
 
-.page-header p {
-  margin: 4px 0 0 0;
-  font-size: 0.9rem;
+.pengaturan-pembayaran-page *,
+.pengaturan-pembayaran-page *::before,
+.pengaturan-pembayaran-page *::after {
+    box-sizing: border-box;
 }
 
-/* Card & Tabel */
-.card {
-  border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
+@keyframes ppPageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.card-body {
-  padding: 1.25rem;
+@keyframes ppFloat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-9px) rotate(3deg); }
 }
 
-.table {
-  width: 100%;
-  margin-bottom: 0;
+@keyframes ppPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, .15); }
+    50% { box-shadow: 0 0 0 9px rgba(16, 185, 129, 0); }
 }
 
-.table thead.table-light {
-    background-color: #f9fafb;
+@keyframes ppShimmer {
+    0% { transform: translateX(-150%) skewX(-20deg); }
+    100% { transform: translateX(250%) skewX(-20deg); }
 }
 
-.table th,
-.table td {
-    padding: 0.75rem 1rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #e5e7eb;
+@keyframes ppModalIn {
+    from { opacity: 0; transform: translateY(18px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.table tbody tr:hover {
-    background-color: #f9fafb;
+/* HERO */
+
+.pengaturan-pembayaran-page .pp-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 230px;
+    overflow: hidden;
+    padding: 35px 42px;
+    margin-bottom: 24px;
+    border-radius: 25px;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 80% 10%, rgba(52, 211, 153, .22), transparent 28%),
+        radial-gradient(circle at 55% 110%, rgba(16, 185, 129, .16), transparent 38%),
+        linear-gradient(115deg, #062f27 0%, #075b45 55%, #08785a 100%);
+    box-shadow: 0 16px 40px rgba(6, 78, 59, .13);
 }
 
-.text-primary {
+.pengaturan-pembayaran-page .pp-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: .15;
+    background-image: radial-gradient(rgba(255,255,255,.6) .7px, transparent .7px);
+    background-size: 19px 19px;
+    mask-image: linear-gradient(90deg, black, transparent 75%);
+}
+
+.pengaturan-pembayaran-page .pp-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 620px;
+}
+
+.pengaturan-pembayaran-page .pp-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 15px;
+    color: #a8e9d0;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.1px;
+}
+
+.pengaturan-pembayaran-page .pp-eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #55e6ad;
+    box-shadow: 0 0 12px rgba(85, 230, 173, .9);
+    animation: ppPulse 2s infinite;
+}
+
+.pengaturan-pembayaran-page .pp-hero h2 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(25px, 3vw, 35px);
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -1.25px;
+}
+
+.pengaturan-pembayaran-page .pp-hero h2 span {
+    color: #83e7bd;
+}
+
+.pengaturan-pembayaran-page .pp-hero-content > p {
+    max-width: 480px;
+    margin: 13px 0 20px;
+    color: rgba(255,255,255,.72);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.pengaturan-pembayaran-page .pp-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: rgba(255,255,255,.76);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pengaturan-pembayaran-page .pp-hero-meta i {
+    margin-right: 5px;
+    color: #8de9c1;
+}
+
+.pengaturan-pembayaran-page .pp-meta-divider {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.4);
+}
+
+/* HERO ART */
+
+.pengaturan-pembayaran-page .pp-hero-art {
+    position: absolute;
+    top: 0;
+    right: 4%;
+    width: 270px;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+}
+
+.pengaturan-pembayaran-page .pp-art-orbit {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    border: 1px solid rgba(255,255,255,.17);
+    border-radius: 50%;
+}
+
+.pengaturan-pembayaran-page .pp-orbit-one {
+    transform: scale(1.2);
+}
+
+.pengaturan-pembayaran-page .pp-orbit-two {
+    transform: scale(.85);
+    border-style: dashed;
+    animation: ppFloat 7s ease-in-out infinite;
+}
+
+.pengaturan-pembayaran-page .pp-art-glow {
+    position: absolute;
+    width: 135px;
+    height: 135px;
+    border-radius: 50%;
+    background: rgba(73, 225, 166, .2);
+    filter: blur(28px);
+}
+
+.pengaturan-pembayaran-page .pp-art-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 102px;
+    height: 102px;
+    color: #d7ffed;
+    font-size: 38px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 30px;
+    background: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.055));
+    backdrop-filter: blur(14px);
+    box-shadow: 0 20px 50px rgba(0,0,0,.2), inset 0 1px rgba(255,255,255,.3);
+    animation: ppFloat 5s ease-in-out infinite;
+}
+
+.pengaturan-pembayaran-page .pp-art-chip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 12px;
+    color: #fff;
+    font-size: 10px;
     font-weight: 700;
-    color: #00498a !important;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,.13);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 25px rgba(0,0,0,.12);
 }
 
-/* Badge Status */
-.badge {
-    padding: 0.35em 0.65em;
-    font-size: 0.75em;
-    font-weight: 500;
-    border-radius: 0.375rem;
+.pengaturan-pembayaran-page .pp-art-chip i {
+    color: #8df0c2;
 }
 
-.bg-success { background-color: #10b981 !important; }
-.bg-secondary { background-color: #6b7280 !important; }
-.bg-primary { color: #2563eb !important; }
-
-/* ==========================================
-    CUSTOM SELECT - SERAGAM DI SEMUA TEMPAT
-   ========================================== */
-.custom-select {
-  position: relative;
-  width: 200px !important;
+.pengaturan-pembayaran-page .pp-chip-one {
+    top: 28%;
+    right: -2px;
+    animation: ppFloat 5s ease-in-out infinite;
 }
 
-/* Pastikan select asli tersembunyi tapi tetap berfungsi */
-.custom-select .form-select {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-  z-index: 2;
+.pengaturan-pembayaran-page .pp-chip-two {
+    bottom: 23%;
+    left: 0;
+    animation: ppFloat 6s ease-in-out infinite reverse;
 }
 
-/* Tampilan visual trigger */
-.custom-select__trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.95rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 38px;
-  box-sizing: border-box;
+/* CONFIGURATION PANEL */
+
+.pengaturan-pembayaran-page .pp-config-panel {
+    position: relative;
+    padding: 24px 27px;
+    margin-bottom: 31px;
+    border: 1px solid var(--pp-line);
+    border-radius: var(--pp-radius);
+    background: var(--pp-surface);
+    box-shadow: 0 5px 22px rgba(27, 55, 42, .035);
+    transition: border-color .25s, box-shadow .25s, transform .25s;
 }
 
-.custom-select__trigger:hover {
-  border-color: #9ca3af;
+.pengaturan-pembayaran-page .pp-config-panel:hover {
+    border-color: #d7e9df;
+    box-shadow: 0 12px 30px rgba(27, 55, 42, .055);
 }
 
-.custom-select.focused .custom-select__trigger,
-.custom-select.open .custom-select__trigger,
-.custom-select .form-select:focus + .custom-select__trigger {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+.pengaturan-pembayaran-page .pp-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 23px;
 }
 
-.custom-select__selected {
-  color: #374151;
+.pengaturan-pembayaran-page .pp-section-icon {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    color: var(--pp-green);
+    font-size: 17px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #e8f8ef, #f3fbf6);
 }
 
-.custom-select__arrow {
-  display: inline-flex;
-  align-items: center;
-  color: #6b7280;
-  font-size: 0.8rem;
-  transition: transform 0.2s ease;
+.pengaturan-pembayaran-page .pp-section-heading h4 {
+    margin: 0 0 4px;
+    color: var(--pp-ink);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -.3px;
 }
 
-.custom-select__options {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  z-index: 9999;
-  max-height: 220px;
-  overflow-y: auto;
-  box-sizing: border-box;
+.pengaturan-pembayaran-page .pp-section-heading p {
+    margin: 0;
+    color: var(--pp-muted);
+    font-size: 11px;
 }
 
-.custom-select__option {
-  padding: 0.55rem 0.75rem;
-  font-size: 0.95rem;
-  color: #374151;
-  cursor: pointer;
-  transition: background 0.15s ease;
+.pengaturan-pembayaran-page .pp-config-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, .8fr) minmax(300px, 1.2fr);
+    gap: 25px;
+    align-items: end;
 }
 
-.custom-select__option:hover {
-  background-color: #f3f4f6;
+.pengaturan-pembayaran-page .pp-field-block > label,
+.pengaturan-pembayaran-page .pp-form-group > label {
+    display: block;
+    margin-bottom: 9px;
+    color: #64766d;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
-.custom-select__option.selected {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  font-weight: 500;
+.pengaturan-pembayaran-page .pp-field-block > small {
+    display: block;
+    margin-top: 8px;
+    color: #99a69f;
+    font-size: 10px;
 }
 
-/* ==========================================
-    MODAL FORM - STRUKTUR SUDAH BENAR
-   ========================================== */
-.modal-dialog {
-    max-width: 520px !important;
-    margin: 1rem auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: calc(100% - 2rem) !important;
+.pengaturan-pembayaran-page .pp-input-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 47px;
+    border: 1px solid #e4ece7;
+    border-radius: 12px;
+    background: #fbfdfb;
+    transition: border-color .2s, box-shadow .2s, background .2s;
 }
 
-.modal-content {
-    border: none !important;
-    border-radius: 0.5rem !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    max-height: calc(100vh - 3rem) !important;
-    height: auto !important;
-    overflow: hidden !important;
+.pengaturan-pembayaran-page .pp-input-shell:focus-within {
+    border-color: #48b58a;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, .09);
 }
 
-.modal-header {
-    background-color: #f9fafb !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    border-radius: 0.5rem 0.5rem 0 0 !important;
-    flex-shrink: 0 !important;
-    padding: 1.1rem 1.3rem !important;
+.pengaturan-pembayaran-page .pp-input-icon {
+    padding-left: 14px;
+    color: #7da994;
+    font-size: 14px;
 }
 
-.modal-body {
-    padding: 1.3rem !important;
-    background: transparent !important;
-    overflow-y: auto !important; /* ✅ ISI FORM YANG SCROLL */
-    flex: 1 1 auto !important;
-    -webkit-overflow-scrolling: touch !important;
+.pengaturan-pembayaran-page .pp-select {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0 37px 0 12px;
+    appearance: none;
+    border: 0;
+    outline: 0;
+    color: #31463c;
+    background: transparent;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.modal-footer {
-    border-top: 1px solid #e5e7eb !important;
-    padding: 0.9rem 1.3rem !important;
-    background-color: #f9fafb !important;
-    border-radius: 0 0 0.5rem 0.5rem !important;
-    flex-shrink: 0 !important; /* ✅ FOOTER PASTI DI BAWAH */
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.6rem !important;
-    justify-content: flex-end !important;
+.pengaturan-pembayaran-page .pp-input-shell:has(.pp-input-icon) .pp-select {
+    padding-left: 10px;
 }
 
-/* Pastikan tag form tidak merusak tata letak */
-.modal-content form {
-    display: contents !important; /* Biar form tidak punya kotak sendiri */
+.pengaturan-pembayaran-page .pp-select-arrow {
+    position: absolute;
+    right: 14px;
+    color: #8ba095;
+    font-size: 10px;
+    pointer-events: none;
 }
 
-/* ==========================================
-    SCROLLBAR: MUNCUL SAAT DIGULIR SAJA
-   ========================================== */
-.modal-body {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    transition: scrollbar-color 0.25s ease;
+.pengaturan-pembayaran-page .pp-copy-block {
+    min-width: 0;
+    padding: 13px 15px;
+    border: 1px solid #e4f1e9;
+    border-radius: 14px;
+    background: linear-gradient(110deg, #f5fbf7, #fbfefc);
 }
 
-.modal-body::-webkit-scrollbar {
+.pengaturan-pembayaran-page .pp-copy-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 11px;
+}
+
+.pengaturan-pembayaran-page .pp-copy-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    color: #13845f;
+    border-radius: 10px;
+    background: #e3f5eb;
+}
+
+.pengaturan-pembayaran-page .pp-copy-info strong,
+.pengaturan-pembayaran-page .pp-copy-info span {
+    display: block;
+}
+
+.pengaturan-pembayaran-page .pp-copy-info strong {
+    color: #29483a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-copy-info span {
+    margin-top: 3px;
+    color: #899b91;
+    font-size: 10px;
+}
+
+.pengaturan-pembayaran-page .pp-copy-form {
+    display: flex;
+    gap: 9px;
+}
+
+.pengaturan-pembayaran-page .pp-copy-select {
+    flex: 1;
+    height: 40px;
+    background: #fff;
+}
+
+.pengaturan-pembayaran-page .pp-copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 15px;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #087d5b, #0b9b70);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.pengaturan-pembayaran-page .pp-copy-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(8, 125, 91, .2);
+}
+
+/* LIST HEADING */
+
+.pengaturan-pembayaran-page .pp-list-section {
+    margin-bottom: 28px;
+}
+
+.pengaturan-pembayaran-page .pp-list-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
+}
+
+.pengaturan-pembayaran-page .pp-eyebrow-dark {
+    margin-bottom: 8px;
+    color: #84988d;
+    font-size: 9px;
+}
+
+.pengaturan-pembayaran-page .pp-eyebrow-dark .pp-eyebrow-dot {
+    background: #10a875;
+    box-shadow: 0 0 9px rgba(16, 168, 117, .5);
+}
+
+.pengaturan-pembayaran-page .pp-list-heading h3 {
+    margin: 0;
+    color: #1d3329;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.65px;
+}
+
+.pengaturan-pembayaran-page .pp-list-heading p {
+    margin: 6px 0 0;
+    color: #89988f;
+    font-size: 11px;
+}
+
+.pengaturan-pembayaran-page .pp-add-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    padding: 10px 17px 10px 10px;
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(120deg, #087656, #0c9a70);
+    box-shadow: 0 7px 17px rgba(8, 120, 90, .17);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .25s, box-shadow .25s;
+}
+
+.pengaturan-pembayaran-page .pp-add-button::after {
+    content: "";
+    position: absolute;
+    top: -30%;
+    left: 0;
+    width: 35%;
+    height: 160%;
+    background: rgba(255,255,255,.2);
+    transform: translateX(-150%) skewX(-20deg);
+}
+
+.pengaturan-pembayaran-page .pp-add-button:hover::after {
+    animation: ppShimmer .8s ease;
+}
+
+.pengaturan-pembayaran-page .pp-add-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 22px rgba(8, 120, 90, .24);
+}
+
+.pengaturan-pembayaran-page .pp-add-icon {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.17);
+}
+
+/* TABLE */
+
+.pengaturan-pembayaran-page .pp-table-card {
+    overflow: hidden;
+    border: 1px solid #e8efeb;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(30, 57, 43, .035);
+}
+
+.pengaturan-pembayaran-page .pp-table-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 21px;
+    border-bottom: 1px solid #edf2ee;
+}
+
+.pengaturan-pembayaran-page .pp-table-caption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #607369;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pengaturan-pembayaran-page .pp-caption-indicator {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a475;
+    box-shadow: 0 0 0 4px #e7f6ee;
+}
+
+.pengaturan-pembayaran-page .pp-table-caption strong {
+    color: #187b59;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-table-total {
+    padding: 6px 10px;
+    color: #71847a;
+    border-radius: 20px;
+    background: #f3f7f4;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.pengaturan-pembayaran-page .pp-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.pengaturan-pembayaran-page .pp-table {
+    width: 100%;
+    min-width: 760px;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.pengaturan-pembayaran-page .pp-table thead th {
+    padding: 14px 15px;
+    color: #8b9b92;
+    border: 0;
+    border-bottom: 1px solid #edf2ee;
+    background: #f9fbf9;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .85px;
+    white-space: nowrap;
+}
+
+.pengaturan-pembayaran-page .pp-table thead th:first-child,
+.pengaturan-pembayaran-page .pp-table tbody td:first-child {
+    padding-left: 21px;
+}
+
+.pengaturan-pembayaran-page .pp-table tbody td {
+    padding: 15px;
+    color: #506359;
+    border: 0;
+    border-bottom: 1px solid #f0f4f1;
+    background: #fff;
+    vertical-align: middle;
+    font-size: 11px;
+}
+
+.pengaturan-pembayaran-page .pp-table tbody tr {
+    transition: background .2s, transform .2s;
+}
+
+.pengaturan-pembayaran-page .pp-table tbody tr:hover td {
+    background: #f8fcf9;
+}
+
+.pengaturan-pembayaran-page .pp-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.pengaturan-pembayaran-page .pp-col-number {
+    width: 65px;
+}
+
+.pengaturan-pembayaran-page .pp-col-action {
+    width: 115px;
+    text-align: center;
+}
+
+.pengaturan-pembayaran-page .pp-number-cell span {
+    display: inline-grid;
+    place-items: center;
+    width: 29px;
+    height: 29px;
+    color: #82938a;
+    border-radius: 9px;
+    background: #f3f7f4;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-payment-name {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 170px;
+}
+
+.pengaturan-pembayaran-page .pp-payment-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    color: #13835f;
+    border: 1px solid #e5f3e9;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #effaf3, #f8fcf9);
+    font-size: 14px;
+    transition: transform .25s, background .25s;
+}
+
+.pengaturan-pembayaran-page .pp-table tbody tr:hover .pp-payment-icon {
+    transform: translateY(-2px) rotate(-4deg);
+    background: #e3f6eb;
+}
+
+.pengaturan-pembayaran-page .pp-payment-name strong,
+.pengaturan-pembayaran-page .pp-payment-name small {
+    display: block;
+}
+
+.pengaturan-pembayaran-page .pp-payment-name strong {
+    color: #2b4035;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-payment-name small {
+    margin-top: 4px;
+    color: #9aa89f;
+    font-size: 9px;
+}
+
+.pengaturan-pembayaran-page .pp-period {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #71847a;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.pengaturan-pembayaran-page .pp-period i {
+    color: #9aafa3;
+}
+
+.pengaturan-pembayaran-page .pp-amount {
+    color: #087b58;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.pengaturan-pembayaran-page .pp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 10px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.pengaturan-pembayaran-page .pp-status > span {
     width: 6px;
     height: 6px;
+    border-radius: 50%;
 }
 
-.modal-body::-webkit-scrollbar-track {
-    background: transparent;
+.pengaturan-pembayaran-page .pp-status-active {
+    color: #16845d;
+    background: #eaf8f0;
 }
 
-.modal-body::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 3px;
-    transition: background-color 0.25s ease;
+.pengaturan-pembayaran-page .pp-status-active > span {
+    background: #16a36e;
+    box-shadow: 0 0 0 3px rgba(22,163,110,.1);
 }
 
-/* ✅ MUNCUL HALUS SAAT DIGULIR */
-.modal-body:hover::-webkit-scrollbar-thumb,
-.modal-body:active::-webkit-scrollbar-thumb,
-.modal-body:focus-within::-webkit-scrollbar-thumb {
-    background-color: #d1d5db;
+.pengaturan-pembayaran-page .pp-status-inactive {
+    color: #84918a;
+    background: #f0f2f1;
 }
 
-.modal-body:hover {
-    scrollbar-color: #d1d5db transparent;
+.pengaturan-pembayaran-page .pp-status-inactive > span {
+    background: #9ca8a1;
 }
 
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background-color: #9ca3af;
+.pengaturan-pembayaran-page .pp-action-group {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
 }
 
-.form-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #374151;
+.pengaturan-pembayaran-page .pp-action-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 11px;
+    cursor: pointer;
+    transition: transform .2s, background .2s, box-shadow .2s;
 }
 
-.form-control,
-.form-select {
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.pengaturan-pembayaran-page .pp-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,.08);
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+.pengaturan-pembayaran-page .pp-edit-btn {
+    color: #a96c17;
+    border-color: #f5e8d1;
+    background: #fff8ec;
 }
 
-/* Penyesuaian khusus di dalam form salin tarif */
-.d-flex.gap-2 .custom-select {
-  flex: 1;
+.pengaturan-pembayaran-page .pp-edit-btn:hover {
+    color: #fff;
+    background: #d99a38;
 }
 
-/* Responsif */
-@media (max-width: 768px) {
-  .page-header {
+.pengaturan-pembayaran-page .pp-toggle-btn {
+    color: #687a70;
+    border-color: #e6ece8;
+    background: #f5f8f6;
+}
+
+.pengaturan-pembayaran-page .pp-toggle-btn:hover {
+    color: #fff;
+    background: #64786d;
+}
+
+.pengaturan-pembayaran-page .pp-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 20px;
+    color: #94a198;
+    border-top: 1px solid #edf2ee;
+    background: #fbfdfb;
+    font-size: 9px;
+}
+
+.pengaturan-pembayaran-page .pp-table-footer i {
+    margin-right: 5px;
+    color: #79a58d;
+}
+
+.pengaturan-pembayaran-page .pp-footer-secure {
+    white-space: nowrap;
+}
+
+/* EMPTY STATES */
+
+.pengaturan-pembayaran-page .pp-empty-state {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    padding: 45px 15px;
+    text-align: center;
+}
+
+.pengaturan-pembayaran-page .pp-empty-icon,
+.pengaturan-pembayaran-page .pp-unselected-circle {
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    color: #15946b;
+    border: 1px solid #dff0e5;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #e9f8ef, #f7fcf8);
+    font-size: 25px;
+}
+
+.pengaturan-pembayaran-page .pp-empty-state h4 {
+    margin: 16px 0 6px;
+    color: #2c4437;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-empty-state p,
+.pengaturan-pembayaran-page .pp-empty-state span {
+    margin: 0;
+    color: #87988e;
+    font-size: 11px;
+}
+
+.pengaturan-pembayaran-page .pp-empty-state span {
+    margin-top: 5px;
+    color: #a2afa7;
+    font-size: 10px;
+}
+
+.pengaturan-pembayaran-page .pp-unselected-state {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    min-height: 210px;
+    padding: 30px;
+    border: 1px dashed #dceae1;
+    border-radius: 20px;
+    background: linear-gradient(115deg, #f8fcf9, #fff);
+}
+
+.pengaturan-pembayaran-page .pp-unselected-visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 110px;
+    height: 110px;
+    flex: 0 0 110px;
+}
+
+.pengaturan-pembayaran-page .pp-unselected-circle {
+    width: 75px;
+    height: 75px;
+    border-radius: 25px;
+    font-size: 27px;
+    animation: ppFloat 5s ease-in-out infinite;
+}
+
+.pengaturan-pembayaran-page .pp-floating-dot {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #6cc89c;
+}
+
+.pengaturan-pembayaran-page .pp-dot-a { top: 8px; right: 12px; }
+.pengaturan-pembayaran-page .pp-dot-b { bottom: 10px; left: 10px; width: 6px; height: 6px; }
+.pengaturan-pembayaran-page .pp-dot-c { top: 22px; left: 5px; width: 5px; height: 5px; }
+
+.pengaturan-pembayaran-page .pp-unselected-label {
+    color: #15936a;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+.pengaturan-pembayaran-page .pp-unselected-content h3 {
+    margin: 7px 0;
+    color: #294438;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-unselected-content p {
+    max-width: 440px;
+    margin: 0;
+    color: #84958b;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* MODAL */
+
+.pengaturan-pembayaran-page .pp-modal .modal-dialog {
+    max-width: 550px;
+    margin: 1.5rem auto;
+}
+
+.pengaturan-pembayaran-page .pp-modal .modal-content {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 21px;
+    background: #fff;
+    box-shadow: 0 25px 80px rgba(7, 38, 26, .2);
+}
+
+.pengaturan-pembayaran-page .pp-modal.show .modal-content {
+    animation: ppModalIn .3s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.pengaturan-pembayaran-page .pp-modal-header {
+    display: flex;
     align-items: flex-start;
-  }
-  
-  .table {
+    justify-content: space-between;
+    padding: 23px 25px;
+    color: #fff;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(87, 226, 168, .22), transparent 35%),
+        linear-gradient(120deg, #063e30, #087b59);
+}
+
+.pengaturan-pembayaran-page .pp-modal-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-icon {
+    display: grid;
+    place-items: center;
+    width: 47px;
+    height: 47px;
+    flex: 0 0 47px;
+    color: #c5f7df;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 15px;
+    background: rgba(255,255,255,.13);
+    font-size: 19px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-heading span {
+    color: #9ce5c3;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-heading h5 {
+    margin: 4px 0 3px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-modal-heading p {
+    margin: 0;
+    color: rgba(255,255,255,.68);
+    font-size: 10px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-close {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    color: rgba(255,255,255,.85);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 9px;
+    background: rgba(255,255,255,.1);
+    cursor: pointer;
+    transition: transform .2s, background .2s;
+}
+
+.pengaturan-pembayaran-page .pp-modal-close:hover {
+    transform: rotate(90deg);
+    background: rgba(255,255,255,.2);
+}
+
+.pengaturan-pembayaran-page .pp-modal-body {
+    max-height: min(65vh, 600px);
+    overflow-y: auto;
+    padding: 23px 25px 8px;
+}
+
+.pengaturan-pembayaran-page .pp-form-intro {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding-bottom: 17px;
+    margin-bottom: 19px;
+    border-bottom: 1px solid #edf2ee;
+}
+
+.pengaturan-pembayaran-page .pp-form-step {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    color: #12825d;
+    border-radius: 10px;
+    background: #eaf7ef;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.pengaturan-pembayaran-page .pp-form-intro strong,
+.pengaturan-pembayaran-page .pp-form-intro small {
     display: block;
-    overflow-x: auto;
-  }
-  
-  .card-body .row {
-    flex-direction: column;
-  }
+}
+
+.pengaturan-pembayaran-page .pp-form-intro strong {
+    color: #30473b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.pengaturan-pembayaran-page .pp-form-intro small {
+    margin-top: 3px;
+    color: #95a39a;
+    font-size: 10px;
+}
+
+.pengaturan-pembayaran-page .pp-form-group {
+    margin-bottom: 17px;
+}
+
+.pengaturan-pembayaran-page .pp-form-group > label {
+    margin-bottom: 7px;
+    color: #53685c;
+    font-size: 10px;
+    letter-spacing: .2px;
+}
+
+.pengaturan-pembayaran-page .pp-form-group > label span {
+    color: #dc765c;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    border: 1px solid #e4ece7;
+    border-radius: 11px;
+    background: #fbfdfb;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input:focus-within {
+    border-color: #48b58a;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, .08);
+}
+
+.pengaturan-pembayaran-page .pp-modal-input > i:first-child {
+    width: 42px;
+    flex: 0 0 42px;
+    color: #8ca99a;
+    text-align: center;
+    font-size: 12px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input input,
+.pengaturan-pembayaran-page .pp-modal-input select,
+.pengaturan-pembayaran-page .pp-modal-input textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 9px 12px 9px 0;
+    color: #344b3e;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input select {
+    padding-right: 35px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.pengaturan-pembayaran-page .pp-modal-chevron {
+    position: absolute;
+    right: 14px;
+    color: #8da095;
+    font-size: 9px;
+    pointer-events: none;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input input::placeholder,
+.pengaturan-pembayaran-page .pp-modal-input textarea::placeholder {
+    color: #aab7af;
+    font-weight: 400;
+}
+
+.pengaturan-pembayaran-page .pp-field-hint {
+    display: block;
+    margin-top: 6px;
+    color: #9aa79f;
+    font-size: 9px;
+}
+
+.pengaturan-pembayaran-page .pp-money-input {
+    min-height: 49px;
+    background: #f7fbf8;
+}
+
+.pengaturan-pembayaran-page .pp-rp-prefix {
+    padding-left: 15px;
+    color: #12835e;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.pengaturan-pembayaran-page .pp-money-input input {
+    padding-left: 9px;
+    color: #087b58;
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.pengaturan-pembayaran-page .pp-textarea-input {
+    align-items: flex-start;
+}
+
+.pengaturan-pembayaran-page .pp-textarea-input > i:first-child {
+    padding-top: 14px;
+}
+
+.pengaturan-pembayaran-page .pp-modal-input textarea {
+    min-height: 75px;
+    resize: vertical;
+}
+
+.pengaturan-pembayaran-page .pp-group-field {
+    overflow: hidden;
+    animation: ppPageIn .25s ease both;
+}
+
+.pengaturan-pembayaran-page .pp-group-field[hidden] {
+    display: none !important;
+}
+
+.pengaturan-pembayaran-page .pp-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 15px 25px 21px;
+    border-top: 1px solid #edf2ee;
+    background: #fcfdfc;
+}
+
+.pengaturan-pembayaran-page .pp-cancel-button,
+.pengaturan-pembayaran-page .pp-save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 17px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, background .2s;
+}
+
+.pengaturan-pembayaran-page .pp-cancel-button {
+    color: #718178;
+    border: 1px solid #e4ebe6;
+    background: #fff;
+}
+
+.pengaturan-pembayaran-page .pp-save-button {
+    color: #fff;
+    border: 0;
+    background: linear-gradient(120deg, #087958, #0b9b70);
+    box-shadow: 0 5px 13px rgba(8, 121, 88, .17);
+}
+
+.pengaturan-pembayaran-page .pp-cancel-button:hover,
+.pengaturan-pembayaran-page .pp-save-button:hover {
+    transform: translateY(-2px);
+}
+
+.pengaturan-pembayaran-page .pp-save-button:hover {
+    box-shadow: 0 8px 18px rgba(8, 121, 88, .25);
+}
+
+.pengaturan-pembayaran-page .pp-save-button:disabled {
+    opacity: .65;
+    cursor: wait;
+    transform: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .pengaturan-pembayaran-page .pp-hero {
+        padding: 30px;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-art {
+        right: -3%;
+        opacity: .72;
+        transform: scale(.85);
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-content {
+        max-width: 70%;
+    }
+
+    .pengaturan-pembayaran-page .pp-config-grid {
+        grid-template-columns: 1fr;
+        gap: 19px;
+    }
+}
+
+@media (max-width: 600px) {
+    .pengaturan-pembayaran-page .pp-hero {
+        min-height: 210px;
+        padding: 25px 21px;
+        border-radius: 19px;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-content {
+        max-width: 100%;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero h2 {
+        max-width: 290px;
+        font-size: 25px;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-content > p {
+        max-width: 280px;
+        font-size: 11px;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 9px;
+    }
+
+    .pengaturan-pembayaran-page .pp-hero-art {
+        top: auto;
+        right: -65px;
+        bottom: -38px;
+        width: 190px;
+        height: 150px;
+        opacity: .23;
+        transform: scale(.8);
+    }
+
+    .pengaturan-pembayaran-page .pp-art-chip {
+        display: none;
+    }
+
+    .pengaturan-pembayaran-page .pp-config-panel {
+        padding: 19px 16px;
+        border-radius: 16px;
+    }
+
+    .pengaturan-pembayaran-page .pp-section-heading {
+        margin-bottom: 18px;
+    }
+
+    .pengaturan-pembayaran-page .pp-section-heading h4 {
+        font-size: 13px;
+    }
+
+    .pengaturan-pembayaran-page .pp-section-heading p {
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .pengaturan-pembayaran-page .pp-copy-form {
+        flex-direction: column;
+    }
+
+    .pengaturan-pembayaran-page .pp-copy-button {
+        min-height: 40px;
+    }
+
+    .pengaturan-pembayaran-page .pp-list-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .pengaturan-pembayaran-page .pp-list-heading h3 {
+        font-size: 18px;
+    }
+
+    .pengaturan-pembayaran-page .pp-add-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pengaturan-pembayaran-page .pp-table-topline {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px 16px;
+    }
+
+    .pengaturan-pembayaran-page .pp-table-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 15px;
+        line-height: 1.6;
+    }
+
+    .pengaturan-pembayaran-page .pp-unselected-state {
+        align-items: center;
+        flex-direction: column;
+        gap: 15px;
+        padding: 25px 18px;
+        text-align: center;
+    }
+
+    .pengaturan-pembayaran-page .pp-unselected-content h3 {
+        font-size: 18px;
+    }
+
+    .pengaturan-pembayaran-page .pp-unselected-content p {
+        font-size: 11px;
+    }
+
+    .pengaturan-pembayaran-page .pp-modal .modal-dialog {
+        margin: 12px;
+    }
+
+    .pengaturan-pembayaran-page .pp-modal-header {
+        padding: 18px;
+    }
+
+    .pengaturan-pembayaran-page .pp-modal-body {
+        max-height: 62vh;
+        padding: 18px 17px 5px;
+    }
+
+    .pengaturan-pembayaran-page .pp-modal-footer {
+        padding: 13px 17px 17px;
+    }
+
+    .pengaturan-pembayaran-page .pp-modal-heading h5 {
+        font-size: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pengaturan-pembayaran-page *,
+    .pengaturan-pembayaran-page *::before,
+    .pengaturan-pembayaran-page *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+
+.pengaturan-pembayaran-page .pp-input-invalid {
+    border-color: #e36b63 !important;
+    box-shadow: 0 0 0 4px rgba(227, 107, 99, .1) !important;
+}
+
+
+/* ==========================================
+   MODAL PORTAL — LAPISAN PALING DEPAN
+   ========================================== */
+
+body > .pp-modal-portal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20000 !important;
+    width: 100%;
+    height: 100%;
+    overflow: visible !important;
+    pointer-events: none;
+}
+
+/* Modal berada di atas seluruh layout */
+body > .pp-modal-portal .pp-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 20001 !important;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    pointer-events: auto !important;
+}
+
+/* Dialog modal */
+body > .pp-modal-portal .pp-modal .modal-dialog {
+    position: relative;
+    z-index: 20002 !important;
+    pointer-events: auto !important;
+}
+
+/* Isi modal */
+body > .pp-modal-portal .pp-modal .modal-content {
+    position: relative;
+    z-index: 20003 !important;
+    pointer-events: auto !important;
+}
+
+/* Semua kontrol modal harus bisa diklik */
+body > .pp-modal-portal .pp-modal input,
+body > .pp-modal-portal .pp-modal select,
+body > .pp-modal-portal .pp-modal textarea,
+body > .pp-modal-portal .pp-modal button,
+body > .pp-modal-portal .pp-modal label {
+    pointer-events: auto !important;
+}
+
+/* Scroll isi modal */
+body > .pp-modal-portal .pp-modal .pp-modal-body {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Animasi tetap berjalan */
+body > .pp-modal-portal .pp-modal.show {
+    display: block;
 }

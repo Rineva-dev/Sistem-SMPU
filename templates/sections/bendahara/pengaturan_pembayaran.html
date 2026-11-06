@@ -1,253 +1,448 @@
-<div class="page-header mb-4">
-    <h3><i class="fas fa-sliders-h"></i> Pengaturan Tarif Pembayaran</h3>
-    <p class="text-muted">Atur jenis dan nominal pembayaran</p>
-</div>
 
-<!-- ✅ PILIH TAHUN AJARAN (HANYA NOMOR SAJA) -->
-<div class="card mb-3">
-    <div class="card-body py-3">
-        <div class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label class="form-label fw-bold">Pilih Tahun Ajaran:</label>
-                <div class="custom-select">
-                    <select class="form-select" id="pilihAngkatan" onchange="location.href='/bendahara/pengaturan-pembayaran?angkatan=' + this.value;">
-                        <option value="">-- Silakan Pilih --</option>
+<div class="pengaturan-pembayaran-page">
+
+    <!-- HEADER -->
+    <section class="pp-hero">
+        <div class="pp-hero-content">
+            <div class="pp-eyebrow">
+                <span class="pp-eyebrow-dot"></span>
+                PAYMENT CONFIGURATION
+            </div>
+
+            <h2>Pengaturan Tarif <span>Pembayaran.</span></h2>
+            <p>
+                Kelola jenis pembayaran, atur nominal, dan sesuaikan
+                skema tarif berdasarkan tahun pelajaran.
+            </p>
+
+            <div class="pp-hero-meta">
+                <span><i class="fas fa-shield-alt"></i> Pengelolaan Tarif</span>
+                <span class="pp-meta-divider"></span>
+                <span><i class="fas fa-sliders-h"></i> Konfigurasi Sekolah</span>
+            </div>
+        </div>
+
+        <div class="pp-hero-art" aria-hidden="true">
+            <div class="pp-art-orbit pp-orbit-one"></div>
+            <div class="pp-art-orbit pp-orbit-two"></div>
+            <div class="pp-art-glow"></div>
+            <div class="pp-art-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="pp-art-chip pp-chip-one">
+                <i class="fas fa-check-circle"></i>
+                <span>Tarif Terkelola</span>
+            </div>
+            <div class="pp-art-chip pp-chip-two">
+                <i class="fas fa-chart-line"></i>
+                <span>Payment System</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- PANEL KONFIGURASI -->
+    <section class="pp-config-panel">
+        <div class="pp-section-heading">
+            <div class="pp-section-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div>
+                <h4>Konfigurasi Tahun Pelajaran</h4>
+                <p>Tentukan tahun pelajaran untuk mengelola tarif pembayaran.</p>
+            </div>
+        </div>
+
+        <div class="pp-config-grid">
+            <div class="pp-field-block">
+                <label for="pilihAngkatan">TAHUN PELAJARAN</label>
+                <div class="pp-input-shell">
+                    <span class="pp-input-icon"><i class="fas fa-calendar-days"></i></span>
+                    <select id="pilihAngkatan" class="pp-select">
+                        <option value="">Pilih tahun pelajaran</option>
                         {% for tp in semua_tp %}
-                        {% set kode_dasar = tp.kode.split('-')[0] %}
-                        {% set kode_pilih = kode_angkatan_terpilih | default('') %}
-                        {% set nama_murni = tp.nama.replace('Tahun Pelajaran ','').replace(' - Semester 1','').replace(' - Semester 2','') %}
-                        <option value="{{ kode_dasar }}" {% if kode_dasar == kode_pilih %}selected{% endif %}>
-                            {{ nama_murni }}
-                        </option>
+                            {% set kode_dasar = tp.kode.split('-')[0] %}
+                            {% set kode_pilih = kode_angkatan_terpilih | default('') %}
+                            {% set nama_murni = tp.nama.replace('Tahun Pelajaran ','').replace(' - Semester 1','').replace(' - Semester 2','') %}
+                            <option value="{{ kode_dasar }}"
+                                {% if kode_dasar == kode_pilih %}selected{% endif %}>
+                                {{ nama_murni }}
+                            </option>
                         {% endfor %}
                     </select>
+                    <i class="fas fa-chevron-down pp-select-arrow"></i>
                 </div>
+                <small>Pilih tahun yang tarifnya ingin dikelola.</small>
             </div>
 
             {% if kode_angkatan_terpilih %}
-            <div class="col-auto">
-                <label class="form-label fw-bold">Salin Tarif dari Tahun Lain:</label>
-                <form method="POST" class="d-flex gap-2 align-items-center">
-                    <div class="custom-select">
-                        <select name="salin_dari_tahun" class="form-select" required>
-                            <option value="">-- Pilih Sumber --</option>
+            <div class="pp-copy-block">
+                <div class="pp-copy-info">
+                    <div class="pp-copy-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div>
+                        <strong>Salin Tarif</strong>
+                        <span>Gunakan konfigurasi dari tahun lain.</span>
+                    </div>
+                </div>
+
+                <form method="POST" class="pp-copy-form">
+                    <div class="pp-input-shell pp-copy-select">
+                        <select name="salin_dari_tahun" class="pp-select" required>
+                            <option value="">Pilih sumber tahun</option>
                             {% for tp in semua_tp %}
-                            {% set kode_sumber = tp.kode.split('-')[0] %}
-                            {% set nama_sumber = tp.nama.replace('Tahun Pelajaran ','').replace(' - Semester 1','').replace(' - Semester 2','') %}
-                            {% if kode_sumber != kode_angkatan_terpilih %}
-                            <option value="{{ kode_sumber }}">{{ nama_sumber }}</option>
-                            {% endif %}
+                                {% set kode_sumber = tp.kode.split('-')[0] %}
+                                {% set nama_sumber = tp.nama.replace('Tahun Pelajaran ','').replace(' - Semester 1','').replace(' - Semester 2','') %}
+                                {% if kode_sumber != kode_angkatan_terpilih %}
+                                <option value="{{ kode_sumber }}">{{ nama_sumber }}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
+                        <i class="fas fa-chevron-down pp-select-arrow"></i>
                     </div>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-copy"></i> Salin
+                    <button type="submit" class="pp-copy-button">
+                        <i class="fas fa-clone"></i>
+                        <span>Salin Tarif</span>
                     </button>
                 </form>
             </div>
             {% endif %}
         </div>
-    </div>
-</div>
+    </section>
 
-<!-- Tombol Tambah Baru -->
-<div class="mb-3">
-    {% if kode_angkatan_terpilih %}
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
-        <i class="fas fa-plus"></i> Tambah Jenis Pembayaran
-    </button>
-    {% else %}
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> Silakan pilih Tahun Ajaran terlebih dahulu untuk mulai mengatur tarif.
-    </div>
-    {% endif %}
-</div>
+    <!-- DAFTAR TARIF -->
+    <section class="pp-list-section">
 
-<!-- Tabel Tarif -->
-<div class="card">
-    <div class="card-body">
-        {% if kode_angkatan_terpilih %}
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th width="5">No</th>
-                    <th>Jenis Pembayaran</th>
-                    <th>Waktu Bayar</th>
-                    <th>Nominal</th>
-                    <th>Status</th>
-                    <th width="150">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for tarif in daftar_tarif %}
-                <tr 
-                    data-id="{{ tarif.id }}"
-                    data-kode="{{ tarif.kode }}"
-                    data-pola="{{ tarif.pola_waktu }}"
-                    data-nama="{{ tarif.nama }}"
-                    data-nominal="{{ tarif.nominal }}"
-                    data-keterangan="{{ tarif.keterangan | default('') }}"
-                >
-                    <td>{{ loop.index }}</td>
-                    <td>{{ tarif.nama }}</td>
-                    <td>
-                        {% set waktu_map = {
-                            'bulanan': 'Setiap Bulan',
-                            'semester_1': 'Semester 1',
-                            'semester_2': 'Semester 2',
-                            'awal_tahun': 'Awal Tahun Pelajaran'
-                        } %}
-                        {{ waktu_map[tarif.pola_waktu] }}
-                    </td>
-                    <td class="text-primary">{{ format_rupiah(tarif.nominal) }}</td>
-                    <td>
-                        {% if tarif.aktif %}
-                        <span class="badge bg-success">Aktif</span>
-                        {% else %}
-                        <span class="badge bg-secondary">Nonaktif</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-warning btnUbah" title="Ubah">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <a href="/pengaturan-pembayaran/status/{{ tarif.id }}" class="btn btn-sm {% if tarif.aktif %}btn-secondary{% else %}btn-success{% endif %}" title="{% if tarif.aktif %}Nonaktifkan{% else %}Aktifkan{% endif %}">
-                            <i class="fas fa-{% if tarif.aktif %}eye-slash{% else %}eye{% endif %}"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
-                        Belum ada jenis pembayaran untuk tahun ini. Silakan klik "Tambah Jenis Pembayaran".
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="text-center py-5 text-muted">
-            <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-            <p>Silakan pilih tahun ajaran di atas untuk melihat daftar tarif.</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- MODAL TAMBAH/EDIT -->
-<div class="modal fade" id="modalTambah" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Tarif Baru</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="pp-list-heading">
+            <div>
+                <div class="pp-eyebrow pp-eyebrow-dark">
+                    <span class="pp-eyebrow-dot"></span>
+                    PAYMENT CATALOG
+                </div>
+                <h3>Daftar Jenis Pembayaran</h3>
+                <p>Kelola tarif dan status pembayaran sekolah.</p>
             </div>
-            <form method="POST" action="{{ url_for('bendahara.pengaturan_pembayaran', angkatan=kode_angkatan_terpilih) }}">
-                <div class="modal-body">
-                    <!-- PILIH JENIS UTAMA -->
-                    <div class="mb-3">
-                        <label class="form-label">Jenis Pembayaran</label>
-                        <select class="form-select" name="jenis_utama" id="pilihJenisUtama" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="SPP">SPP</option>
-                            <option value="Pembangunan">Pembangunan</option>
-                            <option value="Ekstrakurikuler">Ekstrakurikuler</option>
-                            <option value="Kelas Peminatan">Kelas Peminatan</option>
-                            <option value="Seragam">Seragam</option>
-                            <option value="Buku">Buku</option>
-                        </select>
-                    </div>
 
-                    <!-- PILIH NAMA EKSKUL / PEMINATAN -->
-                    <div class="mb-3" id="bagianKelompok" style="display: none;">
-                        <label class="form-label">Nama Kelompok</label>
-                        <select class="form-select" name="nama_kelompok" id="pilihKelompok">
-                            <option value="">-- Pilih --</option>
-                            <!-- Nanti diisi otomatis lewat JS, SUDAH UNIK & SESUAI TAHUN -->
-                        </select>
-                    </div>
+            {% if kode_angkatan_terpilih %}
+            <button type="button" class="pp-add-button"
+                    data-bs-toggle="modal" data-bs-target="#modalTambah">
+                <span class="pp-add-icon"><i class="fas fa-plus"></i></span>
+                <span>Tambah Pembayaran</span>
+            </button>
+            {% endif %}
+        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Kode Unik</label>
-                        <input type="text" class="form-control" name="kode" required placeholder="Contoh: spp_pramuka">
-                        <div class="form-text">Kode ini tidak boleh sama untuk tahun yang sama.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Waktu Pembayaran</label>
-                        <div class="custom-select">
-                            <select class="form-select" name="pola_waktu" required>
-                                <option value="">Pilih...</option>
-                                <option value="bulanan">Setiap Bulan</option>
-                                <option value="semester_1">Semester 1</option>
-                                <option value="semester_2">Semester 2</option>
-                                <option value="awal_tahun">Awal Tahun</option>
-                            </select>
+        {% if kode_angkatan_terpilih %}
+
+        <div class="pp-table-card">
+            <div class="pp-table-topline">
+                <div class="pp-table-caption">
+                    <span class="pp-caption-indicator"></span>
+                    Tarif Tahun Pelajaran
+                    <strong>{{ kode_angkatan_terpilih }}</strong>
+                </div>
+                <div class="pp-table-total">
+                    {{ daftar_tarif | length }} jenis pembayaran
+                </div>
+            </div>
+
+            <div class="pp-table-responsive">
+                <table class="pp-table">
+                    <thead>
+                        <tr>
+                            <th class="pp-col-number">NO.</th>
+                            <th>JENIS PEMBAYARAN</th>
+                            <th>WAKTU PEMBAYARAN</th>
+                            <th>NOMINAL</th>
+                            <th>STATUS</th>
+                            <th class="pp-col-action">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tarif in daftar_tarif %}
+                        <tr
+                            data-id="{{ tarif.id }}"
+                            data-kode="{{ tarif.kode }}"
+                            data-pola="{{ tarif.pola_waktu }}"
+                            data-nama="{{ tarif.nama }}"
+                            data-nominal="{{ tarif.nominal }}"
+                            data-keterangan="{{ tarif.keterangan | default('', true) }}"
+                            data-aktif="{{ '1' if tarif.aktif else '0' }}"
+                        >
+                            <td class="pp-number-cell">
+                                <span>{{ "%02d" | format(loop.index) }}</span>
+                            </td>
+
+                            <td>
+                                <div class="pp-payment-name">
+                                    <div class="pp-payment-icon">
+                                        {% if 'SPP' in tarif.nama %}
+                                            <i class="fas fa-calendar-check"></i>
+                                        {% elif 'Pembangunan' in tarif.nama %}
+                                            <i class="fas fa-building"></i>
+                                        {% elif 'Ekstrakurikuler' in tarif.nama %}
+                                            <i class="fas fa-futbol"></i>
+                                        {% elif 'Peminatan' in tarif.nama %}
+                                            <i class="fas fa-book-open"></i>
+                                        {% elif 'Seragam' in tarif.nama %}
+                                            <i class="fas fa-shirt"></i>
+                                        {% else %}
+                                            <i class="fas fa-wallet"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ tarif.nama }}</strong>
+                                        <small>{{ tarif.kode }}</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% set waktu_map = {
+                                    'bulanan': 'Setiap Bulan',
+                                    'semester_1': 'Semester 1',
+                                    'semester_2': 'Semester 2',
+                                    'awal_tahun': 'Awal Tahun Pelajaran'
+                                } %}
+                                <span class="pp-period">
+                                    <i class="far fa-clock"></i>
+                                    {{ waktu_map.get(tarif.pola_waktu, tarif.pola_waktu) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <strong class="pp-amount">
+                                    {{ format_rupiah(tarif.nominal) }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {% if tarif.aktif %}
+                                <span class="pp-status pp-status-active">
+                                    <span></span> Aktif
+                                </span>
+                                {% else %}
+                                <span class="pp-status pp-status-inactive">
+                                    <span></span> Nonaktif
+                                </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="pp-action-group">
+                                    <button type="button" class="pp-action-btn pp-edit-btn btnUbah"
+                                            title="Ubah tarif" aria-label="Ubah tarif">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+
+                                    <a href="/pengaturan-pembayaran/status/{{ tarif.id }}"
+                                       class="pp-action-btn pp-toggle-btn"
+                                       title="{% if tarif.aktif %}Nonaktifkan{% else %}Aktifkan{% endif %}"
+                                       aria-label="{% if tarif.aktif %}Nonaktifkan{% else %}Aktifkan{% endif %}">
+                                        <i class="fas fa-{% if tarif.aktif %}eye-slash{% else %}eye{% endif %}"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="pp-empty-state">
+                                    <div class="pp-empty-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <h4>Belum Ada Tarif Pembayaran</h4>
+                                    <p>Belum ada jenis pembayaran untuk tahun pelajaran ini.</p>
+                                    <span>Mulai dengan menambahkan jenis pembayaran pertama.</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pp-table-footer">
+                <span><i class="fas fa-info-circle"></i> Perubahan tarif berlaku sesuai konfigurasi tahun pelajaran.</span>
+                <span class="pp-footer-secure"><i class="fas fa-lock"></i> Protected Configuration</span>
+            </div>
+        </div>
+
+        {% else %}
+
+        <div class="pp-unselected-state">
+            <div class="pp-unselected-visual">
+                <div class="pp-unselected-circle">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <span class="pp-floating-dot pp-dot-a"></span>
+                <span class="pp-floating-dot pp-dot-b"></span>
+                <span class="pp-floating-dot pp-dot-c"></span>
+            </div>
+            <div class="pp-unselected-content">
+                <span class="pp-unselected-label">LANGKAH PERTAMA</span>
+                <h3>Pilih Tahun Pelajaran</h3>
+                <p>
+                    Silakan pilih tahun pelajaran pada panel konfigurasi
+                    di atas untuk mulai mengelola tarif pembayaran.
+                </p>
+            </div>
+        </div>
+
+        {% endif %}
+    </section>
+
+    <!-- MODAL TAMBAH / EDIT -->
+    {% if kode_angkatan_terpilih %}
+    <div class="modal fade pp-modal" id="modalTambah" tabindex="-1"
+         aria-labelledby="modalTambahLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="pp-modal-header">
+                    <div class="pp-modal-heading">
+                        <div class="pp-modal-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div>
+                            <span>PAYMENT SETUP</span>
+                            <h5 class="modal-title" id="modalTambahLabel">Tambah Tarif Baru</h5>
+                            <p>Lengkapi informasi jenis pembayaran.</p>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nominal (Rp)</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            name="nominal_tampil" 
-                            id="nominalInput"
-                            placeholder="Rp 0"
-                            autocomplete="off"
-                        >
-                        <input type="hidden" name="nominal" id="nominalAsli">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Keterangan</label>
-                        <textarea class="form-control" name="keterangan" rows="2"></textarea>
-                    </div>
+                    <button type="button" class="pp-modal-close"
+                            data-bs-dismiss="modal" aria-label="Tutup">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-            
+
+                <form method="POST"
+                      id="formTarif"
+                      action="{{ url_for('bendahara.pengaturan_pembayaran', angkatan=kode_angkatan_terpilih) }}">
+
+                    <input type="hidden" name="edit_id" id="editTarifId">
+
+                    <div class="pp-modal-body">
+
+                        <div class="pp-form-intro">
+                            <span class="pp-form-step">01</span>
+                            <div>
+                                <strong>Informasi Pembayaran</strong>
+                                <small>Tentukan kategori dan identitas tarif.</small>
+                            </div>
+                        </div>
+
+                        <div class="pp-form-group">
+                            <label for="pilihJenisUtama">Jenis Pembayaran <span>*</span></label>
+                            <div class="pp-modal-input">
+                                <i class="fas fa-layer-group"></i>
+                                <select name="jenis_utama" id="pilihJenisUtama" required>
+                                    <option value="">Pilih jenis pembayaran</option>
+                                    <option value="SPP">SPP</option>
+                                    <option value="Pembangunan">Pembangunan</option>
+                                    <option value="Ekstrakurikuler">Ekstrakurikuler</option>
+                                    <option value="Kelas Peminatan">Kelas Peminatan</option>
+                                    <option value="Seragam">Seragam</option>
+                                    <option value="Buku">Buku</option>
+                                </select>
+                                <i class="fas fa-chevron-down pp-modal-chevron"></i>
+                            </div>
+                        </div>
+
+                        <div class="pp-form-group pp-group-field" id="bagianKelompok" hidden>
+                            <label for="pilihKelompok">Nama Kelompok <span>*</span></label>
+                            <div class="pp-modal-input">
+                                <i class="fas fa-users"></i>
+                                <select name="nama_kelompok" id="pilihKelompok">
+                                    <option value="">Pilih kelompok</option>
+                                </select>
+                                <i class="fas fa-chevron-down pp-modal-chevron"></i>
+                            </div>
+                            <small class="pp-field-hint">Daftar disesuaikan dengan tahun pelajaran terpilih.</small>
+                        </div>
+
+                        <div class="pp-form-group">
+                            <label for="kodeTarif">Kode Unik <span>*</span></label>
+                            <div class="pp-modal-input">
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" name="kode" id="kodeTarif"
+                                       required placeholder="Contoh: spp_pramuka"
+                                       autocomplete="off">
+                            </div>
+                            <small class="pp-field-hint">Kode tidak boleh sama untuk tahun pelajaran yang sama.</small>
+                        </div>
+
+                        <div class="pp-form-group">
+                            <label for="polaWaktu">Waktu Pembayaran <span>*</span></label>
+                            <div class="pp-modal-input">
+                                <i class="far fa-clock"></i>
+                                <select name="pola_waktu" id="polaWaktu" required>
+                                    <option value="">Pilih periode pembayaran</option>
+                                    <option value="bulanan">Setiap Bulan</option>
+                                    <option value="semester_1">Semester 1</option>
+                                    <option value="semester_2">Semester 2</option>
+                                    <option value="awal_tahun">Awal Tahun Pelajaran</option>
+                                </select>
+                                <i class="fas fa-chevron-down pp-modal-chevron"></i>
+                            </div>
+                        </div>
+
+                        <div class="pp-form-group">
+                            <label for="nominalInput">Nominal Pembayaran <span>*</span></label>
+                            <div class="pp-modal-input pp-money-input">
+                                <span class="pp-rp-prefix">Rp</span>
+                                <input type="text" name="nominal_tampil"
+                                       id="nominalInput" placeholder="0"
+                                       inputmode="numeric" autocomplete="off" required>
+                            </div>
+                            <input type="hidden" name="nominal" id="nominalAsli">
+                            <small class="pp-field-hint">Masukkan nominal dalam Rupiah.</small>
+                        </div>
+
+                        <div class="pp-form-group">
+                            <label for="keteranganTarif">Keterangan</label>
+                            <div class="pp-modal-input pp-textarea-input">
+                                <i class="fas fa-align-left"></i>
+                                <textarea name="keterangan" id="keteranganTarif"
+                                          rows="3" placeholder="Tambahkan keterangan jika diperlukan..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pp-modal-footer">
+                        <button type="button" class="pp-cancel-button" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="pp-save-button" id="btnSimpanTarif">
+                            <i class="fas fa-check"></i>
+                            <span>Simpan Tarif</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+    {% endif %}
+
+    <!-- DATA UNTUK JAVASCRIPT -->
+    <script type="application/json" id="ppDataEkskul">
+        {{ daftar_ekskul | map(attribute='nama') | list | tojson }}
+    </script>
+    <script type="application/json" id="ppDataEkskulTahun">
+        {{ daftar_ekskul | map(attribute='tahun_pelajaran') | list | tojson }}
+    </script>
+    <script type="application/json" id="ppDataPeminatan">
+        {{ daftar_peminatan | map(attribute='nama') | list | tojson }}
+    </script>
+    <script type="application/json" id="ppDataPeminatanTahun">
+        {{ daftar_peminatan | map(attribute='tahun_pelajaran') | list | tojson }}
+    </script>
+    <script type="application/json" id="ppTahunDipilih">
+        {{ (kode_angkatan_terpilih | default('')) | tojson }}
+    </script>
+
 </div>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/jabatan/bendahara/pengaturan_pembayaran.css') }}">
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/bendahara/pengaturan_pembayaran.css') }}">
 <script src="{{ url_for('static', filename='js/sections/bendahara/pengaturan_pembayaran.js') }}"></script>
-
-<script>
-// Data dari backend
-const semuaEkskul = [{% for e in daftar_ekskul %} { nama: "{{ e.nama }}", tahun: "{{ e.tahun_pelajaran.split('-')[0] }}" }, {% endfor %}];
-const semuaPeminatan = [{% for p in daftar_peminatan %} { nama: "{{ p.nama }}", tahun: "{{ p.tahun_pelajaran.split('-')[0] }}" }, {% endfor %}];
-
-// ✅ AMBIL TAHUN YANG SEDANG DIPILIH DI HALAMAN
-const tahunDipilih = "{{ kode_angkatan_terpilih | default('') }}";
-
-const pilihJenis = document.getElementById('pilihJenisUtama');
-const bagianKelompok = document.getElementById('bagianKelompok');
-const pilihKelompok = document.getElementById('pilihKelompok');
-
-pilihJenis.addEventListener('change', function(){
-    pilihKelompok.innerHTML = '<option value="">-- Pilih --</option>';
-    if(!tahunDipilih) {
-        bagianKelompok.style.display = 'none';
-        return;
-    }
-
-    if(this.value === 'Ekstrakurikuler'){
-        bagianKelompok.style.display = 'block';
-        // ✅ FILTER HANYA UNTUK TAHUN YANG DIPILIH & SUDAH PASTI UNIK
-        const daftarTersedia = semuaEkskul.filter(e => e.tahun === tahunDipilih);
-        daftarTersedia.forEach(item => {
-            pilihKelompok.innerHTML += `<option value="${item.nama}">${item.nama}</option>`;
-        });
-    } else if(this.value === 'Kelas Peminatan'){
-        bagianKelompok.style.display = 'block';
-        const daftarTersedia = semuaPeminatan.filter(p => p.tahun === tahunDipilih);
-        daftarTersedia.forEach(item => {
-            pilihKelompok.innerHTML += `<option value="${item.nama}">${item.nama}</option>`;
-        });
-    } else {
-        bagianKelompok.style.display = 'none';
-    }
-});
-</script>

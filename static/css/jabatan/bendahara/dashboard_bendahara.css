@@ -1,245 +1,1062 @@
-/* ==========================================
-   DASHBOARD BENDAHARA - GAYA SERAGAM
-========================================== */
 
-/* Kontainer Utama */
-.dashboard-container {
+/* ==========================================================
+   PREMIUM FINANCIAL COMMAND CENTER
+   Dashboard Bendahara SMPU
+========================================================== */
+
+.dashboard-bendahara-page {
+    --fin-green: #087b56;
+    --fin-green-dark: #075b43;
+    --fin-ink: #183329;
+    --fin-muted: #82928a;
+    --fin-border: #e8efeb;
+    --fin-surface: #ffffff;
     width: 100%;
-    max-width: 100%;
-    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    padding-bottom: 25px;
+    color: var(--fin-ink);
+    font-family: Inter, "Segoe UI", Roboto, sans-serif;
 }
 
-.page-header h3 {
-    font-weight: 700;
-    margin: 0 0 0.4rem 0;
-    color: #0f172a;
+.dashboard-bendahara-page *,
+.dashboard-bendahara-page *::before,
+.dashboard-bendahara-page *::after {
+    box-sizing: border-box;
 }
 
-.page-header p {
-    margin: 0;
-    color: #64748b;
+/* HEADER */
+.dashboard-bendahara-page .fin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 5px 2px 22px;
 }
 
-/* ==========================================
-   GRID & KARTU STATISTIK - SAMA DENGAN ADMIN
-========================================== */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.75rem;
-}
-
-.stat-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 1.25rem;
-    padding: 1.75rem 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+.dashboard-bendahara-page .fin-eyebrow,
+.dashboard-bendahara-page .fin-section-label {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    flex-direction: row;
+    gap: 8px;
+    color: #07845c;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.35px;
 }
 
-.stat-card::before {
-    content: "";
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 100px;
-    height: 100px;
+.dashboard-bendahara-page .fin-live-dot {
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: rgba(37, 99, 235, 0.05);
-    z-index: 0;
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,.12);
+    animation: finPulse 2s infinite;
 }
 
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.1);
-    border-color: rgba(191, 219, 254, 0.6);
+@keyframes finPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(16,185,129,.12); }
+    50% { box-shadow: 0 0 0 7px rgba(16,185,129,.04); }
 }
 
-.stat-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    color: white;
-    flex-shrink: 0;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-    position: relative;
-    z-index: 1;
+.dashboard-bendahara-page .fin-header h2 {
+    margin: 9px 0 5px;
+    color: #183329;
+    font-size: clamp(23px, 2.2vw, 30px);
+    font-weight: 800;
+    letter-spacing: -.8px;
 }
 
-/* ✅ WARNA KHUSUS KEUANGAN - SERAGAM GRADASI */
-.stat-icon.bg-success { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.stat-icon.bg-danger  { background: linear-gradient(135deg, #dc2626, #ef4444); }
-.stat-icon.bg-primary { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-.stat-icon.bg-info    { background: linear-gradient(135deg, #0891b2, #06b6d4); }
-
-.stat-info {
-    flex: 1;
-    position: relative;
-    z-index: 1;
+.dashboard-bendahara-page .fin-header p {
+    margin: 0;
+    color: #87958e;
+    font-size: 12px;
 }
 
-.stat-info h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.35rem 0;
-    color: #0f172a;
-    line-height: 1;
-}
-
-.stat-info p {
-    margin: 0 0 0.4rem 0;
-    color: #64748b;
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.stat-info small {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-/* ==========================================
-   GRID KONTEN & KARTU
-========================================== */
-.content-grid {
+.dashboard-bendahara-page .fin-header-mark {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.75rem;
+    place-items: center;
+    width: 49px;
+    height: 49px;
+    flex-shrink: 0;
+    border: 1px solid #dceee5;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #f0faf4, #e0f3e8);
+    color: #087b56;
+    font-size: 20px;
 }
 
-@media (max-width: 992px) {
-    .content-grid { grid-template-columns: 1fr; }
-}
-
-.card {
-    background: #ffffff;
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #f1f5f9;
+/* HERO SALDO */
+.dashboard-bendahara-page .fin-balance-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: 215px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 27px 32px 46px;
     overflow: hidden;
-    height: 100%;
+    border-radius: 22px;
+    background: linear-gradient(112deg, #064c39 0%, #087b56 53%, #0a9b6b 100%);
+    box-shadow: 0 13px 30px rgba(5, 94, 65, .17);
+    color: #fff;
+    margin-bottom: 18px;
 }
 
-.card-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    background: #fafbfc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.dashboard-bendahara-page .fin-hero-content {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
 }
 
-.card-header h5 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1e293b;
+.dashboard-bendahara-page .fin-hero-label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 10px;
+    color: rgba(255,255,255,.75);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
 }
 
-.card-body {
-    padding: 1.25rem 1.5rem;
+.dashboard-bendahara-page .fin-hero-icon {
+    width: 31px;
+    height: 31px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 9px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
 }
 
-/* ==========================================
-   DAFTAR TRANSAKSI
-========================================== */
-.transaction-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.transaction-item {
-    gap: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.9rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    transition: background 0.2s ease;
-}
-
-.transaction-item:last-child {
-    border-bottom: none;
-}
-
-.transaction-item:hover {
-    background: #f8fafc;
-}
-
-.transaction-item span.d-block {
+.dashboard-bendahara-page .fin-balance-caption {
+    margin: 19px 0 5px;
+    color: rgba(255,255,255,.72);
+    font-size: 12px;
     font-weight: 500;
-    color: #1e293b;
 }
 
-.trx-kiri {
+.dashboard-bendahara-page .fin-balance-hero h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(27px, 3.2vw, 39px);
+    font-weight: 800;
+    letter-spacing: -1.3px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-bendahara-page .fin-balance-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    color: rgba(255,255,255,.7);
+    font-size: 10px;
+}
+
+.dashboard-bendahara-page .fin-note-icon {
+    color: #a9f1cd;
+}
+
+.dashboard-bendahara-page .fin-hero-art {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 5%;
+    width: 270px;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dashboard-bendahara-page .fin-hero-symbol {
+    position: absolute;
+    top: 50%;
+    right: 48px;
+    width: 106px;
+    height: 106px;
+    display: grid;
+    place-items: center;
+    transform: translateY(-50%) rotate(-9deg);
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 30px;
+    background: rgba(255,255,255,.10);
+    color: rgba(255,255,255,.85);
+    font-size: 43px;
+    box-shadow: 0 15px 35px rgba(0,0,0,.10);
+    backdrop-filter: blur(5px);
+}
+
+.dashboard-bendahara-page .fin-orbit {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.dashboard-bendahara-page .fin-orbit-one {
+    width: 230px;
+    height: 230px;
+}
+
+.dashboard-bendahara-page .fin-orbit-two {
+    right: -42px;
+    width: 310px;
+    height: 310px;
+}
+
+.dashboard-bendahara-page .fin-hero-glow {
+    position: absolute;
+    top: -120px;
+    right: -100px;
+    width: 290px;
+    height: 290px;
+    border-radius: 50%;
+    background: rgba(153, 255, 203, .10);
+    filter: blur(3px);
+}
+
+.dashboard-bendahara-page .fin-hero-bottom {
+    position: absolute;
+    right: 27px;
+    bottom: 15px;
+    left: 27px;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.48);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.dashboard-bendahara-page .fin-hero-bottom span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+/* STAT CARDS */
+.dashboard-bendahara-page .fin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.dashboard-bendahara-page .fin-stat-card {
+    --accent: #0a9870;
+    --soft: #e9f8f1;
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    min-height: 173px;
+    padding: 18px 19px;
+    overflow: hidden;
+    border: 1px solid var(--fin-border);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(22, 55, 39, .035);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.dashboard-bendahara-page .fin-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--accent) 30%, white);
+    box-shadow: 0 12px 26px rgba(22, 55, 39, .08);
+}
+
+.dashboard-bendahara-page .fin-income {
+    --accent: #079669;
+    --soft: #e8f8f0;
+}
+
+.dashboard-bendahara-page .fin-expense {
+    --accent: #df6268;
+    --soft: #fff0f0;
+}
+
+.dashboard-bendahara-page .fin-spp {
+    --accent: #bb8b2d;
+    --soft: #fff7e6;
+}
+
+.dashboard-bendahara-page .fin-stat-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-bendahara-page .fin-stat-icon {
+    width: 39px;
+    height: 39px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--soft);
+    color: var(--accent);
+    font-size: 15px;
+}
+
+.dashboard-bendahara-page .fin-stat-chip {
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: var(--soft);
+    color: var(--accent);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .6px;
+}
+
+.dashboard-bendahara-page .fin-stat-main {
+    position: relative;
+    z-index: 1;
+    margin-top: 15px;
+}
+
+.dashboard-bendahara-page .fin-stat-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #829189;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dashboard-bendahara-page .fin-stat-main h3 {
+    margin: 0;
+    color: #193329;
+    font-size: clamp(18px, 1.7vw, 25px);
+    font-weight: 800;
+    letter-spacing: -.7px;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-bendahara-page .fin-stat-main h3 small {
+    margin-left: 3px;
+    color: var(--accent);
+    font-size: 14px;
+}
+
+.dashboard-bendahara-page .fin-stat-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 11px;
+    color: #9aa69f;
+    font-size: 9px;
+}
+
+.dashboard-bendahara-page .fin-stat-footer i {
+    color: var(--accent);
+    font-size: 10px;
+}
+
+.dashboard-bendahara-page .fin-stat-accent {
+    position: absolute;
+    right: -28px;
+    bottom: -48px;
+    width: 105px;
+    height: 105px;
+    border: 17px solid var(--soft);
+    border-radius: 50%;
+    opacity: .7;
+    transition: transform .35s ease;
+}
+
+.dashboard-bendahara-page .fin-stat-card:hover .fin-stat-accent {
+    transform: scale(1.2);
+}
+
+.dashboard-bendahara-page .fin-progress-track {
+    position: relative;
+    z-index: 1;
+    height: 6px;
+    margin-top: 12px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #f4f0e5;
+}
+
+.dashboard-bendahara-page .fin-progress-track span {
+    display: block;
+    height: 100%;
+    max-width: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #b98a30, #edc76b);
+}
+
+/* MAIN PANELS */
+.dashboard-bendahara-page .fin-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(310px, 1fr);
+    gap: 17px;
+    align-items: stretch;
+    margin-bottom: 17px;
+}
+
+.dashboard-bendahara-page .fin-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--fin-border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(22, 55, 39, .035);
+}
+
+.dashboard-bendahara-page .fin-panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 21px 22px 15px;
+}
+
+.dashboard-bendahara-page .fin-panel-heading h3,
+.dashboard-bendahara-page .fin-bottom-content h3 {
+    margin: 7px 0 5px;
+    color: #1b3429;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.35px;
+}
+
+.dashboard-bendahara-page .fin-panel-heading p {
+    margin: 0;
+    color: #96a39c;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.dashboard-bendahara-page .fin-heading-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #eaf7f0;
+    color: #07845c;
+}
+
+/* CHART */
+.dashboard-bendahara-page .fin-chart-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 5px 22px 12px;
+}
+
+.dashboard-bendahara-page .fin-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.dashboard-bendahara-page .fin-chart-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #73837a;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.dashboard-bendahara-page .fin-legend-dot {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.dashboard-bendahara-page .fin-legend-dot.green {
+    background: #0ca678;
+}
+
+.dashboard-bendahara-page .fin-legend-dot.blue {
+    background: #5688df;
+}
+
+.dashboard-bendahara-page .fin-period-label {
+    color: #a0aaa4;
+    font-size: 9px;
+}
+
+.dashboard-bendahara-page .fin-period-label i {
+    margin-right: 5px;
+}
+
+.dashboard-bendahara-page .fin-chart-container {
+    position: relative;
+    height: 290px;
+    padding: 4px 15px 18px;
+}
+
+.dashboard-bendahara-page .fin-chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.dashboard-bendahara-page .fin-chart-empty {
+    position: absolute;
+    inset: 5px 15px 18px;
     display: flex;
     flex-direction: column;
-    line-height: 1.4;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 12px;
+    background: #fbfdfc;
+    color: #91a097;
+    text-align: center;
+}
+
+.dashboard-bendahara-page .fin-chart-empty[hidden] {
+    display: none !important;
+}
+
+.dashboard-bendahara-page .fin-empty-graphic {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 3px;
+    border-radius: 15px;
+    background: #edf7f1;
+    color: #8bb9a0;
+    font-size: 20px;
+}
+
+.dashboard-bendahara-page .fin-chart-empty strong {
+    color: #53685c;
+    font-size: 12px;
+}
+
+.dashboard-bendahara-page .fin-chart-empty span {
+    font-size: 10px;
+}
+
+/* TRANSACTION FEED */
+.dashboard-bendahara-page .fin-heading-action {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 1px solid #e8efeb;
+    border-radius: 10px;
+    color: #6e8176;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.dashboard-bendahara-page .fin-heading-action:hover {
+    border-color: #b9e5d0;
+    background: #edf8f2;
+    color: #07845c;
+}
+
+.dashboard-bendahara-page .fin-transaction-list {
+    max-height: 345px;
+    overflow-y: auto;
+    padding: 0 18px;
+    scrollbar-width: thin;
+    scrollbar-color: #dce8e1 transparent;
+}
+
+.dashboard-bendahara-page .fin-transaction {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 2px;
+    border-bottom: 1px solid #eff3f0;
+}
+
+.dashboard-bendahara-page .fin-transaction:last-child {
+    border-bottom: 0;
+}
+
+.dashboard-bendahara-page .fin-transaction-icon {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    font-size: 12px;
+}
+
+.dashboard-bendahara-page .fin-transaction-icon.incoming {
+    background: #e9f8f0;
+    color: #079669;
+}
+
+.dashboard-bendahara-page .fin-transaction-icon.outgoing {
+    background: #fff0f0;
+    color: #df6268;
+}
+
+.dashboard-bendahara-page .fin-transaction-detail {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.dashboard-bendahara-page .fin-transaction-detail strong {
+    overflow: hidden;
+    color: #34483d;
+    font-size: 10px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-bendahara-page .fin-transaction-detail span {
+    overflow: hidden;
+    color: #87958d;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-bendahara-page .fin-transaction-detail small {
+    color: #a2ada6;
+    font-size: 9px;
+}
+
+.dashboard-bendahara-page .fin-transaction-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.dashboard-bendahara-page .fin-transaction-value strong {
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.dashboard-bendahara-page .fin-transaction-value.incoming strong {
+    color: #079669;
+}
+
+.dashboard-bendahara-page .fin-transaction-value.outgoing strong {
+    color: #df6268;
+}
+
+.dashboard-bendahara-page .fin-transaction-value small {
+    color: #a0aaa4;
+    font-size: 8px;
+}
+
+.dashboard-bendahara-page .fin-view-all {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    margin: 0 18px;
+    padding: 13px 5px;
+    border-top: 1px solid #edf1ee;
+    color: #07845c;
+    font-size: 10px;
+    font-weight: 750;
+    text-decoration: none;
+    transition: gap .2s ease;
+}
+
+.dashboard-bendahara-page .fin-view-all:hover {
+    gap: 14px;
+}
+
+.dashboard-bendahara-page .fin-empty-state {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #98a69e;
+    text-align: center;
+}
+
+.dashboard-bendahara-page .fin-empty-state > div {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 4px;
+    border-radius: 15px;
+    background: #f1f7f3;
+    color: #9ab6a5;
+    font-size: 19px;
+}
+
+.dashboard-bendahara-page .fin-empty-state strong {
+    color: #50645a;
+    font-size: 11px;
+}
+
+.dashboard-bendahara-page .fin-empty-state span {
+    font-size: 9px;
+}
+
+/* BOTTOM ACTIONS */
+.dashboard-bendahara-page .fin-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 17px;
+}
+
+.dashboard-bendahara-page .fin-reminder-panel,
+.dashboard-bendahara-page .fin-report-panel {
+    position: relative;
+    display: flex;
+    gap: 15px;
+    min-width: 0;
+    padding: 22px;
+    overflow: hidden;
+    border: 1px solid var(--fin-border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(22, 55, 39, .035);
+}
+
+.dashboard-bendahara-page .fin-bottom-icon {
+    position: relative;
+    z-index: 1;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 13px;
+    font-size: 16px;
+}
+
+.dashboard-bendahara-page .reminder-icon {
+    background: #fff5df;
+    color: #bd8a2a;
+}
+
+.dashboard-bendahara-page .report-icon {
+    background: #edf3ff;
+    color: #477ed1;
+}
+
+.dashboard-bendahara-page .fin-bottom-content {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
     flex: 1;
 }
-.trx-jenis {
-    font-weight: 600;
-    font-size: 14px;
-    color: #1f2937;
-}
-.trx-nama-siswa {
-    font-size: 13px;
-    color: #4b5563;
-}
-.trx-tanggal {
-    font-size: 12px;
-    color: #9ca3af;
-}
-.trx-nominal {
-    font-weight: 600;
-    font-size: 14px;
-    white-space: nowrap;
-    text-align: right;
-    min-width: 140px;
+
+.dashboard-bendahara-page .fin-bottom-content h3 {
+    margin-top: 7px;
 }
 
-/* ==========================================
-   RESPONSIF
-========================================== */
-@media (max-width: 992px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+.dashboard-bendahara-page .fin-bottom-content p {
+    max-width: 410px;
+    margin: 0;
+    color: #8b9991;
+    font-size: 10px;
+    line-height: 1.65;
 }
 
-@media (max-width: 576px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .stat-info h3 { font-size: 1.6rem; }
-    .stat-icon { width: 56px; height: 56px; font-size: 1.4rem; }
+.dashboard-bendahara-page .fin-unpaid-number {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 13px 0;
 }
 
-.content-grid {
-  grid-auto-rows: minmax(0, 1fr);
+.dashboard-bendahara-page .fin-unpaid-number strong {
+    color: #bd8a2a;
+    font-size: 28px;
+    font-weight: 850;
+    letter-spacing: -1px;
 }
 
-/* Batasi tinggi daftar transaksi agar tidak melebar */
-.transaction-list {
-  max-height: 320px;
-  overflow-y: auto;
+.dashboard-bendahara-page .fin-unpaid-number span {
+    color: #8b9991;
+    font-size: 9px;
 }
 
-/* Sesuaikan jarak agar lebih rapi */
-.transaction-item {
-  padding: 0.75rem 1.5rem;
+.dashboard-bendahara-page .fin-primary-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 37px;
+    padding: 0 14px;
+    border-radius: 9px;
+    background: #fff3d9;
+    color: #a97819;
+    font-size: 10px;
+    font-weight: 750;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.dashboard-bendahara-page .fin-primary-action:hover {
+    transform: translateY(-2px);
+    background: #fce8b9;
+}
+
+.dashboard-bendahara-page .fin-report-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.dashboard-bendahara-page .fin-report-links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 37px;
+    padding: 0 10px;
+    border: 1px solid #e6edf7;
+    border-radius: 9px;
+    background: #f8faff;
+    color: #507ab8;
+    font-size: 9px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.dashboard-bendahara-page .fin-report-links a:hover {
+    transform: translateY(-2px);
+    border-color: #c9dafa;
+    background: #edf4ff;
+}
+
+.dashboard-bendahara-page .fin-report-link-icon {
+    color: #477ed1;
+}
+
+.dashboard-bendahara-page .fin-report-links a > i:last-child {
+    margin-left: 3px;
+    font-size: 8px;
+}
+
+.dashboard-bendahara-page .fin-bottom-decoration {
+    position: absolute;
+    right: -46px;
+    bottom: -68px;
+    width: 155px;
+    height: 155px;
+    border: 23px solid rgba(221, 177, 83, .07);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.dashboard-bendahara-page .fin-report-panel .fin-bottom-decoration {
+    border-color: rgba(76, 131, 218, .07);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    .dashboard-bendahara-page .fin-main-grid {
+        grid-template-columns: minmax(0, 1.35fr) minmax(285px, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-bendahara-page .fin-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-bendahara-page .fin-transaction-list {
+        max-height: 360px;
+    }
+}
+
+@media (max-width: 650px) {
+    .dashboard-bendahara-page .fin-header {
+        padding-bottom: 17px;
+    }
+
+    .dashboard-bendahara-page .fin-header-mark {
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        font-size: 17px;
+    }
+
+    .dashboard-bendahara-page .fin-balance-hero {
+        min-height: 190px;
+        padding: 21px 19px 44px;
+        border-radius: 17px;
+    }
+
+    .dashboard-bendahara-page .fin-balance-hero h1 {
+        max-width: 95%;
+        font-size: clamp(23px, 6vw, 31px);
+    }
+
+    .dashboard-bendahara-page .fin-hero-art {
+        right: -90px;
+        opacity: .55;
+    }
+
+    .dashboard-bendahara-page .fin-hero-symbol {
+        right: 45px;
+        width: 75px;
+        height: 75px;
+        border-radius: 22px;
+        font-size: 30px;
+    }
+
+    .dashboard-bendahara-page .fin-orbit-one {
+        width: 180px;
+        height: 180px;
+    }
+
+    .dashboard-bendahara-page .fin-orbit-two {
+        width: 245px;
+        height: 245px;
+    }
+
+    .dashboard-bendahara-page .fin-hero-bottom {
+        right: 17px;
+        left: 17px;
+        bottom: 13px;
+    }
+
+    .dashboard-bendahara-page .fin-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-card {
+        min-height: 155px;
+        padding: 14px 12px;
+        border-radius: 15px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: 13px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-chip {
+        padding: 4px 5px;
+        font-size: 7px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-main {
+        margin-top: 13px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-main h3 {
+        font-size: clamp(15px, 4vw, 20px);
+    }
+
+    .dashboard-bendahara-page .fin-stat-label {
+        font-size: 9px;
+    }
+
+    .dashboard-bendahara-page .fin-stat-footer {
+        align-items: flex-start;
+        font-size: 8px;
+    }
+
+    .dashboard-bendahara-page .fin-panel {
+        border-radius: 16px;
+    }
+
+    .dashboard-bendahara-page .fin-panel-heading {
+        padding: 17px 15px 13px;
+    }
+
+    .dashboard-bendahara-page .fin-chart-toolbar {
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .dashboard-bendahara-page .fin-period-label {
+        width: 100%;
+    }
+
+    .dashboard-bendahara-page .fin-chart-container {
+        height: 245px;
+        padding-right: 7px;
+        padding-left: 7px;
+    }
+
+    .dashboard-bendahara-page .fin-transaction-list {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .dashboard-bendahara-page .fin-transaction {
+        gap: 8px;
+    }
+
+    .dashboard-bendahara-page .fin-transaction-value strong {
+        font-size: 8px;
+    }
+
+    .dashboard-bendahara-page .fin-bottom-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .dashboard-bendahara-page .fin-reminder-panel,
+    .dashboard-bendahara-page .fin-report-panel {
+        padding: 17px 14px;
+        gap: 11px;
+        border-radius: 16px;
+    }
+
+    .dashboard-bendahara-page .fin-bottom-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 370px) {
+    .dashboard-bendahara-page .fin-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-bendahara-page .fin-stat-card {
+        min-height: 145px;
+    }
+
+    .dashboard-bendahara-page .fin-report-links {
+        flex-direction: column;
+    }
+
+    .dashboard-bendahara-page .fin-report-links a {
+        justify-content: space-between;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-bendahara-page *,
+    .dashboard-bendahara-page *::before,
+    .dashboard-bendahara-page *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
 }

@@ -139,7 +139,8 @@
   margin-bottom: 0;
 }
 
-ul {
+.sidebar .sidebar-menu,
+.sidebar .sidebar-menu ul {
     padding-left: 0;
     margin-top: 0;
 }

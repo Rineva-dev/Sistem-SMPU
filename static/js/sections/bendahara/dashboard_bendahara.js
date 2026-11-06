@@ -1,158 +1,331 @@
-document.addEventListener('DOMContentLoaded', function () {
-  const canvas = document.getElementById('keuanganChart');
-  if (!canvas) {
-    console.error("Canvas tidak ditemukan!");
-    return;
-  }
-  const ctx = canvas.getContext('2d');
 
-  console.log("📊 Label Bulan:", labelBulan);
-  console.log("📊 Pemasukan:", dataMasuk);
-  console.log("📊 Pengeluaran:", dataKeluar);
+(() => {
+    "use strict";
 
-  if (!labelBulan.length || !dataMasuk.length) {
-    console.warn("⚠️ Data grafik masih kosong!");
-    return;
-  }
+    const CHART_JS_URL =
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js";
 
-  const nilaiMaksMasuk = Math.max(...dataMasuk);
-  const nilaiMaksKeluar = Math.max(...dataKeluar);
-  const nilaiMaks = Math.max(nilaiMaksMasuk, nilaiMaksKeluar, 1000000);
-  const batasAtas = nilaiMaks * 1.15;
+    function loadChartJs() {
+        if (window.Chart) return Promise.resolve();
 
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labelBulan,
-      datasets: [
-        {
-            label: 'Pemasukan',
-            data: dataMasuk,
-            borderColor: '#10b981',
-            backgroundColor: function(context) {
-            const chart = context.chart;
-            const {ctx, chartArea} = chart;
-            if (!chartArea) return 'rgba(16, 185, 129, 0.15)';
-            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.03)');
-            return gradient;
-            },
-            borderWidth: 0.5,
-            pointRadius: 0, // ✅ TITIK DIHILANGKAN
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#10b981',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 1.2,
-            fill: true,
-            tension: 0.38,
-            cubicInterpolationMode: 'monotone'
-        },
-        {
-            label: 'Pengeluaran',
-            data: dataKeluar,
-            borderColor: '#3b82f6',
-            backgroundColor: function(context) {
-            const chart = context.chart;
-            const {ctx, chartArea} = chart;
-            if (!chartArea) return 'rgba(59, 130, 246, 0.15)';
-            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.35)');
-            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.03)');
-            return gradient;
-            },
-            borderWidth: 0.5,
-            pointRadius: 0, // ✅ TITIK DIHILANGKAN
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 1.2,
-            fill: true,
-            tension: 0.38,
-            cubicInterpolationMode: 'monotone'
+        if (window.__bendaharaChartPromise) {
+            return window.__bendaharaChartPromise;
         }
-        ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-        axis: 'x'
-      },
-      layout: {
-        padding: { top: 10, right: 20, bottom: 10, left: 10 }
-      },
-      plugins: {
-        legend: {
-          position: 'top',
-          align: 'center', // ✅ LEGENDA DI TENGAH
-          labels: {
-            font: { size: 13.5, family: "'Segoe UI', 'Inter', sans-serif", weight: '600' },
-            usePointStyle: true,
-            pointStyle: 'circle',
-            boxWidth: 8,
-            boxHeight: 8,
-            padding: 25,
-            color: '#374151'
-          }
-        },
-        tooltip: {
-          backgroundColor: '#ffffff',
-          titleColor: '#1f2937',
-          bodyColor: '#374151',
-          borderColor: '#e5e7eb',
-          borderWidth: 1,
-          titleFont: { size: 13.5, weight: '700', family: "'Segoe UI', sans-serif" },
-          bodyFont: { size: 12.5, family: "'Segoe UI', sans-serif" },
-          padding: { top: 12, right: 16, bottom: 12, left: 16 },
-          cornerRadius: 10,
-          displayColors: true,
-          boxWidth: 10,
-          boxHeight: 10,
-          boxPadding: 6,
-          useRoundedPointStyle: true,
-          callbacks: {
-            label: function(tooltipItem) {
-              const nilai = tooltipItem.raw || 0;
-              return ' ' + tooltipItem.dataset.label + ': Rp ' + nilai.toLocaleString('id-ID');
+
+        window.__bendaharaChartPromise = new Promise((resolve, reject) => {
+            let script = document.querySelector(
+                'script[src*="chart.umd.min.js"]'
+            );
+
+            if (!script) {
+                script = document.createElement("script");
+                script.src = CHART_JS_URL;
+                script.async = true;
+                document.head.appendChild(script);
             }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          suggestedMax: batasAtas,
-          grid: { 
-            color: '#f1f5f9',
-            drawBorder: false,
-            borderDash: []
-          },
-          ticks: {
-            font: { size: 11.5, family: "'Segoe UI', sans-serif" },
-            color: '#64748b',
-            maxTicksLimit: 6,
-            callback: function(value) {
-              return 'Rp ' + value.toLocaleString('id-ID');
+
+            if (window.Chart) {
+                resolve();
+                return;
             }
-          }
-        },
-        x: {
-          grid: { display: false },
-          ticks: {
-            font: { size: 12, weight: '500', family: "'Segoe UI', sans-serif" },
-            color: '#475569'
-          }
-        }
-      },
-      elements: {
-        line: {
-          borderCapStyle: 'round',
-          borderJoinStyle: 'round'
-        }
-      }
+
+            script.addEventListener("load", resolve, { once: true });
+            script.addEventListener("error", () => {
+                reject(new Error("Chart.js gagal dimuat."));
+            }, { once: true });
+        });
+
+        return window.__bendaharaChartPromise;
     }
-  });
-});
+
+    function formatRupiahRingkas(value) {
+        const nominal = Number(value) || 0;
+
+        if (nominal >= 1_000_000_000) {
+            return "Rp " + (nominal / 1_000_000_000).toLocaleString(
+                "id-ID", { maximumFractionDigits: 1 }
+            ) + " M";
+        }
+
+        if (nominal >= 1_000_000) {
+            return "Rp " + (nominal / 1_000_000).toLocaleString(
+                "id-ID", { maximumFractionDigits: 1 }
+            ) + " jt";
+        }
+
+        if (nominal >= 1_000) {
+            return "Rp " + (nominal / 1_000).toLocaleString(
+                "id-ID", { maximumFractionDigits: 0 }
+            ) + " rb";
+        }
+
+        return "Rp " + nominal.toLocaleString("id-ID");
+    }
+
+    function formatRupiahLengkap(value) {
+        return "Rp " + (Number(value) || 0).toLocaleString("id-ID");
+    }
+
+    function buatGradient(context, warnaAtas, warnaBawah) {
+        const chart = context.chart;
+        const area = chart.chartArea;
+
+        if (!area) return warnaBawah;
+
+        const gradient = chart.ctx.createLinearGradient(
+            0, area.top, 0, area.bottom
+        );
+
+        gradient.addColorStop(0, warnaAtas);
+        gradient.addColorStop(1, warnaBawah);
+
+        return gradient;
+    }
+
+    async function initDashboardBendahara() {
+        const root = document.querySelector(".dashboard-bendahara-page");
+
+        if (!root || root.dataset.chartInitialized === "true") return;
+
+        const canvas = root.querySelector("#keuanganChart");
+        const dataElement = root.querySelector("#dbKeuanganData");
+        const emptyState = root.querySelector("#keuanganChartEmpty");
+
+        if (!canvas || !dataElement) return;
+
+        let data;
+
+        try {
+            data = JSON.parse(dataElement.textContent || "{}");
+        } catch (error) {
+            console.error("Data grafik keuangan tidak valid:", error);
+            if (emptyState) emptyState.hidden = false;
+            return;
+        }
+
+        const labels = Array.isArray(data.labels) ? data.labels : [];
+        const pemasukan = Array.isArray(data.masuk) ? data.masuk : [];
+        const pengeluaran = Array.isArray(data.keluar) ? data.keluar : [];
+
+        const dataMasuk = pemasukan.map(value => Number(value) || 0);
+        const dataKeluar = pengeluaran.map(value => Number(value) || 0);
+
+        const adaData = labels.length > 0 && (
+            dataMasuk.some(value => value !== 0) ||
+            dataKeluar.some(value => value !== 0)
+        );
+
+        if (!adaData) {
+            canvas.style.display = "none";
+            if (emptyState) emptyState.hidden = false;
+            root.dataset.chartInitialized = "true";
+            return;
+        }
+
+        try {
+            await loadChartJs();
+
+            // Pastikan halaman belum diganti ketika library sedang dimuat
+            if (!root.isConnected || !canvas.isConnected) return;
+
+            if (canvas._keuanganChart) {
+                canvas._keuanganChart.destroy();
+            }
+
+            if (emptyState) emptyState.hidden = true;
+            canvas.style.display = "block";
+
+            canvas._keuanganChart = new window.Chart(
+                canvas.getContext("2d"),
+                {
+                    type: "line",
+
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: "Pemasukan",
+                                data: dataMasuk,
+                                borderColor: "#0ca678",
+                                backgroundColor: context => buatGradient(
+                                    context,
+                                    "rgba(12,166,120,.22)",
+                                    "rgba(12,166,120,.005)"
+                                ),
+                                borderWidth: 2.5,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: "#0ca678",
+                                pointBorderColor: "#ffffff",
+                                pointBorderWidth: 2,
+                                fill: true,
+                                tension: 0.38
+                            },
+                            {
+                                label: "Pengeluaran",
+                                data: dataKeluar,
+                                borderColor: "#5688df",
+                                backgroundColor: context => buatGradient(
+                                    context,
+                                    "rgba(86,136,223,.16)",
+                                    "rgba(86,136,223,.005)"
+                                ),
+                                borderWidth: 2.5,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: "#5688df",
+                                pointBorderColor: "#ffffff",
+                                pointBorderWidth: 2,
+                                fill: true,
+                                tension: 0.38
+                            }
+                        ]
+                    },
+
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        resizeDelay: 100,
+
+                        interaction: {
+                            mode: "index",
+                            intersect: false
+                        },
+
+                        animation: {
+                            duration: 850,
+                            easing: "easeOutQuart"
+                        },
+
+                        layout: {
+                            padding: {
+                                top: 8,
+                                right: 10,
+                                bottom: 0,
+                                left: 2
+                            }
+                        },
+
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+
+                            tooltip: {
+                                backgroundColor: "#17392c",
+                                titleColor: "#d9f6e7",
+                                bodyColor: "#ffffff",
+                                borderColor: "rgba(255,255,255,.12)",
+                                borderWidth: 1,
+                                padding: 13,
+                                cornerRadius: 11,
+                                displayColors: true,
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                boxHeight: 8,
+
+                                titleFont: {
+                                    family: "Inter, Segoe UI, sans-serif",
+                                    size: 11,
+                                    weight: "700"
+                                },
+
+                                bodyFont: {
+                                    family: "Inter, Segoe UI, sans-serif",
+                                    size: 11,
+                                    weight: "500"
+                                },
+
+                                callbacks: {
+                                    label(context) {
+                                        return " " + context.dataset.label +
+                                            ": " +
+                                            formatRupiahLengkap(
+                                                context.parsed.y
+                                            );
+                                    }
+                                }
+                            }
+                        },
+
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                border: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: "#87968e",
+                                    font: {
+                                        family: "Inter, Segoe UI, sans-serif",
+                                        size: 10,
+                                        weight: "600"
+                                    },
+                                    maxRotation: 0,
+                                    autoSkip: true
+                                }
+                            },
+
+                            y: {
+                                beginAtZero: true,
+                                border: {
+                                    display: false,
+                                    dash: [3, 5]
+                                },
+                                grid: {
+                                    color: "rgba(139,157,146,.13)",
+                                    drawTicks: false
+                                },
+                                ticks: {
+                                    color: "#93a198",
+                                    padding: 10,
+                                    maxTicksLimit: 6,
+                                    font: {
+                                        family: "Inter, Segoe UI, sans-serif",
+                                        size: 9
+                                    },
+                                    callback: formatRupiahRingkas
+                                }
+                            }
+                        },
+
+                        elements: {
+                            line: {
+                                borderCapStyle: "round",
+                                borderJoinStyle: "round"
+                            }
+                        }
+                    }
+                }
+            );
+
+            root.dataset.chartInitialized = "true";
+
+            console.log("Dashboard keuangan berhasil diinisialisasi.");
+
+        } catch (error) {
+            console.error("Gagal menampilkan grafik keuangan:", error);
+            if (emptyState) emptyState.hidden = false;
+        }
+    }
+
+    // Initial page load
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initDashboardBendahara,
+            { once: true }
+        );
+    } else {
+        initDashboardBendahara();
+    }
+
+    // SPA navigation
+    document.addEventListener(
+        "spa:page-loaded",
+        initDashboardBendahara
+    );
+
+})();

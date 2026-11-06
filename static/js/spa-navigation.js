@@ -5,6 +5,10 @@
 (() => {
     "use strict";
 
+    console.log(
+        "%c SPA NAVIGATION AKTIF ",
+        "background:#16a34a;color:white;padding:6px;font-weight:bold"
+    );
     const CONTENT_ID = "spa-content";
 
     let navigating = false;
@@ -374,6 +378,11 @@
 
             // Fallback jika server mengembalikan halaman tanpa layout SPA.
             if (!newContent) {
+                console.error(
+                    "[TES SPA] GAGAL: spa-content tidak ditemukan. Reload penuh!",
+                    response.url
+                );
+
                 location.href = response.url || targetUrl.href;
                 return;
             }
@@ -439,17 +448,72 @@
     // ==========================================
     // INTERCEPT LINK
     // ==========================================
+    
+    // ==========================================
+    // INTERCEPT LINK — SIDEBAR SPA
+    // ==========================================
     document.addEventListener("click", function(event) {
-        const link = event.target.closest("a");
 
-        if (!isPageLink(link, event)) return;
+        const target = event.target instanceof Element
+            ? event.target
+            : event.target?.parentElement;
+
+        const link = target?.closest("a");
+
+        if (!link) return;
+
+        // Khusus link menu sidebar
+        const isSidebarMenu = link.matches(
+            "#mainSidebar .sidebar-menu-wrapper a.menu-link"
+        );
+
+        if (!isSidebarMenu) {
+            if (!isPageLink(link, event)) return;
+        } else {
+            // Abaikan aksi khusus browser
+            if (
+                event.button !== 0 ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey ||
+                event.metaKey ||
+                (link.target && link.target !== "_self") ||
+                link.hasAttribute("download") ||
+                link.hasAttribute("data-no-spa") ||
+                link.hasAttribute("data-bs-toggle")
+            ) {
+                return;
+            }
+
+            const url = getPageUrl(link.href);
+
+            if (
+                url.origin !== location.origin ||
+                !["http:", "https:"].includes(url.protocol)
+            ) {
+                return;
+            }
+
+            if (
+                url.pathname === location.pathname &&
+                url.search === location.search &&
+                url.hash === location.hash
+            ) {
+                event.preventDefault();
+                return;
+            }
+        }
+
+        console.log("[SPA] LINK DITANGKAP:", link.href);
 
         event.preventDefault();
 
         saveSidebarScroll();
 
         navigateTo(link.href);
-    });
+
+    }, true);
+
 
     // ==========================================
     // BACK / FORWARD
