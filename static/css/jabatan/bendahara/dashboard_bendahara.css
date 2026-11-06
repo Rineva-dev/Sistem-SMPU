@@ -20,13 +20,6 @@
     color: var(--ink);
     font-family: Inter, "Segoe UI", Arial, sans-serif;
     line-height: 1.5;
-
-    background:
-        radial-gradient(
-            ellipse at 0 10%,
-            #c7dfcb26,
-            transparent 38%
-        );
 }
 
 .bdx *,
