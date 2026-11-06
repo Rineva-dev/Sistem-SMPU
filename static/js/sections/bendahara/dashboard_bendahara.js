@@ -1,9 +1,9 @@
 (() => {
     "use strict";
 
-    // Mencegah listener global terpasang berulang saat SPA.
-    const MODULE_KEY = "__emeraldFinanceDashboardV2";
+    const MODULE_KEY = "__hamzanwadiFinanceEmeraldV3";
 
+    // Jika script dijalankan lagi oleh SPA, gunakan modul yang sama.
     if (window[MODULE_KEY]) {
         window[MODULE_KEY].init();
         return;
@@ -12,48 +12,44 @@
     const CHART_URL =
         "https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js";
 
-    const ROOT_SELECTOR = ".dashboard-bendahara-page";
-
-    const reducedMotion = window.matchMedia(
+    const motionPreference = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
     );
 
-    const rupiah = new Intl.NumberFormat("id-ID", {
+    const currency = new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
         maximumFractionDigits: 0
     });
 
-    let current = null;
-    let chartPromise = null;
-    let motionPaused = false;
+    let active = null;
+    let chartLibraryPromise = null;
+    let paused = false;
 
     try {
-        motionPaused =
-            sessionStorage.getItem("fin-motion-paused") === "true";
-    } catch (_) {
-        // Dashboard tetap berjalan jika sessionStorage tidak tersedia.
-    }
+        paused =
+            sessionStorage.getItem("bdx-motion-paused") === "true";
+    } catch (_) {}
 
     // ==========================================
-    // LOAD CHART.JS
+    // CHART LIBRARY
     // ==========================================
 
-    function loadChartJs() {
+    function loadChartLibrary() {
         if (typeof window.Chart === "function") {
             return Promise.resolve(window.Chart);
         }
 
-        if (chartPromise) {
-            return chartPromise;
+        if (chartLibraryPromise) {
+            return chartLibraryPromise;
         }
 
-        chartPromise = new Promise((resolve, reject) => {
+        chartLibraryPromise = new Promise((resolve, reject) => {
             const script = document.createElement("script");
 
             script.src = CHART_URL;
             script.async = true;
-            script.dataset.finChartLoader = "true";
+            script.dataset.bdxChartLoader = "true";
 
             let settled = false;
 
@@ -62,7 +58,6 @@
                 settled = true;
 
                 clearTimeout(timeout);
-
                 script.onload = null;
                 script.onerror = null;
 
@@ -82,100 +77,94 @@
             }, 15000);
 
             script.onload = () => {
-                if (typeof window.Chart !== "function") {
-                    finish(
-                        new Error("Chart.js tidak tersedia.")
-                    );
-                    return;
-                }
-
-                finish();
+                finish(
+                    typeof window.Chart === "function"
+                        ? null
+                        : new Error("Chart.js tidak tersedia.")
+                );
             };
 
             script.onerror = () => {
                 finish(
                     new Error(
-                        "Chart.js gagal dimuat. Periksa jaringan atau CSP."
+                        "Chart.js gagal dimuat. Periksa koneksi atau CSP."
                     )
                 );
             };
 
             document.head.appendChild(script);
         }).catch(error => {
-            // Izinkan percobaan ulang.
-            chartPromise = null;
+            chartLibraryPromise = null;
             throw error;
         });
 
-        return chartPromise;
+        return chartLibraryPromise;
     }
 
     // ==========================================
-    // UTILITAS
+    // HELPERS
     // ==========================================
 
-    function isCurrent(state) {
+    function isActive(state) {
         return (
-            current === state &&
+            active === state &&
             state.root.isConnected
         );
     }
 
-    function formatRupiahRingkas(value) {
-        const nominal = Number(value);
-        const absolute = Math.abs(nominal);
+    function motionDisabled() {
+        return paused || motionPreference.matches;
+    }
 
-        if (absolute >= 1_000_000_000) {
+    function chartAnimation(duration = 550) {
+        return motionDisabled()
+            ? false
+            : {
+                duration,
+                easing: "easeOutQuart"
+            };
+    }
+
+    function compactCurrency(value) {
+        const number = Number(value);
+        const absolute = Math.abs(number);
+
+        if (absolute >= 1e9) {
             return "Rp " +
-                (nominal / 1_000_000_000).toLocaleString(
+                (number / 1e9).toLocaleString(
                     "id-ID",
                     { maximumFractionDigits: 1 }
                 ) +
                 " M";
         }
 
-        if (absolute >= 1_000_000) {
+        if (absolute >= 1e6) {
             return "Rp " +
-                (nominal / 1_000_000).toLocaleString(
+                (number / 1e6).toLocaleString(
                     "id-ID",
                     { maximumFractionDigits: 1 }
                 ) +
                 " jt";
         }
 
-        if (absolute >= 1_000) {
+        if (absolute >= 1e3) {
             return "Rp " +
-                (nominal / 1_000).toLocaleString(
+                (number / 1e3).toLocaleString(
                     "id-ID",
                     { maximumFractionDigits: 0 }
                 ) +
                 " rb";
         }
 
-        return rupiah.format(nominal);
-    }
-
-    function showState(state, title, detail, allowRetry = false) {
-        state.canvas.hidden = true;
-        state.stateBox.hidden = false;
-
-        state.stateBox.querySelector(
-            "[data-state-title]"
-        ).textContent = title;
-
-        state.stateBox.querySelector(
-            "[data-state-detail]"
-        ).textContent = detail;
-
-        state.retryButton.hidden = !allowRetry;
+        return currency.format(number);
     }
 
     // ==========================================
-    // VALIDASI DATA BACKEND
+    // DATA VALIDATION
     // ==========================================
 
     function readData(root) {
-        const element = root.querySelector("#dbKeuanganData");
+        const element = root.querySelector("#bdxKeuanganData");
 
         if (!element) {
             throw new Error("Elemen data grafik tidak ditemukan.");
@@ -183,11 +172,8 @@
 
         const source = JSON.parse(element.textContent);
 
-        if (
-            !Array.isArray(source.labels) ||
-            !Array.isArray(source.masuk)
-        ) {
-            throw new Error("Format data grafik tidak valid.");
+        if (!Array.isArray(source.labels)) {
+            throw new Error("Label bulan harus berupa array.");
         }
 
         const expenseReady =
@@ -199,20 +185,17 @@
                 values.length !== source.labels.length
             ) {
                 throw new Error(
-                    "Jumlah bulan dan nilai grafik tidak sama."
+                    "Jumlah label dan nominal grafik tidak sama."
                 );
             }
 
             return values.map(value => {
                 if (
-                    (
-                        typeof value !== "number" &&
-                        typeof value !== "string"
-                    ) ||
+                    !["number", "string"].includes(typeof value) ||
                     String(value).trim() === ""
                 ) {
                     throw new Error(
-                        "Nominal grafik harus berupa angka mentah."
+                        "Nominal grafik harus angka mentah."
                     );
                 }
 
@@ -220,7 +203,7 @@
 
                 if (!Number.isFinite(number)) {
                     throw new Error(
-                        "Nominal grafik tidak valid: " + value
+                        "Nominal grafik tidak valid."
                     );
                 }
 
@@ -238,38 +221,44 @@
         };
     }
 
+    function selectedData(state) {
+        // Baca ulang agar tombol Coba lagi juga
+        // dapat memproses data yang sudah diperbaiki.
+        const data = readData(state.root);
+
+        return {
+            labels: data.labels.slice(-state.range),
+            masuk: data.masuk.slice(-state.range),
+            keluar: data.keluar.slice(-state.range),
+            expenseReady: data.expenseReady
+        };
+    }
+
     // ==========================================
-    // RINGKASAN DAN TABEL
+    // SUMMARY / TABLE
     // ==========================================
 
-    function updateSummaryAndTable(state, data) {
-        const totalElement = state.root.querySelector(
-            "[data-fin-total]"
-        );
-
-        const tableBody = state.root.querySelector(
-            "[data-fin-table]"
-        );
-
-        const totalMasuk = data.masuk.reduce(
-            (total, nominal) => total + nominal,
+    function updateSummary(state, data) {
+        const total = data.masuk.reduce(
+            (sum, value) => sum + value,
             0
         );
 
-        totalElement.textContent = rupiah.format(totalMasuk);
-        tableBody.replaceChildren();
+        state.total.textContent = currency.format(total);
+
+        const fragment = document.createDocumentFragment();
 
         data.labels.forEach((label, index) => {
             const row = document.createElement("tr");
 
             const values = [
                 label,
-                rupiah.format(data.masuk[index])
+                currency.format(data.masuk[index])
             ];
 
             if (data.expenseReady) {
                 values.push(
-                    rupiah.format(data.keluar[index])
+                    currency.format(data.keluar[index])
                 );
             }
 
@@ -279,41 +268,64 @@
                 row.appendChild(cell);
             });
 
-            tableBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        state.dataTable.replaceChildren(fragment);
     }
 
     // ==========================================
-    // DATASET GRAFIK
+    // CHART STATES
     // ==========================================
 
-    function createDataset(label, values, color, fillColor) {
+    function showChartState(state, title, detail, retry = false) {
+        state.canvas.hidden = true;
+        state.stateBox.hidden = false;
+
+        state.stateTitle.textContent = title;
+        state.stateDetail.textContent = detail;
+        state.retry.hidden = !retry;
+    }
+
+    function destroyChart(state) {
+        const instance = state.chart;
+        state.chart = null;
+
+        if (instance) {
+            instance.destroy();
+        }
+
+        // Bersihkan instance parsial jika constructor gagal.
+        const partial =
+            window.Chart?.getChart?.(state.canvas);
+
+        if (partial) {
+            partial.destroy();
+        }
+
+        delete state.canvas._keuanganChart;
+    }
+
+    // ==========================================
+    // DATASET
+    // ==========================================
+
+    function createDataset(label, values, topColor, bottomColor) {
         return {
             label,
             data: values,
 
-            borderColor: color,
-            borderWidth: 2.5,
-
-            pointRadius: 3,
-            pointHoverRadius: 6,
-            pointBackgroundColor: color,
-            pointBorderColor: "#ffffff",
-            pointBorderWidth: 2,
-
-            fill: true,
-
-            // Garis lurus tidak menghasilkan lekukan
-            // yang seolah turun di bawah nol antarbulan.
-            tension: 0,
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 42,
+            categoryPercentage: 0.65,
+            barPercentage: 0.8,
 
             backgroundColor(context) {
                 const chart = context.chart;
                 const area = chart.chartArea;
 
-                if (!area) {
-                    return fillColor;
-                }
+                if (!area) return bottomColor;
 
                 const gradient = chart.ctx.createLinearGradient(
                     0,
@@ -322,36 +334,53 @@
                     area.bottom
                 );
 
-                gradient.addColorStop(0, fillColor);
-                gradient.addColorStop(
-                    1,
-                    "rgba(255,255,255,0)"
-                );
+                gradient.addColorStop(0, topColor);
+                gradient.addColorStop(1, bottomColor);
 
                 return gradient;
-            }
+            },
+
+            hoverBackgroundColor: bottomColor
         };
     }
 
+    function buildDatasets(data) {
+        const result = [
+            createDataset(
+                "Pemasukan",
+                data.masuk,
+                "#47a17b",
+                "#1d7453"
+            )
+        ];
+
+        if (data.expenseReady) {
+            result.push(
+                createDataset(
+                    "Pengeluaran",
+                    data.keluar,
+                    "#ddc795",
+                    "#b49a64"
+                )
+            );
+        }
+
+        return result;
+    }
+
     // ==========================================
-    // RENDER GRAFIK
+    // RENDER CHART
     // ==========================================
 
     async function renderChart(state) {
-        if (
-            state.loading ||
-            state.chart ||
-            !isCurrent(state)
-        ) {
-            return;
-        }
+        if (!isActive(state)) return;
 
-        state.loading = true;
+        const token = ++state.renderToken;
 
         try {
-            const data = readData(state.root);
+            const data = selectedData(state);
 
-            updateSummaryAndTable(state, data);
+            updateSummary(state, data);
 
             const hasData =
                 data.labels.length > 0 &&
@@ -360,71 +389,76 @@
                 );
 
             if (!hasData) {
-                showState(
+                destroyChart(state);
+
+                showChartState(
                     state,
-                    "Belum ada data keuangan",
-                    "Tidak ada nominal transaksi pada periode enam bulan ini."
+                    "Belum ada transaksi pada periode ini",
+                    "Pilih periode lain atau periksa riwayat pembayaran."
                 );
 
                 return;
             }
 
-            showState(
+            // Perbarui instance yang sudah ada agar transisi
+            // 3/6 bulan lebih halus tanpa membangun ulang canvas.
+            if (state.chart) {
+                state.chart.stop();
+
+                state.chart.data.labels = data.labels;
+
+                state.chart.data.datasets.forEach(
+                    (dataset, index) => {
+                        dataset.data = index === 0
+                            ? data.masuk
+                            : data.keluar;
+                    }
+                );
+
+                state.chart.options.animation = chartAnimation(450);
+
+                state.canvas.hidden = false;
+                state.stateBox.hidden = true;
+
+                state.chart.update();
+                return;
+            }
+
+            showChartState(
                 state,
                 "Menyiapkan grafik",
-                "Memuat tampilan arus keuangan…"
+                "Memuat ringkasan transaksi…"
             );
 
-            const Chart = await loadChartJs();
+            const Chart = await loadChartLibrary();
 
-            // Pengguna mungkin sudah pindah halaman
-            // ketika CDN selesai dimuat.
-            if (!isCurrent(state)) return;
+            // Abaikan hasil lama jika periode berubah
+            // atau halaman sudah ditinggalkan.
+            if (
+                !isActive(state) ||
+                token !== state.renderToken
+            ) {
+                return;
+            }
 
             state.canvas.hidden = false;
             state.stateBox.hidden = true;
 
-            const datasets = [
-                createDataset(
-                    "Pemasukan",
-                    data.masuk,
-                    "#079669",
-                    "rgba(7,150,105,.22)"
-                )
-            ];
-
-            if (data.expenseReady) {
-                datasets.push(
-                    createDataset(
-                        "Pengeluaran",
-                        data.keluar,
-                        "#5688df",
-                        "rgba(86,136,223,.16)"
-                    )
-                );
-            }
-
             state.chart = new Chart(
                 state.canvas.getContext("2d"),
                 {
-                    type: "line",
+                    type: "bar",
 
                     data: {
                         labels: data.labels,
-                        datasets
+                        datasets: buildDatasets(data)
                     },
 
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-
-                        animation:
-                            reducedMotion.matches || motionPaused
-                                ? false
-                                : {
-                                    duration: 700,
-                                    easing: "easeOutQuart"
-                                },
+                        resizeDelay: 100,
+                        animation: chartAnimation(700),
 
                         interaction: {
                             mode: "index",
@@ -434,7 +468,7 @@
                         layout: {
                             padding: {
                                 top: 10,
-                                right: 10
+                                right: 8
                             }
                         },
 
@@ -444,9 +478,11 @@
                             },
 
                             tooltip: {
-                                backgroundColor: "#123f30",
-                                titleColor: "#d9f3e3",
+                                backgroundColor: "#173e30",
+                                titleColor: "#dce9dc",
                                 bodyColor: "#ffffff",
+                                borderColor: "#ffffff15",
+                                borderWidth: 1,
                                 padding: 13,
                                 cornerRadius: 10,
                                 displayColors: true,
@@ -455,7 +491,7 @@
                                     label(context) {
                                         return context.dataset.label +
                                             ": " +
-                                            rupiah.format(
+                                            currency.format(
                                                 context.parsed.y
                                             );
                                     }
@@ -465,21 +501,21 @@
 
                         scales: {
                             x: {
-                                grid: {
-                                    display: false
-                                },
-
                                 border: {
                                     display: false
                                 },
 
+                                grid: {
+                                    display: false
+                                },
+
                                 ticks: {
-                                    color: "#62796b",
+                                    color: "#7b8c79",
+                                    maxRotation: 0,
+                                    autoSkip: true,
                                     font: {
                                         size: 11
-                                    },
-                                    maxRotation: 0,
-                                    autoSkip: true
+                                    }
                                 }
                             },
 
@@ -491,16 +527,16 @@
                                 },
 
                                 grid: {
-                                    color: "#edf2ee"
+                                    color: "#edf2e9"
                                 },
 
                                 ticks: {
-                                    color: "#62796b",
+                                    color: "#7b8c79",
                                     maxTicksLimit: 5,
                                     font: {
                                         size: 10
                                     },
-                                    callback: formatRupiahRingkas
+                                    callback: compactCurrency
                                 }
                             }
                         }
@@ -508,105 +544,128 @@
                 }
             );
 
-            // Tetap tersedia untuk pemeriksaan lewat Console.
             state.canvas._keuanganChart = state.chart;
 
         } catch (error) {
-            if (!isCurrent(state)) return;
-
-            if (state.chart) {
-                state.chart.destroy();
-                state.chart = null;
+            if (
+                !isActive(state) ||
+                token !== state.renderToken
+            ) {
+                return;
             }
 
-            // Bersihkan jika constructor sempat
-            // mendaftarkan instance sebelum gagal.
-            const partialChart =
-                window.Chart?.getChart?.(state.canvas);
+            destroyChart(state);
 
-            if (partialChart) {
-                partialChart.destroy();
-            }
-
-            delete state.canvas._keuanganChart;
-
-            showState(
+            showChartState(
                 state,
                 "Grafik belum bisa ditampilkan",
-                "Coba lagi. Jika tetap gagal, periksa data grafik dan koneksi.",
+                "Periksa koneksi atau data grafik, lalu coba lagi.",
                 true
             );
 
             console.error(
-                "[Dashboard Bendahara]",
+                "[Hamzanwadi Finance]",
                 error
             );
-
-        } finally {
-            state.loading = false;
         }
     }
 
     // ==========================================
-    // PENGATURAN ANIMASI
+    // SEARCH TRANSACTIONS
     // ==========================================
 
-    function applyMotionPreference() {
-        if (!current) return;
+    function filterTransactions(state) {
+        const query = state.search.value
+            .trim()
+            .toLocaleLowerCase("id-ID");
 
-        const shouldPause =
-            motionPaused || reducedMotion.matches;
+        let count = 0;
 
-        current.root.classList.toggle(
-            "fin-motion-paused",
-            shouldPause
+        state.rows.forEach(item => {
+            const matches =
+                query === "" ||
+                item.searchText.includes(query);
+
+            item.element.hidden = !matches;
+
+            if (matches) count++;
+        });
+
+        state.noResults.hidden = !(
+            state.rows.length > 0 &&
+            count === 0
         );
 
-        const button = current.root.querySelector(
-            "[data-fin-motion]"
+        state.count.textContent = query
+            ? `${count} dari ${state.rows.length} transaksi ditampilkan`
+            : `${state.rows.length} transaksi ditampilkan`;
+    }
+
+    // ==========================================
+    // MOTION
+    // ==========================================
+
+    function applyMotion() {
+        if (!active) return;
+
+        active.root.classList.toggle(
+            "bdx-paused",
+            motionDisabled()
         );
 
-        button.textContent = motionPaused
+        const label = paused
             ? "Aktifkan animasi"
             : "Jeda animasi";
 
-        button.setAttribute(
+        active.motionButton.setAttribute(
             "aria-pressed",
-            String(motionPaused)
+            String(paused)
         );
 
-        if (current.chart) {
-            current.chart.stop();
+        active.motionButton.setAttribute(
+            "aria-label",
+            label
+        );
 
-            current.chart.options.animation = shouldPause
-                ? false
-                : {
-                    duration: 700,
-                    easing: "easeOutQuart"
-                };
+        active.motionButton.title = label;
 
-            current.chart.update("none");
+        const icon = active.motionButton.querySelector("i");
+
+        icon.classList.toggle("fa-play", paused);
+        icon.classList.toggle("fa-pause", !paused);
+
+        if (active.chart) {
+            active.chart.stop();
+            active.chart.options.animation = chartAnimation(450);
+            active.chart.update("none");
         }
     }
 
+    function applyVisibility() {
+        if (!active) return;
+
+        active.root.classList.toggle(
+            "bdx-background",
+            document.hidden
+        );
+    }
+
     // ==========================================
-    // CLEANUP SEBELUM PINDAH HALAMAN
+    // CLEANUP
     // ==========================================
 
     function cleanup() {
-        if (!current) return;
+        if (!active) return;
 
-        const previous = current;
-        current = null;
+        const previous = active;
+        active = null;
 
-        // Lepaskan listener tombol pada halaman lama.
+        previous.renderToken++;
         previous.events.abort();
 
-        if (previous.chart) {
-            previous.chart.destroy();
-        }
+        cancelAnimationFrame(previous.searchFrame);
 
-        delete previous.canvas._keuanganChart;
+        destroyChart(previous);
     }
 
     // ==========================================
@@ -614,10 +673,10 @@
     // ==========================================
 
     function init() {
-        const root = document.querySelector(ROOT_SELECTOR);
+        const root = document.querySelector(".bdx");
 
         if (
-            current?.root === root &&
+            active?.root === root &&
             root?.isConnected
         ) {
             return;
@@ -627,62 +686,118 @@
 
         if (!root) return;
 
-        const canvas = root.querySelector("#keuanganChart");
-        const stateBox = root.querySelector("#keuanganChartEmpty");
-        const retryButton = root.querySelector("[data-fin-retry]");
-        const motionButton = root.querySelector("[data-fin-motion]");
+        const selectors = {
+            canvas: "#bdxKeuanganChart",
+            stateBox: "[data-bdx-chart-state]",
+            stateTitle: "[data-bdx-state-title]",
+            stateDetail: "[data-bdx-state-detail]",
+            retry: "[data-bdx-retry]",
+            total: "[data-bdx-total]",
+            dataTable: "[data-bdx-data-table]",
+            search: "[data-bdx-search]",
+            noResults: "[data-bdx-no-results]",
+            count: "[data-bdx-count]",
+            motionButton: "[data-bdx-motion]"
+        };
 
-        if (
-            !canvas ||
-            !stateBox ||
-            !retryButton ||
-            !motionButton
-        ) {
-            return;
+        const elements = {};
+
+        for (const [key, selector] of Object.entries(selectors)) {
+            elements[key] = root.querySelector(selector);
+
+            if (!elements[key]) {
+                console.error(
+                    "[Hamzanwadi Finance] Elemen tidak ditemukan:",
+                    selector
+                );
+                return;
+            }
         }
 
         const state = {
             root,
-            canvas,
-            stateBox,
-            retryButton,
+            ...elements,
+
+            range: 6,
             chart: null,
-            loading: false,
-            events: new AbortController()
+            renderToken: 0,
+            searchFrame: 0,
+            events: new AbortController(),
+
+            rows: Array.from(
+                root.querySelectorAll("[data-bdx-transaction]")
+            ).map(element => ({
+                element,
+                searchText: element.textContent.toLocaleLowerCase("id-ID")
+            }))
         };
 
-        current = state;
+        active = state;
 
-        retryButton.addEventListener(
-            "click",
-            () => renderChart(state),
-            {
-                signal: state.events.signal
-            }
+        const options = {
+            signal: state.events.signal
+        };
+
+        const rangeButtons = Array.from(
+            root.querySelectorAll("[data-bdx-range]")
         );
 
-        motionButton.addEventListener(
-            "click",
-            () => {
-                motionPaused = !motionPaused;
+        rangeButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const range = Number(button.dataset.bdxRange);
 
-                try {
-                    sessionStorage.setItem(
-                        "fin-motion-paused",
-                        String(motionPaused)
-                    );
-                } catch (_) {
-                    // Preferensi tetap berlaku untuk halaman aktif.
+                if (
+                    ![3, 6].includes(range) ||
+                    range === state.range
+                ) {
+                    return;
                 }
 
-                applyMotionPreference();
-            },
-            {
-                signal: state.events.signal
-            }
-        );
+                state.range = range;
 
-        applyMotionPreference();
+                rangeButtons.forEach(item => {
+                    item.setAttribute(
+                        "aria-pressed",
+                        String(
+                            Number(item.dataset.bdxRange) === range
+                        )
+                    );
+                });
+
+                renderChart(state);
+            }, options);
+        });
+
+        state.retry.addEventListener("click", () => {
+            renderChart(state);
+        }, options);
+
+        state.search.addEventListener("input", () => {
+            cancelAnimationFrame(state.searchFrame);
+
+            state.searchFrame = requestAnimationFrame(() => {
+                if (isActive(state)) {
+                    filterTransactions(state);
+                }
+            });
+        }, options);
+
+        state.motionButton.addEventListener("click", () => {
+            paused = !paused;
+
+            try {
+                sessionStorage.setItem(
+                    "bdx-motion-paused",
+                    String(paused)
+                );
+            } catch (_) {}
+
+            applyMotion();
+        }, options);
+
+        applyMotion();
+        applyVisibility();
+        filterTransactions(state);
         renderChart(state);
     }
 
@@ -701,9 +816,14 @@
         init
     );
 
-    reducedMotion.addEventListener(
+    document.addEventListener(
+        "visibilitychange",
+        applyVisibility
+    );
+
+    motionPreference.addEventListener(
         "change",
-        applyMotionPreference
+        applyMotion
     );
 
     if (document.readyState === "loading") {

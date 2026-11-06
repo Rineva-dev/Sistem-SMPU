@@ -1,478 +1,530 @@
-{% set pengeluaran_siap = pengeluaran_tersedia | default(false) %}
-{% set persen = [100, [0, persen_lunas_spp | default(0) | float] | max] | min %}
+{% set expense_ready = pengeluaran_tersedia | default(false) %}
+{% set paid_percent = [100, [0, persen_lunas_spp | default(0) | float] | max] | min %}
 
 <div
-    class="dashboard-bendahara-page"
-    data-expense-ready="{{ 'true' if pengeluaran_siap else 'false' }}"
+    class="bdx"
+    data-expense-ready="{{ 'true' if expense_ready else 'false' }}"
 >
 
     <!-- HEADER -->
-    <header class="fin-header fin-enter">
-        <div>
-            <div class="fin-eyebrow">
-                <span class="fin-status-dot"></span>
-                SMP UNGGULAN HAMZANWADI
-            </div>
-
-            <h1>
-                Dashboard Keuangan<span class="fin-title-dot">.</span>
-            </h1>
-
-            <p>
-                Selamat datang, {{ user_name | default('Bendahara', true) }}.
-                Mari kelola keuangan sekolah.
-            </p>
-        </div>
-
-        <div class="fin-context">
-            <span>
-                <i class="far fa-calendar" aria-hidden="true"></i>
-                {{ tahun_ajaran | default('Tahun ajaran', true) }}
+    <header class="bdx-header">
+        <div class="bdx-brand">
+            <span class="bdx-brand-icon" aria-hidden="true">
+                <i class="fas fa-wallet"></i>
             </span>
 
-            <small>
-                Semester {{ semester | default('—', true) }}
-            </small>
+            <div>
+                <p class="bdx-breadcrumb">
+                    SMP Unggulan Hamzanwadi
+                    <span>/</span>
+                    Bendahara
+                </p>
+
+                <h1>Finance workspace<span>.</span></h1>
+            </div>
+        </div>
+
+        <div class="bdx-header-tools">
+            <div class="bdx-period">
+                <i class="far fa-calendar" aria-hidden="true"></i>
+
+                <div>
+                    <strong>
+                        {{ tahun_ajaran | default('Tahun ajaran', true) }}
+                    </strong>
+
+                    <span>
+                        Semester {{ semester | default('—', true) }}
+                    </span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="bdx-motion"
+                data-bdx-motion
+                aria-label="Jeda animasi"
+                aria-pressed="false"
+                title="Jeda animasi"
+            >
+                <i class="fas fa-pause" aria-hidden="true"></i>
+            </button>
         </div>
     </header>
 
-    <!-- HERO -->
-    <section class="fin-hero fin-enter" aria-labelledby="finSaldoTitle">
+    <div class="bdx-welcome">
+        <p>
+            Halo,
+            <strong>{{ user_name | default('Bendahara', true) }}</strong>.
+            Ini ringkasan keuangan sekolah.
+        </p>
 
-        <div class="fin-hero-light" aria-hidden="true"></div>
-        <div class="fin-hero-grid" aria-hidden="true"></div>
+        <span class="bdx-overview-badge">
+            <span></span>
+            Financial overview
+        </span>
+    </div>
 
-        <div class="fin-hero-copy">
-            <div class="fin-hero-kicker">
+    <!-- RINGKASAN UTAMA -->
+    <section class="bdx-overview" aria-label="Ringkasan keuangan">
+
+        <!-- SALDO -->
+        <article class="bdx-balance bdx-enter">
+            <div class="bdx-balance-glow" aria-hidden="true"></div>
+
+            <div class="bdx-balance-heading">
+                <span>SCHOOL FINANCE</span>
+
+                <i class="fas fa-wallet" aria-hidden="true"></i>
+            </div>
+
+            <div class="bdx-balance-copy">
+                <p>
+                    {{ 'Saldo tersedia' if expense_ready else 'Penerimaan tercatat' }}
+                </p>
+
+                <h2>{{ saldo_tersedia | default('Rp 0', true) }}</h2>
+
                 <span>
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                    {% if expense_ready %}
+                        Berdasarkan penerimaan dan pengeluaran yang tercatat.
+                    {% else %}
+                        Total pembayaran tercatat, sebelum pengeluaran.
+                    {% endif %}
                 </span>
-                RINGKASAN KAS SEKOLAH
             </div>
 
-            <h2 id="finSaldoTitle">
-                {{ 'Saldo tersedia' if pengeluaran_siap else 'Penerimaan tercatat' }}
-            </h2>
+            <div class="bdx-card-art" aria-hidden="true">
+                <div class="bdx-art-ring"></div>
+                <div class="bdx-card-back"></div>
 
-            <p class="fin-balance">
-                {{ saldo_tersedia | default('Rp 0', true) }}
-            </p>
+                <div class="bdx-card-front">
+                    <div class="bdx-card-top">
+                        <span class="bdx-card-chip"></span>
+                        <i class="fas fa-wave-square"></i>
+                    </div>
 
-            <p class="fin-hero-note">
-                {% if pengeluaran_siap %}
-                    Berdasarkan penerimaan dan pengeluaran yang tercatat.
-                {% else %}
-                    Berdasarkan data pembayaran; belum memperhitungkan pengeluaran.
-                {% endif %}
-            </p>
+                    <div class="bdx-card-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
 
-            <a
-                href="/keuangan/laporan"
-                class="fin-button fin-button-light"
-            >
-                Lihat laporan
-                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    <div class="bdx-card-bottom">
+                        <span>SMPU HAMZANWADI</span>
+                        <i class="fas fa-school"></i>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/keuangan/laporan" class="bdx-balance-link">
+                Buka laporan keuangan
+
+                <span>
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </span>
             </a>
-        </div>
-
-        <div class="fin-hero-art" aria-hidden="true">
-            <div class="fin-orbit fin-orbit-one"></div>
-            <div class="fin-orbit fin-orbit-two"></div>
-
-            <div class="fin-glass-tile">
-                <i class="fas fa-chart-pie"></i>
-                <span>FINANCE</span>
-            </div>
-
-            <span class="fin-float-token fin-token-one">
-                <i class="fas fa-coins"></i>
-            </span>
-
-            <span class="fin-float-token fin-token-two">
-                <i class="fas fa-file-invoice"></i>
-            </span>
-
-            <span class="fin-art-star">✧</span>
-        </div>
-
-        <footer class="fin-hero-footer">
-            <span>FINANCIAL OVERVIEW</span>
-            <span>Administrasi yang tertata, langkah yang terarah.</span>
-        </footer>
-    </section>
-
-    <!-- STATISTIK -->
-    <section class="fin-stats-grid" aria-label="Statistik keuangan">
-
-        <article class="fin-stat-card fin-income fin-enter">
-            <div class="fin-card-top">
-                <span class="fin-icon">
-                    <i class="fas fa-arrow-down" aria-hidden="true"></i>
-                </span>
-
-                <span class="fin-chip">PENERIMAAN</span>
-            </div>
-
-            <h2>Masuk bulan ini</h2>
-
-            <p class="fin-stat-value">
-                {{ pemasukan_bulan_ini | default('Rp 0', true) }}
-            </p>
-
-            <p class="fin-card-caption">
-                Total pembayaran yang tercatat bulan ini
-            </p>
-
-            <span class="fin-card-ring" aria-hidden="true"></span>
         </article>
 
-        <article class="fin-stat-card fin-expense fin-enter">
-            <div class="fin-card-top">
-                <span class="fin-icon">
-                    <i class="fas fa-arrow-up" aria-hidden="true"></i>
-                </span>
+        <!-- RINGKASAN BULANAN -->
+        <div class="bdx-overview-right">
 
-                <span class="fin-chip">PENGELUARAN</span>
-            </div>
-
-            <h2>Keluar bulan ini</h2>
-
-            {% if pengeluaran_siap %}
-                <p class="fin-stat-value">
-                    {{ pengeluaran_bulan_ini | default('Rp 0', true) }}
-                </p>
-
-                <p class="fin-card-caption">
-                    Total pengeluaran yang tercatat bulan ini
-                </p>
-            {% else %}
-                <p class="fin-stat-value fin-unavailable">
-                    Belum tersedia
-                </p>
-
-                <p class="fin-card-caption">
-                    Sumber data pengeluaran belum terhubung
-                </p>
-            {% endif %}
-
-            <span class="fin-card-ring" aria-hidden="true"></span>
-        </article>
-
-        <article class="fin-stat-card fin-spp fin-enter">
-            <div class="fin-card-top">
-                <span class="fin-icon">
-                    <i class="fas fa-graduation-cap" aria-hidden="true"></i>
-                </span>
-
-                <span class="fin-chip">PELUNASAN</span>
-            </div>
-
-            <h2>Siswa dengan tagihan lunas</h2>
-
-            <p class="fin-stat-value">
-                {{ persen }}<small>%</small>
-            </p>
-
-            <div
-                class="fin-progress"
-                role="progressbar"
-                aria-label="Persentase siswa dengan tagihan lunas"
-                aria-valuenow="{{ persen }}"
-                aria-valuemin="0"
-                aria-valuemax="100"
-            >
-                <span style="width: {{ persen }}%"></span>
-            </div>
-
-            <p class="fin-card-caption">
-                {{ jumlah_lunas | default(0) }}
-                dari {{ total_siswa | default(0) }} siswa
-                pada tahun ajaran terpilih
-            </p>
-        </article>
-
-    </section>
-
-    <!-- GRAFIK DAN TRANSAKSI -->
-    <section class="fin-main-grid" aria-label="Analisis dan aktivitas">
-
-        <article class="fin-panel fin-chart-panel fin-enter">
-
-            <header class="fin-panel-heading">
+            <div class="bdx-section-heading">
                 <div>
-                    <span class="fin-eyebrow">ANALISIS KEUANGAN</span>
-                    <h2>Arus keuangan</h2>
+                    <span class="bdx-eyebrow">MONTHLY SNAPSHOT</span>
+                    <h2>Keuangan bulan ini</h2>
+                </div>
+
+                <span class="bdx-section-note">
+                    Berdasarkan transaksi tercatat
+                </span>
+            </div>
+
+            <div class="bdx-money-grid">
+
+                <article class="bdx-money bdx-income bdx-enter">
+                    <div class="bdx-money-heading">
+                        <span>
+                            <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                        </span>
+
+                        <h3>Pemasukan</h3>
+                    </div>
+
+                    <p class="bdx-money-value">
+                        {{ pemasukan_bulan_ini | default('Rp 0', true) }}
+                    </p>
+
+                    <div class="bdx-money-footer">
+                        <span>Penerimaan bulan berjalan</span>
+                        <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                    </div>
+                </article>
+
+                <article class="bdx-money bdx-expense bdx-enter">
+                    <div class="bdx-money-heading">
+                        <span>
+                            <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                        </span>
+
+                        <h3>Pengeluaran</h3>
+                    </div>
+
+                    {% if expense_ready %}
+                        <p class="bdx-money-value">
+                            {{ pengeluaran_bulan_ini | default('Rp 0', true) }}
+                        </p>
+                    {% else %}
+                        <p class="bdx-money-value bdx-unavailable">
+                            Belum terhubung
+                        </p>
+                    {% endif %}
+
+                    <div class="bdx-money-footer">
+                        <span>
+                            {{ 'Pengeluaran bulan berjalan' if expense_ready else 'Sumber data belum tersedia' }}
+                        </span>
+
+                        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- PELUNASAN -->
+            <article class="bdx-collection bdx-enter">
+                <div class="bdx-collection-copy">
+                    <span class="bdx-eyebrow">STATUS PELUNASAN</span>
+
+                    <h2>Setiap pembayaran berarti.</h2>
 
                     <p>
-                        Riwayat penerimaan berdasarkan tanggal pembayaran.
+                        Ringkasan tagihan siswa pada tahun ajaran terpilih.
                     </p>
+
+                    <div class="bdx-collection-metrics">
+                        <div>
+                            <span class="bdx-dot bdx-dot-green"></span>
+                            <strong>{{ jumlah_lunas | default(0) }}</strong>
+                            <small>Siswa lunas</small>
+                        </div>
+
+                        <div>
+                            <span class="bdx-dot bdx-dot-muted"></span>
+                            <strong>{{ jumlah_belum_lunas | default(0) }}</strong>
+                            <small>Belum lunas</small>
+                        </div>
+                    </div>
                 </div>
-
-                <span class="fin-panel-icon">
-                    <i class="fas fa-chart-line" aria-hidden="true"></i>
-                </span>
-            </header>
-
-            <div class="fin-chart-summary">
-                <div>
-                    <span>Total penerimaan periode</span>
-                    <strong data-fin-total>—</strong>
-                </div>
-
-                <span class="fin-period">
-                    <i class="far fa-calendar" aria-hidden="true"></i>
-                    6 bulan terakhir
-                </span>
-            </div>
-
-            <div class="fin-chart-toolbar">
-                <span>
-                    <b class="fin-dot fin-dot-green"></b>
-                    Pemasukan
-                </span>
-
-                {% if pengeluaran_siap %}
-                    <span>
-                        <b class="fin-dot fin-dot-blue"></b>
-                        Pengeluaran
-                    </span>
-                {% else %}
-                    <span class="fin-chart-note">
-                        Pengeluaran belum terhubung
-                    </span>
-                {% endif %}
-            </div>
-
-            <div class="fin-chart-container">
-                <canvas
-                    id="keuanganChart"
-                    role="img"
-                    aria-label="Grafik keuangan enam bulan terakhir. Rincian tersedia pada tabel di bawah."
-                ></canvas>
 
                 <div
-                    class="fin-chart-state"
-                    id="keuanganChartEmpty"
-                    role="status"
+                    class="bdx-donut"
+                    style="--paid: {{ paid_percent }}%"
+                    role="img"
+                    aria-label="{{ paid_percent }} persen siswa memiliki tagihan lunas"
                 >
-                    <span class="fin-state-icon">
-                        <i class="fas fa-chart-area" aria-hidden="true"></i>
-                    </span>
+                    <div>
+                        <strong>{{ paid_percent }}<small>%</small></strong>
+                        <span>Pelunasan</span>
+                    </div>
+                </div>
+            </article>
 
-                    <strong data-state-title>Menyiapkan grafik</strong>
-                    <p data-state-detail>Memuat data keuangan…</p>
+        </div>
+    </section>
+
+    <!-- GRAFIK DAN AKSES CEPAT -->
+    <section class="bdx-analysis" aria-label="Analisis dan tindakan">
+
+        <article class="bdx-chart-panel bdx-enter">
+
+            <header class="bdx-panel-heading">
+                <div>
+                    <span class="bdx-eyebrow">CASH FLOW ANALYTICS</span>
+                    <h2>Perjalanan keuangan</h2>
+                </div>
+
+                <div
+                    class="bdx-segmented"
+                    role="group"
+                    aria-label="Periode grafik"
+                >
+                    <button
+                        type="button"
+                        data-bdx-range="3"
+                        aria-pressed="false"
+                    >3 bulan</button>
 
                     <button
                         type="button"
-                        class="fin-button fin-button-outline"
-                        data-fin-retry
-                        hidden
-                    >
-                        Coba lagi
-                    </button>
+                        data-bdx-range="6"
+                        aria-pressed="true"
+                    >6 bulan</button>
+                </div>
+            </header>
+
+            <div class="bdx-chart-summary">
+                <div>
+                    <span>Total penerimaan periode</span>
+                    <strong data-bdx-total>—</strong>
+                </div>
+
+                <div class="bdx-chart-legend">
+                    <span>
+                        <b class="bdx-dot bdx-dot-green"></b>
+                        Pemasukan
+                    </span>
+
+                    {% if expense_ready %}
+                        <span>
+                            <b class="bdx-dot bdx-dot-gold"></b>
+                            Pengeluaran
+                        </span>
+                    {% else %}
+                        <small>Pengeluaran belum terhubung</small>
+                    {% endif %}
                 </div>
             </div>
 
-            <details class="fin-data-details">
-                <summary>Lihat angka per bulan</summary>
+            <div class="bdx-chart-wrap">
+                <canvas
+                    id="bdxKeuanganChart"
+                    role="img"
+                    aria-label="Grafik keuangan. Rincian angka tersedia pada tabel di bawah."
+                    hidden
+                ></canvas>
 
-                <div class="fin-table-scroll">
-                    <table>
-                        <caption>
-                            Ringkasan transaksi enam bulan terakhir
-                        </caption>
+                <div
+                    class="bdx-chart-state"
+                    data-bdx-chart-state
+                    role="status"
+                >
+                    <span>
+                        <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                    </span>
+
+                    <strong data-bdx-state-title>Menyiapkan grafik</strong>
+                    <p data-bdx-state-detail>Memuat data transaksi…</p>
+
+                    <button
+                        type="button"
+                        class="bdx-button bdx-button-outline"
+                        data-bdx-retry
+                        hidden
+                    >Coba lagi</button>
+                </div>
+            </div>
+
+            <details class="bdx-data-details">
+                <summary>Lihat rincian angka</summary>
+
+                <div
+                    class="bdx-table-scroll"
+                    tabindex="0"
+                    role="region"
+                    aria-label="Tabel keuangan bulanan"
+                >
+                    <table class="bdx-data-table">
+                        <caption>Data keuangan pada periode terpilih</caption>
 
                         <thead>
                             <tr>
                                 <th scope="col">Bulan</th>
                                 <th scope="col">Pemasukan</th>
 
-                                {% if pengeluaran_siap %}
+                                {% if expense_ready %}
                                     <th scope="col">Pengeluaran</th>
                                 {% endif %}
                             </tr>
                         </thead>
 
-                        <tbody data-fin-table></tbody>
+                        <tbody data-bdx-data-table></tbody>
                     </table>
                 </div>
             </details>
 
             <noscript>
-                <p class="fin-noscript">
-                    Aktifkan JavaScript untuk melihat grafik dan tabel bulanan.
+                <p class="bdx-noscript">
+                    Aktifkan JavaScript untuk melihat grafik.
                 </p>
             </noscript>
         </article>
 
-        <article class="fin-panel fin-transactions-panel fin-enter">
+        <aside class="bdx-action-rail" aria-label="Akses cepat">
 
-            <header class="fin-panel-heading">
-                <div>
-                    <span class="fin-eyebrow">AKTIVITAS TERBARU</span>
-                    <h2>Transaksi terbaru</h2>
-                    <p>Aktivitas pembayaran yang tercatat.</p>
+            <article class="bdx-followup bdx-enter">
+                <div class="bdx-followup-heading">
+                    <span class="bdx-eyebrow">PERLU DITINDAKLANJUTI</span>
+                    <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i>
                 </div>
 
-                <a
-                    href="/keuangan/laporan"
-                    class="fin-icon-link"
-                    aria-label="Buka laporan transaksi"
-                >
-                    <i
-                        class="fas fa-arrow-up-right-from-square"
-                        aria-hidden="true"
-                    ></i>
-                </a>
-            </header>
-
-            <div class="fin-transaction-list">
-
-                {% for trx in daftar_transaksi | default([], true) %}
-
-                    <div class="fin-transaction {% if trx.jenis_trx != 'masuk' %}is-outgoing{% endif %}">
-
-                        <span class="fin-trx-icon">
-                            <i
-                                class="fas {{ 'fa-arrow-down' if trx.jenis_trx == 'masuk' else 'fa-arrow-up' }}"
-                                aria-hidden="true"
-                            ></i>
-                        </span>
-
-                        <div class="fin-trx-detail">
-                            <strong>{{ trx.nama_siswa }}</strong>
-                            <span>{{ trx.jenis_pembayaran }}</span>
-                            <small>{{ trx.tanggal_lengkap }}</small>
-                        </div>
-
-                        <div class="fin-trx-value">
-                            <strong>
-                                {{ '+' if trx.jenis_trx == 'masuk' else '−' }}Rp
-                                {{ '{:,.0f}'.format(trx.nominal | default(0, true)).replace(',', '.') }}
-                            </strong>
-
-                            <span>
-                                {{ 'Pemasukan' if trx.jenis_trx == 'masuk' else 'Pengeluaran' }}
-                            </span>
-                        </div>
-                    </div>
-
-                {% else %}
-
-                    <div class="fin-empty">
-                        <span class="fin-state-icon">
-                            <i class="fas fa-inbox" aria-hidden="true"></i>
-                        </span>
-
-                        <strong>Belum ada transaksi</strong>
-
-                        <p>
-                            Pembayaran yang tercatat akan tampil di sini.
-                        </p>
-                    </div>
-
-                {% endfor %}
-
-            </div>
-
-            <a href="/keuangan/laporan" class="fin-panel-link">
-                Lihat semua transaksi
-                <i class="fas fa-arrow-right" aria-hidden="true"></i>
-            </a>
-        </article>
-
-    </section>
-
-    <!-- AKSES CEPAT -->
-    <section class="fin-bottom-grid" aria-label="Tagihan dan laporan">
-
-        <article class="fin-action-card fin-reminder fin-enter">
-            <span class="fin-icon">
-                <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i>
-            </span>
-
-            <div>
-                <span class="fin-eyebrow">TINDAK LANJUT</span>
-                <h2>Pantau tagihan siswa</h2>
-
-                <p class="fin-unpaid">
-                    <strong>{{ jumlah_belum_lunas | default(0) }}</strong>
-                    siswa belum lunas
+                <p class="bdx-followup-number">
+                    {{ jumlah_belum_lunas | default(0) }}
+                    <span>siswa</span>
                 </p>
 
-                <p>
-                    Periksa rincian tagihan siswa pada tahun ajaran terpilih.
+                <h2>Tagihan belum lunas</h2>
+
+                <p class="bdx-followup-description">
+                    Periksa rincian pembayaran dan sisa tagihan siswa.
                 </p>
 
                 <a
                     href="{{ url_for('bendahara.spp_siswa') }}"
-                    class="fin-button fin-button-amber"
+                    class="bdx-button bdx-button-dark"
                 >
-                    Lihat daftar tagihan
+                    Periksa tagihan
                     <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
-            </div>
+            </article>
 
-            <span class="fin-action-decoration" aria-hidden="true"></span>
-        </article>
+            <article class="bdx-reports bdx-enter">
+                <div class="bdx-reports-heading">
+                    <span>
+                        <i class="fas fa-folder-open" aria-hidden="true"></i>
+                    </span>
 
-        <article class="fin-action-card fin-reports fin-enter">
-            <span class="fin-icon">
-                <i class="fas fa-file-alt" aria-hidden="true"></i>
-            </span>
-
-            <div>
-                <span class="fin-eyebrow">DOKUMENTASI</span>
-                <h2>Laporan, lebih terarah.</h2>
-
-                <p>
-                    Akses ringkasan keuangan untuk evaluasi dan
-                    pertanggungjawaban sekolah.
-                </p>
-
-                <div class="fin-report-links">
-                    <a
-                        href="/keuangan/laporan/bulan"
-                        class="fin-button fin-button-outline"
-                    >
-                        <i class="far fa-calendar" aria-hidden="true"></i>
-                        Bulanan
-                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    </a>
-
-                    <a
-                        href="/keuangan/laporan/tahun"
-                        class="fin-button fin-button-outline"
-                    >
-                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                        Tahunan
-                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    </a>
+                    <div>
+                        <h2>Pusat laporan</h2>
+                        <p>Dokumentasi keuangan</p>
+                    </div>
                 </div>
-            </div>
 
-            <span class="fin-action-decoration" aria-hidden="true"></span>
-        </article>
+                <a href="/keuangan/laporan/bulan">
+                    <span>
+                        <i class="far fa-calendar" aria-hidden="true"></i>
+                        Laporan bulanan
+                    </span>
 
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </a>
+
+                <a href="/keuangan/laporan/tahun">
+                    <span>
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                        Laporan tahunan
+                    </span>
+
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </article>
+
+        </aside>
     </section>
 
-    <footer class="fin-page-footer">
-        <span>
-            Administrasi Keuangan · SMP Unggulan Hamzanwadi
-        </span>
+    <!-- TRANSAKSI -->
+    <section
+        class="bdx-transactions bdx-enter"
+        aria-labelledby="bdxTransactionsTitle"
+    >
+        <header class="bdx-transactions-heading">
+            <div>
+                <span class="bdx-eyebrow">TRANSACTION HISTORY</span>
+                <h2 id="bdxTransactionsTitle">Aktivitas terbaru</h2>
+                <p>Pembayaran yang tercatat pada dashboard.</p>
+            </div>
 
-        <button
-            type="button"
-            class="fin-motion-button"
-            data-fin-motion
-            aria-pressed="false"
+            <label class="bdx-search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+
+                <input
+                    type="search"
+                    data-bdx-search
+                    placeholder="Cari nama atau pembayaran…"
+                    aria-label="Cari transaksi yang ditampilkan"
+                >
+            </label>
+        </header>
+
+        <div
+            class="bdx-table-scroll"
+            tabindex="0"
+            role="region"
+            aria-label="Tabel transaksi terbaru"
         >
-            Jeda animasi
-        </button>
+            <table class="bdx-transactions-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Siswa / penerima</th>
+                        <th scope="col">Pembayaran</th>
+                        <th scope="col">Tanggal</th>
+                        <th scope="col">Jenis</th>
+                        <th scope="col">Nominal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for trx in daftar_transaksi | default([], true) %}
+                        <tr data-bdx-transaction>
+                            <td>
+                                <div class="bdx-person">
+                                    <span class="bdx-avatar" aria-hidden="true">
+                                        {{ (trx.nama_siswa | default('S', true))[:1] | upper }}
+                                    </span>
+
+                                    <strong>
+                                        {{ trx.nama_siswa | default('—', true) }}
+                                    </strong>
+                                </div>
+                            </td>
+
+                            <td>{{ trx.jenis_pembayaran }}</td>
+                            <td>{{ trx.tanggal_lengkap }}</td>
+
+                            <td>
+                                <span class="bdx-type {{ 'bdx-type-in' if trx.jenis_trx == 'masuk' else 'bdx-type-out' }}">
+                                    <i
+                                        class="fas {{ 'fa-arrow-down' if trx.jenis_trx == 'masuk' else 'fa-arrow-up' }}"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    {{ 'Pemasukan' if trx.jenis_trx == 'masuk' else 'Pengeluaran' }}
+                                </span>
+                            </td>
+
+                            <td class="bdx-amount">
+                                {{ '+' if trx.jenis_trx == 'masuk' else '−' }}Rp
+                                {{ '{:,.0f}'.format(trx.nominal | default(0, true)).replace(',', '.') }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr data-bdx-no-results hidden>
+                        <td colspan="5" class="bdx-empty-cell">
+                            Tidak ada transaksi yang sesuai pencarian.
+                        </td>
+                    </tr>
+
+                    {% if not daftar_transaksi | default([], true) %}
+                        <tr>
+                            <td colspan="5" class="bdx-empty-cell">
+                                Belum ada transaksi yang tercatat.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="bdx-transactions-footer">
+            <span data-bdx-count role="status">
+                {{ daftar_transaksi | default([], true) | length }}
+                transaksi ditampilkan
+            </span>
+
+            <a href="/keuangan/laporan">
+                Buka seluruh transaksi
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </footer>
+    </section>
+
+    <footer class="bdx-footer">
+        <span><b>H.</b> Hamzanwadi Finance</span>
+        <span>Kelola dengan teliti. Tumbuh dengan pasti.</span>
     </footer>
 
-    <!-- ANGKA MENTAH UNTUK GRAFIK -->
-    <script type="application/json" id="dbKeuanganData">
+    <script type="application/json" id="bdxKeuanganData">
         {{
             {
                 'labels': dlabel_bulan | default([], true),
