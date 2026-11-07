@@ -1,6 +1,25 @@
+// =========================================
+// PENGAJUAN ONLINE — SPA READY
+// =========================================
 
-document.addEventListener('DOMContentLoaded', function () {
+(function () {
     'use strict';
+
+    const PAGE_SELECTOR = '.pengajuan-page';
+
+    function initPengajuanOnline() {
+
+        const root = document.querySelector(PAGE_SELECTOR);
+
+        // Halaman ini tidak sedang aktif
+        if (!root) return;
+
+        // Jangan pasang event listener dua kali
+        if (root.dataset.pengajuanInitialized === 'true') {
+            return;
+        }
+
+        root.dataset.pengajuanInitialized = 'true';
 
     // =========================================
     // KONFIGURASI
@@ -715,11 +734,44 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+        // =========================================
+        // INISIALISASI HALAMAN
+        // =========================================
+
+        filterPengajuan();
+
+    } // END initPengajuanOnline
+
+
     // =========================================
-    // INISIALISASI
+    // INITIAL PAGE LOAD
     // =========================================
 
-    filterPengajuan();
+    if (document.readyState === 'loading') {
 
-});
+        document.addEventListener(
+            'DOMContentLoaded',
+            initPengajuanOnline,
+            { once: true }
+        );
+
+    } else {
+
+        initPengajuanOnline();
+
+    }
+
+
+    // =========================================
+    // SPA PAGE LOADED
+    // =========================================
+
+    document.addEventListener(
+        'spa:page-loaded',
+        function () {
+            initPengajuanOnline();
+        }
+    );
+
+})();
 

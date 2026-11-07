@@ -319,7 +319,7 @@
     height: 340px;
     border-radius: 50%;
     background: radial-gradient(circle, #bedb992d, transparent 65%);
-    animation: bdxGlow 14s ease-in-out infinite alternate;
+    animation: bdxGlow 14s ease-in-out infinite alternate !important;
     pointer-events: none;
 }
 
@@ -349,7 +349,7 @@
 }
 
 .bdx-balance-copy {
-    margin-top: 24px;
+    margin-top: 10px;
 }
 
 .bdx-balance-copy > p {
@@ -358,7 +358,7 @@
 }
 
 .bdx-balance-copy h2 {
-    margin: 8px 0 11px;
+    margin: 8px 0 6px;
     color: #fcfff9;
     font-size: clamp(27px, 2.7vw, 39px);
     font-weight: 700;
@@ -455,7 +455,7 @@
         inset 0 1px 0 #fff8dd,
         0 17px 30px #032b2040;
 
-    animation: bdxCardFloat 8s ease-in-out infinite;
+    animation: bdxCardFloat 8s ease-in-out infinite !important;
 }
 
 .bdx-card-front::after {
@@ -467,7 +467,7 @@
     height: 190%;
     background: linear-gradient(90deg, transparent, #fff9e970, transparent);
     transform: rotate(25deg);
-    animation: bdxShine 1.6s .8s ease-out both;
+    animation: bdxShine 1.6s .8s ease-out both !important;
 }
 
 .bdx-card-top,
@@ -1354,16 +1354,16 @@
 /* MOTION: TRANSFORM / OPACITY SAJA */
 
 .bdx-enter {
-    animation: bdxEnter .65s var(--ease) backwards;
+    animation: bdxEnter .65s var(--ease) backwards !important;
 }
 
-.bdx-money:nth-child(1) { animation-delay: 50ms; }
-.bdx-money:nth-child(2) { animation-delay: 100ms; }
-.bdx-collection { animation-delay: 140ms; }
+.bdx-money:nth-child(1) { animation-delay: 50ms !important; }
+.bdx-money:nth-child(2) { animation-delay: 100ms !important; }
+.bdx-collection { animation-delay: 140ms !important; }
 .bdx-chart-panel,
-.bdx-followup { animation-delay: 180ms; }
-.bdx-reports { animation-delay: 220ms; }
-.bdx-transactions { animation-delay: 250ms; }
+.bdx-followup { animation-delay: 180ms !important; }
+.bdx-reports { animation-delay: 220ms !important; }
+.bdx-transactions { animation-delay: 250ms !important; }
 
 @keyframes bdxEnter {
     from {
@@ -1678,9 +1678,9 @@
     .bdx *,
     .bdx *::before,
     .bdx *::after {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
+        animation: none;
+        transition: none;
+        scroll-behavior: auto;
     }
 
     .bdx-motion { display: none; }

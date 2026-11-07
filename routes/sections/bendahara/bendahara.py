@@ -607,7 +607,22 @@ def kode_tp_tagihan(tarif, tahun_siswa):
 
 
 def format_rupiah(angka):
-    return "Rp " + "{:,.0f}".format(angka).replace(",", ".")
+    try:
+        if angka is None or angka == "":
+            angka = 0
+
+        # Bersihkan format angka jika berupa string
+        if isinstance(angka, str):
+            angka = angka.strip()
+            angka = angka.replace("Rp", "").replace("rp", "")
+            angka = angka.replace(".", "").replace(",", ".")
+
+        angka = float(angka)
+
+        return "Rp " + "{:,.0f}".format(angka).replace(",", ".")
+
+    except (ValueError, TypeError):
+        return "Rp 0"
 
 
 def format_tahun_pelajaran(kode):
@@ -1434,14 +1449,6 @@ def simpan_pembayaran():
                     id=int(tagihan_id)
                 ).first()
 
-            if not tagihan and nominal_asli > 0:
-                tagihan = TagihanSiswa.query.filter(
-                    TagihanSiswa.siswa_id == id_siswa,
-                    TagihanSiswa.nominal_tagihan == nominal_asli,
-                    TagihanSiswa.tahun_pelajaran.like(f"{angkatan_masuk}%"),
-                    TagihanSiswa.status.notin_(['Lunas', 'Sudah Lunas'])
-                ).first()
-
             if tagihan:
                 # ✅ =====================================================
                 # 🔒 PENGAMANAN UTAMA: Hitung sisa sebenarnya dari DB
@@ -1478,6 +1485,13 @@ def simpan_pembayaran():
                 print(f"   ⚠️ Tagihan tidak ditemukan! Nominal:{nominal_asli}")
 
         db.session.commit()
+
+        if jumlah_diperbarui == 0:
+            db.session.rollback()
+            return jsonify({
+                "sukses": False,
+                "pesan": "Tidak ada tagihan yang berhasil diperbarui. Silakan muat ulang data tagihan."
+            }), 400
 
         return jsonify({
             "sukses": True,
