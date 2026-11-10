@@ -1485,7 +1485,6 @@
     /* ---------- 1. AREA UTAMA ---------- */
     .absensi-harian-wrapper {
         width: 100%;
-        max-width: 1500px;
         margin: 0 auto;
         box-sizing: border-box;
         color: #1e293b;
