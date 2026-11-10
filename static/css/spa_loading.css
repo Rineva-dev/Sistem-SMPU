@@ -1,0 +1,963 @@
+
+/* ============================================================
+   SMPU GLOBAL SPA LOADER
+   EMERALD PREMIUM SAAS
+   Compatible with updated layout.html
+============================================================ */
+
+
+/* ============================================================
+   01. ROOT POSITION
+============================================================ */
+
+:root {
+    --spa-sidebar-width: 272px;
+    --spa-header-height: 72px;
+
+    --spa-emerald-dark: #022c22;
+    --spa-emerald: #059669;
+    --spa-emerald-light: #34d399;
+
+    --spa-content-left: 272px;
+}
+
+
+/* ============================================================
+   02. CONTENT LOADING PROTECTION
+============================================================ */
+
+#spa-content {
+    position: relative;
+    min-height: calc(100vh - var(--spa-header-height));
+}
+
+#spa-content.spa-loading {
+    overflow: hidden;
+}
+
+#spa-content.spa-loading #spa-page-content {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+
+/* ============================================================
+   03. GLOBAL LOADER POSITION
+   Loader sudah berada di luar app-container
+============================================================ */
+
+#spa-page-loader,
+#spa-connection-state {
+    position: fixed !important;
+
+    top: var(--spa-header-height) !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: var(--spa-content-left) !important;
+
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    display: none;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    padding: 24px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity .3s ease,
+        visibility .3s ease;
+
+    z-index: 2147483000 !important;
+}
+
+
+/* ============================================================
+   04. LOADER ACTIVE STATE
+============================================================ */
+
+#spa-page-loader.is-active,
+#spa-connection-state.is-active {
+    display: flex !important;
+
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* ============================================================
+   05. LOADER LEAVING STATE
+============================================================ */
+
+#spa-page-loader.is-leaving {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+
+/* ============================================================
+   06. MAIN LOADER BACKGROUND
+============================================================ */
+
+#spa-page-loader {
+    background:
+        radial-gradient(
+            ellipse at 50% 42%,
+            rgba(16, 185, 129, .15),
+            transparent 48%
+        ),
+        radial-gradient(
+            ellipse at 80% 15%,
+            rgba(52, 211, 153, .07),
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(2, 35, 27, .97),
+            rgba(2, 25, 19, .96)
+        );
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+
+/* Decorative glow */
+
+#spa-page-loader::before,
+#spa-page-loader::after {
+    content: "";
+
+    position: absolute;
+
+    width: 320px;
+    height: 320px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter: blur(75px);
+
+    opacity: .15;
+}
+
+#spa-page-loader::before {
+    top: 8%;
+    left: 12%;
+
+    background: #10b981;
+
+    animation: spa-glow-float 8s ease-in-out infinite;
+}
+
+#spa-page-loader::after {
+    right: 10%;
+    bottom: 5%;
+
+    background: #047857;
+
+    animation: spa-glow-float 10s ease-in-out infinite reverse;
+}
+
+
+/* ============================================================
+   07. LOADER CARD
+============================================================ */
+
+.spa-loader-card {
+    position: relative;
+
+    z-index: 2;
+
+    width: min(100%, 410px);
+
+    flex: 0 1 410px;
+
+    margin: auto;
+
+    padding: 34px 34px 24px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(110, 231, 183, .17);
+
+    border-radius: 28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, .98),
+            rgba(245, 253, 248, .96)
+        );
+
+    box-shadow:
+        0 40px 100px rgba(0, 0, 0, .25),
+        0 15px 40px rgba(0, 0, 0, .12),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    animation: spa-card-enter .55s cubic-bezier(.2, .8, .2, 1);
+}
+
+.spa-loader-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 15%;
+
+    width: 70%;
+    height: 1px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(16, 185, 129, .5),
+        transparent
+    );
+}
+
+
+/* ============================================================
+   08. BRAND
+============================================================ */
+
+.spa-loader-brand {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 11px;
+}
+
+.spa-loader-logo {
+    width: 43px;
+    height: 43px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    color: #ffffff;
+
+    font-size: 19px;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        145deg,
+        #10b981,
+        #047857
+    );
+
+    box-shadow:
+        0 8px 20px rgba(16, 185, 129, .25),
+        inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.spa-loader-brand-text {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.spa-loader-brand-text span {
+    color: #064e3b;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+.spa-loader-brand-text small {
+    color: #6b8c7d;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: 2.1px;
+}
+
+
+/* ============================================================
+   09. ORBIT ANIMATION
+============================================================ */
+
+.spa-loader-orbit {
+    position: relative;
+
+    width: 148px;
+    height: 148px;
+
+    margin: 28px auto 22px;
+
+    display: grid;
+    place-items: center;
+}
+
+.spa-loader-orbit-ring {
+    position: absolute;
+
+    inset: 6px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(16, 185, 129, .16);
+
+    border-top-color: #10b981;
+    border-right-color: #34d399;
+
+    animation: spa-orbit-spin 2.2s linear infinite;
+}
+
+.spa-loader-ring-two {
+    inset: 19px;
+
+    border: 1px dashed rgba(5, 150, 105, .35);
+
+    animation: spa-orbit-spin-reverse 5s linear infinite;
+}
+
+.spa-loader-core {
+    width: 72px;
+    height: 72px;
+
+    display: grid;
+    place-items: center;
+
+    color: #ffffff;
+
+    font-size: 27px;
+
+    border-radius: 24px;
+
+    background: linear-gradient(
+        145deg,
+        #34d399,
+        #059669 65%,
+        #047857
+    );
+
+    box-shadow:
+        0 14px 32px rgba(5, 150, 105, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .4);
+
+    animation: spa-core-pulse 2s ease-in-out infinite;
+}
+
+
+/* Orbit dots */
+
+.spa-loader-dot {
+    position: absolute;
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #10b981;
+
+    box-shadow: 0 0 15px rgba(16, 185, 129, .45);
+}
+
+.spa-dot-one {
+    top: 17px;
+    right: 18px;
+
+    animation: spa-dot-float 2.5s ease-in-out infinite;
+}
+
+.spa-dot-two {
+    bottom: 18px;
+    left: 17px;
+
+    width: 7px;
+    height: 7px;
+
+    animation: spa-dot-float 3s ease-in-out infinite reverse;
+}
+
+.spa-dot-three {
+    bottom: 27px;
+    right: 13px;
+
+    width: 5px;
+    height: 5px;
+
+    background: #a7f3d0;
+}
+
+
+/* ============================================================
+   10. HEADING
+============================================================ */
+
+.spa-loader-heading {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 7px;
+
+    text-align: center;
+}
+
+.spa-loader-heading span:first-child {
+    color: #064e3b;
+
+    font-size: 17px;
+    font-weight: 750;
+
+    letter-spacing: -.45px;
+}
+
+.spa-loader-heading span:last-child {
+    color: #82978c;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   11. PROGRESS
+============================================================ */
+
+.spa-loader-progress {
+    margin-top: 27px;
+}
+
+.spa-loader-progress-track {
+    height: 6px;
+
+    overflow: hidden;
+
+    border-radius: 99px;
+
+    background: #e4f1e9;
+}
+
+#spa-loader-progress-bar {
+    width: 0%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: linear-gradient(
+        90deg,
+        #059669,
+        #34d399,
+        #10b981
+    );
+
+    box-shadow: 0 0 12px rgba(16, 185, 129, .25);
+
+    transition: width .3s ease;
+}
+
+.spa-loader-progress-info {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 11px;
+}
+
+.spa-loader-progress-info span:first-child {
+    color: #789186;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.spa-loader-progress-info span:last-child {
+    color: #059669;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================
+   12. FOOTER
+============================================================ */
+
+.spa-loader-footer {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 24px;
+    padding-top: 17px;
+
+    border-top: 1px solid rgba(16, 185, 129, .1);
+
+    color: #9aaca2;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: .2px;
+}
+
+.spa-loader-status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #10b981;
+
+    box-shadow: 0 0 9px rgba(16, 185, 129, .4);
+
+    animation: spa-status-pulse 1.5s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   13. CONNECTION / OFFLINE BACKGROUND
+============================================================ */
+
+#spa-connection-state {
+    background:
+        radial-gradient(
+            ellipse at 50% 35%,
+            rgba(16, 185, 129, .12),
+            transparent 50%
+        ),
+        rgba(2, 25, 19, .96);
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    z-index: 2147483001 !important;
+}
+
+
+/* ============================================================
+   14. CONNECTION CARD
+============================================================ */
+
+.spa-connection-card {
+    position: relative;
+
+    z-index: 2;
+
+    width: min(100%, 420px);
+
+    flex: 0 1 420px;
+
+    margin: auto;
+
+    padding: 35px 30px 25px;
+
+    text-align: center;
+
+    border: 1px solid #e7eee9;
+
+    border-radius: 26px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, .2),
+        0 10px 30px rgba(0, 0, 0, .08);
+
+    animation: spa-card-enter .45s ease;
+}
+
+
+/* ============================================================
+   15. CONNECTION ICON
+============================================================ */
+
+.spa-connection-icon {
+    position: relative;
+
+    width: 76px;
+    height: 76px;
+
+    display: grid;
+    place-items: center;
+
+    margin: 0 auto 22px;
+
+    color: #059669;
+
+    font-size: 28px;
+
+    border-radius: 25px;
+
+    background: #ecfdf5;
+}
+
+.spa-connection-icon-cross {
+    position: absolute;
+
+    right: -3px;
+    bottom: -3px;
+
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    color: white;
+
+    font-size: 12px;
+
+    border: 3px solid white;
+
+    border-radius: 50%;
+
+    background: #e59b3b;
+}
+
+
+/* ============================================================
+   16. CONNECTION TEXT
+============================================================ */
+
+.spa-connection-eyebrow {
+    color: #b58b51;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+.spa-connection-card h2 {
+    margin: 10px 0 9px;
+
+    color: #123c2d;
+
+    font-size: 25px;
+    font-weight: 800;
+
+    letter-spacing: -.7px;
+}
+
+.spa-connection-card p {
+    max-width: 300px;
+
+    margin: 0 auto;
+
+    color: #7b8d83;
+
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+/* ============================================================
+   17. RETRY BUTTON
+============================================================ */
+
+.spa-retry-button {
+    min-height: 45px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    margin-top: 23px;
+    padding: 0 24px;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    border: 0;
+    border-radius: 13px;
+
+    background: linear-gradient(
+        135deg,
+        #10b981,
+        #047857
+    );
+
+    box-shadow: 0 8px 22px rgba(5, 150, 105, .2);
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.spa-retry-button:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 12px 28px rgba(5, 150, 105, .28);
+}
+
+.spa-retry-button:active {
+    transform: scale(.97);
+}
+
+
+/* ============================================================
+   18. CONNECTION FOOTER
+============================================================ */
+
+.spa-connection-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 26px;
+    padding-top: 17px;
+
+    border-top: 1px solid #edf2ee;
+
+    color: #a1b0a6;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.spa-connection-footer span {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #d6a05a;
+}
+
+
+/* ============================================================
+   19. ANIMATIONS
+============================================================ */
+
+@keyframes spa-orbit-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spa-orbit-spin-reverse {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes spa-core-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.07);
+    }
+}
+
+@keyframes spa-dot-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes spa-status-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .45;
+        transform: scale(.75);
+    }
+}
+
+@keyframes spa-card-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes spa-glow-float {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, -20px);
+    }
+}
+
+
+/* ============================================================
+   20. TABLET
+============================================================ */
+
+@media (max-width: 1024px) {
+
+    :root {
+        --spa-content-left: 0px;
+    }
+
+    #spa-page-loader,
+    #spa-connection-state {
+        left: 0 !important;
+    }
+
+}
+
+
+/* ============================================================
+   21. MOBILE
+============================================================ */
+
+@media (max-width: 576px) {
+
+    :root {
+        --spa-header-height: 64px;
+    }
+
+    #spa-page-loader,
+    #spa-connection-state {
+        padding: 16px !important;
+    }
+
+    .spa-loader-card {
+        width: min(100%, 370px);
+
+        padding: 27px 22px 20px;
+
+        border-radius: 23px;
+    }
+
+    .spa-loader-orbit {
+        width: 130px;
+        height: 130px;
+
+        margin: 24px auto 20px;
+    }
+
+    .spa-loader-core {
+        width: 65px;
+        height: 65px;
+
+        font-size: 24px;
+
+        border-radius: 21px;
+    }
+
+    .spa-loader-heading span:first-child {
+        font-size: 16px;
+    }
+
+    .spa-connection-card {
+        width: min(100%, 370px);
+
+        padding: 29px 22px 22px;
+    }
+
+    .spa-connection-card h2 {
+        font-size: 23px;
+    }
+
+}
+
+
+/* ============================================================
+   22. SMALL MOBILE
+============================================================ */
+
+@media (max-width: 360px) {
+
+    .spa-loader-card {
+        padding: 23px 17px 19px;
+    }
+
+    .spa-loader-orbit {
+        width: 115px;
+        height: 115px;
+    }
+
+    .spa-loader-core {
+        width: 59px;
+        height: 59px;
+
+        font-size: 22px;
+    }
+
+    .spa-loader-heading span:first-child {
+        font-size: 15px;
+    }
+
+}
+
+
+/* ============================================================
+   23. ACCESSIBILITY
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .spa-loader-orbit-ring,
+    .spa-loader-core,
+    .spa-loader-dot,
+    .spa-loader-status-dot,
+    #spa-page-loader::before,
+    #spa-page-loader::after {
+        animation: none !important;
+    }
+
+    #spa-page-loader,
+    #spa-connection-state,
+    .spa-retry-button {
+        transition: none !important;
+    }
+
+}

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,8 +8,10 @@
 
     <!-- Ikon & CSS Dasar -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
@@ -25,56 +28,257 @@
     <link rel="stylesheet" data-spa-global href="{{ url_for('static', filename='css/custom-time.css') }}">
     <link rel="stylesheet" data-spa-global href="{{ url_for('static', filename='css/editor_text_input.css') }}">
 
-    <!-- ✅ CSS Notifikasi Global -->
+    <!-- Global SPA Loading -->
+    <link rel="stylesheet"
+          data-spa-global
+          href="{{ url_for('static', filename='css/spa_loading.css') }}">
+
+    <!-- CSS Notifikasi Global -->
     <link rel="stylesheet" data-spa-global href="{{ url_for('static', filename='css/notif.css') }}">
     <link rel="stylesheet" data-spa-global href="{{ url_for('static', filename='css/notif_custom.css') }}">
-    <!-- Tempat tambahan CSS khusus per halaman -->
-    {% block extra_css %}
-    {% endblock %}
-    
+
+    <!-- CSS Khusus Halaman -->
+    {% block extra_css %}{% endblock %}
+
 </head>
+
 <body class="dashboard-page">
+
     <div class="app-container">
 
-        <!-- Sidebar -->
+        <!-- =====================================
+             SIDEBAR
+        ====================================== -->
         {% include "components/sidebar.html" %}
 
-        <!-- Bagian Kanan: Header + Konten -->
+
+        <!-- =====================================
+             MAIN CONTENT
+        ====================================== -->
         <div class="main-content">
-            <!-- Header -->
+
+            <!-- HEADER -->
             {% include "components/header.html" %}
 
-            <!-- Konten Utama Halaman -->
+
+            <!-- =================================
+                 KONTEN UTAMA
+            ================================== -->
             <div class="content-wrapper" id="spa-content">
-                {% block content %}{% endblock %}
+
+                <!-- Konten halaman yang diganti SPA -->
+                <div id="spa-page-content">
+                    {% block content %}{% endblock %}
+                </div>
+
             </div>
+
         </div>
 
     </div>
 
-    <!-- ✅ Komponen Data Pesan Flash -->
+
+    <!-- ==================================================
+         GLOBAL SPA PAGE LOADER
+         Berada di luar app-container
+         Tidak menutupi sidebar dan header
+    =================================================== -->
+
+    <div id="spa-page-loader"
+         class="spa-page-loader"
+         aria-hidden="true">
+
+        <div class="spa-loader-card">
+
+            <div class="spa-loader-brand">
+
+                <div class="spa-loader-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+
+                <div class="spa-loader-brand-text">
+                    <span>SMPU</span>
+                    <small>HAMZANWADI</small>
+                </div>
+
+            </div>
+
+
+            <div class="spa-loader-orbit">
+
+                <div class="spa-loader-orbit-ring"></div>
+                <div class="spa-loader-orbit-ring spa-loader-ring-two"></div>
+
+                <div class="spa-loader-core">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+
+                <span class="spa-loader-dot spa-dot-one"></span>
+                <span class="spa-loader-dot spa-dot-two"></span>
+                <span class="spa-loader-dot spa-dot-three"></span>
+
+            </div>
+
+
+            <div class="spa-loader-heading">
+
+                <span id="spa-loader-title">
+                    Menyiapkan halaman
+                </span>
+
+                <span id="spa-loader-subtitle">
+                    Mohon tunggu sebentar...
+                </span>
+
+            </div>
+
+
+            <div class="spa-loader-progress">
+
+                <div class="spa-loader-progress-track">
+                    <div id="spa-loader-progress-bar"></div>
+                </div>
+
+                <div class="spa-loader-progress-info">
+
+                    <span id="spa-loader-status">
+                        Menghubungkan halaman
+                    </span>
+
+                    <span id="spa-loader-percent">
+                        0%
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="spa-loader-footer">
+
+                <span class="spa-loader-status-dot"></span>
+
+                <span>
+                    SMP Unggulan Hamzanwadi
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         GLOBAL CONNECTION / OFFLINE STATE
+         Berada di luar app-container
+    =================================================== -->
+
+    <div id="spa-connection-state"
+         class="spa-connection-state"
+         aria-hidden="true">
+
+        <div class="spa-connection-card">
+
+            <div class="spa-connection-icon">
+
+                <i class="fa-solid fa-wifi"></i>
+
+                <span class="spa-connection-icon-cross">
+                    <i class="fa-solid fa-xmark"></i>
+                </span>
+
+            </div>
+
+
+            <span class="spa-connection-eyebrow">
+                CONNECTION INTERRUPTED
+            </span>
+
+
+            <h2 id="spa-connection-title">
+                No Connection
+            </h2>
+
+
+            <p id="spa-connection-message">
+                Koneksi terputus. Periksa jaringan internet Anda
+                dan coba kembali.
+            </p>
+
+
+            <button type="button"
+                    id="spa-retry-button"
+                    class="spa-retry-button">
+
+                <i class="fa-solid fa-rotate-right"></i>
+
+                <span>
+                    Coba Lagi
+                </span>
+
+            </button>
+
+
+            <div class="spa-connection-footer">
+
+                <span></span>
+
+                SMP Unggulan Hamzanwadi
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         KOMPONEN GLOBAL
+    =================================================== -->
+
+    <!-- Notifikasi Flash -->
     {% include "components/notif.html" %}
 
+    <!-- Komponen Surat -->
     {% include "components/surat.html" %}
 
-    <!-- Script Dasar -->
+
+    <!-- ==================================================
+         SCRIPT DASAR
+    =================================================== -->
+
     <script data-spa-global src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script data-spa-global src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <script data-spa-global src="{{ url_for('static', filename='js/custom-date.js') }}"></script>
+
     <script data-spa-global src="{{ url_for('static', filename='js/custom-time.js') }}"></script>
+
     <script data-spa-global src="{{ url_for('static', filename='js/custom-select.js') }}"></script>
+
     <script data-spa-global src="{{ url_for('static', filename='js/editor_text_input.js') }}"></script>
 
-    <!-- ✅ JS Notifikasi Global -->
+
+    <!-- ==================================================
+         NOTIFIKASI GLOBAL
+    =================================================== -->
+
     <script data-spa-global src="{{ url_for('static', filename='js/notif.js') }}"></script>
+
     <script data-spa-global src="{{ url_for('static', filename='js/notif_custom.js') }}"></script>
 
-    <!-- SPA Navigation -->
+
+    <!-- ==================================================
+         SPA NAVIGATION
+    =================================================== -->
+
     <script data-spa-global src="{{ url_for('static', filename='js/spa-navigation.js') }}"></script>
 
-    <!-- Tempat tambahan JS khusus per halaman -->
+
+    <!-- JavaScript Khusus Halaman -->
     {% block extra_js %}{% endblock %}
-    
+
 </body>
 </html>
