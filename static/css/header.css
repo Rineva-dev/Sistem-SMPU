@@ -676,11 +676,11 @@
 }
 
 .dropdown-menu li a {
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 11px;
 
-    padding: 10px 9px;
+    padding: 10px 9px !important;
 
     color: #34483C;
     text-decoration: none;
@@ -725,7 +725,7 @@
     min-width: 0;
     flex: 1;
 
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     gap: 3px;
 }
