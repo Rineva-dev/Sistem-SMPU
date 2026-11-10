@@ -1,719 +1,2593 @@
-/* ==========================================
-   STYLE UTAMA DASHBOARD
-========================================== */
-/* Header Selamat Datang */
-/* Header Selamat Datang */
-.welcome-box {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
-    color: #ffffff;
-    border-radius: 1.25rem;
-    padding: 2rem 2.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.75rem;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22), 0 3px 8px rgba(37, 99, 235, 0.15);
-    position: relative;
-    overflow: hidden;
+
+/* =========================================================
+   SMPU TEACHER WORKSPACE
+   PREMIUM EMERALD DASHBOARD
+========================================================= */
+
+.teacher-dashboard {
+    --td-green: #087f5b;
+    --td-green-dark: #064e3b;
+    --td-green-deep: #043b2e;
+    --td-green-soft: #e8f5ef;
+    --td-green-light: #f3faf6;
+
+    --td-orange: #f59e0b;
+    --td-purple: #8b5cf6;
+    --td-blue: #3b82f6;
+
+    --td-text: #172b25;
+    --td-muted: #84938d;
+    --td-border: #e8efeb;
+    --td-surface: #ffffff;
+    --td-background: #f5f8f6;
+
+    font-family: inherit;
+    color: var(--td-text);
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 1.5rem;
 }
 
-/* Lingkaran dekorasi besar */
-.welcome-box::before {
-    content: "";
+.teacher-dashboard *,
+.teacher-dashboard *::before,
+.teacher-dashboard *::after {
+    box-sizing: border-box;
+}
+
+.teacher-dashboard a {
+    text-decoration: none;
+}
+
+.teacher-dashboard button {
+    font-family: inherit;
+}
+
+.teacher-dashboard .d-none {
+    display: none !important;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.td-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(260px, .75fr);
+    gap: 2rem;
+
+    min-height: 300px;
+    padding: 2.25rem;
+
+    margin-bottom: 2rem;
+
+    color: #ffffff;
+
+    background:
+        radial-gradient(
+            circle at 85% 10%,
+            rgba(34, 197, 94, .19),
+            transparent 32%
+        ),
+        linear-gradient(
+            125deg,
+            #063d30 0%,
+            #075b43 48%,
+            #087f5b 100%
+        );
+
+    border-radius: 26px;
+
+    box-shadow:
+        0 18px 42px rgba(4, 78, 59, .13),
+        inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+
+.td-hero-content,
+.td-hero-side {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+}
+
+.td-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.td-hero-grid {
     position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    opacity: .13;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.1) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.1) 1px,
+            transparent 1px
+        );
+
+    background-size: 40px 40px;
+
+    mask-image:
+        linear-gradient(
+            90deg,
+            transparent,
+            black 50%,
+            black
+        );
+}
+
+.td-hero-decoration {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.09);
+}
+
+.td-hero-decoration-one {
+    width: 360px;
+    height: 360px;
+
+    right: -130px;
+    top: -180px;
+
+    box-shadow:
+        0 0 0 35px rgba(255,255,255,.025),
+        0 0 0 75px rgba(255,255,255,.025);
+}
+
+.td-hero-decoration-two {
     width: 220px;
     height: 220px;
-    top: -70px;
-    right: -70px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    filter: blur(4px);
-}
 
-/* Lingkaran dekorasi kecil */
-.welcome-box::after {
-    content: "";
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    bottom: -40px;
-    left: 18%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    filter: blur(2px);
-}
-
-/* Tambahan: Garis lengkung samar */
-.welcome-box .garis-1 {
-    position: absolute;
-    top: 30%;
-    left: -50px;
-    width: 200px;
-    height: 200px;
-    border: 2px solid rgba(255, 255, 255, 0.06);
-    border-radius: 50%;
-}
-
-.welcome-box .garis-2 {
-    position: absolute;
-    bottom: 20%;
     right: 25%;
-    width: 150px;
-    height: 150px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
+    bottom: -160px;
+
+    background: rgba(255,255,255,.035);
 }
 
-/* Titik-titik dekorasi halus */
-.welcome-box .titik {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-}
-.welcome-box .titik-1 { width: 12px; height: 12px; top: 25%; left: 20%; }
-.welcome-box .titik-2 { width: 8px; height: 8px; top: 65%; right: 30%; }
-.welcome-box .titik-3 { width: 15px; height: 15px; bottom: 20%; left: 40%; }
-
-.welcome-box h2 {
-    font-size: 1.9rem;
-    margin: 0 0 0.6rem 0;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    position: relative;
-    z-index: 2;
-}
-
-.welcome-box p {
-    margin: 0;
-    opacity: 0.92;
-    font-size: 1.05rem;
-    line-height: 1.5;
-    position: relative;
-    z-index: 2;
-    color: #fffbeb !important;
-}
-
-.welcome-box .text-primary {
-    color: #dbeafe !important;
-    font-weight: 500;
-}
-
-
-.date-box {
-    background: rgba(255, 255, 255, 0.18);
-    padding: 1.25rem 1.75rem;
-    border-radius: 1rem;
-    text-align: center;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    min-width: 125px;
-    position: relative;
-    z-index: 2;
-}
-
-.date-box i {
-    font-size: 1.7rem;
-    margin-bottom: 0.4rem;
-    display: block;
-    opacity: 0.95;
-}
-
-.date-box span {
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-a.text-decoration-none.text-dark.d-block.w-100.h-100 {
-    color: white !important;
-}
-
-@media (max-width: 768px) {
-    .welcome-box {
-        flex-direction: column;
-        text-align: center;
-        gap: 1.5rem;
-        padding: 1.75rem 1.5rem;
-    }
-
-    .welcome-box h2 {
-        font-size: 1.5rem;
-    }
-
-    .date-box {
-        width: 100%;
-        max-width: 200px;
-    }
-
-    /* Sembunyikan elemen dekorasi kecil di HP agar rapi */
-    .welcome-box .garis-1,
-    .welcome-box .garis-2,
-    .welcome-box .titik {
-        display: none;
-    }
-}
-
-/* Grid Statistik */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.75rem;
-}
-
-.stat-card {
-    /* Latar belakang gradien lembut */
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 1.25rem;
-    padding: 1.75rem 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(226, 232, 240, 0.8);
+.td-hero-topline {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Efek cahaya samar di sudut */
-.stat-card::before {
-    content: "";
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: rgba(37, 99, 235, 0.05);
-    z-index: 0;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.1);
-    border-color: rgba(191, 219, 254, 0.6);
-}
-
-.stat-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    color: white;
-    flex-shrink: 0;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-    position: relative;
-    z-index: 1;
-}
-
-/* Warna ikon sesuai jenis kartu */
-.stat-icon.bg-primary { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-.stat-icon.bg-success { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.stat-icon.bg-info    { background: linear-gradient(135deg, #0284c7, #38bdf8); }
-.stat-icon.bg-warning { background: linear-gradient(135deg, #d97706, #fbbf24); }
-
-.stat-info {
-    flex: 1;
-    position: relative;
-    z-index: 1;
-}
-
-.stat-info h3 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0 0 0.35rem 0;
-    color: #0f172a;
-    line-height: 1;
-}
-
-.stat-info p {
-    margin: 0 0 0.6rem 0;
-    color: #64748b;
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.stat-change {
-    font-size: 0.6rem;
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 2rem;
-    font-weight: 500;
-    letter-spacing: 0.2px;
-}
-
-.stat-change.positive { background: #dcfce7; color: #15803d; }
-.stat-change.warning { background: #fef3c7; color: #b45309; }
-.stat-change.neutral { background: #f1f5f9; color: #475569; }
-
-/* Grid Konten */
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.75rem;
-}
-
-@media (max-width: 992px) {
-    .content-grid { grid-template-columns: 1fr; }
-}
-
-/* Kartu Umum */
-.card {
-    background: #ffffff;
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #f1f5f9;
-    overflow: hidden;
-}
-
-.card-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    background: #fafbfc;
-}
-
-.card-header h4 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-link {
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.btn-link:hover { text-decoration: underline; }
-
-/* Daftar Pengumuman */
-.announcement-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.announcement-item {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f1f5f9;
-    display: flex;
-    gap: 1rem;
-}
-
-.announcement-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #2563eb;
-    margin-top: 0.3rem;
-    flex-shrink: 0;
-}
-
-.announcement-item h5 {
-    margin: 0 0 0.3rem 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-.announcement-item p {
-    margin: 0 0 0.4rem 0;
-    font-size: 0.85rem;
-    color: #64748b;
-    line-height: 1.4;
-}
-
-.announcement-date {
-    font-size: 0.75rem;
-    color: #94a3b8;
-}
-
-/* ==========================================
-   ✅ STYLE BAGIAN AGENDA
-========================================== */
-.agenda-list {
-    padding: 0.75rem;
-}
-
-.agenda-item {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    margin-bottom: 0.75rem;
-    background: #fafbfc;
-    border: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
-}
-
-.agenda-item:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    transform: translateX(3px);
-}
-
-.agenda-tanggal {
-    width: 60px;
-    height: 60px;
-    background: #2563eb;
-    color: white;
-    border-radius: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.agenda-hari {
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.agenda-bulan {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    opacity: 0.9;
-}
-
-.agenda-info {
-    flex: 1;
-}
-
-.agenda-judul {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    color: #0f172a;
-}
-
-.agenda-meta {
-    display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 0.85rem;
-    color: #64748b;
-    align-items: center;
+    gap: 9px;
+
+    color: #a8d8c4;
+
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: 1.6px;
 }
 
-.agenda-meta i {
-    margin-right: 0.3rem;
+.td-live-dot {
+    width: 8px;
+    height: 8px;
+
+    background: #63e6a5;
+    border-radius: 50%;
+
+    box-shadow: 0 0 0 4px rgba(99,230,165,.12);
 }
 
-.agenda-status {
-    padding: 0.2rem 0.7rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: white;
+.td-hero-divider {
+    opacity: .4;
 }
 
-.status-terjadwal { background: #3b82f6; }
-.status-berlangsung { background: #10b981; }
-.status-selesai { background: #94a3b8; }
-.status-dibatalkan { background: #ef4444; }
+.td-hero h1 {
+    margin: 1.4rem 0 .7rem;
 
-@media (max-width: 768px) {
-    .agenda-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-    .agenda-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.4rem;
-    }
-    
-}
+    max-width: 700px;
 
-/* ==========================================
-   GAYA AGENDA DI DASHBOARD
-========================================== */
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    line-height: 1.18;
 
-/* Tombol Switch Tampilan */
-.btn-group .btn-outline-primary {
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
+    font-weight: 800;
+    letter-spacing: -.9px;
 
-.btn-group .btn-outline-primary.active {
-    background-color: #2563eb;
-    border-color: #2563eb;
     color: #ffffff;
 }
 
-.btn-group .btn-outline-primary:hover:not(.active) {
-    background-color: #eff6ff;
-    border-color: #bfdbfe;
-    color: #1d4ed8;
+.td-hero h1 span {
+    display: inline;
+    color: #91e4b9;
 }
 
-/* Perpindahan Tampilan */
-#tampilanDaftar,
-#tampilanKalender {
-    width: 100%;
-    transition: opacity 0.25s ease;
+.td-hero-description {
+    max-width: 540px;
+
+    margin: 0;
+
+    color: rgba(255,255,255,.74);
+
+    font-size: .93rem;
+    line-height: 1.8;
 }
 
-.tampilan-aktif {
-    display: block !important;
-    opacity: 1;
-}
-
-.d-none {
-    display: none !important;
-    opacity: 0;
-}
-
-/* Daftar Agenda */
-.agenda-list {
+.td-role-tags {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-top: 1.1rem;
 }
 
-.agenda-item {
+.td-role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 7px 11px;
+
+    border-radius: 8px;
+
+    color: #e0f7e9;
+    background: rgba(255,255,255,.09);
+
+    border: 1px solid rgba(255,255,255,.12);
+
+    font-size: .74rem;
+    font-weight: 600;
+}
+
+.td-role-tag i {
+    color: #8ee4b6;
+    font-size: .7rem;
+}
+
+.td-hero-bottom {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+
+    margin-top: auto;
+    padding-top: 1.6rem;
+}
+
+.td-hero-date {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.td-date-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #b6f2d1;
+    background: rgba(255,255,255,.1);
+
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+}
+
+.td-date-icon i {
+    font-size: 1rem;
+}
+
+.td-hero-date > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.td-date-label {
+    color: #9fd2bb;
+
+    font-size: .6rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.td-hero-date strong {
+    color: #ffffff;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.td-hero-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 11px 16px;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #075b43;
+
+    font-size: .78rem;
+    font-weight: 700;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.td-hero-action:hover {
+    color: #064e3b;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 7px 18px rgba(0,0,0,.14);
+}
+
+.td-hero-action i {
+    font-size: .7rem;
+}
+
+
+/* HERO SIDE */
+
+.td-hero-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: 1rem;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    background: #fafbfc;
-    border: 1px solid #f1f5f9;
-    transition: all 0.2s ease;
 }
 
-.agenda-item:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    transform: translateX(3px);
+.td-hero-calendar {
+    padding: 1.35rem;
+
+    background: rgba(255,255,255,.09);
+
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 20px;
+
+    backdrop-filter: blur(12px);
 }
 
-.agenda-tanggal {
-    width: 55px;
-    height: 55px;
-    background: #2563eb;
-    color: white;
-    border-radius: 0.6rem;
+.td-calendar-top {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.td-calendar-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #b6f2d1;
+    background: rgba(255,255,255,.1);
+
+    border-radius: 9px;
+}
+
+.td-calendar-icon i {
+    font-size: .85rem;
+}
+
+.td-calendar-label {
+    color: #d7efe3;
+
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.td-calendar-status {
+    margin-left: auto;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: .58rem;
+    font-weight: 700;
+
+    color: #a8eac5;
+}
+
+.td-calendar-status span {
+    width: 5px;
+    height: 5px;
+
+    background: #65e7a6;
+    border-radius: 50%;
+}
+
+.td-calendar-date {
+    margin-top: 1.5rem;
+
+    color: #ffffff;
+
+    font-size: 1.45rem;
+    line-height: 1.3;
+
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+.td-calendar-caption {
+    margin-top: 6px;
+
+    color: rgba(255,255,255,.6);
+
+    font-size: .73rem;
+}
+
+.td-calendar-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+
+    border-top: 1px solid rgba(255,255,255,.13);
+
+    color: #b7f2d0;
+
+    font-size: .76rem;
+    font-weight: 700;
+}
+
+.td-calendar-link:hover {
+    color: #ffffff;
+}
+
+.td-calendar-disabled {
+    color: rgba(255,255,255,.5);
+}
+
+.td-calendar-link i {
+    font-size: .7rem;
+}
+
+.td-hero-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    padding: 12px 13px;
+
+    border-radius: 12px;
+
+    background: rgba(0,0,0,.12);
+}
+
+.td-hero-note-icon {
+    color: #fbd77b;
+    padding-top: 2px;
+}
+
+.td-hero-note > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.td-hero-note strong {
+    font-size: .72rem;
+    color: #e8f6ed;
+}
+
+.td-hero-note span {
+    color: rgba(255,255,255,.58);
+
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+========================================================= */
+
+.td-stat-section {
+    margin-bottom: 2rem;
+}
+
+.td-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-bottom: 1.2rem;
+}
+
+.td-section-eyebrow {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--td-green);
+
+    font-size: .64rem;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+.td-section-heading h2 {
+    margin: 0;
+
+    color: var(--td-text);
+
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+.td-section-heading p {
+    margin: 6px 0 0;
+
+    color: var(--td-muted);
+
+    font-size: .79rem;
+    line-height: 1.6;
+}
+
+.td-semester-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+
+    padding: 9px 13px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--td-border);
+    border-radius: 10px;
+
+    color: #667a70;
+
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.td-semester-dot {
+    width: 7px;
+    height: 7px;
+
+    background: var(--td-green);
+    border-radius: 50%;
+}
+
+
+/* =========================================================
+   STAT CARDS
+========================================================= */
+
+.td-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.td-stat-card {
+    position: relative;
+    overflow: hidden;
+
+    min-width: 0;
+
+    padding: 1.25rem;
+
+    background: #ffffff;
+
+    border: 1px solid #e9efeb;
+    border-radius: 18px;
+
+    box-shadow: 0 3px 12px rgba(17,45,33,.025);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        border-color .22s ease;
+}
+
+.td-stat-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #d1e6da;
+
+    box-shadow: 0 12px 26px rgba(17,45,33,.07);
+}
+
+.td-stat-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 110px;
+    height: 110px;
+
+    right: -48px;
+    bottom: -55px;
+
+    border-radius: 50%;
+
+    background: var(--td-card-glow, #f3faf6);
+}
+
+.td-stat-mapel {
+    --td-card-glow: #e9f5ef;
+    --td-card-color: #087f5b;
+}
+
+.td-stat-siswa {
+    --td-card-glow: #edf3ff;
+    --td-card-color: #4974ce;
+}
+
+.td-stat-kehadiran {
+    --td-card-glow: #fff5e7;
+    --td-card-color: #c88721;
+}
+
+.td-stat-jam {
+    --td-card-glow: #f2edff;
+    --td-card-color: #8a65cf;
+}
+
+.td-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.td-stat-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: var(--td-card-glow);
+    color: var(--td-card-color);
+}
+
+.td-stat-icon i {
+    font-size: 1rem;
+}
+
+.td-stat-label {
+    color: #a0aaa5;
+
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: .9px;
+}
+
+.td-stat-number {
+    position: relative;
+    z-index: 1;
+
+    margin-top: 1.35rem;
+
+    color: #183129;
+
+    font-size: clamp(1.8rem, 2.3vw, 2.45rem);
+    line-height: 1;
+
+    font-weight: 800;
+    letter-spacing: -1.1px;
+
+    overflow-wrap: anywhere;
+}
+
+.td-stat-number small {
+    margin-left: 3px;
+
+    color: #8b9b92;
+
+    font-size: .9rem;
+    font-weight: 700;
+}
+
+.td-stat-title {
+    position: relative;
+    z-index: 1;
+
+    margin-top: 9px;
+
+    color: #60736a;
+
+    font-size: .77rem;
+    font-weight: 600;
+}
+
+.td-stat-footer {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: 1.25rem;
+    padding-top: .85rem;
+
+    border-top: 1px solid #f0f3f1;
+
+    color: #829188;
+
+    font-size: .65rem;
+    line-height: 1.4;
+}
+
+.td-stat-footer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--td-card-color);
+
+    font-size: .65rem;
+}
+
+
+/* =========================================================
+   MAIN GRID
+========================================================= */
+
+.td-workspace-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    gap: 1.25rem;
+
+    margin-bottom: 1.75rem;
+}
+
+.td-panel {
+    min-width: 0;
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e8efeb;
+    border-radius: 20px;
+
+    box-shadow: 0 3px 14px rgba(17,45,33,.025);
+}
+
+.td-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 1.4rem 1.45rem;
+
+    border-bottom: 1px solid #edf2ee;
+}
+
+.td-panel-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 0;
+}
+
+.td-panel-icon {
+    width: 43px;
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+}
+
+.td-panel-icon i {
+    font-size: 1rem;
+}
+
+.td-panel-icon-green {
+    color: #087f5b;
+    background: #e8f5ef;
+}
+
+.td-panel-icon-orange {
+    color: #c98520;
+    background: #fff3df;
+}
+
+.td-panel-icon-purple {
+    color: #8660cb;
+    background: #f0eaff;
+}
+
+.td-panel-eyebrow {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #a0aaa5;
+
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.td-panel-title-group h3 {
+    margin: 0;
+
+    color: #1b3027;
+
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -.2px;
+}
+
+.td-panel-title-group p {
+    margin: 5px 0 0;
+
+    color: #96a39b;
+
+    font-size: .68rem;
+    line-height: 1.5;
+}
+
+.td-panel-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+
+    color: #087f5b;
+
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.td-panel-action:hover {
+    color: #064e3b;
+}
+
+.td-panel-action i {
+    font-size: .65rem;
+}
+
+
+/* =========================================================
+   SCHEDULE TIMELINE
+========================================================= */
+
+.td-schedule-content {
+    padding: .4rem 1.4rem 1rem;
+}
+
+.td-schedule-timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.td-schedule-item {
+    display: grid;
+    grid-template-columns: 72px 18px minmax(0, 1fr) 22px;
+    align-items: stretch;
+    gap: 12px;
+
+    min-height: 84px;
+}
+
+.td-schedule-time {
+    padding-top: 21px;
+
+    color: #667a70;
+
+    font-size: .73rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.td-schedule-track {
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+}
+
+.td-schedule-track-dot {
+    position: relative;
+    z-index: 1;
+
+    width: 11px;
+    height: 11px;
+
+    margin-top: 23px;
+
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+
+    background: #0c9468;
+
+    box-shadow: 0 0 0 3px #dff1e7;
+}
+
+.td-schedule-track-line {
+    position: absolute;
+
+    top: 34px;
+    bottom: -1px;
+
+    width: 1px;
+
+    background: #dceae2;
+}
+
+.td-schedule-item:last-child .td-schedule-track-line {
+    display: none;
+}
+
+.td-schedule-detail {
+    align-self: center;
+
+    min-width: 0;
+
+    padding: 13px 14px;
+
+    background: #f8faf8;
+
+    border: 1px solid #edf2ee;
+    border-radius: 12px;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease;
+}
+
+.td-schedule-item:hover .td-schedule-detail {
+    background: #f0f8f3;
+    border-color: #dcebe1;
+}
+
+.td-schedule-subject {
+    color: #20372b;
+
+    font-size: .82rem;
+    font-weight: 800;
+
+    overflow-wrap: anywhere;
+}
+
+.td-schedule-class {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-top: 7px;
+
+    color: #87968d;
+
+    font-size: .67rem;
+}
+
+.td-schedule-class i {
+    color: #91a99b;
+    font-size: .62rem;
+}
+
+.td-schedule-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #c3cec7;
+
+    font-size: .65rem;
+}
+
+.td-schedule-item:hover .td-schedule-arrow {
+    color: #087f5b;
+}
+
+.td-panel-footer {
+    padding: 0 1.4rem 1.2rem;
+}
+
+.td-panel-footer a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 11px 14px;
+
+    color: #087f5b;
+    background: #f0f8f3;
+
+    border: 1px solid #e5f0e8;
+    border-radius: 10px;
+
+    font-size: .71rem;
+    font-weight: 800;
+
+    transition: background .2s ease;
+}
+
+.td-panel-footer a:hover {
+    background: #e5f3ea;
+}
+
+.td-panel-footer a i:last-child {
+    margin-left: auto;
+    font-size: .65rem;
+}
+
+.td-panel-footer a i:first-child {
+    font-size: .72rem;
+}
+
+
+/* =========================================================
+   ANNOUNCEMENT
+========================================================= */
+
+.td-announcement-content {
+    padding: .25rem 1.4rem .8rem;
+}
+
+.td-announcement-item {
+    display: grid;
+    grid-template-columns: 13px minmax(0, 1fr) 16px;
+    align-items: start;
+    gap: 11px;
+
+    padding: 1.1rem 0;
+
+    border-bottom: 1px solid #edf2ee;
+}
+
+.td-announcement-item:last-child {
+    border-bottom: none;
+}
+
+.td-announcement-marker {
+    display: flex;
+    justify-content: center;
+
+    padding-top: 5px;
+}
+
+.td-announcement-marker span {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #e6a23a;
+    box-shadow: 0 0 0 4px #fff4df;
+}
+
+.td-announcement-detail {
+    min-width: 0;
+}
+
+.td-announcement-detail h4 {
+    margin: 0;
+
+    color: #24372d;
+
+    font-size: .79rem;
+    font-weight: 800;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+.td-announcement-detail p {
+    margin: 6px 0 9px;
+
+    color: #829188;
+
+    font-size: .7rem;
+    line-height: 1.7;
+
+    overflow-wrap: anywhere;
+}
+
+.td-announcement-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #a0aaa5;
+
+    font-size: .63rem;
+}
+
+.td-announcement-meta i {
+    font-size: .62rem;
+}
+
+.td-announcement-arrow {
+    display: flex;
+    justify-content: center;
+
+    padding-top: 5px;
+
+    color: #c2cdc6;
+    font-size: .62rem;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.td-empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+
+    padding: 2.5rem 1.5rem;
+
+    text-align: center;
 }
 
-.agenda-hari {
-    font-size: 1.2rem;
+.td-empty-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 1rem;
+
+    border-radius: 18px;
+
+    background: #f0f7f2;
+    color: #8aab97;
+}
+
+.td-empty-icon i {
+    font-size: 1.4rem;
+}
+
+.td-empty-state h4 {
+    margin: 0;
+
+    color: #34483c;
+
+    font-size: .88rem;
+    font-weight: 800;
+}
+
+.td-empty-state p {
+    max-width: 300px;
+
+    margin: 8px 0 0;
+
+    color: #94a198;
+
+    font-size: .72rem;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   AGENDA
+========================================================= */
+
+.td-agenda-panel {
+    margin-top: 0;
+}
+
+.td-agenda-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+
+    padding: 1.5rem;
+
+    border-bottom: 1px solid #edf2ee;
+}
+
+.td-agenda-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.td-agenda-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #087f5b;
+
+    font-size: .71rem;
+    font-weight: 800;
+}
+
+.td-agenda-all:hover {
+    color: #064e3b;
+}
+
+.td-agenda-all i {
+    font-size: .65rem;
+}
+
+.td-agenda-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 4px;
+
+    background: #f1f5f2;
+
+    border: 1px solid #e8eeea;
+    border-radius: 11px;
+}
+
+.td-agenda-switch-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 34px;
+
+    padding: 8px 12px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #89978f;
+
+    font-size: .69rem;
     font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+}
+
+.td-agenda-switch-btn i {
+    font-size: .68rem;
+}
+
+.td-agenda-switch-btn.active {
+    color: #087f5b;
+
+    background: #ffffff;
+
+    border-color: #e7eee9;
+
+    box-shadow: 0 2px 5px rgba(17,45,33,.06);
+}
+
+.td-agenda-switch-btn:hover:not(.active) {
+    color: #456b57;
+}
+
+.td-agenda-view {
+    display: block;
+    width: 100%;
+}
+
+.td-agenda-list {
+    display: flex;
+    flex-direction: column;
+
+    padding: .5rem 1.5rem;
+}
+
+.td-agenda-item {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+
+    padding: 1.15rem 0;
+
+    border-bottom: 1px solid #edf2ee;
+}
+
+.td-agenda-item:last-child {
+    border-bottom: none;
+}
+
+.td-agenda-date {
+    width: 58px;
+    height: 62px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    color: #ffffff;
+    background: #087f5b;
+}
+
+.td-agenda-day {
+    font-size: 1.4rem;
+    font-weight: 800;
     line-height: 1;
 }
 
-.agenda-bulan {
-    font-size: 0.75rem;
+.td-agenda-month {
+    margin-top: 5px;
+
+    font-size: .64rem;
+    font-weight: 700;
     text-transform: uppercase;
-    opacity: 0.9;
 }
 
-.agenda-info {
-    flex: 1;
+.td-agenda-date.tanggal-terjadwal {
+    background: #4778ce;
 }
 
-.agenda-judul {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 0.4rem 0;
-    color: #0f172a;
+.td-agenda-date.tanggal-berlangsung {
+    background: #0d9870;
 }
 
-.agenda-meta {
+.td-agenda-date.tanggal-selesai {
+    background: #83918a;
+}
+
+.td-agenda-date.tanggal-dibatalkan {
+    background: #d65f65;
+}
+
+.td-agenda-info {
+    min-width: 0;
+}
+
+.td-agenda-title-row {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.td-agenda-title-row h4 {
+    margin: 0;
+
+    color: #263b2f;
+
+    font-size: .83rem;
+    font-weight: 800;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+.td-agenda-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    font-size: .57rem;
+    font-weight: 800;
+}
+
+.td-agenda-status.status-terjadwal {
+    color: #4778ce;
+    background: #edf3ff;
+}
+
+.td-agenda-status.status-berlangsung {
+    color: #0a8a63;
+    background: #e6f6ed;
+}
+
+.td-agenda-status.status-selesai {
+    color: #75847b;
+    background: #edf1ee;
+}
+
+.td-agenda-status.status-dibatalkan {
+    color: #cf535a;
+    background: #fff0f0;
+}
+
+.td-agenda-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 13px;
+
+    margin-top: 8px;
+
+    color: #8a9990;
+
+    font-size: .66rem;
+}
+
+.td-agenda-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-width: 0;
+}
+
+.td-agenda-meta i {
+    flex-shrink: 0;
+
+    color: #a5b2a9;
+    font-size: .65rem;
+}
+
+.td-agenda-detail {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+
+    padding: 9px 12px;
+
+    color: #087f5b;
+
+    background: #f0f8f3;
+
+    border: 1px solid #e4f0e8;
+    border-radius: 9px;
+
+    font-size: .67rem;
+    font-weight: 800;
+
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.td-agenda-detail:hover {
+    color: #064e3b;
+
+    background: #e3f3e9;
+
+    transform: translateY(-1px);
+}
+
+.td-agenda-detail i {
+    font-size: .62rem;
+}
+
+.td-agenda-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
-    font-size: 0.85rem;
-    color: #64748b;
+
+    padding: 1rem 1.5rem;
+
+    background: #fafcfb;
+
+    border-top: 1px solid #edf2ee;
+}
+
+.td-agenda-bottom > span {
+    display: inline-flex;
     align-items: center;
+    gap: 7px;
+
+    color: #8b9991;
+
+    font-size: .67rem;
 }
 
-.agenda-meta i {
-    margin-right: 0.3rem;
+.td-agenda-bottom > span i {
+    color: #0b9368;
 }
 
-.agenda-status {
-    padding: 0.2rem 0.7rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: white;
+.td-agenda-bottom a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #087f5b;
+
+    font-size: .68rem;
+    font-weight: 800;
 }
 
-.status-terjadwal { background: #2563eb; }
-.status-berlangsung { background: #16a34a; }
-.status-selesai { background: #64748b; }
-.status-dibatalkan { background: #dc2626; }
+.td-agenda-bottom a i {
+    font-size: .63rem;
+}
 
-/* --- FullCalendar Gaya Sama --- */
+.td-agenda-empty {
+    min-height: 260px;
+}
+
+
+/* =========================================================
+   FULLCALENDAR
+========================================================= */
+
+.td-agenda-calendar {
+    padding: 1.5rem;
+}
+
+.td-calendar-container {
+    min-width: 0;
+    width: 100%;
+}
+
 #kalenderDashboard {
+    min-height: 420px;
+
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: .78rem;
 }
 
-.fc {
-    --fc-border-color: #e2e8f0;
-    --fc-today-bg-color: #eff6ff;
-    --fc-neutral-bg-color: #f8fafc;
+#kalenderDashboard .fc {
+    --fc-border-color: #e8efeb;
+    --fc-today-bg-color: #f0f8f3;
+    --fc-neutral-bg-color: #f8faf8;
+    --fc-page-bg-color: #ffffff;
     --fc-event-border-color: transparent;
     --fc-event-text-color: #ffffff;
-    --fc-page-bg-color: #ffffff;
 }
 
-.fc-theme-standard .fc-scrollgrid {
-    border: 1px solid #e2e8f0;
+#kalenderDashboard .fc-toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+
+    margin-bottom: 1.25rem !important;
+}
+
+#kalenderDashboard .fc-toolbar-title {
+    color: #263b2f;
+
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+#kalenderDashboard .fc-button {
     border-radius: 8px;
+
+    font-size: .7rem;
+    font-weight: 700;
+
+    box-shadow: none !important;
 }
 
-.fc-toolbar-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1e293b;
+#kalenderDashboard .fc-button-primary {
+    color: #087f5b;
+
+    background: #ffffff;
+
+    border: 1px solid #e1ebe4;
 }
 
-.fc-button {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    color: #475569;
-    font-weight: 500;
-    border-radius: 6px;
-    padding: 0.35rem 0.7rem;
-    margin: 0 0.25rem;
-    transition: all 0.2s ease;
+#kalenderDashboard .fc-button-primary:hover {
+    color: #064e3b;
+
+    background: #f0f8f3;
+
+    border-color: #cfe5d7;
 }
 
-.fc-button:hover {
-    background-color: #f8fafc;
-    border-color: #cbd5e1;
-    color: #1e293b;
-}
-
-.fc-button-primary {
-    background-color: #2563eb;
-    border-color: #2563eb;
+#kalenderDashboard .fc-button-primary:not(:disabled).fc-button-active,
+#kalenderDashboard .fc-button-primary:not(:disabled):active {
     color: #ffffff;
+
+    background: #087f5b;
+
+    border-color: #087f5b;
 }
 
-.fc-button-primary:hover {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-}
-
-.fc-event {
-    border-radius: 4px;
-    padding: 3px 8px;
-    line-height: 1.4;
-    cursor: pointer;
-    border: none;
-    margin: 1px 0;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    color: #ffffff !important;
+#kalenderDashboard .fc-scrollgrid {
+    border-radius: 12px;
     overflow: hidden;
 }
 
-.fc-event-time {
-    font-size: 0.7rem;
-    font-weight: 400;
-    opacity: 0.9;
-    display: block;
-    margin-bottom: 1px;
+#kalenderDashboard .fc-col-header-cell {
+    background: #f8faf8;
 }
 
-.fc-event-title {
-    font-size: 0.8rem;
-    font-weight: 500;
-    display: block;
-    line-height: 1.2;
+#kalenderDashboard .fc-col-header-cell-cushion,
+#kalenderDashboard .fc-daygrid-day-number {
+    padding: 9px;
+
+    color: #77877d;
+
+    font-size: .68rem;
+    font-weight: 700;
+
+    text-decoration: none;
 }
 
-.fc-event.terjadwal { background-color: #2563eb; }
-.fc-event.berlangsung { background-color: #16a34a; }
-.fc-event.selesai { background-color: #64748b; opacity: 0.9; }
-.fc-event.dibatalkan { background-color: #dc2626; text-decoration: line-through; opacity: 0.9; }
+#kalenderDashboard .fc-daygrid-day-number {
+    color: #566a5d;
+}
+
+#kalenderDashboard .fc-day-today .fc-daygrid-day-number {
+    color: #087f5b;
+
+    font-weight: 900;
+}
+
+#kalenderDashboard .fc-event {
+    border: none;
+    border-radius: 5px;
+
+    padding: 3px 5px;
+
+    cursor: pointer;
+
+    font-size: .65rem;
+    line-height: 1.4;
+}
+
+#kalenderDashboard .fc-event-time {
+    font-size: .6rem;
+    font-weight: 700;
+}
+
+#kalenderDashboard .fc-event-title {
+    font-weight: 700;
+}
+
+#kalenderDashboard .fc-event.terjadwal {
+    background: #4778ce;
+}
+
+#kalenderDashboard .fc-event.berlangsung {
+    background: #0d9870;
+}
+
+#kalenderDashboard .fc-event.selesai {
+    background: #83918a;
+}
+
+#kalenderDashboard .fc-event.dibatalkan {
+    background: #d65f65;
+}
+
+#kalenderDashboard .fc-daygrid-event:hover {
+    filter: brightness(.95);
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .td-hero {
+        grid-template-columns: minmax(0, 1fr) 270px;
+        gap: 1.25rem;
+
+        padding: 1.75rem;
+    }
+
+    .td-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .td-workspace-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE MOBILE
+========================================================= */
 
 @media (max-width: 768px) {
-    .agenda-item {
+
+    .teacher-dashboard {
+        padding-bottom: 1rem;
+    }
+
+    .td-hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.25rem;
+
+        padding: 1.5rem;
+
+        margin-bottom: 1.5rem;
+
+        border-radius: 20px;
+    }
+
+    .td-hero h1 {
+        margin-top: 1.1rem;
+
+        font-size: 1.85rem;
+        letter-spacing: -.7px;
+    }
+
+    .td-hero-description {
+        font-size: .82rem;
+        line-height: 1.7;
+    }
+
+    .td-hero-bottom {
+        gap: 1rem;
+
+        padding-top: 1.25rem;
+    }
+
+    .td-hero-date {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .td-hero-date strong {
+        font-size: .72rem;
+    }
+
+    .td-hero-action {
+        padding: 10px 13px;
+
+        font-size: .7rem;
+    }
+
+    .td-hero-side {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: .75rem;
+    }
+
+    .td-hero-calendar {
+        padding: 1rem 1.15rem;
+
+        border-radius: 15px;
+    }
+
+    .td-calendar-date {
+        margin-top: 1rem;
+
+        font-size: 1.2rem;
+    }
+
+    .td-calendar-link {
+        margin-top: .9rem;
+        padding-top: .8rem;
+    }
+
+    .td-hero-note {
+        padding: 10px 12px;
+    }
+
+    .td-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: .8rem;
+
+        margin-bottom: 1rem;
+    }
+
+    .td-section-heading h2 {
+        font-size: 1.2rem;
+    }
+
+    .td-section-heading p {
+        font-size: .73rem;
+    }
+
+    .td-semester-pill {
+        padding: 7px 10px;
+
+        font-size: .66rem;
+    }
+
+    .td-stats-grid {
+        gap: .75rem;
+    }
+
+    .td-stat-card {
+        padding: 1rem;
+
+        border-radius: 15px;
+    }
+
+    .td-stat-icon {
+        width: 37px;
+        height: 37px;
+
+        border-radius: 10px;
+    }
+
+    .td-stat-icon i {
+        font-size: .85rem;
+    }
+
+    .td-stat-label {
+        font-size: .49rem;
+        letter-spacing: .5px;
+    }
+
+    .td-stat-number {
+        margin-top: 1rem;
+
+        font-size: 1.85rem;
+    }
+
+    .td-stat-title {
+        font-size: .68rem;
+        line-height: 1.5;
+    }
+
+    .td-stat-footer {
+        margin-top: .9rem;
+        padding-top: .75rem;
+
+        font-size: .59rem;
+    }
+
+    .td-workspace-grid {
+        gap: 1rem;
+
+        margin-bottom: 1.25rem;
+    }
+
+    .td-panel {
+        border-radius: 17px;
+    }
+
+    .td-panel-header {
+        padding: 1.1rem;
+
+        gap: .7rem;
+    }
+
+    .td-panel-icon {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 11px;
+    }
+
+    .td-panel-title-group {
+        gap: 9px;
+    }
+
+    .td-panel-title-group h3 {
+        font-size: .88rem;
+    }
+
+    .td-panel-title-group p {
+        font-size: .62rem;
+    }
+
+    .td-panel-eyebrow {
+        font-size: .5rem;
+    }
+
+    .td-panel-action {
+        font-size: .65rem;
+    }
+
+    .td-schedule-content {
+        padding: .35rem 1rem .8rem;
+    }
+
+    .td-schedule-item {
+        grid-template-columns: 57px 14px minmax(0, 1fr) 14px;
+        gap: 8px;
+
+        min-height: 78px;
+    }
+
+    .td-schedule-time {
+        padding-top: 20px;
+
+        font-size: .63rem;
+    }
+
+    .td-schedule-track-dot {
+        width: 9px;
+        height: 9px;
+
+        margin-top: 22px;
+    }
+
+    .td-schedule-track-line {
+        top: 32px;
+    }
+
+    .td-schedule-detail {
+        padding: 11px 10px;
+    }
+
+    .td-schedule-subject {
+        font-size: .73rem;
+    }
+
+    .td-schedule-class {
+        font-size: .62rem;
+    }
+
+    .td-panel-footer {
+        padding: 0 1rem 1rem;
+    }
+
+    .td-announcement-content {
+        padding: .2rem 1rem .6rem;
+    }
+
+    .td-announcement-item {
+        grid-template-columns: 11px minmax(0, 1fr) 12px;
+        gap: 8px;
+
+        padding: .9rem 0;
+    }
+
+    .td-announcement-detail h4 {
+        font-size: .74rem;
+    }
+
+    .td-announcement-detail p {
+        font-size: .65rem;
+        line-height: 1.6;
+    }
+
+    .td-announcement-meta {
+        font-size: .58rem;
+    }
+
+    .td-agenda-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1rem;
+
+        padding: 1.1rem;
+    }
+
+    .td-agenda-header-actions {
+        width: 100%;
+
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+    }
+
+    .td-agenda-all {
+        font-size: .65rem;
+    }
+
+    .td-agenda-switch-btn {
+        min-height: 32px;
+
+        padding: 7px 10px;
+
+        font-size: .63rem;
+    }
+
+    .td-agenda-list {
+        padding: .25rem 1rem;
+    }
+
+    .td-agenda-item {
+        grid-template-columns: 49px minmax(0, 1fr);
+        gap: 11px;
+
+        padding: 1rem 0;
+    }
+
+    .td-agenda-date {
+        width: 48px;
+        height: 53px;
+
+        border-radius: 11px;
+    }
+
+    .td-agenda-day {
+        font-size: 1.15rem;
+    }
+
+    .td-agenda-month {
+        font-size: .57rem;
+    }
+
+    .td-agenda-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .td-agenda-title-row h4 {
+        font-size: .73rem;
+    }
+
+    .td-agenda-status {
+        font-size: .52rem;
+        padding: 3px 7px;
+    }
+
+    .td-agenda-meta {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: 6px;
+
+        margin-top: 7px;
+
+        font-size: .61rem;
     }
-    .agenda-meta {
-        flex-direction: column;
+
+    .td-agenda-detail {
+        grid-column: 2;
+
+        justify-self: start;
+
+        padding: 7px 10px;
+
+        font-size: .61rem;
+    }
+
+    .td-agenda-bottom {
+        padding: .9rem 1rem;
+    }
+
+    .td-agenda-bottom > span,
+    .td-agenda-bottom a {
+        font-size: .61rem;
+    }
+
+    .td-agenda-calendar {
+        padding: 1rem;
+    }
+
+    #kalenderDashboard {
+        min-height: 350px;
+        font-size: .68rem;
+    }
+
+    #kalenderDashboard .fc-toolbar {
+        gap: 8px;
+    }
+
+    #kalenderDashboard .fc-toolbar-title {
+        font-size: .85rem;
+    }
+
+    #kalenderDashboard .fc-button {
+        padding: .35rem .45rem;
+
+        font-size: .61rem;
+    }
+
+    #kalenderDashboard .fc-col-header-cell-cushion,
+    #kalenderDashboard .fc-daygrid-day-number {
+        padding: 5px;
+
+        font-size: .6rem;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .td-hero {
+        padding: 1.2rem;
+    }
+
+    .td-hero h1 {
+        font-size: 1.55rem;
+    }
+
+    .td-hero-topline {
+        font-size: .58rem;
+    }
+
+    .td-hero-bottom {
         align-items: flex-start;
-        gap: 0.4rem;
-    }
-    .fc-toolbar {
         flex-direction: column;
-        gap: 0.5rem;
     }
+
+    .td-hero-action {
+        width: 100%;
+    }
+
+    .td-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .td-stat-card {
+        padding: .85rem;
+    }
+
+    .td-stat-number {
+        font-size: 1.65rem;
+    }
+
+    .td-stat-label {
+        font-size: .44rem;
+    }
+
+    .td-stat-footer {
+        align-items: flex-start;
+        font-size: .55rem;
+    }
+
+    .td-agenda-header-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .td-agenda-switch {
+        width: 100%;
+    }
+
+    .td-agenda-switch-btn {
+        flex: 1;
+    }
+
+    .td-agenda-meta {
+        overflow-wrap: anywhere;
+    }
+
 }
 
-.agenda-tanggal.tanggal-terjadwal { background: #2563eb; }
-.agenda-tanggal.tanggal-berlangsung { background: #16a34a; }
-.agenda-tanggal.tanggal-selesai { background: #64748b; }
-.agenda-tanggal.tanggal-dibatalkan { background: #dc2626; }
 
-/* ==========================================
-   STYLE MODAL DETAIL AGENDA
-========================================== */
-.detail-row {
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .teacher-dashboard *,
+    .teacher-dashboard *::before,
+    .teacher-dashboard *::after {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+    }
+
+}
+
+/* =========================================================
+   TEACHER DASHBOARD - AGENDA DETAIL MODAL
+========================================================= */
+
+.td-modal-dialog {
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e8efeb;
+    border-radius: 22px;
+
+    box-shadow:
+        0 24px 70px rgba(0,0,0,.2),
+        0 5px 20px rgba(0,0,0,.08);
+
+    animation: tdModalAppear .22s ease;
+}
+
+@keyframes tdModalAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+.td-modal-header {
     display: flex;
     align-items: center;
-    margin-bottom: 0.8rem;
+    gap: 12px;
+
+    padding: 1.3rem 1.5rem;
+
+    border-bottom: 1px solid #edf2ee;
 }
 
-.detail-label {
-    width: 170px; /* Sesuaikan angka ini jika perlu */
-    font-weight: 500;
-    color: #334155;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem; /* Jarak ikon dan teks */
-}
+.td-modal-header-icon {
+    width: 43px;
+    height: 43px;
 
-/* Posisi titik dua tetap */
-.detail-separator {
-    width: 15px;
-    text-align: center;
     flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #087f5b;
+    background: #e8f5ef;
+
+    border-radius: 13px;
 }
 
-/* Isi data */
-.detail-value {
-    color: #475569;
+.td-modal-header-content {
+    flex: 1;
+    min-width: 0;
 }
+
+.td-modal-eyebrow {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #9ba9a0;
+
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.td-modal-header h3 {
+    margin: 0;
+
+    color: #20372b;
+
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.td-modal-close {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #edf2ee;
+    border-radius: 10px;
+
+    background: #f8faf8;
+    color: #829188;
+
+    cursor: pointer;
+
+    transition:
+        color .2s ease,
+        background .2s ease;
+}
+
+.td-modal-close:hover {
+    color: #b6474e;
+    background: #fff0f0;
+}
+
+.td-modal-body {
+    overflow-y: auto;
+
+    padding: 1.5rem;
+
+    overscroll-behavior: contain;
+}
+
+.td-modal-agenda-title {
+    color: #20372b;
+
+    font-size: 1.25rem;
+    line-height: 1.5;
+
+    font-weight: 800;
+    letter-spacing: -.3px;
+
+    overflow-wrap: anywhere;
+}
+
+.td-modal-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 12px;
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    background: #f4f8f5;
+
+    color: #6b8174;
+
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.td-modal-status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+}
+
+.td-status-blue {
+    background: #4778ce;
+}
+
+.td-status-green {
+    background: #0d9870;
+}
+
+.td-status-gray {
+    background: #83918a;
+}
+
+.td-status-red {
+    background: #d65f65;
+}
+
+.td-modal-details {
+    display: flex;
+    flex-direction: column;
+
+    margin-top: 1.5rem;
+
+    border: 1px solid #edf2ee;
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+.td-modal-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid #edf2ee;
+}
+
+.td-modal-detail-row:last-child {
+    border-bottom: none;
+}
+
+.td-modal-detail-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #087f5b;
+    background: #edf7f1;
+
+    border-radius: 10px;
+}
+
+.td-modal-detail-icon i {
+    font-size: .8rem;
+}
+
+.td-modal-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    min-width: 0;
+}
+
+.td-modal-detail-label {
+    color: #99a59d;
+
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+.td-modal-detail-content strong {
+    color: #42574a;
+
+    font-size: .74rem;
+    line-height: 1.6;
+
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+.td-modal-description {
+    margin-top: 1.25rem;
+    padding: 1rem;
+
+    background: #f8faf8;
+    border: 1px solid #edf2ee;
+    border-radius: 13px;
+}
+
+.td-modal-description-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #41574a;
+
+    font-size: .74rem;
+    font-weight: 800;
+}
+
+.td-modal-description-heading i {
+    color: #087f5b;
+}
+
+.td-modal-description p {
+    margin: 10px 0 0;
+
+    color: #829188;
+
+    font-size: .72rem;
+    line-height: 1.8;
+
+    overflow-wrap: anywhere;
+}
+
+.td-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 1rem 1.5rem;
+
+    background: #fafcfb;
+
+    border-top: 1px solid #edf2ee;
+}
+
+.td-modal-dismiss,
+.td-modal-open-detail {
+    min-height: 39px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 9px 15px;
+
+    border-radius: 9px;
+
+    font-size: .7rem;
+    font-weight: 800;
+}
+
+.td-modal-dismiss {
+    color: #75857b;
+
+    background: #ffffff;
+
+    border: 1px solid #e5ece7;
+
+    cursor: pointer;
+}
+
+.td-modal-dismiss:hover {
+    background: #f0f5f1;
+}
+
+.td-modal-open-detail {
+    color: #ffffff;
+
+    background: #087f5b;
+
+    border: 1px solid #087f5b;
+}
+
+.td-modal-open-detail:hover {
+    color: #ffffff;
+    background: #064e3b;
+}
+
+.td-modal-open-detail i {
+    font-size: .65rem;
+}
+
+
+/* MOBILE MODAL */
 
 @media (max-width: 576px) {
-    .detail-row {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    .detail-separator {
-        display: none;
-    }
-}
 
-.fc .fc-col-header-cell-cushion,
-.fc .fc-daygrid-day-number {
-    text-decoration: none;
+    .td-modal-overlay {
+        padding: .65rem !important;
+    }
+
+    .td-modal-dialog {
+        max-height: 92vh;
+
+        border-radius: 18px;
+    }
+
+    .td-modal-header {
+        padding: 1rem;
+    }
+
+    .td-modal-body {
+        padding: 1rem;
+    }
+
+    .td-modal-agenda-title {
+        font-size: 1.05rem;
+    }
+
+    .td-modal-detail-row {
+        gap: 9px;
+
+        padding: 11px;
+    }
+
+    .td-modal-detail-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .td-modal-detail-content strong {
+        font-size: .68rem;
+    }
+
+    .td-modal-footer {
+        padding: .85rem 1rem;
+    }
+
+    .td-modal-dismiss,
+    .td-modal-open-detail {
+        flex: 1;
+
+        padding: 9px 10px;
+    }
+
 }

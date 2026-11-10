@@ -119,50 +119,72 @@
     // ==========================================
     // CSS HALAMAN
     // ==========================================
+
     function updatePageStyles(doc, newContent) {
+
         // Hapus CSS halaman sebelumnya.
-        document.querySelectorAll(
-            "[data-spa-page-style]"
-        ).forEach(el => el.remove());
+        document.querySelectorAll("[data-spa-page-style]").forEach(el => {
+            el.remove();
+        });
 
         pageStyleIds.clear();
 
         const styles = [];
 
-        // CSS dari extra_css di HEAD.
+        // 1. CSS eksternal dari HEAD (extra_css).
         doc.head.querySelectorAll(
             'link[rel="stylesheet"]:not([data-spa-global])'
-        ).forEach(el => styles.push(el.cloneNode(true)));
-
-        // CSS dari block content.
-        newContent.querySelectorAll(
-            'link[rel="stylesheet"]:not([data-spa-global])'
-        ).forEach(el => styles.push(el.cloneNode(true)));
-
-        // Style inline dari konten halaman.
-        newContent.querySelectorAll("style").forEach(el => {
+        ).forEach(el => {
             styles.push(el.cloneNode(true));
         });
 
+        // 2. CSS inline dari HEAD (extra_css).
+        doc.head.querySelectorAll(
+            'style[data-spa-page-style]'
+        ).forEach(el => {
+            styles.push(el.cloneNode(true));
+        });
+
+        // 3. CSS eksternal dari dalam spa-content.
+        newContent.querySelectorAll(
+            'link[rel="stylesheet"]:not([data-spa-global])'
+        ).forEach(el => {
+            styles.push(el.cloneNode(true));
+        });
+
+        // 4. CSS inline dari dalam spa-content.
+        newContent.querySelectorAll(
+            'style:not([data-spa-global])'
+        ).forEach(el => {
+            styles.push(el.cloneNode(true));
+        });
+
+        // Pasang CSS baru tanpa duplikasi.
         const seen = new Set();
 
         styles.forEach(style => {
+
             if (style.tagName === "LINK") {
                 const href = getPageUrl(style.href).href;
 
                 if (seen.has(href)) return;
+
                 seen.add(href);
             }
 
             style.dataset.spaPageStyle = "true";
+
             document.head.appendChild(style);
         });
 
-        // Hilangkan CSS dari konten agar tidak terpasang dua kali.
+        // Hapus CSS dari konten agar tidak terpasang dua kali.
         newContent.querySelectorAll(
             'link[rel="stylesheet"], style'
-        ).forEach(el => el.remove());
+        ).forEach(el => {
+            el.remove();
+        });
     }
+
 
     // ==========================================
     // SCRIPT EKSTERNAL

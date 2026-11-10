@@ -65,10 +65,28 @@ def halaman_jurnal():
     sudah_diproses = set()
     
     for aturan in pengaturan_list:
-        mapel = aturan.mata_pelajaran
-        kelas = aturan.kelas
-        
+
+        # Ambil data berdasarkan foreign key secara langsung
+        mapel = MataPelajaran.query.get(aturan.mata_pelajaran_id)
+        kelas = Kelas.query.get(aturan.kelas_id)
+
+        # Pastikan relasi masih memiliki data yang valid
+        if not mapel or not kelas:
+            current_app.logger.warning(
+                f"Pengaturan mapel-kelas tidak valid: "
+                f"ID aturan={aturan.id}, "
+                f"mapel_id={aturan.mata_pelajaran_id}, "
+                f"kelas_id={aturan.kelas_id}, "
+                f"guru_id={guru_data.id}"
+            )
+            continue
+
         kunci = (mapel.id, kelas.id)
+
+        if kunci in sudah_diproses:
+            continue
+
+        sudah_diproses.add(kunci)
         if kunci in sudah_diproses:
             continue
         sudah_diproses.add(kunci)
@@ -142,15 +160,38 @@ def halaman_jurnal():
 @jurnal_mengajar_bp.route('/simpan', methods=['POST'])
 @guru_wajib
 def simpan_jurnal():
+
     user_id = session.get('user_id')
-    user_db = User.query.get(user_id)
+    user_db = User.query.get(user_id) if user_id else None
     guru_data = user_db.guru if user_db else None
-    
+
     if not guru_data:
-        flash("<i class='fas fa-exclamation-triangle'></i> Data guru tidak ditemukan", "danger")
+        flash(
+            "<i class='fas fa-exclamation-triangle'></i> "
+            "Data guru tidak ditemukan",
+            "danger"
+        )
         return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
-    
-    mapel_id = request.form.get('mapel_id')
+
+    # Ambil tahun pelajaran aktif
+    from models import TahunPelajaran
+
+    tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+
+    kode_tahun = (
+        request.form.get('tahun_pelajaran')
+        or session.get('tahun_pelajaran')
+        or (tahun_aktif.kode if tahun_aktif else None)
+    )
+
+    if not kode_tahun:
+        flash("Tahun pelajaran aktif belum tersedia.", "danger")
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    # Ambil data form
+    mapel_id = request.form.get('mapel_id', type=int)
+    kelas_id = request.form.get('kelas_id', type=int)
+
     tanggal = request.form.get('tanggal')
     jam_pelajaran = request.form.get('jam_pelajaran')
     materi = request.form.get('materi', '').strip()
@@ -158,64 +199,155 @@ def simpan_jurnal():
     metode = request.form.get('metode', '').strip()
     kehadiran = request.form.get('kehadiran', '').strip()
     catatan = request.form.get('catatan', '').strip()
-    
+
     if not mapel_id or not tanggal or not jam_pelajaran or not materi:
-        flash("<i class='fas fa-times-circle'></i> Tanggal, Jam Pelajaran, dan Materi wajib diisi!", "danger")
+        flash(
+            "Tanggal, Jam Pelajaran, dan Materi wajib diisi!",
+            "danger"
+        )
         return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
-    
-    # Ambil info kelas dari pengaturan mapel
-    kode_tahun = session.get('tahun_pelajaran')
-    aturan = PengaturanMapelKelas.query.filter_by(
+
+    # Cari seluruh pengaturan yang sesuai
+    query_aturan = PengaturanMapelKelas.query.filter_by(
         mata_pelajaran_id=mapel_id,
         guru_id=guru_data.id,
-        tahun_pelajaran=kode_tahun
-    ).first()
-    
-    kelas_id = aturan.kelas_id if aturan else None
-    
-    # Simpan jurnal
-    jurnal_baru = JurnalMengajar(
-        guru_id=guru_data.id,
-        mata_pelajaran_id=mapel_id,
-        kelas_id=kelas_id,
-        tanggal=datetime.strptime(tanggal, '%Y-%m-%d').date(),
-        jam_pelajaran=jam_pelajaran,
-        materi=materi,
-        kegiatan=kegiatan,
-        metode=metode,
-        kehadiran=kehadiran,
-        catatan=catatan,
         tahun_pelajaran=kode_tahun
     )
-    
-    db.session.add(jurnal_baru)
-    db.session.commit()
-    
-    flash("<i class='fas fa-check-circle'></i> Jurnal mengajar berhasil disimpan!", "success")
-    return redirect(url_for('jurnal_mengajar.daftar_jurnal', mapel_id=mapel_id))
+
+    # Jika kelas dikirim, cocokkan secara spesifik
+    if kelas_id:
+        query_aturan = query_aturan.filter_by(kelas_id=kelas_id)
+
+    aturan_list = query_aturan.all()
+
+    # Pastikan pengaturan benar-benar ditemukan
+    if not aturan_list:
+        flash(
+            "Penugasan mata pelajaran dan kelas tidak ditemukan "
+            "untuk akun guru ini.",
+            "danger"
+        )
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    # Jika kelas tidak dikirim dan mapel berada di beberapa kelas,
+    # jangan memilih kelas secara sembarangan.
+    if not kelas_id and len(aturan_list) > 1:
+        flash(
+            "Mata pelajaran ini terdapat di beberapa kelas. "
+            "Silakan pilih kelas terlebih dahulu.",
+            "warning"
+        )
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    aturan = aturan_list[0]
+
+    # Validasi data master
+    mapel = MataPelajaran.query.get(mapel_id)
+    kelas = Kelas.query.get(aturan.kelas_id)
+
+    if not mapel or not kelas:
+        flash(
+            "Data mata pelajaran atau kelas tidak ditemukan.",
+            "danger"
+        )
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    # Validasi tanggal
+    try:
+        tanggal_jurnal = datetime.strptime(
+            tanggal, '%Y-%m-%d'
+        ).date()
+    except (ValueError, TypeError):
+        flash("Format tanggal tidak valid.", "danger")
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    # Simpan jurnal
+    try:
+        jurnal_baru = JurnalMengajar(
+            guru_id=guru_data.id,
+            mata_pelajaran_id=mapel.id,
+            kelas_id=kelas.id,
+            tanggal=tanggal_jurnal,
+            jam_pelajaran=jam_pelajaran,
+            materi=materi,
+            kegiatan=kegiatan,
+            metode=metode,
+            kehadiran=kehadiran,
+            catatan=catatan,
+            tahun_pelajaran=kode_tahun
+        )
+
+        db.session.add(jurnal_baru)
+        db.session.commit()
+
+        flash(
+            "<i class='fas fa-check-circle'></i> "
+            "Jurnal mengajar berhasil disimpan!",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                'jurnal_mengajar.daftar_jurnal',
+                mapel_id=mapel.id,
+                tahun=kode_tahun
+            )
+        )
+
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal menyimpan jurnal mengajar")
+
+        flash(
+            "Terjadi kesalahan saat menyimpan jurnal mengajar.",
+            "danger"
+        )
+
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
 
 @jurnal_mengajar_bp.route('/riwayat/<int:mapel_id>')
 @guru_wajib
 def daftar_jurnal(mapel_id):
+
     user_id = session.get('user_id')
-    user_db = User.query.get(user_id)
+    user_db = User.query.get(user_id) if user_id else None
     guru_data = user_db.guru if user_db else None
-    
-    kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
-    
+
+    if not guru_data:
+        flash("Data guru tidak ditemukan.", "danger")
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    from models import TahunPelajaran
+
+    tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+
+    kode_tahun = (
+        request.args.get('tahun')
+        or session.get('tahun_pelajaran')
+        or (tahun_aktif.kode if tahun_aktif else None)
+    )
+
+    mapel = MataPelajaran.query.get(mapel_id)
+
+    if not mapel:
+        flash("Mata pelajaran tidak ditemukan.", "danger")
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
+    # Pastikan guru memiliki penugasan mapel ini
+    penugasan = PengaturanMapelKelas.query.filter_by(
+        mata_pelajaran_id=mapel_id,
+        guru_id=guru_data.id,
+        tahun_pelajaran=kode_tahun
+    ).first()
+
+    if not penugasan:
+        flash("Kamu tidak memiliki penugasan mata pelajaran ini.", "danger")
+        return redirect(url_for('jurnal_mengajar.halaman_jurnal'))
+
     daftar_jurnal = JurnalMengajar.query.filter_by(
         guru_id=guru_data.id,
         mata_pelajaran_id=mapel_id,
         tahun_pelajaran=kode_tahun
-    ).order_by(JurnalMengajar.tanggal.desc()).all()
-    
-    mapel = MataPelajaran.query.get(mapel_id)
-    
-    return render_template(
-        'sections/guru/riwayat_jurnal.html',
-        daftar_jurnal=daftar_jurnal,
-        mapel=mapel,
-        tahun_ajaran=kode_tahun,
-        active_page='jurnal_mengajar',
-        halaman_aktif='utama'
-    )
+    ).order_by(
+        JurnalMengajar.tanggal.desc()
+    ).all()

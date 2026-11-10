@@ -271,104 +271,257 @@
 
 
 <script>
-
-document.addEventListener('DOMContentLoaded', function () {
+(() => {
+    "use strict";
 
     // =====================================================
-    // DROPDOWN PROFIL PENGGUNA
+    // PREMIUM HEADER CONTROLLER — SPA SAFE
     // =====================================================
 
-    const userProfile = document.getElementById('userProfileBtn');
-    const userProfileTrigger = document.getElementById('userProfileTrigger');
-    const userDropdown = document.getElementById('userDropdown');
+    // Hindari pemasangan listener global berulang.
+    if (window.smpuHeaderControllerReady) return;
+    window.smpuHeaderControllerReady = true;
+
+    const SELECTOR = {
+        profile: "#userProfileBtn",
+        profileTrigger: "#userProfileTrigger",
+        profileDropdown: "#userDropdown",
+        sidebar: "#mainSidebar",
+        sidebarToggle: "#toggleSidebar"
+    };
+
+    // =====================================================
+    // HELPER
+    // =====================================================
+
+    function getProfile() {
+        return document.querySelector(SELECTOR.profile);
+    }
+
+    function getProfileTrigger() {
+        return document.querySelector(SELECTOR.profileTrigger);
+    }
+
+    function getProfileDropdown() {
+        return document.querySelector(SELECTOR.profileDropdown);
+    }
+
+    function getSidebar() {
+        return document.querySelector(SELECTOR.sidebar);
+    }
+
+    function getSidebarToggle() {
+        return document.querySelector(SELECTOR.sidebarToggle);
+    }
+
+    // =====================================================
+    // DROPDOWN PROFIL
+    // =====================================================
 
     function tutupDropdownProfil() {
-        if (!userProfile || !userProfileTrigger) return;
+        const profile = getProfile();
+        const trigger = getProfileTrigger();
 
-        userProfile.classList.remove('open');
-        userProfileTrigger.setAttribute('aria-expanded', 'false');
+        if (!profile || !trigger) return;
+
+        profile.classList.remove("open");
+        trigger.setAttribute("aria-expanded", "false");
     }
 
     function bukaDropdownProfil() {
-        if (!userProfile || !userProfileTrigger) return;
+        const profile = getProfile();
+        const trigger = getProfileTrigger();
 
-        userProfile.classList.add('open');
-        userProfileTrigger.setAttribute('aria-expanded', 'true');
+        if (!profile || !trigger) return;
+
+        profile.classList.add("open");
+        trigger.setAttribute("aria-expanded", "true");
     }
 
-    if (userProfile && userProfileTrigger && userDropdown) {
+    function toggleDropdownProfil() {
+        const profile = getProfile();
 
-        userProfileTrigger.addEventListener('click', function (e) {
-            e.stopPropagation();
+        if (!profile) return;
 
-            const sedangTerbuka = userProfile.classList.contains('open');
-
-            if (sedangTerbuka) {
-                tutupDropdownProfil();
-            } else {
-                bukaDropdownProfil();
-            }
-        });
-
-        // Klik di dalam dropdown tidak menutup menu.
-        userDropdown.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        // Klik di luar area profil menutup dropdown.
-        document.addEventListener('click', function (e) {
-            if (!userProfile.contains(e.target)) {
-                tutupDropdownProfil();
-            }
-        });
-
-        // Tutup dropdown dengan tombol Escape.
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                tutupDropdownProfil();
-            }
-        });
+        if (profile.classList.contains("open")) {
+            tutupDropdownProfil();
+        } else {
+            bukaDropdownProfil();
+        }
     }
-
 
     // =====================================================
-    // KONTROL SIDEBAR
+    // SIDEBAR
     // =====================================================
 
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const mainSidebar = document.getElementById('mainSidebar');
+    function bukaSidebar() {
+        const sidebar = getSidebar();
 
-    if (toggleBtn && mainSidebar) {
+        if (!sidebar) return;
 
-        toggleBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-
-            mainSidebar.classList.toggle('active');
-        });
-
-        // Klik di dalam sidebar tidak menutup sidebar.
-        mainSidebar.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        // Klik di luar sidebar dan tombol toggle menutup sidebar.
-        document.addEventListener('click', function (e) {
-            if (
-                !mainSidebar.contains(e.target) &&
-                !toggleBtn.contains(e.target)
-            ) {
-                mainSidebar.classList.remove('active');
-            }
-        });
-
-        // Escape juga menutup sidebar.
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                mainSidebar.classList.remove('active');
-            }
-        });
+        sidebar.classList.add("active");
     }
 
-});
+    function tutupSidebar() {
+        const sidebar = getSidebar();
 
+        if (!sidebar) return;
+
+        sidebar.classList.remove("active");
+    }
+
+    function toggleSidebar() {
+        const sidebar = getSidebar();
+
+        if (!sidebar) return;
+
+        sidebar.classList.toggle("active");
+    }
+
+    // =====================================================
+    // DELEGATED CLICK
+    //
+    // Elemen header boleh diganti SPA.
+    // Listener tetap bekerja karena dipasang di document.
+    // =====================================================
+
+    document.addEventListener("click", function (event) {
+
+        const target = event.target;
+
+        if (!(target instanceof Element)) return;
+
+        // ---------------------------------------------
+        // TOMBOL PROFIL
+        // ---------------------------------------------
+
+        const profileTrigger = target.closest(
+            SELECTOR.profileTrigger
+        );
+
+        if (profileTrigger) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            toggleDropdownProfil();
+
+            return;
+        }
+
+        // ---------------------------------------------
+        // KLIK DI DALAM DROPDOWN PROFIL
+        // ---------------------------------------------
+
+        const profileDropdown = target.closest(
+            SELECTOR.profileDropdown
+        );
+
+        if (profileDropdown) {
+            event.stopPropagation();
+            return;
+        }
+
+        // ---------------------------------------------
+        // TOMBOL SIDEBAR
+        // ---------------------------------------------
+
+        const sidebarToggle = target.closest(
+            SELECTOR.sidebarToggle
+        );
+
+        if (sidebarToggle) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            toggleSidebar();
+
+            return;
+        }
+
+        // ---------------------------------------------
+        // KLIK DI DALAM SIDEBAR
+        // ---------------------------------------------
+
+        const sidebar = getSidebar();
+
+        if (sidebar && sidebar.contains(target)) {
+            return;
+        }
+
+        // ---------------------------------------------
+        // KLIK DI LUAR PROFIL
+        // ---------------------------------------------
+
+        tutupDropdownProfil();
+
+        // ---------------------------------------------
+        // KLIK DI LUAR SIDEBAR
+        // ---------------------------------------------
+
+        tutupSidebar();
+
+    }, true);
+
+    // =====================================================
+    // ESCAPE
+    // =====================================================
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key !== "Escape") return;
+
+        tutupDropdownProfil();
+        tutupSidebar();
+
+    });
+
+    // =====================================================
+    // SPA LIFECYCLE
+    // =====================================================
+
+    // Tutup dropdown ketika akan pindah halaman.
+    document.addEventListener(
+        "spa:before-page-unload",
+        function () {
+            tutupDropdownProfil();
+        }
+    );
+
+    // Pastikan dropdown tidak tertinggal terbuka
+    // setelah halaman baru selesai dimuat.
+    document.addEventListener(
+        "spa:page-loaded",
+        function () {
+            tutupDropdownProfil();
+        }
+    );
+
+    // =====================================================
+    // INITIAL STATE
+    // =====================================================
+
+    function initHeader() {
+
+        const trigger = getProfileTrigger();
+
+        if (trigger) {
+            trigger.setAttribute("aria-expanded", "false");
+        }
+
+        tutupDropdownProfil();
+
+    }
+
+    // Script dapat dijalankan sebelum atau setelah DOM ready.
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initHeader,
+            { once: true }
+        );
+    } else {
+        initHeader();
+    }
+
+})();
 </script>
