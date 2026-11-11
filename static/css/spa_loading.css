@@ -45,6 +45,9 @@
    03. GLOBAL LOADER POSITION
    Loader sudah berada di luar app-container
 ============================================================ */
+/* ============================================================
+   03. GLOBAL LOADER POSITION
+============================================================ */
 
 #spa-page-loader,
 #spa-connection-state {
@@ -65,7 +68,6 @@
     justify-content: center !important;
 
     box-sizing: border-box !important;
-
     padding: 24px !important;
 
     overflow-x: hidden !important;
@@ -78,9 +80,8 @@
         opacity .3s ease,
         visibility .3s ease;
 
-    z-index: 2147483000 !important;
+    z-index: 1040 !important;
 }
-
 
 /* ============================================================
    04. LOADER ACTIVE STATE
@@ -558,7 +559,7 @@
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
 
-    z-index: 2147483001 !important;
+    z-index: 1041 !important;
 }
 
 
@@ -960,4 +961,26 @@
         transition: none !important;
     }
 
+}
+/* ============================================================
+   24. SIDEBAR & HEADER LAYER PRIORITY
+============================================================ */
+
+/* Sidebar utama */
+#mainSidebar.sidebar {
+    z-index: 1050 !important;
+}
+
+/* Backdrop sidebar */
+.sidebar-backdrop {
+    z-index: 1040 !important;
+}
+
+/* Loader dan offline state */
+#spa-page-loader {
+    z-index: 1030 !important;
+}
+
+#spa-connection-state {
+    z-index: 1031 !important;
 }
