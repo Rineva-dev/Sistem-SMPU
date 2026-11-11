@@ -1,778 +1,1274 @@
-// ==========================================
-// ABSENSI HARIAN — SCRIPT LENGKAP & BENAR
-// ==========================================
 
-// --- JAM DIGITAL ---
-function updateClock() {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const wita = new Date(utc + (8 * 3600000));
-    const h = String(wita.getHours()).padStart(2, '0');
-    const m = String(wita.getMinutes()).padStart(2, '0');
-    const s = String(wita.getSeconds()).padStart(2, '0');
+/* =========================================================
+   SMPU ATTENDANCE CENTER
+   Premium Attendance Workspace
+   SPA-safe · QR · Camera · Modal · Pagination
+========================================================= */
 
-    const jamDigital = document.getElementById('jam-digital');
-    if (jamDigital) {
-        jamDigital.textContent = `${h}.${m}.${s}`;
-    }
+(function () {
+    'use strict';
 
-    const jamHP = document.getElementById('hp-jam');
-    if (jamHP) {
-        const ikon = jamHP.querySelector('i');
-        jamHP.innerHTML = '';
-        if (ikon) jamHP.appendChild(ikon);
-        jamHP.appendChild(document.createTextNode(` ${h}.${m}`));
-    }
-}
+    const runtime = window.__absensiHarianRuntime || {
+        intervalJam: null,
+        root: null,
+        kameraStream: null,
+        pemindaianAktif: false,
+        dataQRTerlambat: null,
+        frameScan: null,
+        serverTimeAnchor: null,
+        intervalSinkronisasi: null
+    };
 
-// --- FUNGSI NOTIFIKASI (jika belum ada di layout) ---
-function notifSukses(pesan) { alert('✅ SUKSES: ' + pesan); }
-function notifError(pesan) { alert('❌ GAGAL: ' + pesan); }
-function notifInfo(pesan) { alert('ℹ️ INFO: ' + pesan); }
-function notifPeringatan(pesan) { alert('⚠️ PERINGATAN: ' + pesan); }
+    window.__absensiHarianRuntime = runtime;
 
-// --- FILTER BULAN & TAHUN ---
-function terapkanFilter() {
-    const bulan = document.getElementById('filter-bulan').value;
-    const tahun = document.getElementById('filter-tahun').value;
-    let url = ABSENSI.URL_ABSENSI_HARIAN;
-    const params = new URLSearchParams();
-    if (bulan) params.append('bulan', bulan);
-    if (tahun) params.append('tahun', tahun);
-    if (params.toString()) url += '?' + params.toString();
-    window.location.href = url;
-}
+    const getConfig = () => window.ABSENSI || {};
+    const getPagination = () => window.PAGINASI || {};
 
-// --- UBAH JAM KE MENIT ---
-function jamKeMenit(jamStr) {
-    const [j, m] = jamStr.split(':').map(Number);
-    return j * 60 + m;
-}
+    /* =====================================================
+       NOTIFICATION FALLBACK
+    ===================================================== */
 
-// --- AMBIL JAM SAAT INI (WITA) ---
-function ambilJamSaatIni() {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const wita = new Date(utc + (8 * 3600000));
-    const h = String(wita.getHours()).padStart(2, '0');
-    const m = String(wita.getMinutes()).padStart(2, '0');
-    return `${h}:${m}`;
-}
+    
+    function tampilkanNotifikasi(pesan, tipe = 'info') {
 
-// --- CEK: SUDAH LEWAT BATAS WAKTU? ---
-let BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
-function sudahLewatBatasWaktu() {
-    const jamSaatIni = ambilJamSaatIni();
-    return jamKeMenit(jamSaatIni) >= jamKeMenit(BATAS_ABSENSI);
-}
-function tampilkanPeringatanAlfa() {
-    notifPeringatan(`Sudah lewat jam ${BATAS_ABSENSI}\n\nAbsensi DITUTUP.`);
-}
+        // Gunakan sistem notifikasi global jika tersedia.
+        if (window.notif && typeof window.notif.tampil === 'function') {
+            const ikon = {
+                sukses: 'fa-check-circle',
+                error: 'fa-times-circle',
+                peringatan: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
 
-// --- CEK: BELUM JAM PULANG? ---
-let BATAS_PULANG = ABSENSI.BATAS_PULANG;
-function belumJamPulang() {
-    const jamSaatIni = ambilJamSaatIni();
-    return jamKeMenit(jamSaatIni) < jamKeMenit(BATAS_PULANG);
-}
-function tampilkanPeringatanBelumJamPulang() {
-    notifInfo(`BELUM JAM ${BATAS_PULANG}\n\nAbsen pulang baru bisa mulai jam ${BATAS_PULANG}.`);
-}
+            window.notif.tampil(
+                `<i class="fas ${ikon[tipe] || ikon.info}"></i> ${pesan}`,
+                tipe
+            );
 
-// --- KIRIM ABSEN MASUK ---
-function kirimAbsenMasuk(alasan = '') {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = ABSENSI.URL_ABSEN_MASUK;
-    if (alasan) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'alasan_keterlambatan';
-        input.value = alasan;
-        form.appendChild(input);
-    }
-    document.body.appendChild(form);
-    form.submit();
-}
-
-// --- KIRIM ABSEN PULANG ---
-function kirimAbsenPulang() {
-    if (belumJamPulang()) {
-        tampilkanPeringatanBelumJamPulang();
-        return;
-    }
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = ABSENSI.URL_ABSEN_PULANG;
-    document.body.appendChild(form);
-    form.submit();
-}
-
-// --- PROSES HASIL SCAN QR ---
-// --- PROSES HASIL SCAN QR ---
-async function prosesHasilScan(dataQR) {
-    // Tutup kamera & modal dulu
-    if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
-    if (window._aliranKamera) {
-        window._aliranKamera.getTracks().forEach(track => track.stop());
-        window._aliranKamera = null;
-    }
-    const modalKameraOverlay = document.getElementById('modal-kamera-overlay');
-    const modalKamera = document.getElementById('modal-kamera');
-    if (modalKameraOverlay) modalKameraOverlay.style.display = 'none';
-    if (modalKamera) modalKamera.style.display = 'none';
-
-    // ==================================================
-    // ✅ TAMBAHKAN CEK TERLAMBAT DI SINI!
-    // ==================================================
-    const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
-    if (!sudahMasuk) {
-        const jamSaatIni = ambilJamSaatIni();
-        const batasMenit = jamKeMenit(ABSENSI.BATAS_TERLAMBAT);
-        const saatIniMenit = jamKeMenit(jamSaatIni);
-
-        if (sudahLewatBatasWaktu()) {
-            tampilkanPeringatanAlfa();
-            return;
-        }
-    }
-
-    try {
-        const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data_qr: dataQR })
-        });
-        const hasil = await res.json();
-        if (hasil.status === 'sukses' || hasil.status === 'info') {
-            notifSukses(hasil.pesan || 'Absensi berhasil tercatat!');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            notifError(hasil.pesan || 'Gagal memproses QR.');
-        }
-    } catch (err) {
-        notifError(`Kesalahan: ${err.message}`);
-    }
-}
-
-function bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef) {
-    if (!pemindaianAktifRef.value) return;
-
-    if (!videoKamera || videoKamera.readyState < 2 ||
-        videoKamera.videoWidth === 0 || videoKamera.videoHeight === 0) {
-        requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
-        return;
-    }
-
-    kanvasPemindai.width = videoKamera.videoWidth;
-    kanvasPemindai.height = videoKamera.videoHeight;
-    const konteks = kanvasPemindai.getContext('2d', { willReadFrequently: true });
-    konteks.drawImage(videoKamera, 0, 0, kanvasPemindai.width, kanvasPemindai.height);
-
-    const kameraStatus = document.getElementById('kamera-status');
-
-    if (kameraStatus) {
-        kameraStatus.innerHTML = '<i class="fas fa-search"></i> Sedang memindai... arahkan QR ke bingkai';
-        kameraStatus.style.color = '#2563eb';
-        kameraStatus.classList.add('scanning');
-    }
-
-    try {
-        if (!window.jsQR) {
-            if (kameraStatus) {
-                kameraStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menunggu pustaka...';
-                kameraStatus.style.color = '#f59e0b';
-            }
-            requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
             return;
         }
 
-        const lebar = kanvasPemindai.width;
-        const tinggi = kanvasPemindai.height;
-        const skala = 0.6;
-        const potongX = lebar * (1 - skala) / 2;
-        const potongY = tinggi * (1 - skala) / 2;
-        const potongLebar = lebar * skala;
-        const potongTinggi = tinggi * skala;
+        // Gunakan modal premium dari notif_custom.js.
+        const notifGlobal = {
+            sukses: window.notifSukses,
+            error: window.notifError,
+            peringatan: window.notifPeringatan,
+            info: window.notifInfo
+        };
 
-        const gambarData = konteks.getImageData(
-            Math.floor(potongX), Math.floor(potongY),
-            Math.floor(potongLebar), Math.floor(potongTinggi)
-        );
+        const tampilkan = notifGlobal[tipe] || window.notifInfo;
 
-        if (gambarData.data.length < 100 || gambarData.width < 50 || gambarData.height < 50) {
-            requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
+        if (typeof tampilkan === 'function') {
+            tampilkan(pesan);
             return;
         }
 
-        const kodeQR = window.jsQR(gambarData.data, gambarData.width, gambarData.height, {
-            inversionAttempts: 'dontInvert'
-        });
+        // Fallback terakhir jika sistem notifikasi belum tersedia.
+        window.alert(pesan);
+    }
 
-        if (kodeQR && kodeQR.data) {
-            pemindaianAktifRef.value = false;
 
-            // ✅ SAAT QR TERDETEKSI
-            if (kameraStatus) {
-                kameraStatus.textContent = '✅ QR Terdeteksi! Memproses...';
-                kameraStatus.classList.remove('scanning'); // ← hapus kelas scanning
-                kameraStatus.style.color = '#16a34a';
-            }
+    function notifSukses(pesan) {
+        tampilkanNotifikasi(pesan, 'sukses');
+    }
 
-            prosesHasilScan(kodeQR.data);
-            return;
+    function notifError(pesan) {
+        tampilkanNotifikasi(pesan, 'error');
+    }
+
+    function notifInfo(pesan) {
+        tampilkanNotifikasi(pesan, 'info');
+    }
+
+    function notifPeringatan(pesan) {
+        tampilkanNotifikasi(pesan, 'peringatan');
+    }
+    
+    
+    /* =========================================================
+    WITA CLOCK — SERVER SYNCHRONIZED
+    ========================================================= */
+
+    function ambilWaktuWITA() {
+        if (runtime.serverTimeAnchor) {
+            const elapsed =
+                performance.now() - runtime.serverTimeAnchor.performanceTime;
+
+            return new Date(
+                runtime.serverTimeAnchor.timestamp + elapsed
+            );
         }
 
-    } catch (e) {
-        // Diam saja
+        // Fallback sebelum sinkronisasi server berhasil.
+        return new Date();
     }
 
-    requestAnimationFrame(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef));
-}
 
-// ==========================================
-// INISIALISASI SETELAH HALAMAN SIAP
-// ==========================================
-let intervalJamAbsensi = null;
-let elemenAbsensiTerinisialisasi = null;
+    /* FORMAT JAM WITA */
 
-function initAbsensiHarian() {
-    const penandaHalaman = document.getElementById('filter-bulan');
+    function formatJamWITA(denganDetik = true) {
+        const waktu = ambilWaktuWITA();
 
-    if (!penandaHalaman) return;
-
-    // Jangan memasang event dua kali pada elemen yang sama.
-    if (elemenAbsensiTerinisialisasi === penandaHalaman) return;
-
-    elemenAbsensiTerinisialisasi = penandaHalaman;
-
-    // Ambil konfigurasi terbaru setiap halaman dibuka.
-    BATAS_ABSENSI = ABSENSI.BATAS_TUTUP_ABSENSI;
-    BATAS_PULANG = ABSENSI.BATAS_PULANG;
-
-    updateClock();
-
-    if (intervalJamAbsensi) {
-        clearInterval(intervalJamAbsensi);
+        return new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Makassar',
+            hour: '2-digit',
+            minute: '2-digit',
+            ...(denganDetik ? { second: '2-digit' } : {}),
+            hourCycle: 'h23'
+        }).format(waktu).replace(/\./g, ':');
     }
 
-    intervalJamAbsensi = setInterval(updateClock, 1000);
 
-    // ==========================================
-    // MODAL IZIN / SAKIT
-    // ==========================================
-    const semuaBtnIzin = document.querySelectorAll('.btn-aksi-izin');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalForm = document.getElementById('modal-form');
-    const modalCancel = document.getElementById('modal-cancel');
-    const modalSubmit = document.getElementById('modal-submit');
+    /* JAM UNTUK VALIDASI ABSENSI */
 
-    function bukaModalIzin() {
-        if (sudahLewatBatasWaktu()) {
-            tampilkanPeringatanAlfa();
-            return;
-        }
-        modalOverlay.style.display = 'block';
-        modalForm.style.display = 'block';
-        setTimeout(() => {
-            modalOverlay.classList.add('active');
-            modalForm.classList.add('active');
-        }, 10);
-    }
-    function tutupModalIzin() {
-        modalOverlay.classList.remove('active');
-        modalForm.classList.remove('active');
-        setTimeout(() => {
-            modalOverlay.style.display = 'none';
-            modalForm.style.display = 'none';
-        }, 350);
-    }
-    semuaBtnIzin.forEach(btn => btn.addEventListener('click', bukaModalIzin));
-    if (modalCancel) modalCancel.addEventListener('click', tutupModalIzin);
-    if (modalSubmit) {
-        modalSubmit.addEventListener('click', () => {
-            const alasan = document.getElementById('modal-reason').value.trim();
-            if (!alasan) {
-                notif.tampil(
-                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum mengajukan izin.`,
-                    'peringatan'
-                );
-                document.getElementById('modal-reason').focus();
-                return;
-            }
-            // ✅ KIRIM KE ROUTE AJUKAN IZIN, BUKAN absen-masuk
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = ABSENSI.URL_AJUKAN_IZIN;
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'alasan_izin';
-            input.value = alasan;
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
-        });
+    function ambilJamSaatIni() {
+        return formatJamWITA(true).slice(0, 5);
     }
 
-    // ==========================================
-    // MODAL TAMPILKAN QR
-    // ==========================================
-    const semuaBtnQR = document.querySelectorAll('.btn-aksi-qr');
-    const modalQrOverlay = document.getElementById('modal-qr-overlay');
-    const modalQr = document.getElementById('modal-qr');
-    const modalQrTutup = document.getElementById('modal-qr-tutup');
 
-    function bukaModalQR() {
-        const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
-        if (!sudahMasuk) {
-            if (sudahLewatBatasWaktu()) {
-                tampilkanPeringatanAlfa();
-                return;
-            }
-        } else {
-            if (belumJamPulang()) {
-                tampilkanPeringatanBelumJamPulang();
-                return;
-            }
-        }
-        modalQrOverlay.style.display = 'block';
-        modalQr.style.display = 'block';
-        setTimeout(() => {
-            modalQrOverlay.classList.add('active');
-            modalQr.classList.add('active');
-        }, 10);
-    }
-    function tutupModalQR() {
-        modalQrOverlay.classList.remove('active');
-        modalQr.classList.remove('active');
-        setTimeout(() => {
-            modalQrOverlay.style.display = 'none';
-            modalQr.style.display = 'none';
-        }, 350);
-    }
-    semuaBtnQR.forEach(btn => btn.addEventListener('click', async () => {
-        bukaModalQR();
+    /* SINKRONISASI DENGAN SERVER */
+
+    async function sinkronkanWaktuServer() {
+        const config = getConfig();
+        const url = config.URL_SERVER_TIME || '/api/server-time';
+
+        // Simpan halaman yang sedang aktif.
+        const rootSaatMulai = runtime.root;
+
         try {
-            const res = await fetch(ABSENSI.URL_QR_DATA);
-            const data = await res.json();
-            if (data.status === 'sukses') {
-                document.getElementById('qr-tempat-tampil').innerHTML =
-                    `<img src="data:image/png;base64,${data.qr_code}" alt="QR Absensi">`;
-                document.getElementById('qr-nama-guru').textContent = data.nama;
-                document.getElementById('qr-nip-guru').textContent = data.nip || '-';
-                document.getElementById('qr-tanggal-hariini').textContent = data.hari_ini;
-            } else {
-                document.getElementById('qr-tempat-tampil').innerHTML =
-                    `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> ${data.pesan || 'QR gagal dimuat'}</em>`;
+            const waktuMulai = performance.now();
+
+            const response = await fetch(url, {
+                method: 'GET',
+                cache: 'no-store',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const waktuSelesai = performance.now();
+
+            if (!response.ok) {
+                throw new Error('Gagal mengambil waktu server.');
             }
-        } catch (err) {
-            document.getElementById('qr-tempat-tampil').innerHTML =
-                `<em style="color:red;"><i class="fas fa-exclamation-circle"></i> Gagal memuat QR</em>`;
-        }
-    }));
-    if (modalQrTutup) modalQrTutup.addEventListener('click', tutupModalQR);
 
-    // ==========================================
-    // MODAL ALASAN TERLAMBAT — ABSEN MASUK
-    // ==========================================
-    const semuaBtnMasuk = document.querySelectorAll('.btn-aksi-masuk');
-    const modalTelatOverlay = document.getElementById('modal-telat-overlay');
-    const modalTelat = document.getElementById('modal-telat');
-    const modalTelatBatal = document.getElementById('modal-telat-batal');
-    const modalTelatSimpan = document.getElementById('modal-telat-simpan');
+            const data = await response.json();
 
-    function bukaModalAlasanTelat(jamSaatIni) {
-        document.getElementById('jam-saat-ini').textContent = jamSaatIni;
-        document.getElementById('alasan-keterlambatan').value = '';
-        modalTelatOverlay.style.display = 'block';
-        modalTelat.style.display = 'block';
-        setTimeout(() => {
-            modalTelatOverlay.classList.add('active');
-            modalTelat.classList.add('active');
-        }, 10);
-    }
-    function tutupModalTelat() {
-        modalTelatOverlay.classList.remove('active');
-        modalTelat.classList.remove('active');
-        setTimeout(() => {
-            modalTelatOverlay.style.display = 'none';
-            modalTelat.style.display = 'none';
-        }, 350);
-    }
-    semuaBtnMasuk.forEach(btn => btn.addEventListener('click', () => {
-        if (sudahLewatBatasWaktu()) {
-            tampilkanPeringatanAlfa();
-            return;
-        }
-        const jamSaatIni = ambilJamSaatIni();
-        const batasMenit = jamKeMenit(ABSENSI.BATAS_TERLAMBAT);
-        const saatIniMenit = jamKeMenit(jamSaatIni);
-        if (saatIniMenit > batasMenit) {
-            bukaModalAlasanTelat(jamSaatIni);
-        } else {
-            kirimAbsenMasuk();
-        }
-    }));
-    if (modalTelatBatal) modalTelatBatal.addEventListener('click', tutupModalTelat);
-    if (modalTelatSimpan) {
-        modalTelatSimpan.addEventListener('click', () => {
-            const alasan = document.getElementById('alasan-keterlambatan').value.trim();
-
-            if (!alasan) {
-                notif.tampil(
-                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
-                    'peringatan'
-                );
-                document.getElementById('alasan-keterlambatan').focus();
-                return;
+            if (
+                data.status !== 'success' ||
+                !Number.isFinite(Number(data.timestamp))
+            ) {
+                throw new Error('Format waktu server tidak valid.');
             }
-            kirimAbsenMasuk(alasan);
+
+            // Jangan memperbarui waktu jika halaman sudah ditinggalkan.
+            if (
+                !rootSaatMulai ||
+                runtime.root !== rootSaatMulai ||
+                !rootSaatMulai.isConnected
+            ) {
+                return false;
+            }
+
+            // Gunakan titik tengah waktu request untuk mengurangi
+            // pengaruh keterlambatan jaringan.
+            runtime.serverTimeAnchor = {
+                timestamp: Number(data.timestamp),
+                performanceTime: (waktuMulai + waktuSelesai) / 2
+            };
+
+            updateClock();
+
+            return true;
+
+        } catch (error) {
+            console.warn(
+                'Sinkronisasi waktu server gagal:',
+                error
+            );
+
+            return false;
+        }
+    }
+
+
+    /* PERBARUI JAM DIGITAL */
+
+    function updateClock() {
+        const jam = formatJamWITA(true);
+        const jamTanpaDetik = formatJamWITA(false);
+
+        const jamDigital = document.getElementById('jam-digital');
+
+        if (jamDigital) {
+            jamDigital.textContent = jam;
+        }
+
+        const jamHP = document.getElementById('hp-jam');
+
+        if (jamHP) {
+            const ikon = jamHP.querySelector('i');
+
+            jamHP.textContent = '';
+
+            if (ikon) {
+                jamHP.appendChild(ikon);
+            }
+
+            jamHP.appendChild(
+                document.createTextNode(` ${jamTanpaDetik}`)
+            );
+        }
+    }
+
+
+    /* =====================================================
+       TIME VALIDATION — CLIENT SIDE ONLY
+    ===================================================== */
+
+    function jamKeMenit(jamStr) {
+        if (!jamStr || typeof jamStr !== 'string') {
+            return 0;
+        }
+
+        const bagian = jamStr.split(':').map(Number);
+
+        if (
+            bagian.length < 2 ||
+            !Number.isFinite(bagian[0]) ||
+            !Number.isFinite(bagian[1])
+        ) {
+            return 0;
+        }
+
+        return (bagian[0] * 60) + bagian[1];
+    }
+
+    function sudahLewatBatasWaktu() {
+        const batas = getConfig().BATAS_TUTUP_ABSENSI;
+        return jamKeMenit(ambilJamSaatIni()) >= jamKeMenit(batas);
+    }
+
+    function belumJamPulang() {
+        const batas = getConfig().BATAS_PULANG;
+        return jamKeMenit(ambilJamSaatIni()) < jamKeMenit(batas);
+    }
+
+    function tampilkanPeringatanAlfa() {
+        const batas =
+            getConfig().BATAS_TUTUP_ABSENSI || '--:--';
+
+        notifPeringatan(
+            `Absensi sudah ditutup pada pukul <strong>${batas}</strong>.`
+        );
+    }
+
+    function tampilkanPeringatanBelumJamPulang() {
+        notifInfo(
+            `Absen pulang baru dapat dilakukan mulai pukul ${getConfig().BATAS_PULANG}.`
+        );
+    }
+
+
+    /* =====================================================
+       FORM POST
+    ===================================================== */
+
+    function kirimFormPost(url, data = {}) {
+        const form = document.createElement('form');
+
+        form.method = 'POST';
+        form.action = url;
+        form.style.display = 'none';
+
+        Object.entries(data).forEach(([nama, nilai]) => {
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+            input.name = nama;
+            input.value = nilai;
+
+            form.appendChild(input);
         });
+
+        document.body.appendChild(form);
+        form.submit();
     }
 
-    // ==========================================
-    // ABSEN PULANG
-    // ==========================================
-    const semuaBtnPulang = document.querySelectorAll('.btn-aksi-pulang');
-    semuaBtnPulang.forEach(btn => btn.addEventListener('click', () => {
+    function kirimAbsenMasuk(alasan = '') {
+        const config = getConfig();
+
+        const data = {};
+
+        if (alasan) {
+            data.alasan_keterlambatan = alasan;
+        }
+
+        kirimFormPost(config.URL_ABSEN_MASUK, data);
+    }
+
+    function kirimAbsenPulang() {
         if (belumJamPulang()) {
             tampilkanPeringatanBelumJamPulang();
             return;
         }
-        kirimAbsenPulang();
-    }));
 
-    // ==========================================
-    // MODAL KAMERA SCAN QR
-    // ==========================================
-    const semuaBtnScan = document.querySelectorAll('.btn-aksi-scan');
-    const btnTutupKameraEl = document.getElementById('btn-tutup-kamera');
-    const modalKameraOverlay = document.getElementById('modal-kamera-overlay');
-    const modalKamera = document.getElementById('modal-kamera');
+        kirimFormPost(getConfig().URL_ABSEN_PULANG);
+    }
 
-    async function bukaKamera() {
-        const sudahMasuk = !!ABSENSI.SUDAH_ABSEN_MASUK;
+
+    /* =====================================================
+       MODAL HELPERS
+    ===================================================== */
+
+    function bukaModal(overlay, modal) {
+        if (!overlay || !modal) return false;
+
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+            modal.classList.add('active');
+        });
+
+        return true;
+    }
+
+    function tutupModal(overlay, modal) {
+        if (!overlay || !modal) return;
+
+        overlay.classList.remove('active');
+        modal.classList.remove('active');
+
+        window.setTimeout(() => {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }, 280);
+    }
+
+
+    /* =====================================================
+       CAMERA CLEANUP
+    ===================================================== */
+
+    function hentikanKamera() {
+        runtime.pemindaianAktif = false;
+
+        if (runtime.frameScan) {
+            cancelAnimationFrame(runtime.frameScan);
+            runtime.frameScan = null;
+        }
+
+        if (runtime.kameraStream) {
+            runtime.kameraStream.getTracks().forEach(track => {
+                track.stop();
+            });
+
+            runtime.kameraStream = null;
+        }
+
+        const video = document.getElementById('video-kamera');
+
+        if (video) {
+            video.pause();
+            video.srcObject = null;
+        }
+    }
+
+    function tutupModalKamera() {
+        hentikanKamera();
+
+        const overlay = document.getElementById('modal-kamera-overlay');
+        const modal = document.getElementById('modal-kamera');
+
+        tutupModal(overlay, modal);
+    }
+
+    /* =====================================================
+       QR RESULT
+    ===================================================== */
+
+    async function kirimHasilQR(dataQR, alasanKeterlambatan = '') {
+        const config = getConfig();
+
+        try {
+            const response = await fetch(config.URL_SCAN_QR_PROSES, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    data_qr: dataQR,
+                    alasan_keterlambatan: alasanKeterlambatan
+                })
+            });
+
+            const hasil = await response.json();
+
+            if (
+                response.ok &&
+                (hasil.status === 'sukses' || hasil.status === 'info')
+            ) {
+                notifSukses(hasil.pesan || 'Absensi berhasil dicatat.');
+
+                window.setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+
+                return true;
+            }
+
+            notifError(hasil.pesan || 'QR tidak dapat diproses.');
+            return false;
+
+        } catch (error) {
+            notifError(`Terjadi kesalahan: ${error.message}`);
+            return false;
+        }
+    }
+
+    async function prosesHasilScan(dataQR) {
+        hentikanKamera();
+
+        const overlayKamera = document.getElementById('modal-kamera-overlay');
+        const modalKamera = document.getElementById('modal-kamera');
+
+        tutupModal(overlayKamera, modalKamera);
+
+        const sudahMasuk = !!getConfig().SUDAH_ABSEN_MASUK;
+
         if (!sudahMasuk) {
             if (sudahLewatBatasWaktu()) {
                 tampilkanPeringatanAlfa();
                 return;
             }
-        } else {
-            if (belumJamPulang()) {
-                tampilkanPeringatanBelumJamPulang();
+
+            const sekarang = jamKeMenit(ambilJamSaatIni());
+            const batasTerlambat = jamKeMenit(
+                getConfig().BATAS_TERLAMBAT
+            );
+
+            if (sekarang > batasTerlambat) {
+                runtime.dataQRTerlambat = dataQR;
+                bukaModalAlasanTelat(ambilJamSaatIni());
                 return;
             }
-        }
-        let aliranKamera = null;
-        let pemindaianAktifRef = { value: false };
-        try {
-            const cekIzin = await navigator.permissions.query({ name: 'camera' });
-            if (cekIzin.state === 'denied') {
-                notifError('Izin kamera DIBLOKIR.\n\nKlik ikon gembok 🔒 di bilah alamat → Pengaturan Situs → Izinkan Kamera');
-                return;
-            }
-            aliranKamera = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
-            });
-            const videoKamera = document.getElementById('video-kamera');
-            videoKamera.srcObject = aliranKamera;
-            const kameraStatus = document.getElementById('kamera-status');
-            kameraStatus.innerHTML = sudahMasuk
-                ? '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Pulang'
-                : '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Masuk';
-            kameraStatus.classList.add('scanning');
-            modalKameraOverlay.style.display = 'block';
-            modalKamera.style.display = 'block';
-            setTimeout(() => {
-                modalKameraOverlay.classList.add('active');
-                modalKamera.classList.add('active');
-            }, 10);
-            pemindaianAktifRef.value = true;
-            const kanvasPemindai = document.getElementById('kanvas-pemindai');
-            setTimeout(() => bacaDariKanvas(kanvasPemindai, videoKamera, pemindaianAktifRef), 500);
-        } catch (err) {
-            let pesan = '⚠️ Tidak bisa membuka kamera.\n\n';
-            if (err.name === 'NotAllowedError') {
-                pesan += '→ Akses kamera DITOLAK/BLOKIR.\n→ Klik ikon gembok 🔒 di alamat → Izinkan Kamera';
-            } else if (err.name === 'NotFoundError') {
-                pesan += '→ Kamera tidak ditemukan di perangkat.';
-            } else if (err.name === 'NotReadableError') {
-                pesan += '→ Kamera sedang dipakai aplikasi lain.';
-            } else {
-                pesan += `→ Error: ${err.message}`;
-            }
-            notifError(pesan);
-        }
-        window._aliranKamera = aliranKamera;
-        window._pemindaianAktifRef = pemindaianAktifRef;
-    }
-    function tutupKamera() {
-        if (window._pemindaianAktifRef) window._pemindaianAktifRef.value = false;
-        if (window._aliranKamera) {
-            window._aliranKamera.getTracks().forEach(track => track.stop());
-            window._aliranKamera = null;
-        }
-        modalKameraOverlay.classList.remove('active');
-        modalKamera.classList.remove('active');
-        setTimeout(() => {
-            modalKameraOverlay.style.display = 'none';
-            modalKamera.style.display = 'none';
-        }, 350);
-    }
-    semuaBtnScan.forEach(btn => btn.addEventListener('click', bukaKamera));
-    if (btnTutupKameraEl) btnTutupKameraEl.addEventListener('click', tutupKamera);
-
-    // ==========================================
-    // ✅ ATURAN TOMBOL NAVIGASI HP (KHUSUS)
-    // ==========================================
-    const SUDAH_MASUK = !!(ABSENSI.SUDAH_ABSEN_MASUK);
-    const SUDAH_LENGKAP = !!(ABSENSI.SUDAH_ABSEN_MASUK && ABSENSI.SUDAH_SUDAH_PULANG); 
-    const SUDAH_PULANG = document.querySelector('.btn-aksi-pulang') ? false : false; // akan diatur ulang lewat kondisi dari server lewat HTML disabled
-
-    if (SUDAH_MASUK) {
-        document.querySelectorAll('.side-btn.btn-aksi-izin').forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-            btn.style.pointerEvents = 'none';
-        });
-    }
-
-    // Nonaktifkan SEMUA tombol jika sudah lengkap
-    if (SUDAH_MASUK && SUDAH_PULANG) {
-        document.querySelectorAll('.side-btn.btn-aksi-scan').forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'not-allowed';
-            btn.style.pointerEvents = 'none';
-        });
-    }
-
-        // ==========================================
-    // ✅ PAGINASI — LOGIKA LENGKAP
-    // ==========================================
-    // Update tampilan teks
-    function perbaruiTeksPaginasi() {
-        document.getElementById('total-data').textContent = PAGINASI.total_data;
-        document.getElementById('jumlah-per-halaman').value = PAGINASI.per_halaman;
-    }
-
-    // Hitung jumlah halaman
-    function hitungTotalHalaman() {
-        return Math.ceil(PAGINASI.total_data / PAGINASI.per_halaman);
-    }
-
-    // Generate tombol nomor halaman
-    function renderTombolPaginasi() {
-        const wadah = document.getElementById('tombol-paginasi');
-        const totalHalaman = hitungTotalHalaman();
-        wadah.innerHTML = '';
-
-        // Tombol Prev
-        const btnPrev = document.createElement('button');
-        btnPrev.className = 'page-btn' + (PAGINASI.halaman_sekarang <= 1 ? ' disabled' : '');
-        btnPrev.textContent = 'Prev';
-        btnPrev.addEventListener('click', () => {
-            if (PAGINASI.halaman_sekarang > 1) {
-                ubahHalaman(PAGINASI.halaman_sekarang - 1);
-            }
-        });
-        wadah.appendChild(btnPrev);
-
-        // Jika tidak ada data / 1 halaman saja
-        if (totalHalaman <= 1) {
-            const btnSatu = document.createElement('button');
-            btnSatu.className = 'page-btn active';
-            btnSatu.textContent = '1';
-            wadah.appendChild(btnSatu);
-            // Tombol Next tetap tampil tapi dinonaktifkan
-            const btnNext = document.createElement('button');
-            btnNext.className = 'page-btn disabled';
-            btnNext.textContent = 'Next';
-            wadah.appendChild(btnNext);
+        } else if (belumJamPulang()) {
+            tampilkanPeringatanBelumJamPulang();
             return;
         }
 
-        // Hitung rentang nomor halaman yang ditampilkan
-        let mulai = Math.max(1, PAGINASI.halaman_sekarang - Math.floor(PAGINASI.batas_tampil_tombol / 2));
-        let akhir = Math.min(totalHalaman, mulai + PAGINASI.batas_tampil_tombol - 1);
-        if (akhir - mulai + 1 < PAGINASI.batas_tampil_tombol) {
-            mulai = Math.max(1, akhir - PAGINASI.batas_tampil_tombol + 1);
+        await kirimHasilQR(dataQR);
+    }
+
+
+    /* =====================================================
+       LATE ARRIVAL MODAL
+    ===================================================== */
+
+    function bukaModalAlasanTelat(jamSaatIni) {
+        const overlay = document.getElementById('modal-telat-overlay');
+        const modal = document.getElementById('modal-telat');
+        const jam = document.getElementById('jam-saat-ini');
+        const textarea = document.getElementById('alasan-keterlambatan');
+
+        if (jam) {
+            jam.textContent = jamSaatIni;
         }
 
-        // Tambahkan tombol halaman pertama jika tidak dalam rentang
-        if (mulai > 1) {
-            const btnPertama = document.createElement('button');
-            btnPertama.className = 'page-btn';
-            btnPertama.textContent = '1';
-            btnPertama.addEventListener('click', () => ubahHalaman(1));
-            wadah.appendChild(btnPertama);
-            if (mulai > 2) {
-                const titik = document.createElement('span');
-                titik.style.padding = '0 8px';
-                titik.textContent = '...';
-                wadah.appendChild(titik);
+        if (textarea) {
+            textarea.value = '';
+        }
+
+        bukaModal(overlay, modal);
+
+        window.setTimeout(() => {
+            textarea?.focus();
+        }, 300);
+    }
+
+    function tutupModalTelat() {
+        tutupModal(
+            document.getElementById('modal-telat-overlay'),
+            document.getElementById('modal-telat')
+        );
+    }
+
+    async function simpanAlasanTerlambat() {
+        const textarea = document.getElementById('alasan-keterlambatan');
+        const tombol = document.getElementById('modal-telat-simpan');
+
+        const alasan = textarea?.value.trim() || '';
+
+        if (!alasan) {
+            notifPeringatan('Silakan tuliskan alasan keterlambatan terlebih dahulu.');
+            textarea?.focus();
+            return;
+        }
+
+        if (tombol?.disabled) return;
+
+        if (tombol) {
+            tombol.disabled = true;
+        }
+
+        const dataQR = runtime.dataQRTerlambat;
+
+        if (dataQR) {
+            tutupModalTelat();
+
+            const berhasil = await kirimHasilQR(dataQR, alasan);
+
+            if (berhasil) {
+                runtime.dataQRTerlambat = null;
             }
+        } else {
+            kirimAbsenMasuk(alasan);
         }
 
-        // Tambahkan nomor halaman dalam rentang
-        for (let h = mulai; h <= akhir; h++) {
-            const btn = document.createElement('button');
-            btn.className = 'page-btn' + (h === PAGINASI.halaman_sekarang ? ' active' : '');
-            btn.textContent = h;
-            btn.addEventListener('click', () => ubahHalaman(h));
-            wadah.appendChild(btn);
+        if (tombol) {
+            tombol.disabled = false;
+        }
+    }
+
+
+    /* =====================================================
+       QR DISPLAY MODAL
+    ===================================================== */
+
+    async function bukaModalQR() {
+        const config = getConfig();
+        const sudahMasuk = !!config.SUDAH_ABSEN_MASUK;
+
+        if (!sudahMasuk && sudahLewatBatasWaktu()) {
+            tampilkanPeringatanAlfa();
+            return;
         }
 
-        // Tambahkan titik & halaman terakhir jika perlu
-        if (akhir < totalHalaman) {
-            if (akhir < totalHalaman - 1) {
-                const titik = document.createElement('span');
-                titik.style.padding = '0 8px';
-                titik.textContent = '...';
-                wadah.appendChild(titik);
+        if (sudahMasuk && belumJamPulang()) {
+            tampilkanPeringatanBelumJamPulang();
+            return;
+        }
+
+        const overlay = document.getElementById('modal-qr-overlay');
+        const modal = document.getElementById('modal-qr');
+
+        const tempatQR = document.getElementById('qr-tempat-tampil');
+        const namaGuru = document.getElementById('qr-nama-guru');
+        const nipGuru = document.getElementById('qr-nip-guru');
+        const tanggal = document.getElementById('qr-tanggal-hariini');
+
+        if (tempatQR) {
+            tempatQR.innerHTML = '<em>Menyiapkan QR absensi...</em>';
+        }
+
+        if (namaGuru) namaGuru.textContent = '';
+        if (nipGuru) nipGuru.textContent = '-';
+        if (tanggal) tanggal.textContent = '';
+
+        bukaModal(overlay, modal);
+
+        try {
+            const response = await fetch(config.URL_QR_DATA, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.status !== 'sukses') {
+                throw new Error(data.pesan || 'QR gagal dimuat.');
             }
-            const btnTerakhir = document.createElement('button');
-            btnTerakhir.className = 'page-btn';
-            btnTerakhir.textContent = totalHalaman;
-            btnTerakhir.addEventListener('click', () => ubahHalaman(totalHalaman));
-            wadah.appendChild(btnTerakhir);
+
+            if (tempatQR) {
+                const image = document.createElement('img');
+
+                image.src = `data:image/png;base64,${data.qr_code}`;
+                image.alt = 'QR Absensi';
+
+                tempatQR.replaceChildren(image);
+            }
+
+            if (namaGuru) namaGuru.textContent = data.nama || '';
+            if (nipGuru) nipGuru.textContent = data.nip || '-';
+            if (tanggal) tanggal.textContent = data.hari_ini || '-';
+
+        } catch (error) {
+            if (tempatQR) {
+                tempatQR.textContent = error.message || 'Gagal memuat QR.';
+            }
+
+            notifError(error.message || 'Gagal memuat QR absensi.');
+        }
+    }
+
+
+    /* =====================================================
+       CAMERA SCANNER
+    ===================================================== */
+
+    async function bukaKamera() {
+        const config = getConfig();
+        const sudahMasuk = !!config.SUDAH_ABSEN_MASUK;
+
+        if (!sudahMasuk && sudahLewatBatasWaktu()) {
+            tampilkanPeringatanAlfa();
+            return;
         }
 
-        // Tombol Next
-        const btnNext = document.createElement('button');
-        btnNext.className = 'page-btn' + (PAGINASI.halaman_sekarang >= totalHalaman ? ' disabled' : '');
-        btnNext.textContent = 'Next';
-        btnNext.addEventListener('click', () => {
-            if (PAGINASI.halaman_sekarang < totalHalaman) {
-                ubahHalaman(PAGINASI.halaman_sekarang + 1);
+        if (sudahMasuk && belumJamPulang()) {
+            tampilkanPeringatanBelumJamPulang();
+            return;
+        }
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            notifError(
+                'Browser tidak mendukung kamera. Pastikan halaman dibuka melalui HTTPS.'
+            );
+            return;
+        }
+
+        const video = document.getElementById('video-kamera');
+        const status = document.getElementById('kamera-status');
+
+        if (!video) return;
+
+        try {
+            hentikanKamera();
+
+            if (status) {
+                status.textContent = 'Meminta akses kamera...';
             }
-        });
-        wadah.appendChild(btnNext);
+
+            runtime.kameraStream =
+                await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+            video.srcObject = runtime.kameraStream;
+
+            await video.play();
+
+            if (status) {
+                status.innerHTML = sudahMasuk
+                    ? '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Pulang'
+                    : '<i class="fas fa-qrcode"></i> Scan QR untuk Absen Masuk';
+
+                status.classList.add('scanning');
+            }
+
+            bukaModal(
+                document.getElementById('modal-kamera-overlay'),
+                document.getElementById('modal-kamera')
+            );
+
+            runtime.pemindaianAktif = true;
+
+            const canvas = document.getElementById('kanvas-pemindai');
+
+            if (!canvas) {
+                throw new Error('Elemen pemindai tidak ditemukan.');
+            }
+
+            window.setTimeout(() => {
+                bacaDariKanvas(canvas, video);
+            }, 400);
+
+        } catch (error) {
+            hentikanKamera();
+
+            let pesan = 'Tidak dapat membuka kamera.';
+
+            if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+                pesan =
+                    'Akses kamera ditolak. Periksa izin kamera pada pengaturan browser.';
+            } else if (error.name === 'NotFoundError') {
+                pesan = 'Kamera tidak ditemukan pada perangkat.';
+            } else if (error.name === 'NotReadableError') {
+                pesan = 'Kamera sedang digunakan aplikasi lain.';
+            } else if (error.name === 'OverconstrainedError') {
+                pesan = 'Kamera tidak mendukung konfigurasi yang diminta.';
+            } else {
+                pesan = error.message || pesan;
+            }
+
+            if (status) {
+                status.textContent = pesan;
+            }
+
+            notifError(pesan);
+        }
     }
 
-    // Ubah halaman → kirim ke server lewat URL
-    function ubahHalaman(halamanBaru) {
-        PAGINASI.halaman_sekarang = halamanBaru;
-        terapkanFilterDanPaginasi();
-    }
+    function bacaDariKanvas(canvas, video) {
+        if (!runtime.pemindaianAktif) return;
 
-    // Ubah jumlah per halaman
-    document.getElementById('jumlah-per-halaman').addEventListener('change', function () {
-        const nilai = parseInt(this.value) || 10;
-        PAGINASI.per_halaman = Math.max(1, Math.min(100, nilai));
-        PAGINASI.halaman_sekarang = 1; // reset ke halaman 1
-        terapkanFilterDanPaginasi();
-    });
+        if (
+            !video ||
+            video.readyState < 2 ||
+            !video.videoWidth ||
+            !video.videoHeight
+        ) {
+            runtime.frameScan = requestAnimationFrame(
+                () => bacaDariKanvas(canvas, video)
+            );
+            return;
+        }
 
-    // Gabungkan filter + paginasi
-    function terapkanFilterDanPaginasi() {
-        const bulan = document.getElementById('filter-bulan').value;
-        const tahun = document.getElementById('filter-tahun').value;
-        let url = ABSENSI.URL_ABSENSI_HARIAN;
-        const params = new URLSearchParams();
-        if (bulan) params.append('bulan', bulan);
-        if (tahun) params.append('tahun', tahun);
-        params.append('halaman', PAGINASI.halaman_sekarang);
-        params.append('per_halaman', PAGINASI.per_halaman);
-        url += '?' + params.toString();
-        window.location.href = url;
-    }
+        if (!window.jsQR) {
+            const status = document.getElementById('kamera-status');
 
-    // Override fungsi filter lama agar ikut paginasi
-    window.terapkanFilter = function () {
-        PAGINASI.halaman_sekarang = 1;
-        terapkanFilterDanPaginasi();
-    };
+            if (status) {
+                status.textContent = 'Menunggu pustaka pemindai QR...';
+            }
 
-    // Inisialisasi saat halaman dimuat
-    perbaruiTeksPaginasi();
-    renderTombolPaginasi();
+            runtime.frameScan = requestAnimationFrame(
+                () => bacaDariKanvas(canvas, video)
+            );
+            return;
+        }
 
-    // --- BUKA MODAL ALASAN TERLAMBAT DARI SCAN QR ---
-    let _dataQRTerlambat = null; // simpan data QR sementara
-    function bukaModalAlasanTelatDariQR(jamSaatIni, dataQR) {
-        _dataQRTerlambat = dataQR; // simpan untuk dipakai nanti
-        document.getElementById('jam-saat-ini').textContent = jamSaatIni;
-        document.getElementById('alasan-keterlambatan').value = '';
-        modalTelatOverlay.style.display = 'block';
-        modalTelat.style.display = 'block';
-        setTimeout(() => {
-            modalTelatOverlay.classList.add('active');
-            modalTelat.classList.add('active');
-        }, 10);
-    }
+        try {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-    // --- OVERRIDE: Saat Simpan Alasan, KIRIM BESERTA DATA QR ---
-    // Ganti bagian lama: modalTelatSimpan.addEventListener('click', ...)
-    // Menjadi seperti di bawah ini:
+            const context = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
 
-    if (modalTelatSimpan) {
-        modalTelatSimpan.addEventListener('click', async () => {
-            const alasan = document.getElementById('alasan-keterlambatan').value.trim();
-            if (!alasan) {
-                notif.tampil(
-                    `<i class="fas fa-exclamation-triangle"></i> <strong>ALASAN WAJIB DIISI!</strong><br>Silakan tuliskan alasan sebelum menyimpan absen.`,
-                    'peringatan'
-                );
-                document.getElementById('alasan-keterlambatan').focus();
+            if (!context) {
+                throw new Error('Canvas tidak dapat diinisialisasi.');
+            }
+
+            context.drawImage(
+                video,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            const skala = 0.72;
+            const lebarPotong = Math.floor(canvas.width * skala);
+            const tinggiPotong = Math.floor(canvas.height * skala);
+
+            const x = Math.floor((canvas.width - lebarPotong) / 2);
+            const y = Math.floor((canvas.height - tinggiPotong) / 2);
+
+            const gambar = context.getImageData(
+                x,
+                y,
+                lebarPotong,
+                tinggiPotong
+            );
+
+            const hasil = window.jsQR(
+                gambar.data,
+                gambar.width,
+                gambar.height,
+                {
+                    inversionAttempts: 'attemptBoth'
+                }
+            );
+
+            if (hasil?.data) {
+                runtime.pemindaianAktif = false;
+
+                const status = document.getElementById('kamera-status');
+
+                if (status) {
+                    status.innerHTML =
+                        '<i class="fas fa-check-circle"></i> QR terdeteksi, memproses...';
+
+                    status.classList.remove('scanning');
+                }
+
+                prosesHasilScan(hasil.data);
                 return;
             }
 
-            tutupModalTelat();
+        } catch (error) {
+            // Pemindaian dilanjutkan pada frame berikutnya.
+        }
 
-            // ✅ Kalau asalnya DARI QR → kirim lewat jalur QR + alasan
-            if (_dataQRTerlambat) {
-                try {
-                    const res = await fetch(ABSENSI.URL_SCAN_QR_PROSES, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            data_qr: _dataQRTerlambat,
-                            alasan_keterlambatan: alasan  // ← kirim alasan juga!
-                        })
-                    });
-                    const hasil = await res.json();
-                    _dataQRTerlambat = null; // bersihkan
-                    if (hasil.status === 'sukses' || hasil.status === 'info') {
-                        notifSukses(hasil.pesan || 'Absensi berhasil tercatat!');
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        notifError(hasil.pesan || 'Gagal memproses QR.');
-                    }
-                } catch (err) {
-                    notifError(`Kesalahan: ${err.message}`);
-                }
-            } else {
-                // ✅ Kalau asalnya DARI TOMBOL MANUAL → jalur lama
-                kirimAbsenMasuk(alasan);
+        runtime.frameScan = requestAnimationFrame(
+            () => bacaDariKanvas(canvas, video)
+        );
+    }
+
+
+    /* =====================================================
+       FILTER & PAGINATION
+    ===================================================== */
+
+    function buatURLDenganParameter(parameter = {}) {
+        const config = getConfig();
+        const url = new URL(
+            config.URL_ABSENSI_HARIAN,
+            window.location.origin
+        );
+
+        Object.entries(parameter).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                url.searchParams.set(key, value);
             }
         });
+
+        return url.toString();
     }
 
-}
+    function terapkanFilterDanPaginasi() {
+        const bulan = document.getElementById('filter-bulan')?.value || '';
+        const tahun = document.getElementById('filter-tahun')?.value || '';
 
-// Jalankan saat halaman pertama kali dibuka.
-document.addEventListener('DOMContentLoaded', initAbsensiHarian);
+        const pagination = getPagination();
 
-// Jalankan kembali ketika halaman dibuka melalui SPA.
-document.addEventListener('spa:page-loaded', initAbsensiHarian);
+        const url = buatURLDenganParameter({
+            bulan,
+            tahun,
+            halaman: pagination.halaman_sekarang || 1,
+            per_halaman: pagination.per_halaman || 10
+        });
 
-// Bersihkan resource sebelum konten halaman diganti.
-document.addEventListener('spa:before-page-unload', function () {
-    if (intervalJamAbsensi) {
-        clearInterval(intervalJamAbsensi);
-        intervalJamAbsensi = null;
+        window.location.href = url;
     }
 
-    if (window._pemindaianAktifRef) {
-        window._pemindaianAktifRef.value = false;
+    function terapkanFilter() {
+        const pagination = getPagination();
+
+        pagination.halaman_sekarang = 1;
+
+        terapkanFilterDanPaginasi();
     }
 
-    if (window._aliranKamera) {
-        window._aliranKamera.getTracks().forEach(track => track.stop());
-        window._aliranKamera = null;
+    function terapkanFilterTanggal(nilai) {
+        if (!nilai) return;
+
+        const url = buatURLDenganParameter({
+            tanggal: nilai
+        });
+
+        window.location.href = url;
     }
 
-    elemenAbsensiTerinisialisasi = null;
-});
+    window.terapkanFilter = terapkanFilter;
+    window.terapkanFilterTanggal = terapkanFilterTanggal;
+
+
+    function perbaruiTeksPaginasi() {
+        const pagination = getPagination();
+
+        const total = document.getElementById('total-data');
+        const jumlah = document.getElementById('jumlah-per-halaman');
+
+        if (total) {
+            total.textContent = pagination.total_data || 0;
+        }
+
+        if (jumlah) {
+            jumlah.value = pagination.per_halaman || 10;
+        }
+    }
+
+    function hitungTotalHalaman() {
+        const pagination = getPagination();
+
+        const totalData = Math.max(
+            0,
+            Number(pagination.total_data) || 0
+        );
+
+        const perHalaman = Math.max(
+            1,
+            Number(pagination.per_halaman) || 10
+        );
+
+        return Math.max(1, Math.ceil(totalData / perHalaman));
+    }
+
+    function renderTombolPaginasi() {
+        const wadah = document.getElementById('tombol-paginasi');
+
+        if (!wadah) return;
+
+        const pagination = getPagination();
+
+        const totalHalaman = hitungTotalHalaman();
+        const halamanAktif = Math.max(
+            1,
+            Math.min(
+                totalHalaman,
+                Number(pagination.halaman_sekarang) || 1
+            )
+        );
+
+        const batas = Math.max(
+            3,
+            Number(pagination.batas_tampil_tombol) || 5
+        );
+
+        wadah.replaceChildren();
+
+        function buatTombol(label, halaman, aktif = false, disabled = false) {
+            const tombol = document.createElement('button');
+
+            tombol.type = 'button';
+            tombol.className =
+                'page-btn' +
+                (aktif ? ' active' : '') +
+                (disabled ? ' disabled' : '');
+
+            tombol.textContent = label;
+            tombol.disabled = disabled;
+
+            if (!disabled && halaman !== null) {
+                tombol.addEventListener('click', () => {
+                    pagination.halaman_sekarang = halaman;
+                    terapkanFilterDanPaginasi();
+                });
+            }
+
+            wadah.appendChild(tombol);
+        }
+
+        buatTombol('Prev', halamanAktif - 1, false, halamanAktif <= 1);
+
+        let mulai = Math.max(
+            1,
+            halamanAktif - Math.floor(batas / 2)
+        );
+
+        let akhir = Math.min(
+            totalHalaman,
+            mulai + batas - 1
+        );
+
+        if (akhir - mulai + 1 < batas) {
+            mulai = Math.max(1, akhir - batas + 1);
+        }
+
+        if (mulai > 1) {
+            buatTombol('1', 1);
+
+            if (mulai > 2) {
+                const titik = document.createElement('span');
+                titik.textContent = '...';
+                wadah.appendChild(titik);
+            }
+        }
+
+        for (let halaman = mulai; halaman <= akhir; halaman++) {
+            buatTombol(
+                String(halaman),
+                halaman,
+                halaman === halamanAktif
+            );
+        }
+
+        if (akhir < totalHalaman) {
+            if (akhir < totalHalaman - 1) {
+                const titik = document.createElement('span');
+                titik.textContent = '...';
+                wadah.appendChild(titik);
+            }
+
+            buatTombol(
+                String(totalHalaman),
+                totalHalaman
+            );
+        }
+
+        buatTombol(
+            'Next',
+            halamanAktif + 1,
+            false,
+            halamanAktif >= totalHalaman
+        );
+    }
+
+
+    /* =====================================================
+       INITIALIZE PAGE EVENTS
+    ===================================================== */
+
+    function initAbsensiHarian() {
+        const root = document.querySelector('.attendance-workspace');
+
+        if (!root) return;
+
+        // Halaman yang sama sudah aktif: jangan pasang event lagi.
+        if (runtime.root === root) return;
+
+        // Bersihkan resource halaman sebelumnya.
+        cleanupAbsensiHarian();
+
+        runtime.root = root;
+
+        // Tampilkan jam sementara, lalu sinkronkan dengan server.
+        updateClock();
+
+        sinkronkanWaktuServer();
+
+        runtime.intervalJam = window.setInterval(
+            updateClock,
+            1000
+        );
+
+        // Sinkronisasi ulang setiap 60 detik.
+        runtime.intervalSinkronisasi = window.setInterval(
+            sinkronkanWaktuServer,
+            60000
+        );
+
+
+        /* ---------------------------------------------
+           MODAL IZIN
+        --------------------------------------------- */
+
+        const overlayIzin = document.getElementById('modal-overlay');
+        const modalIzin = document.getElementById('modal-form');
+
+        const tombolIzin = root.querySelectorAll('.btn-aksi-izin');
+        const tombolBatalIzin = document.getElementById('modal-cancel');
+        const tombolKirimIzin = document.getElementById('modal-submit');
+
+        function bukaModalIzin() {
+            if (sudahLewatBatasWaktu()) {
+                tampilkanPeringatanAlfa();
+                return;
+            }
+
+            const textarea = document.getElementById('modal-reason');
+
+            if (textarea) textarea.value = '';
+
+            bukaModal(overlayIzin, modalIzin);
+
+            window.setTimeout(() => textarea?.focus(), 300);
+        }
+
+        function tutupModalIzin() {
+            tutupModal(overlayIzin, modalIzin);
+        }
+
+        tombolIzin.forEach(tombol => {
+            tombol.addEventListener('click', bukaModalIzin);
+        });
+
+        tombolBatalIzin?.addEventListener('click', tutupModalIzin);
+
+        overlayIzin?.addEventListener('click', tutupModalIzin);
+
+        tombolKirimIzin?.addEventListener('click', () => {
+            const textarea = document.getElementById('modal-reason');
+            const alasan = textarea?.value.trim() || '';
+
+            if (!alasan) {
+                notifPeringatan('Alasan izin atau sakit wajib diisi.');
+                textarea?.focus();
+                return;
+            }
+
+            kirimFormPost(
+                getConfig().URL_AJUKAN_IZIN,
+                { alasan_izin: alasan }
+            );
+        });
+
+
+        /* ---------------------------------------------
+           MODAL QR
+        --------------------------------------------- */
+
+        const overlayQR = document.getElementById('modal-qr-overlay');
+        const modalQR = document.getElementById('modal-qr');
+
+        root.querySelectorAll('.btn-aksi-qr').forEach(tombol => {
+            tombol.addEventListener('click', bukaModalQR);
+        });
+
+        document.getElementById('modal-qr-tutup')
+            ?.addEventListener('click', () => {
+                tutupModal(overlayQR, modalQR);
+            });
+
+        overlayQR?.addEventListener('click', () => {
+            tutupModal(overlayQR, modalQR);
+        });
+
+
+        /* ---------------------------------------------
+           ABSEN MASUK
+        --------------------------------------------- */
+
+        root.querySelectorAll('.btn-aksi-masuk').forEach(tombol => {
+            tombol.addEventListener('click', () => {
+                if (sudahLewatBatasWaktu()) {
+                    tampilkanPeringatanAlfa();
+                    return;
+                }
+
+                const sekarang = jamKeMenit(ambilJamSaatIni());
+                const batas = jamKeMenit(
+                    getConfig().BATAS_TERLAMBAT
+                );
+
+                if (sekarang > batas) {
+                    runtime.dataQRTerlambat = null;
+                    bukaModalAlasanTelat(ambilJamSaatIni());
+                } else {
+                    kirimAbsenMasuk();
+                }
+            });
+        });
+
+
+        /* ---------------------------------------------
+           MODAL TERLAMBAT
+        --------------------------------------------- */
+
+        const overlayTelat = document.getElementById('modal-telat-overlay');
+        const modalTelat = document.getElementById('modal-telat');
+
+        document.getElementById('modal-telat-batal')
+            ?.addEventListener('click', () => {
+                runtime.dataQRTerlambat = null;
+                tutupModalTelat();
+            });
+
+        overlayTelat?.addEventListener('click', () => {
+            runtime.dataQRTerlambat = null;
+            tutupModalTelat();
+        });
+
+        // Hanya satu listener untuk tombol simpan.
+        document.getElementById('modal-telat-simpan')
+            ?.addEventListener('click', simpanAlasanTerlambat);
+
+
+        /* ---------------------------------------------
+           ABSEN PULANG
+        --------------------------------------------- */
+
+        root.querySelectorAll('.btn-aksi-pulang').forEach(tombol => {
+            tombol.addEventListener('click', kirimAbsenPulang);
+        });
+
+
+        /* ---------------------------------------------
+           SCAN QR
+        --------------------------------------------- */
+
+        root.querySelectorAll('.btn-aksi-scan').forEach(tombol => {
+            tombol.addEventListener('click', bukaKamera);
+        });
+
+        document.getElementById('btn-tutup-kamera')
+            ?.addEventListener('click', tutupModalKamera);
+
+        document.getElementById('modal-kamera-overlay')
+            ?.addEventListener('click', tutupModalKamera);
+
+
+        /* ---------------------------------------------
+           PAGINATION
+        --------------------------------------------- */
+
+        const inputPerHalaman =
+            document.getElementById('jumlah-per-halaman');
+
+        inputPerHalaman?.addEventListener('change', function () {
+            const pagination = getPagination();
+
+            const nilai = parseInt(this.value, 10) || 10;
+
+            pagination.per_halaman = Math.max(
+                1,
+                Math.min(100, nilai)
+            );
+
+            pagination.halaman_sekarang = 1;
+
+            terapkanFilterDanPaginasi();
+        });
+
+        perbaruiTeksPaginasi();
+        renderTombolPaginasi();
+    }
+
+
+    /* =====================================================
+       CLEANUP — SPA NAVIGATION
+    ===================================================== */
+
+    function cleanupAbsensiHarian() {
+
+        // Hentikan interval jam digital
+        if (runtime.intervalJam) {
+            clearInterval(runtime.intervalJam);
+            runtime.intervalJam = null;
+        }
+
+        // Hentikan interval sinkronisasi waktu server
+        if (runtime.intervalSinkronisasi) {
+            clearInterval(runtime.intervalSinkronisasi);
+            runtime.intervalSinkronisasi = null;
+        }
+
+        // Hentikan kamera jika masih aktif
+        hentikanKamera();
+
+        // Bersihkan referensi halaman
+        runtime.root = null;
+        runtime.dataQRTerlambat = null;
+        runtime.serverTimeAnchor = null;
+    }
+
+
+    /* =====================================================
+       GLOBAL LIFECYCLE BINDING
+       Bind sekali, tetap bekerja saat script dieksekusi ulang.
+    ===================================================== */
+
+    window.initAbsensiHarian = initAbsensiHarian;
+    window.cleanupAbsensiHarian = cleanupAbsensiHarian;
+
+    if (!window.__absensiHarianLifecycleBound) {
+        window.__absensiHarianLifecycleBound = true;
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => window.initAbsensiHarian?.()
+        );
+
+        document.addEventListener(
+            'spa:page-loaded',
+            () => window.initAbsensiHarian?.()
+        );
+
+        document.addEventListener(
+            'spa:before-page-unload',
+            () => window.cleanupAbsensiHarian?.()
+        );
+    }
+
+    // Script bisa dieksekusi setelah DOMContentLoaded oleh SPA.
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            initAbsensiHarian,
+            { once: true }
+        );
+    } else {
+        initAbsensiHarian();
+    }
+
+})();

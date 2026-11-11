@@ -510,7 +510,7 @@ def ajukan_izin():
             tanggal=hari_ini,
             jam_masuk=None,
             jam_pulang=None,
-            jam_izin=datetime.now().strftime("%H:%M"),
+            jam_izin=waktu_wita().strftime("%H:%M"),
             status='izin',
             keterangan=alasan
         )
@@ -644,9 +644,14 @@ def scan_qr_proses():
     hari_ini_str = hari_ini_date.strftime("%Y-%m-%d")
 
     # === HAPUS CEK BATAS DI SINI ===
-    # if sudah_lewat_batas_absensi(): ... ❌ DIHAPUS
+    json_data = request.get_json(silent=True) or {}
 
-    data_scan = request.form.get('data_qr') or request.json.get('data_qr') or request.form.get('qr_data')
+    data_scan = (
+        request.form.get('data_qr')
+        or json_data.get('data_qr')
+        or request.form.get('qr_data')
+    )
+
     if not data_scan:
         return jsonify({"status": "error", "pesan": "Data QR tidak terbaca"}), 400
 
@@ -1132,3 +1137,16 @@ def export_rekap_absensi():
     response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     return response
 
+@absensi_guru_bp.route('/api/server-time', methods=['GET'])
+def api_server_time():
+    now_utc = datetime.now(timezone.utc)
+    now_wita = now_utc + timedelta(hours=8)
+
+    return jsonify({
+        "status": "success",
+        "timezone": "Asia/Makassar",
+        "time": now_wita.strftime("%H:%M:%S"),
+        "date": now_wita.strftime("%Y-%m-%d"),
+        "datetime": now_wita.strftime("%Y-%m-%dT%H:%M:%S"),
+        "timestamp": int(now_utc.timestamp() * 1000)
+    })

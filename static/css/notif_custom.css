@@ -1,90 +1,465 @@
-/* ==========================================
-   MODAL NOTIFIKASI GLOBAL — PENGGANTI alert()
-   ========================================== */
 
-/* Latar belakang gelap transparan */
+/* =========================================================
+   SMPU GLOBAL NOTIFICATION
+   PREMIUM SAAS — EMERALD EDITION
+========================================================= */
+
+.modal-notif-overlay,
+.modal-notif-overlay * {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
 .modal-notif-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    z-index: 999999;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 99999;
+
+    padding: 22px;
+
+    background: rgba(8, 18, 15, 0.48);
+
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
+    pointer-events: none;
+
+    transition:
+        opacity .28s ease,
+        visibility .28s ease;
 }
 
 .modal-notif-overlay.aktif {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
-/* Kotak Modal */
+/* =========================================================
+   MODAL CARD
+========================================================= */
+
 .modal-notif-kotak {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 24px 28px;
-    max-width: 420px;
-    width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    transform: scale(0.9);
-    transition: transform 0.25s ease;
+    position: relative;
+
+    width: 100%;
+    max-width: 430px;
+
+    padding: 34px 32px 25px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(145deg, #ffffff 0%, #fbfdfc 100%);
+
+    border: 1px solid rgba(255, 255, 255, .85);
+    border-radius: 25px;
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, .19),
+        0 8px 25px rgba(0, 0, 0, .07),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+
+    transform: translateY(22px) scale(.96);
+    opacity: 0;
+
+    transition:
+        transform .35s cubic-bezier(.2, .8, .2, 1),
+        opacity .28s ease;
 }
 
 .modal-notif-overlay.aktif .modal-notif-kotak {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
+    opacity: 1;
 }
 
-/* Bagian Isi: Ikon + Teks */
-.modal-notif-isi {
+/* Garis aksen atas */
+
+.modal-notif-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 5px;
+
+    background: linear-gradient(
+        90deg,
+        #047857,
+        #10b981,
+        #6ee7b7
+    );
+}
+
+.modal-notif-overlay[data-jenis="peringatan"] .modal-notif-accent {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.modal-notif-overlay[data-jenis="error"] .modal-notif-accent {
+    background: linear-gradient(90deg, #dc2626, #fb7185);
+}
+
+.modal-notif-overlay[data-jenis="info"] .modal-notif-accent {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.modal-notif-close {
+    position: absolute;
+    top: 19px;
+    right: 19px;
+
+    width: 34px;
+    height: 34px;
+
     display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    margin-bottom: 20px;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #edf1ef;
+    border-radius: 11px;
+
+    background: #f8faf9;
+    color: #84918b;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+.modal-notif-close:hover {
+    background: #edf5f1;
+    color: #047857;
+    transform: rotate(90deg);
+}
+
+/* =========================================================
+   HEADER / ICON
+========================================================= */
+
+.modal-notif-header {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+
+    margin-bottom: 23px;
+    padding-right: 25px;
 }
 
 .modal-notif-ikon {
-    font-size: 28px;
-    flex-shrink: 0;
-    margin-top: 2px;
-    line-height: 1;
+    position: relative;
+
+    width: 58px;
+    height: 58px;
+
+    flex: 0 0 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 19px;
+
+    font-size: 23px;
+
+    background: #e9f8f0;
+    color: #059669;
+
+    box-shadow: inset 0 0 0 1px rgba(5, 150, 105, .08);
 }
 
+.modal-notif-ikon::after {
+    content: "";
+
+    position: absolute;
+    inset: -5px;
+
+    border: 1px solid rgba(5, 150, 105, .10);
+    border-radius: 23px;
+}
+
+.modal-notif-ikon.peringatan {
+    background: #fff7e6;
+    color: #d97706;
+    box-shadow: inset 0 0 0 1px rgba(217, 119, 6, .08);
+}
+
+.modal-notif-ikon.peringatan::after {
+    border-color: rgba(217, 119, 6, .13);
+}
+
+.modal-notif-ikon.error {
+    background: #fff0f0;
+    color: #dc2626;
+    box-shadow: inset 0 0 0 1px rgba(220, 38, 38, .08);
+}
+
+.modal-notif-ikon.error::after {
+    border-color: rgba(220, 38, 38, .13);
+}
+
+.modal-notif-ikon.info {
+    background: #eff6ff;
+    color: #2563eb;
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .08);
+}
+
+.modal-notif-ikon.info::after {
+    border-color: rgba(37, 99, 235, .13);
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.modal-notif-heading {
+    min-width: 0;
+}
+
+.modal-notif-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #9aa7a0;
+
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+
+.modal-notif-heading h3 {
+    margin: 0;
+
+    color: #172b23;
+
+    font-family: Inter, sans-serif;
+    font-size: 21px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -.65px;
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
 .modal-notif-teks {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #1f2937;
+    padding: 17px 18px;
+
+    background: #f7faf8;
+
+    border: 1px solid #edf2ef;
+    border-radius: 15px;
+
+    color: #52635a;
+
+    font-family: Inter, sans-serif;
+    font-size: 13.5px;
+    font-weight: 450;
+    line-height: 1.75;
+
+    overflow-wrap: anywhere;
 }
 
 .modal-notif-teks strong {
+    color: #08734f;
+    font-weight: 800;
+}
+
+.modal-notif-overlay[data-jenis="peringatan"] .modal-notif-teks strong {
+    color: #b77912;
+}
+
+.modal-notif-overlay[data-jenis="error"] .modal-notif-teks strong {
+    color: #dc2626;
+}
+
+.modal-notif-overlay[data-jenis="info"] .modal-notif-teks strong {
+    color: #2563eb;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.modal-notif-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 23px;
+}
+
+.modal-notif-footer-info {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #9aa7a0;
+
+    font-size: 10px;
     font-weight: 600;
 }
 
-/* Tombol OK */
+.modal-notif-footer-info i {
+    color: #10a474;
+    font-size: 12px;
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
 .modal-notif-tombol {
-    width: 100%;
-    padding: 10px;
-    background: #2563eb;
-    color: #ffffff;
+    min-width: 126px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 12px 17px;
+
     border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #047857, #059669);
+    color: #ffffff;
+
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-weight: 750;
+
     cursor: pointer;
-    transition: background 0.2s ease;
+
+    box-shadow:
+        0 5px 13px rgba(4, 120, 87, .20),
+        inset 0 1px 0 rgba(255, 255, 255, .15);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        filter .2s ease;
 }
 
 .modal-notif-tombol:hover {
-    background: #1d4ed8;
+    transform: translateY(-2px);
+
+    filter: brightness(1.06);
+
+    box-shadow:
+        0 8px 19px rgba(4, 120, 87, .25);
 }
 
-/* Warna ikon berdasarkan jenis pesan */
-.modal-notif-ikon.peringatan { color: #f59e0b; }  /* Kuning */
-.modal-notif-ikon.sukses    { color: #16a34a; }  /* Hijau */
-.modal-notif-ikon.error      { color: #dc2626; }  /* Merah */
-.modal-notif-ikon.info       { color: #3b82f6; }  /* Biru */
+.modal-notif-tombol:active {
+    transform: translateY(0) scale(.97);
+}
+
+.modal-notif-tombol i {
+    font-size: 11px;
+    transition: transform .2s ease;
+}
+
+.modal-notif-tombol:hover i {
+    transform: translateX(3px);
+}
+
+.modal-notif-overlay[data-jenis="peringatan"] .modal-notif-tombol {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 5px 13px rgba(217, 119, 6, .20);
+}
+
+.modal-notif-overlay[data-jenis="error"] .modal-notif-tombol {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 5px 13px rgba(220, 38, 38, .20);
+}
+
+.modal-notif-overlay[data-jenis="info"] .modal-notif-tombol {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow: 0 5px 13px rgba(37, 99, 235, .20);
+}
+
+.modal-notif-tombol:focus-visible,
+.modal-notif-close:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, .35);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   RESPONSIVE MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+    .modal-notif-overlay {
+        padding: 20px;
+    }
+
+    .modal-notif-kotak {
+        max-width: 390px;
+        padding: 30px 22px 21px;
+        border-radius: 22px;
+    }
+
+    .modal-notif-header {
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .modal-notif-ikon {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        border-radius: 17px;
+        font-size: 21px;
+    }
+
+    .modal-notif-heading h3 {
+        font-size: 19px;
+    }
+
+    .modal-notif-teks {
+        padding: 15px;
+        font-size: 13px;
+    }
+
+    .modal-notif-footer {
+        align-items: flex-end;
+    }
+
+    .modal-notif-footer-info {
+        max-width: 125px;
+        font-size: 9px;
+    }
+
+    .modal-notif-tombol {
+        min-width: 115px;
+        padding: 11px 14px;
+    }
+}
+
+/* Kurangi animasi jika pengguna memilih reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-notif-overlay,
+    .modal-notif-kotak,
+    .modal-notif-tombol,
+    .modal-notif-close {
+        transition: none !important;
+    }
+}
