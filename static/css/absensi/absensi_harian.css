@@ -3095,6 +3095,10 @@ body:has(.attendance-workspace) .attendance-workspace {
     header#adminHeader {
         display: none;
     }
+
+    main.attendance-main {
+        padding-top: 60px;
+    }
 }
 
 @media (min-width: 769px) {
