@@ -1036,7 +1036,7 @@
         const overlayIzin = document.getElementById('modal-overlay');
         const modalIzin = document.getElementById('modal-form');
 
-        const tombolIzin = root.querySelectorAll('.btn-aksi-izin');
+        const tombolIzin = document.querySelectorAll('.btn-aksi-izin');
         const tombolBatalIzin = document.getElementById('modal-cancel');
         const tombolKirimIzin = document.getElementById('modal-submit');
 
@@ -1091,7 +1091,7 @@
         const overlayQR = document.getElementById('modal-qr-overlay');
         const modalQR = document.getElementById('modal-qr');
 
-        root.querySelectorAll('.btn-aksi-qr').forEach(tombol => {
+        document.querySelectorAll('.btn-aksi-qr').forEach(tombol => {
             tombol.addEventListener('click', bukaModalQR);
         });
 
@@ -1109,7 +1109,7 @@
            ABSEN MASUK
         --------------------------------------------- */
 
-        root.querySelectorAll('.btn-aksi-masuk').forEach(tombol => {
+        document.querySelectorAll('.btn-aksi-masuk').forEach(tombol => {
             tombol.addEventListener('click', () => {
                 if (sudahLewatBatasWaktu()) {
                     tampilkanPeringatanAlfa();
@@ -1158,7 +1158,7 @@
            ABSEN PULANG
         --------------------------------------------- */
 
-        root.querySelectorAll('.btn-aksi-pulang').forEach(tombol => {
+        document.querySelectorAll('.btn-aksi-pulang').forEach(tombol => {
             tombol.addEventListener('click', kirimAbsenPulang);
         });
 
@@ -1167,7 +1167,7 @@
            SCAN QR
         --------------------------------------------- */
 
-        root.querySelectorAll('.btn-aksi-scan').forEach(tombol => {
+        document.querySelectorAll('.btn-aksi-scan').forEach(tombol => {
             tombol.addEventListener('click', bukaKamera);
         });
 

@@ -2034,29 +2034,25 @@
 
 
 /* =========================================================
-   MOBILE BOTTOM ACTIONS
+   MOBILE BOTTOM ACTIONS — GLOBAL VISIBILITY
 ========================================================= */
 
+/* Default: sembunyikan navigasi HP pada desktop */
 .absensi-harian-wrapper .mobile-bottom-nav,
 .absensi-harian-wrapper ~ .mobile-bottom-nav {
     display: none;
 }
 
+/* Tombol utama HP juga tersembunyi pada desktop */
+body:has(.attendance-workspace) .nav-btn.main-btn {
+    display: none;
+}
+
+/* Ruang bawah untuk menghindari konten tertutup navigasi */
 body:has(.attendance-workspace) .attendance-workspace {
     padding-bottom: 45px;
 }
 
-body:has(.attendance-workspace) .attendance-workspace .mobile-bottom-nav {
-    display: none;
-}
-
-body:has(.attendance-workspace) .attendance-workspace ~ .mobile-bottom-nav {
-    display: none;
-}
-
-body:has(.attendance-workspace) .nav-btn.main-btn {
-    display: none;
-}
 
 
 /* =========================================================
@@ -2089,29 +2085,34 @@ body:has(.attendance-workspace) .nav-btn.main-btn {
 @media (max-width: 768px) {
     .absensi-harian-wrapper.attendance-workspace {
         min-height: 100vh;
-        padding: 82px 15px 115px;
         overflow: clip;
         background:
             radial-gradient(circle at 100% 5%, rgba(16,185,129,.07), transparent 28%),
             #f5f8f6;
     }
 
+    
     .absensi-harian-wrapper .hp-fixed-header {
-        position: fixed;
+        position: fixed !important;
         z-index: 1000;
         top: 0;
         right: 0;
         left: 0;
-        display: flex;
+
+        display: flex !important;
         height: 65px;
         align-items: center;
         justify-content: space-between;
+
         padding: 0 17px;
         border-bottom: 1px solid rgba(223,237,228,.85);
-        background: rgba(255,255,255,.91);
+
+        background: rgba(255,255,255,.94);
         box-shadow: 0 5px 20px rgba(18,59,40,.045);
         backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
     }
+
 
     .absensi-harian-wrapper .header-kembali-btn,
     .absensi-harian-wrapper .header-keluar-btn {
@@ -3046,6 +3047,82 @@ body:has(.attendance-workspace) .nav-btn.main-btn {
 @media (min-width: 769px) {
     body:has(.attendance-workspace) .mobile-bottom-nav,
     body:has(.attendance-workspace) .nav-btn.main-btn {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   FINAL MOBILE VISIBILITY FIX
+========================================================= */
+
+@media (max-width: 768px) {
+
+    body:has(.attendance-workspace) .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        z-index: 1001;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 75px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px max(25px, calc((100vw - 420px) / 2)) 12px;
+        border-top: 1px solid rgba(224,237,228,.9);
+        background: rgba(255,255,255,.96);
+        box-shadow: 0 -8px 25px rgba(18,59,40,.07);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+
+    body:has(.attendance-workspace) .mobile-bottom-nav .nav-btn {
+        display: flex !important;
+        pointer-events: auto;
+        touch-action: manipulation;
+    }
+
+    body:has(.attendance-workspace) .nav-btn.main-btn {
+        display: grid !important;
+        pointer-events: auto;
+        touch-action: manipulation;
+    }
+
+    body:has(.attendance-workspace) .hp-fixed-header {
+        display: flex !important;
+    }
+
+    header#adminHeader {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) {
+    body:has(.attendance-workspace) .mobile-bottom-nav,
+    body:has(.attendance-workspace) .nav-btn.main-btn {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   FIX HEADER KHUSUS HP
+========================================================= */
+
+@media (max-width: 768px) {
+    body:has(.absensi-harian-wrapper) .hp-fixed-header {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 10000 !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .hp-fixed-header {
         display: none !important;
     }
 }
