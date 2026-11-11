@@ -241,41 +241,31 @@
     {% include "components/notif.html" %}
 
     <!-- Komponen Surat -->
-    {% include "components/surat.html" %}
-
+    {% if g.sistem_mode == 'sekolah' %}
+        {% include "components/surat.html" %}
+    {% endif %}
 
     <!-- ==================================================
          SCRIPT DASAR
     =================================================== -->
-
     <script data-spa-global src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <script data-spa-global src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-
     <script data-spa-global src="{{ url_for('static', filename='js/custom-date.js') }}"></script>
-
     <script data-spa-global src="{{ url_for('static', filename='js/custom-time.js') }}"></script>
-
     <script data-spa-global src="{{ url_for('static', filename='js/custom-select.js') }}"></script>
-
     <script data-spa-global src="{{ url_for('static', filename='js/editor_text_input.js') }}"></script>
-
 
     <!-- ==================================================
          NOTIFIKASI GLOBAL
     =================================================== -->
-
     <script data-spa-global src="{{ url_for('static', filename='js/notif.js') }}"></script>
-
     <script data-spa-global src="{{ url_for('static', filename='js/notif_custom.js') }}"></script>
 
 
     <!-- ==================================================
          SPA NAVIGATION
     =================================================== -->
-
     <script data-spa-global src="{{ url_for('static', filename='js/spa-navigation.js') }}"></script>
-
 
     <!-- JavaScript Khusus Halaman -->
     {% block extra_js %}{% endblock %}

@@ -173,7 +173,7 @@
 
 .absensi-harian-wrapper .breadcrumb-separator {
     color: #c1cdc7;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 .absensi-harian-wrapper .breadcrumb-current {
@@ -354,7 +354,7 @@
 .absensi-harian-wrapper .clock-overline {
     margin-bottom: 4px;
     color: #9be7c6;
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 800;
     letter-spacing: .16em;
 }
@@ -371,7 +371,7 @@
     border-radius: 30px;
     color: #b8f7d9;
     background: rgba(255,255,255,.07);
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 800;
     letter-spacing: .1em;
 }
@@ -566,7 +566,7 @@
     display: block;
     margin-bottom: 4px;
     color: #8a9c93;
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 800;
     letter-spacing: .13em;
 }
@@ -601,7 +601,7 @@
 
 .absensi-harian-wrapper .status-meta-label {
     color: #9aaa9f;
-    font-size: 8px;
+    font-size: 10px !important;
     font-weight: 800;
     letter-spacing: .12em;
 }
@@ -662,7 +662,7 @@
     border-radius: 10px;
     color: #668276;
     background: rgba(255,255,255,.75);
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 800;
     letter-spacing: .08em;
 }
@@ -761,7 +761,7 @@
 .absensi-harian-wrapper .action-button-copy small {
     margin-top: 5px;
     color: #91a098;
-    font-size: 9px;
+    font-size: 9px !important ;
     line-height: 1.4;
 }
 
@@ -860,7 +860,7 @@
     border-radius: 8px;
     color: #08764f;
     background: #d8f8e5;
-    font-size: 8px;
+    font-size: 10px ;
     font-weight: 800;
     letter-spacing: .08em;
 }
@@ -910,7 +910,7 @@
 
 .absensi-harian-wrapper .info-heading-text .section-kicker {
     margin-bottom: 5px;
-    font-size: 8px;
+    font-size: 10px !important;
 }
 
 .absensi-harian-wrapper .card-title-info {
@@ -932,12 +932,12 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 7px 10px;
+    padding: 7px 10px !important;
     border: 1px solid #d9f1e2;
     border-radius: 30px;
     color: #08764f;
     background: #f0fbf4;
-    font-size: 8px;
+    font-size: 10px !important;
     font-weight: 800;
     letter-spacing: .09em;
 }
@@ -1013,7 +1013,7 @@
     display: block;
     margin: 2px 0 7px;
     color: #91a098;
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 700;
 }
 
@@ -1021,7 +1021,7 @@
     display: block;
     overflow-wrap: anywhere;
     color: #2a4c3e;
-    font-size: 12px;
+    font-size: 12px !important;
     font-weight: 800;
     line-height: 1.5;
 }
@@ -1050,7 +1050,7 @@
     width: fit-content;
     padding: 6px 9px;
     border-radius: 8px;
-    font-size: 9px;
+    font-size: 10px !important;
     font-weight: 800;
 }
 
@@ -1159,7 +1159,7 @@
 
 .absensi-harian-wrapper .history-total-chip small {
     color: #9aaa9f;
-    font-size: 8px;
+    font-size: 9px !important;
     font-weight: 800;
     letter-spacing: .09em;
 }
@@ -1168,7 +1168,7 @@
     margin-top: 3px;
     color: #1e4c3a;
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 800;
 }
 
@@ -1212,7 +1212,7 @@
 .absensi-harian-wrapper .filter-heading-text p {
     margin: 4px 0 0;
     color: #95a49c;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 .absensi-harian-wrapper .filter-controls {
@@ -1258,7 +1258,7 @@
     outline: none;
     color: #385849;
     background: #fbfdfb;
-    font-size: 10px;
+    font-size: 10px !important;
     font-weight: 700;
     cursor: pointer;
     transition: border-color .2s ease, box-shadow .2s ease;
@@ -1273,7 +1273,7 @@
     position: absolute;
     right: 11px;
     color: #8ba196;
-    font-size: 9px;
+    font-size: 9px  !important;
     pointer-events: none;
 }
 
@@ -1333,7 +1333,7 @@
 .absensi-harian-wrapper .date-month {
     margin-top: 5px;
     color: #789387;
-    font-size: 8px;
+    font-size: 8px !important;
     font-weight: 700;
 }
 
@@ -1354,7 +1354,7 @@
 
 .absensi-harian-wrapper .riwayat-times span {
     color: #657c70;
-    font-size: 10px;
+    font-size: 10px !important;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
@@ -1362,7 +1362,7 @@
 .absensi-harian-wrapper .riwayat-times i {
     margin-right: 4px;
     color: #0b9569;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 .absensi-harian-wrapper .riwayat-times .time-out i {
@@ -1374,7 +1374,7 @@
     margin-top: 8px;
     overflow: hidden;
     color: #91a098;
-    font-size: 9px;
+    font-size: 9px !important;
     line-height: 1.5;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -1394,7 +1394,7 @@
     border-radius: 8px;
     color: #9bb0a4;
     background: #f5f9f6;
-    font-size: 9px;
+    font-size: 9px !important;
     transition: transform .2s ease, color .2s ease;
 }
 
@@ -1517,7 +1517,7 @@
     border-radius: 9px;
     color: #60776b;
     background: #fff;
-    font-size: 9px;
+    font-size: 9px !important;
     font-weight: 800;
     cursor: pointer;
     transition: all .2s ease;
@@ -1663,7 +1663,7 @@
     display: block;
     margin-bottom: 5px;
     color: #0b9569;
-    font-size: 8px;
+    font-size: 10px !important;
     font-weight: 800;
     letter-spacing: .14em;
 }
@@ -1736,7 +1736,7 @@
 #modal-telat .modal-helper {
     margin-top: 9px;
     color: #8c9c93;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 #modal-form .modal-helper i,
@@ -1808,7 +1808,7 @@
 
 #modal-telat .jam-info span {
     color: #899990;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 #modal-telat .jam-info strong {
@@ -1888,7 +1888,7 @@
     gap: 5px;
     margin-top: 16px;
     color: #82938a;
-    font-size: 10px;
+    font-size: 10px !important;
 }
 
 #modal-qr .qr-info strong {
@@ -1904,7 +1904,7 @@
     color: #58806b;
     background: #effaf3;
     text-align: center;
-    font-size: 9px;
+    font-size: 9px !important;
 }
 
 #modal-qr .qr-security-note i {
@@ -2050,7 +2050,7 @@ body:has(.attendance-workspace) .nav-btn.main-btn {
 
 /* Ruang bawah untuk menghindari konten tertutup navigasi */
 body:has(.attendance-workspace) .attendance-workspace {
-    padding-bottom: 45px;
+    padding-bottom: 100px;
 }
 
 
@@ -2158,7 +2158,7 @@ body:has(.attendance-workspace) .attendance-workspace {
         display: block;
         margin-top: 2px;
         color: #92a198;
-        font-size: 8px;
+        font-size: 10px !important;
         font-weight: 600;
     }
 
@@ -2168,7 +2168,7 @@ body:has(.attendance-workspace) .attendance-workspace {
 
     .absensi-harian-wrapper .page-breadcrumb {
         margin-bottom: 10px;
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .page-heading-row {
@@ -2176,7 +2176,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .page-eyebrow {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .page-heading-content h3 {
@@ -2251,7 +2251,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     .absensi-harian-wrapper .hp-date-text {
         overflow: hidden;
         color: #557164;
-        font-size: 9px;
+        font-size: 9px !important;
         font-weight: 700;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -2331,7 +2331,7 @@ body:has(.attendance-workspace) .attendance-workspace {
 
     .absensi-harian-wrapper .tanggal-hijriah {
         margin-top: 4px;
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .wita-label {
@@ -2340,7 +2340,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .clock-hero-bottom {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .divider-line {
@@ -2411,7 +2411,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     .absensi-harian-wrapper .hp-status-desc {
         margin-top: 4px;
         color: #84968c;
-        font-size: 8px;
+        font-size: 10px !important;
         line-height: 1.5;
     }
 
@@ -2428,7 +2428,7 @@ body:has(.attendance-workspace) .attendance-workspace {
 
     .absensi-harian-wrapper .section-heading p,
     .absensi-harian-wrapper .history-title-block p {
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .section-heading-mark {
@@ -2473,7 +2473,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .info-heading-text p {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .section-live-label {
@@ -2510,7 +2510,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .info-value {
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .info-value-time {
@@ -2518,7 +2518,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .info-value-description {
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .badge-hadir,
@@ -2548,7 +2548,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .info-empty-content p {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .history-section-top {
@@ -2570,7 +2570,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .history-total-chip small {
-        font-size: 6px;
+        font-size: 6px !important;
     }
 
     .absensi-harian-wrapper .history-total-chip strong {
@@ -2601,7 +2601,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .filter-heading-text p {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .filter-controls {
@@ -2617,7 +2617,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     .absensi-harian-wrapper .filter-field-label {
         display: block;
         margin-bottom: 5px;
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .filter-select-wrap,
@@ -2627,7 +2627,7 @@ body:has(.attendance-workspace) .attendance-workspace {
 
     .absensi-harian-wrapper .filter-dropdown {
         height: 37px;
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .riwayat-grid {
@@ -2665,19 +2665,19 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .riwayat-times span {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .riwayat-note {
         margin-top: 6px;
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .history-card-indicator {
         width: 22px;
         height: 22px;
         flex-basis: 22px;
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .riwayat-empty {
@@ -2697,7 +2697,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .riwayat-empty p {
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     .absensi-harian-wrapper .pagination-bar {
@@ -2711,20 +2711,20 @@ body:has(.attendance-workspace) .attendance-workspace {
 
     .absensi-harian-wrapper .pagination-summary {
         justify-content: center;
-        font-size: 8px;
+        font-size: 12px;
     }
 
     .absensi-harian-wrapper .pagination-summary-icon {
         width: 27px;
         height: 27px;
         border-radius: 8px;
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .input-pagenation {
         width: 42px;
         height: 27px;
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .pagination-controls {
@@ -2736,7 +2736,7 @@ body:has(.attendance-workspace) .attendance-workspace {
         min-width: 29px;
         height: 29px;
         padding: 0 7px;
-        font-size: 8px;
+        font-size: 10px !important;
     }
 
     /* Mobile fixed actions */
@@ -2779,7 +2779,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .side-btn span {
-        font-size: 8px;
+        font-size: 10px !important;
         font-weight: 800;
     }
 
@@ -2896,11 +2896,11 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .rule-label {
-        font-size: 6px;
+        font-size: 6px !important;
     }
 
     .absensi-harian-wrapper .rule-value {
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .section-heading-mark {
@@ -2928,7 +2928,7 @@ body:has(.attendance-workspace) .attendance-workspace {
         width: 25px;
         height: 25px;
         flex-basis: 25px;
-        font-size: 9px;
+        font-size: 9px !important;
     }
 
     .absensi-harian-wrapper .info-value-time {
@@ -3001,7 +3001,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     body:has(.attendance-workspace) .mobile-bottom-nav .side-btn span {
-        font-size: 8px;
+        font-size: 10px !important;
         font-weight: 800;
     }
 
