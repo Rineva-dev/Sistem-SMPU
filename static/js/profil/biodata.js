@@ -1,48 +1,55 @@
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-    
-    const $ = (selector) => document.querySelector(selector);
+/* =========================================================
+   SMPU BIODATA
+   PREMIUM PROFILE + SPA COMPATIBLE
+========================================================= */
 
-    // =====================================================
-    // ELEMENTS
-    // =====================================================
+(() => {
+    "use strict";
 
-    const avatarWrapper = $("#avatarWrapper");
-    const btnGantiFoto = $("#btnGantiFoto");
-    const fileInput = $("#fileInput");
+    // Hindari pemasangan event global berulang.
+    if (window.__smpuBiodataSPARegistered) return;
 
-    const viewModal = $("#viewModal");
-    const viewFoto = $("#viewFoto");
-    const btnTutupFoto = $("#btnTutupFoto");
-
-    const cropModal = $("#cropModal");
-    const cropImage = $("#cropImage");
-    const btnBatalFoto = $("#btnBatalFoto");
-    const btnBatalFotoFooter = $("#btnBatalFotoFooter");
-    const btnSimpanFoto = $("#btnSimpanFoto");
-
-    const fotoData = $("#fotoData");
-    const formUploadFoto = $("#formUploadFoto");
-
-    const editModal = $("#editModal");
-    const btnEdit = $("#btnEdit");
-    const btnBatalEdit = $("#btnBatalEdit");
-    const btnBatalEditFooter = $("#btnBatalEditFooter");
+    window.__smpuBiodataSPARegistered = true;
 
     let cropper = null;
+    let activePage = null;
+    let previousBodyOverflow = "";
 
     // =====================================================
-    // HELPER MODAL
+    // HELPER
     // =====================================================
+
+    const $ = (selector, root = document) =>
+        root.querySelector(selector);
+
+    function refreshIcons(root = document) {
+        if (window.lucide?.createIcons) {
+            window.lucide.createIcons({
+                attrs: {
+                    "stroke-width": 1.8
+                }
+            });
+        }
+    }
+
+    function getActiveModal() {
+        return document.querySelector(
+            ".modal-overlay.active, .view-modal.active"
+        );
+    }
 
     function bukaModal(modal) {
         if (!modal) return;
 
+        if (!getActiveModal()) {
+            previousBodyOverflow = document.body.style.overflow;
+        }
+
         modal.classList.add("active");
         document.body.style.overflow = "hidden";
+
+        refreshIcons(modal);
     }
 
     function tutupModal(modal) {
@@ -50,197 +57,376 @@ document.addEventListener("DOMContentLoaded", () => {
 
         modal.classList.remove("active");
 
-        const modalMasihTerbuka = document.querySelector(
+        if (!getActiveModal()) {
+            document.body.style.overflow = previousBodyOverflow;
+        }
+    }
+
+    function tutupSemuaModal() {
+        document.querySelectorAll(
             ".modal-overlay.active, .view-modal.active"
-        );
+        ).forEach(modal => {
+            modal.classList.remove("active");
+        });
 
-        if (!modalMasihTerbuka) {
-            document.body.style.overflow = "";
-        }
+        document.body.style.overflow = previousBodyOverflow;
     }
 
     // =====================================================
-    // VIEW PHOTO
+    // DESTROY CROPper
     // =====================================================
 
-    function tampilkanFotoBesar() {
-        if (!avatarWrapper || !viewModal || !viewFoto) return;
-
-        const foto = avatarWrapper.querySelector("img");
-
-        if (!foto || !foto.src) return;
-
-        viewFoto.src = foto.src;
-        bukaModal(viewModal);
-    }
-
-    avatarWrapper?.addEventListener("click", tampilkanFotoBesar);
-
-    btnTutupFoto?.addEventListener("click", () => {
-        tutupModal(viewModal);
-    });
-
-    viewModal?.addEventListener("click", (event) => {
-        if (event.target === viewModal) {
-            tutupModal(viewModal);
-        }
-    });
-
-    // =====================================================
-    // UPLOAD & CROP PHOTO
-    // =====================================================
-
-    btnGantiFoto?.addEventListener("click", (event) => {
-        event.stopPropagation();
-        fileInput?.click();
-    });
-
-    fileInput?.addEventListener("change", (event) => {
-        const file = event.target.files?.[0];
-
-        if (!file) return;
-
-        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-            alert("Gunakan foto berformat JPG, PNG, atau WEBP.");
-            fileInput.value = "";
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert("Ukuran foto maksimal 5 MB.");
-            fileInput.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            cropImage.src = reader.result;
-
-            bukaModal(cropModal);
-
-            cropImage.onload = () => {
-                if (cropper) {
-                    cropper.destroy();
-                    cropper = null;
-                }
-
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    dragMode: "move",
-                    autoCropArea: 0.9,
-                    responsive: true,
-                    restore: false,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    background: false,
-                    movable: true,
-                    zoomable: true,
-                    zoomOnWheel: true,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false
-                });
-            };
-        };
-
-        reader.readAsDataURL(file);
-    });
-
-    function batalkanCrop() {
+    function destroyCropper() {
         if (cropper) {
             cropper.destroy();
             cropper = null;
         }
+    }
 
-        tutupModal(cropModal);
+    // =====================================================
+    // CLEANUP SEBELUM HALAMAN SPA DIGANTI
+    // =====================================================
+
+    function cleanupBiodata() {
+        destroyCropper();
+        tutupSemuaModal();
+
+        if (activePage) {
+            activePage = null;
+        }
+
+        const fileInput = $("#fileInput");
 
         if (fileInput) {
             fileInput.value = "";
         }
     }
 
-    btnBatalFoto?.addEventListener("click", batalkanCrop);
-    btnBatalFotoFooter?.addEventListener("click", batalkanCrop);
+    // =====================================================
+    // INITIALIZE BIODATA
+    // =====================================================
 
-    btnSimpanFoto?.addEventListener("click", () => {
-        if (!cropper || !fotoData || !formUploadFoto) return;
+    function initBiodata() {
+        const page = $(".biodata-page");
 
-        const canvas = cropper.getCroppedCanvas({
-            width: 400,
-            height: 400,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: "high"
+        // Bukan halaman biodata.
+        if (!page) return;
+
+        // Hindari inisialisasi dua kali pada halaman yang sama.
+        if (activePage === page) return;
+
+        cleanupBiodata();
+
+        activePage = page;
+
+        refreshIcons(page);
+
+        // =================================================
+        // ELEMENTS
+        // =================================================
+
+        const avatarWrapper = $("#avatarWrapper", page);
+        const btnGantiFoto = $("#btnGantiFoto", page);
+        const fileInput = $("#fileInput");
+
+        const viewModal = $("#viewModal");
+        const viewFoto = $("#viewFoto");
+
+        const cropModal = $("#cropModal");
+        const cropImage = $("#cropImage");
+
+        const btnSimpanFoto = $("#btnSimpanFoto");
+        const fotoData = $("#fotoData");
+        const formUploadFoto = $("#formUploadFoto");
+
+        const editModal = $("#editModal");
+        const btnEdit = $("#btnEdit", page);
+
+        // =================================================
+        // VIEW PHOTO
+        // =================================================
+
+        function tampilkanFotoBesar() {
+            if (!avatarWrapper || !viewModal || !viewFoto) return;
+
+            const foto = $("img", avatarWrapper);
+
+            if (!foto || !foto.src) return;
+
+            viewFoto.src = foto.src;
+
+            bukaModal(viewModal);
+        }
+
+        avatarWrapper?.addEventListener(
+            "click",
+            tampilkanFotoBesar
+        );
+
+        $("#btnTutupFoto")?.addEventListener("click", () => {
+            tutupModal(viewModal);
         });
 
-        if (!canvas) {
-            alert("Foto tidak dapat diproses. Silakan coba kembali.");
-            return;
+        $("#btnTutupFotoFooter")?.addEventListener("click", () => {
+            tutupModal(viewModal);
+        });
+
+        viewModal?.addEventListener("click", event => {
+            if (event.target === viewModal) {
+                tutupModal(viewModal);
+            }
+        });
+
+        // =================================================
+        // UPLOAD PHOTO
+        // =================================================
+
+        btnGantiFoto?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            fileInput?.click();
+        });
+
+        fileInput?.addEventListener("change", event => {
+            const file = event.target.files?.[0];
+
+            if (!file) return;
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert("Gunakan foto berformat JPG, PNG, atau WEBP.");
+                fileInput.value = "";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Ukuran foto maksimal 5 MB.");
+                fileInput.value = "";
+                return;
+            }
+
+            if (typeof Cropper === "undefined") {
+                alert("Komponen pemotong foto belum siap. Silakan muat ulang halaman.");
+                fileInput.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                destroyCropper();
+
+                cropImage.src = reader.result;
+
+                bukaModal(cropModal);
+
+                cropImage.onload = () => {
+                    destroyCropper();
+
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: "move",
+                        autoCropArea: 0.9,
+                        responsive: true,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        background: false,
+                        movable: true,
+                        zoomable: true,
+                        zoomOnWheel: true,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false
+                    });
+                };
+            };
+
+            reader.onerror = () => {
+                alert("Foto gagal dibaca. Silakan pilih foto lain.");
+                fileInput.value = "";
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // =================================================
+        // CANCEL CROP
+        // =================================================
+
+        function batalkanCrop() {
+            destroyCropper();
+
+            tutupModal(cropModal);
+
+            if (fileInput) {
+                fileInput.value = "";
+            }
+
+            if (cropImage) {
+                cropImage.onload = null;
+                cropImage.removeAttribute("src");
+            }
         }
 
-        fotoData.value = canvas.toDataURL("image/jpeg", 0.9);
+        $("#btnBatalFoto")?.addEventListener(
+            "click",
+            batalkanCrop
+        );
 
-        btnSimpanFoto.disabled = true;
-        btnSimpanFoto.innerHTML = '<i data-lucide="loader-circle"></i> Menyimpan...';
+        $("#btnBatalFotoFooter")?.addEventListener(
+            "click",
+            batalkanCrop
+        );
 
-        formUploadFoto.submit();
-    });
+        cropModal?.addEventListener("click", event => {
+            if (event.target === cropModal) {
+                batalkanCrop();
+            }
+        });
 
-    // =====================================================
-    // EDIT BIODATA
-    // =====================================================
+        // =================================================
+        // SAVE CROPPED PHOTO
+        // =================================================
 
-    btnEdit?.addEventListener("click", () => {
-        bukaModal(editModal);
-    });
+        btnSimpanFoto?.addEventListener("click", () => {
+            if (!cropper || !fotoData || !formUploadFoto) return;
 
-    function tutupEdit() {
-        tutupModal(editModal);
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: "high"
+            });
+
+            if (!canvas) {
+                alert("Foto tidak dapat diproses. Silakan coba kembali.");
+                return;
+            }
+
+            try {
+                fotoData.value = canvas.toDataURL(
+                    "image/jpeg",
+                    0.9
+                );
+            } catch (error) {
+                console.error("Gagal memproses foto:", error);
+                alert("Foto gagal diproses. Silakan gunakan foto lain.");
+                return;
+            }
+
+            btnSimpanFoto.disabled = true;
+
+            btnSimpanFoto.innerHTML =
+                '<i data-lucide="loader-circle"></i>' +
+                '<span>Menyimpan...</span>';
+
+            refreshIcons(btnSimpanFoto);
+
+            formUploadFoto.submit();
+        });
+
+        // =================================================
+        // EDIT BIODATA
+        // =================================================
+
+        btnEdit?.addEventListener("click", () => {
+            bukaModal(editModal);
+        });
+
+        function tutupEdit() {
+            tutupModal(editModal);
+        }
+
+        $("#btnBatalEdit")?.addEventListener(
+            "click",
+            tutupEdit
+        );
+
+        $("#btnBatalEditFooter")?.addEventListener(
+            "click",
+            tutupEdit
+        );
+
+        editModal?.addEventListener("click", event => {
+            if (event.target === editModal) {
+                tutupEdit();
+            }
+        });
+
+        console.log("[SMPU SPA] Biodata berhasil diinisialisasi.");
     }
 
-    btnBatalEdit?.addEventListener("click", tutupEdit);
-    btnBatalEditFooter?.addEventListener("click", tutupEdit);
+    // =====================================================
+    // SPA EVENTS
+    // =====================================================
 
-    editModal?.addEventListener("click", (event) => {
-        if (event.target === editModal) {
-            tutupEdit();
-        }
-    });
+    document.addEventListener(
+        "spa:before-page-unload",
+        cleanupBiodata
+    );
+
+    document.addEventListener(
+        "spa:page-loaded",
+        initBiodata
+    );
 
     // =====================================================
     // ESCAPE KEY
     // =====================================================
 
-    document.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", event => {
         if (event.key !== "Escape") return;
 
+        const cropModal = $("#cropModal");
+
         if (cropModal?.classList.contains("active")) {
-            batalkanCrop();
-        } else if (editModal?.classList.contains("active")) {
-            tutupEdit();
-        } else if (viewModal?.classList.contains("active")) {
-            tutupModal(viewModal);
+            destroyCropper();
+            tutupModal(cropModal);
+
+            const fileInput = $("#fileInput");
+
+            if (fileInput) {
+                fileInput.value = "";
+            }
+
+            const cropImage = $("#cropImage");
+
+            if (cropImage) {
+                cropImage.onload = null;
+                cropImage.removeAttribute("src");
+            }
+
+            return;
+        }
+
+        const activeModal = getActiveModal();
+
+        if (activeModal) {
+            tutupModal(activeModal);
         }
     });
 
-    
-    /* =========================================================
-    MODAL PREMIUM — FOOTER PHOTO BUTTON
-    ========================================================= */
+    // =====================================================
+    // INITIAL PAGE LOAD
+    // =====================================================
 
-    // Tombol Tutup pada footer pratinjau foto
-    document.getElementById('btnTutupFotoFooter')?.addEventListener('click', function () {
-        document.getElementById('btnTutupFoto')?.click();
-    });
-
-    // Refresh Lucide untuk ikon pada modal yang baru dibuka
-    function refreshBiodataModalIcons() {
-        if (window.lucide?.createIcons) {
-            window.lucide.createIcons();
-        }
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            initBiodata,
+            { once: true }
+        );
+    } else {
+        initBiodata();
     }
 
-
-});
+})();
