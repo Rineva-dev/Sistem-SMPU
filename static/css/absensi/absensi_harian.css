@@ -2195,7 +2195,7 @@ body:has(.attendance-workspace) .attendance-workspace {
     }
 
     .absensi-harian-wrapper .hp-datetime-bar {
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
