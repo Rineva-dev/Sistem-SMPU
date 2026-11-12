@@ -1,158 +1,337 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Absensi - SMP Unggulan Hamzanwadi</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_absensi.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#063b2e">
+
+    <title>Login Absensi | SMP Unggulan Hamzanwadi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_absensi.css') }}">
 </head>
-<body>
 
-    <div class="login-container">
-        <!-- Logo Khusus HP Saja -->
-        <div class="mobile-logo-top">
-            <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo" class="logo-hp">
-        </div>
-        <!-- Bagian Kiri: Informasi Absensi -->
-        <div class="school-info">
-            <div class="logo-wrapper">
-                <img src="{{ url_for('static', filename='img/logo-sekolah.png') }}" alt="Logo SMP Unggulan Hamzanwadi" class="logo-sekolah">
-            </div>
-            <h2>Sistem Absensi Guru</h2>
-            <div class="divider"></div>
-            <p class="desc">
-                Catat kehadiran Anda secara mudah, cepat, dan terintegrasi. Silakan masuk menggunakan akun yang sama dengan sistem manajemen sekolah.
-            </p>
-            <div class="copyright">&copy; 2026 SMP Unggulan Hamzanwadi</div>
-        </div>
+<body class="smpu-login">
 
-        <!-- Bagian Kanan: Form Login -->
-        <div class="login-form-section">
-            <div class="form-header">
-                <h3 class="komp">Masuk ke Absensi</h3>
-                <h3 class="hp">Welcome Back</h3>
-                <p class="komp">Silakan masukkan Username dan kata sandi Anda</p>
-                <p class="hp">Enter your details below</p>
-            </div>
-            <form id="formLogin" action="{{ url_for('absensi.login_absensi') }}" method="POST">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper {% if session.get('error_username') %}salah{% endif %}">
-                        <i class="fa fa-user"></i>
-                        <input type="text" id="username" name="username" required 
-                               value="{{ session.get('last_username', '')|e }}"
-                               placeholder="Masukkan Username">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="password">Kata Sandi</label>
-                    <div class="input-wrapper {% if session.get('error_password') %}salah{% endif %}">
-                        <i class="fa fa-lock"></i>
-                        <input type="password" id="password" name="password" required 
-                               placeholder="Masukkan kata sandi">
-                        <button type="button" class="toggle-password" onclick="lihatSandi()">
-                            <i id="iconMata" class="fa fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-login">Masuk ke Absensi</button>
-            </form>
-
-            <!-- Pembatas & Info Kontak Khusus HP -->
-            <div class="divider-or">
-                <span>Butuh Bantuan?</span>
-            </div>
-            <div class="contact-info-mobile">
-                <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
-                <p class="mt-2">
-                    <a href="https://school.smpuhamzanwadi.sch.id" class="link-sistem-utama">
-                        ← Kembali ke Sistem Manajemen Sekolah
-                    </a>
-                </p>
-            </div>
-
-            <!-- Info Kontak Asli (Tetap Tampil di Komputer) -->
-            <div class="contact-info contact-info-desktop">
-                <p>Butuh bantuan? Hubungi bagian administrasi</p>
-                <p>📞 (62) 81929830033 | 📧 smpu@hamzanwadi.ac.id</p>
-                <p class="mt-2">
-                    <a href="https://school.smpuhamzanwadi.sch.id" class="link-sistem-utama">
-                        ← Kembali ke Sistem Manajemen Sekolah
-                    </a>
-                </p>
-            </div>
-        </div>
+    <div class="page-background">
+        <div class="bg-orb bg-orb-one"></div>
+        <div class="bg-orb bg-orb-two"></div>
+        <div class="bg-grid"></div>
     </div>
 
+    <main class="login-shell">
+
+        <section class="login-layout">
+
+            <!-- BRAND PANEL -->
+            <aside class="brand-panel">
+
+                <div class="brand-decoration decoration-one"></div>
+                <div class="brand-decoration decoration-two"></div>
+
+                <div class="brand-content">
+
+                    <a class="school-identity" href="https://school.smpuhamzanwadi.sch.id">
+                        <div class="school-logo">
+                            <img
+                                src="{{ url_for('static', filename='img/logo1.png') }}"
+                                alt="Logo SMP Unggulan Hamzanwadi">
+                        </div>
+
+                        <div class="school-identity-text">
+                            <span>OFFICIAL DIGITAL PLATFORM</span>
+                            <strong>SMP UNGGULAN</strong>
+                            <b>HAMZANWADI</b>
+                        </div>
+                    </a>
+
+                    <div class="brand-main">
+
+                        <div class="brand-eyebrow">
+                            <span class="eyebrow-dot"></span>
+                            SMART ATTENDANCE SYSTEM
+                        </div>
+
+                        <h1>
+                            Disiplin Hari Ini.<br>
+                            <span>Unggul Esok Hari.</span>
+                        </h1>
+
+                        <p>
+                            Membangun budaya kerja yang disiplin,
+                            profesional, dan penuh dedikasi melalui
+                            sistem kehadiran digital SMPU.
+                        </p>
+
+                        <div class="brand-features">
+                            <div class="feature-item">
+                                <span class="feature-icon">
+                                    <i class="fa fa-bolt"></i>
+                                </span>
+                                <div>
+                                    <strong>Smart & Efficient</strong>
+                                    <small>Pengelolaan kehadiran digital</small>
+                                </div>
+                            </div>
+
+                            <div class="feature-item">
+                                <span class="feature-icon">
+                                    <i class="fa fa-shield"></i>
+                                </span>
+                                <div>
+                                    <strong>Secure Access</strong>
+                                    <small>Akses akun terlindungi</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="brand-visual" aria-hidden="true">
+                        <div class="visual-halo"></div>
+                        <div class="visual-ring ring-one"></div>
+                        <div class="visual-ring ring-two"></div>
+                        <div class="visual-ring ring-three"></div>
+
+                        <span class="visual-star star-one"></span>
+                        <span class="visual-star star-two"></span>
+                        <span class="visual-star star-three"></span>
+
+                        <div class="visual-center">
+                            <div class="visual-center-icon">
+                                <i class="fa fa-calendar-check-o"></i>
+                            </div>
+                            <span>ATTENDANCE</span>
+                            <strong>EXCELLENCE</strong>
+                        </div>
+
+                        <div class="visual-chip chip-top">
+                            <span class="chip-status"></span>
+                            <div>
+                                <small>Platform status</small>
+                                <strong>System online</strong>
+                            </div>
+                        </div>
+
+                        <div class="visual-chip chip-bottom">
+                            <span class="chip-shield">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <div>
+                                <small>Your account</small>
+                                <strong>Protected access</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="brand-bottom">
+                        <span>DISCIPLINE</span>
+                        <i></i>
+                        <span>INTEGRITY</span>
+                        <i></i>
+                        <span>EXCELLENCE</span>
+                        <small>© 2026 SMPU</small>
+                    </div>
+
+                </div>
+            </aside>
+
+
+            <!-- LOGIN PANEL -->
+            <section class="login-panel">
+
+                <div class="mobile-identity">
+                    <div class="mobile-logo">
+                        <img
+                            src="{{ url_for('static', filename='img/logo1.png') }}"
+                            alt="Logo SMPU">
+                    </div>
+
+                    <div class="mobile-identity-text">
+                        <strong>SMP UNGGULAN HAMZANWADI</strong>
+                        <span>ATTENDANCE MANAGEMENT</span>
+                    </div>
+
+                    <div class="mobile-live">
+                        <span></span>
+                        LIVE
+                    </div>
+                </div>
+
+                <div class="login-content">
+
+                    <div class="login-heading">
+
+                        <div class="login-label">
+                            <span></span>
+                            TEACHER PORTAL
+                        </div>
+
+                        <div class="login-icon">
+                            <i class="fa fa-user-circle-o"></i>
+                        </div>
+
+                        <h2>Selamat datang<br>kembali.</h2>
+
+                        <p>
+                            Masuk ke akun Anda untuk mengakses
+                            sistem absensi guru SMPU.
+                        </p>
+
+                    </div>
+
+
+                    <form
+                        id="formLogin"
+                        action="{{ url_for('absensi.login_absensi') }}"
+                        method="POST"
+                        autocomplete="on">
+
+                        <div class="input-group">
+                            <label for="username">USERNAME</label>
+
+                            <div class="input-box {% if session.get('error_username') %}has-error{% endif %}">
+                                <span class="input-icon">
+                                    <i class="fa fa-user-o"></i>
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    placeholder="Masukkan username"
+                                    value="{{ session.get('last_username', '')|e }}"
+                                    autocomplete="username"
+                                    autocapitalize="none"
+                                    spellcheck="false"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="password">KATA SANDI</label>
+
+                            <div class="input-box {% if session.get('error_password') %}has-error{% endif %}">
+                                <span class="input-icon">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Masukkan kata sandi"
+                                    autocomplete="current-password"
+                                    required>
+
+                                <button
+                                    type="button"
+                                    class="password-toggle"
+                                    id="togglePassword"
+                                    aria-label="Tampilkan kata sandi"
+                                    aria-pressed="false">
+                                    <i id="iconMata" class="fa fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="login-button" id="btnLogin">
+                            <span class="button-text">Masuk ke Absensi</span>
+                            <span class="button-icon">
+                                <i class="fa fa-arrow-right"></i>
+                            </span>
+                            <span class="button-glow"></span>
+                        </button>
+
+                    </form>
+
+
+                    <div class="login-security">
+                        <div class="security-symbol">
+                            <i class="fa fa-shield"></i>
+                        </div>
+
+                        <div class="security-copy">
+                            <strong>Secure authentication</strong>
+                            <span>Akses akun dilindungi sistem keamanan sekolah.</span>
+                        </div>
+
+                        <i class="fa fa-check-circle security-verified"></i>
+                    </div>
+
+
+                    <div class="help-section">
+
+                        <div class="help-heading">
+                            <span></span>
+                            BUTUH BANTUAN?
+                            <span></span>
+                        </div>
+
+                        <div class="help-content">
+                            <div class="help-icon">
+                                <i class="fa fa-headphones"></i>
+                            </div>
+
+                            <div class="help-info">
+                                <strong>Tim administrasi sekolah</strong>
+                                <p>Siap membantu kendala akses akun Anda.</p>
+
+                                <div class="help-links">
+                                    <a href="tel:+6281929830033">
+                                        <i class="fa fa-phone"></i>
+                                        (62) 81929830033
+                                    </a>
+
+                                    <a href="mailto:smpu@hamzanwadi.ac.id">
+                                        <i class="fa fa-envelope-o"></i>
+                                        smpu@hamzanwadi.ac.id
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <a
+                        href="https://school.smpuhamzanwadi.sch.id"
+                        class="back-link">
+                        <i class="fa fa-arrow-left"></i>
+                        Kembali ke Sistem Manajemen Sekolah
+                    </a>
+
+                </div>
+
+                <footer class="login-footer">
+                    <span>POWERED BY SMPU DIGITAL SYSTEM</span>
+                    <span>VERSION 2026</span>
+                </footer>
+
+            </section>
+
+        </section>
+
+        <div class="mobile-bottom-note">
+            <span>© 2026 SMP Unggulan Hamzanwadi</span>
+            <span>DISCIPLINE · INTEGRITY · EXCELLENCE</span>
+        </div>
+
+    </main>
+
+
+    <div class="notification-stack" id="notifContainer"></div>
+
     <script>
-        function lihatSandi() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('iconMata');
-            input.type = input.type === 'password' ? 'text' : 'password';
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        }
-
-        // ==========================================
-        // SISTEM NOTIFIKASI GLOBAL
-        // ==========================================
-        class Notifikasi {
-            constructor() {
-                this.waktuTampil = 3500;
-                this.container = document.querySelector('.notif-container');
-                if (!this.container) this.buatContainer();
-            }
-            buatContainer() {
-                const wadah = document.createElement('div');
-                wadah.className = 'notif-container';
-                document.body.appendChild(wadah);
-                this.container = wadah;
-            }
-            tampil(teks, tipe = 'info', waktu = null) {
-                const elemen = document.createElement('div');
-                elemen.className = `notif ${tipe}`;
-                elemen.innerHTML = `
-                    <span>${teks}</span>
-                    <button class="notif-tutup" onclick="this.parentElement.classList.add('hilang'); setTimeout(() => this.parentElement.remove(), 400);">&times;</button>
-                `;
-                this.container.appendChild(elemen);
-                setTimeout(() => elemen.classList.add('muncul'), 10);
-                const durasi = waktu || this.waktuTampil;
-                setTimeout(() => {
-                    if (elemen.parentElement) {
-                        elemen.classList.add('hilang');
-                        setTimeout(() => elemen.remove(), 400);
-                    }
-                }, durasi);
-            }
-            bacaFlash() {
-                if (window.pesanFlash && Array.isArray(window.pesanFlash)) {
-                    window.pesanFlash.forEach(pesan => {
-                        let tipe = 'info';
-                        if (pesan[0].includes('success')) tipe = 'sukses';
-                        if (pesan[0].includes('danger')) tipe = 'error';
-                        if (pesan[0].includes('warning')) tipe = 'peringatan';
-                        this.tampil(pesan[1], tipe);
-                    });
-                }
-            }
-        }
-
-        // === ✅ KIRIM PESAN FLASH DARI FLASK KE JS ===
-        window.pesanFlash = [
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        ["{{ category }}", "{{ message|e }}"]{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        ];
-
-        // === ✅ JALANKAN OTOMATIS ===
-        const notif = new Notifikasi();
-        document.addEventListener('DOMContentLoaded', () => notif.bacaFlash());
+        window.pesanFlash = {{ get_flashed_messages(with_categories=true) | tojson }};
     </script>
+
+    <script src="{{ url_for('static', filename='js/login_absensi.js') }}"></script>
+
 </body>
 </html>
