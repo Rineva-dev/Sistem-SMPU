@@ -1,725 +1,583 @@
 
-<div class="teacher-dashboard">
+<div class="edux-workspace">
 
-    <!-- =========================================
-         HERO / WELCOME
-    ========================================== -->
-    <section class="td-hero">
+    <!-- TOP WELCOME / WORKSPACE HERO -->
+    <section class="edux-hero">
+        <div class="edux-hero-pattern"></div>
 
-        <div class="td-hero-decoration td-hero-decoration-one"></div>
-        <div class="td-hero-decoration td-hero-decoration-two"></div>
-        <div class="td-hero-grid"></div>
-
-        <div class="td-hero-content">
-
-            <div class="td-hero-topline">
-                <span class="td-live-dot"></span>
-                TEACHER WORKSPACE
-                <span class="td-hero-divider">/</span>
-                SMPU
-            </div>
-
-            <h1>
-                Selamat datang,
-                <span>{{ user_name }}!</span>
-            </h1>
-
-            <p class="td-hero-description">
-                Mari mulai hari ini dengan semangat untuk menginspirasi,
-                membimbing, dan memberikan yang terbaik bagi siswa.
-            </p>
-
-            {% if daftar_tugas %}
-            <div class="td-role-tags">
-                {% for tugas in daftar_tugas %}
-                <span class="td-role-tag">
-                    <i class="fas fa-briefcase"></i>
-                    {{ tugas }}
-                </span>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <div class="td-hero-bottom">
-
-                <div class="td-hero-date">
-                    <div class="td-date-icon">
-                        <i class="far fa-calendar-alt"></i>
-                    </div>
-
-                    <div>
-                        <span class="td-date-label">HARI INI</span>
-                        <strong>{{ today_date_long }}</strong>
-                    </div>
+        <div class="edux-hero-content">
+            <div class="edux-hero-copy">
+                <div class="edux-eyebrow">
+                    <span class="edux-eyebrow-dot"></span>
+                    TEACHER WORKSPACE
+                    <span class="edux-eyebrow-line"></span>
+                    <span>{{ semester or 'Tahun Akademik' }}</span>
                 </div>
 
-                <a href="/jadwal" class="td-hero-action">
-                    <span>Lihat Jadwal</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                {% set gender = (user.guru.jenis_kelamin | default('') | string | lower | trim) if user and user.guru else '' %}
 
-            </div>
+                <h1>
+                    Welcome,
+                    {% if user.jenis_kelamin|lower|trim in ['l', 'laki-laki', 'laki laki', 'male', 'pria'] %}
+                        Mr.
+                    {% elif user.jenis_kelamin|lower|trim in ['p', 'perempuan', 'female', 'wanita'] %}
+                        Ms.
+                    {% endif %}
+                    <br>
+                    <span>{{ user_name }}</span>
+                </h1>
 
-        </div>
-
-        <div class="td-hero-side">
-
-            <div class="td-hero-calendar">
-
-                <div class="td-calendar-top">
-                    <span class="td-calendar-icon">
-                        <i class="far fa-calendar-check"></i>
-                    </span>
-
-                    <span class="td-calendar-label">
-                        KALENDER
-                    </span>
-
-                    <span class="td-calendar-status">
-                        <span></span>
-                        AKTIF
-                    </span>
-                </div>
-
-                <div class="td-calendar-date">
-                    {{ today_date }}
-                </div>
-
-                <div class="td-calendar-caption">
-                    Kalender akademik sekolah
-                </div>
-
-                {% if bisa_lihat_kalender %}
-                <a
-                    href="{{ url_for('kalender.halaman_kalender') }}?asal=dashboard"
-                    class="td-calendar-link"
-                >
-                    Buka Kalender
-                    <i class="fas fa-arrow-up-right-from-square"></i>
-                </a>
-                {% else %}
-                <div class="td-calendar-link td-calendar-disabled">
-                    Kalender sekolah
-                </div>
-                {% endif %}
-
-            </div>
-
-            <div class="td-hero-note">
-                <div class="td-hero-note-icon">
-                    <i class="fas fa-lightbulb"></i>
-                </div>
-
-                <div>
-                    <strong>Inspirasi hari ini</strong>
-                    <span>Setiap pelajaran adalah kesempatan untuk bertumbuh.</span>
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================
-         STATISTIK MENGAJAR
-    ========================================== -->
-    <section class="td-stat-section">
-
-        <div class="td-section-heading">
-
-            <div>
-                <span class="td-section-eyebrow">
-                    OVERVIEW
-                </span>
-
-                <h2>Ringkasan Mengajar</h2>
-
-                <p>
-                    Gambaran aktivitas akademik Anda pada semester ini.
+                <p class="edux-hero-description">
+                    Ruang kerja mengajar Anda. Pantau jadwal, kelola aktivitas,
+                    dan tetap terhubung dengan kegiatan akademik sekolah.
                 </p>
-            </div>
 
-            <div class="td-semester-pill">
-                <span class="td-semester-dot"></span>
-                Semester {{ semester | default('Genap') }}
-            </div>
-
-        </div>
-
-
-        <div class="td-stats-grid">
-
-            <!-- MAPEL -->
-            <article class="td-stat-card td-stat-mapel">
-
-                <div class="td-stat-top">
-                    <div class="td-stat-icon">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-
-                    <span class="td-stat-label">
-                        AKADEMIK
+                <div class="edux-role-list">
+                    {% for tugas in daftar_tugas %}
+                    <span class="edux-role-chip">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        {{ tugas }}
                     </span>
-                </div>
-
-                <div class="td-stat-number">
-                    {{ jumlah_mapel_diampu | default('0') }}
-                </div>
-
-                <div class="td-stat-title">
-                    Mata Pelajaran
-                </div>
-
-                <div class="td-stat-footer">
-                    <span class="td-stat-footer-icon">
-                        <i class="fas fa-layer-group"></i>
-                    </span>
-
-                    <span>
-                        Mata pelajaran diampu
-                    </span>
-                </div>
-
-            </article>
-
-
-            <!-- SISWA -->
-            <article class="td-stat-card td-stat-siswa">
-
-                <div class="td-stat-top">
-                    <div class="td-stat-icon">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-
-                    <span class="td-stat-label">
-                        PESERTA DIDIK
-                    </span>
-                </div>
-
-                <div class="td-stat-number">
-                    {{ jumlah_siswa_diajar | default('0') }}
-                </div>
-
-                <div class="td-stat-title">
-                    Total Siswa Diajar
-                </div>
-
-                <div class="td-stat-footer">
-                    <span class="td-stat-footer-icon">
-                        <i class="fas fa-users"></i>
-                    </span>
-
-                    <span>
-                        Seluruh rombel
-                    </span>
-                </div>
-
-            </article>
-
-
-            <!-- KEHADIRAN -->
-            <article class="td-stat-card td-stat-kehadiran">
-
-                <div class="td-stat-top">
-                    <div class="td-stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-
-                    <span class="td-stat-label">
-                        PERFORMA
-                    </span>
-                </div>
-
-                <div class="td-stat-number">
-                    {{ persen_kehadiran_mengajar | default('0') }}<small>%</small>
-                </div>
-
-                <div class="td-stat-title">
-                    Kehadiran Mengajar
-                </div>
-
-                <div class="td-stat-footer">
-                    <span class="td-stat-footer-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </span>
-
-                    <span>
-                        Rata-rata semester ini
-                    </span>
-                </div>
-
-            </article>
-
-
-            <!-- JAM -->
-            <article class="td-stat-card td-stat-jam">
-
-                <div class="td-stat-top">
-                    <div class="td-stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-
-                    <span class="td-stat-label">
-                        BEBAN KERJA
-                    </span>
-                </div>
-
-                <div class="td-stat-number">
-                    {{ jumlah_jam_minggu | default('0') }}
-                </div>
-
-                <div class="td-stat-title">
-                    Jam Mengajar
-        </div>
-
-                <div class="td-stat-footer">
-                    <span class="td-stat-footer-icon">
-                        <i class="fas fa-calendar-week"></i>
-                    </span>
-
-                    <span>
-                        Jam mengajar per minggu
-                    </span>
-                </div>
-
-            </article>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================================
-         MAIN WORKSPACE
-    ========================================== -->
-    <section class="td-workspace-grid">
-
-
-        <!-- =====================================
-             JADWAL MENGAJAR
-        ====================================== -->
-        <article class="td-panel td-schedule-panel">
-
-            <div class="td-panel-header">
-
-                <div class="td-panel-title-group">
-
-                    <div class="td-panel-icon td-panel-icon-green">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-
-                    <div>
-                        <span class="td-panel-eyebrow">
-                            DAILY SCHEDULE
-                        </span>
-
-                        <h3>Jadwal Mengajar</h3>
-
-                        <p>
-                            Agenda pembelajaran hari ini
-                        </p>
-                    </div>
-
-                </div>
-
-                <a href="/jadwal" class="td-panel-action">
-                    Semua
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-
-            <div class="td-schedule-content">
-
-                {% if jadwal_hari_ini %}
-
-                <div class="td-schedule-timeline">
-
-                    {% for item in jadwal_hari_ini %}
-
-                    <div class="td-schedule-item">
-
-                        <div class="td-schedule-time">
-                            {{ item.jam }}
-                        </div>
-
-                        <div class="td-schedule-track">
-                            <span class="td-schedule-track-dot"></span>
-                            <span class="td-schedule-track-line"></span>
-                        </div>
-
-                        <div class="td-schedule-detail">
-
-                            <div class="td-schedule-subject">
-                                {{ item.mapel }}
-                            </div>
-
-                            <div class="td-schedule-class">
-                                <i class="fas fa-users"></i>
-                                {{ item.kelas }}
-                            </div>
-
-                        </div>
-
-                        <div class="td-schedule-arrow">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-
-                    </div>
-
                     {% endfor %}
-
                 </div>
 
-                {% else %}
-
-                <div class="td-empty-state">
-
-                    <div class="td-empty-icon">
-                        <i class="fas fa-mug-hot"></i>
-                    </div>
-
-                    <h4>Hari yang lebih santai!</h4>
-
-                    <p>
-                        Tidak ada jadwal mengajar hari ini.
-                        Gunakan waktu untuk mempersiapkan pembelajaran berikutnya.
-                    </p>
-
-                </div>
-
-                {% endif %}
-
-            </div>
-
-            <div class="td-panel-footer">
-
-                <a href="/jadwal">
-                    <i class="fas fa-calendar-alt"></i>
-                    Lihat jadwal lengkap
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-        </article>
-
-
-        <!-- =====================================
-             PENGUMUMAN
-        ====================================== -->
-        <article class="td-panel td-announcement-panel">
-
-            <div class="td-panel-header">
-
-                <div class="td-panel-title-group">
-
-                    <div class="td-panel-icon td-panel-icon-orange">
-                        <i class="fas fa-bullhorn"></i>
-                    </div>
-
-                    <div>
-                        <span class="td-panel-eyebrow">
-                            SCHOOL INFORMATION
-                        </span>
-
-                        <h3>Pengumuman</h3>
-
-                        <p>
-                            Informasi terbaru sekolah
-                        </p>
-                    </div>
-
-                </div>
-
-                <a href="/pengumuman" class="td-panel-action">
-                    Semua
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-
-            <div class="td-announcement-content">
-
-                {% if pengumuman %}
-
-                {% for item in pengumuman[:4] %}
-
-                <div class="td-announcement-item">
-
-                    <div class="td-announcement-marker">
-                        <span></span>
-                    </div>
-
-                    <div class="td-announcement-detail">
-
-                        <h4>
-                            {{ item.judul }}
-                        </h4>
-
-                        <p>
-                            {{ item.isi | truncate(100) }}
-                        </p>
-
-                        <div class="td-announcement-meta">
-                            <i class="far fa-clock"></i>
-                            {{ item.tanggal }}
-                        </div>
-
-                    </div>
-
-                    <div class="td-announcement-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-
-                </div>
-
-                {% endfor %}
-
-                {% else %}
-
-                <div class="td-empty-state td-announcement-empty">
-
-                    <div class="td-empty-icon">
-                        <i class="far fa-bell-slash"></i>
-                    </div>
-
-                    <h4>Belum ada pengumuman</h4>
-
-                    <p>
-                        Informasi terbaru sekolah akan muncul di sini.
-                    </p>
-
-                </div>
-
-                {% endif %}
-
-            </div>
-
-            <div class="td-panel-footer">
-
-                <a href="/pengumuman">
-                    <i class="fas fa-bullhorn"></i>
-                    Semua pengumuman
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-        </article>
-
-    </section>
-
-
-    <!-- =========================================
-         AGENDA SEKOLAH
-    ========================================== -->
-    <section class="td-panel td-agenda-panel">
-
-        <div class="td-agenda-header">
-
-            <div class="td-panel-title-group">
-
-                <div class="td-panel-icon td-panel-icon-purple">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-
-                <div>
-                    <span class="td-panel-eyebrow">
-                        SCHOOL ACTIVITIES
-                    </span>
-
-                    <h3>Agenda & Kegiatan Sekolah</h3>
-
-                    <p>
-                        Pantau kegiatan dan agenda penting sekolah.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div class="td-agenda-header-actions">
-
-                <a href="/agenda" class="td-agenda-all">
-                    Semua Agenda
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-                <div class="td-agenda-switch">
-
-                    <button
-                        type="button"
-                        class="td-agenda-switch-btn active"
-                        id="btnTampilanDaftar"
-                        aria-pressed="true"
-                    >
-                        <i class="fas fa-list"></i>
-                        <span>Daftar</span>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="td-agenda-switch-btn"
-                        id="btnTampilanKalender"
-                        aria-pressed="false"
-                    >
-                        <i class="fas fa-calendar-week"></i>
-                        <span>Kalender</span>
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- DAFTAR AGENDA -->
-        <div
-            class="td-agenda-view"
-            id="tampilanDaftar"
-        >
-
-            {% if agenda_sekolah %}
-
-            <div class="td-agenda-list">
-
-                {% for agenda in agenda_sekolah[:5] %}
-
-                <article class="td-agenda-item">
-
-                    <div class="td-agenda-date
-                        tanggal-{{ agenda.status | lower | replace(' ', '-') }}">
-
-                        <span class="td-agenda-day">
-                            {{ agenda.tgl_mulai_obj.strftime('%d') }}
-                        </span>
-
-                        <span class="td-agenda-month">
-                            {{ agenda.tgl_mulai_obj.strftime('%b') }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="td-agenda-info">
-
-                        <div class="td-agenda-title-row">
-
-                            <h4>
-                                {{ agenda.judul }}
-                            </h4>
-
-                            <span class="td-agenda-status
-                                status-{{ agenda.status | lower | replace(' ', '-') }}">
-                                {{ agenda.status }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="td-agenda-meta">
-
-                            <span>
-                                <i class="far fa-clock"></i>
-                                {{ agenda.tgl_mulai_obj.strftime('%H:%M') }}
-                            </span>
-
-                            <span>
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ agenda.lokasi or 'Lokasi belum ditentukan' }}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <a
-                        href="/agenda/detail/{{ agenda.id }}"
-                        class="td-agenda-detail"
-                    >
-                        Detail
-                        <i class="fas fa-arrow-right"></i>
+                <div class="edux-hero-actions">
+                    <a href="/jadwal" class="edux-btn-primary">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Lihat Jadwal Mengajar
+                        <i class="fa-solid fa-arrow-up-right-from-square edux-btn-arrow"></i>
                     </a>
 
-                </article>
-
-                {% endfor %}
-
+                    <div class="edux-hero-date">
+                        <span class="edux-date-icon">
+                            <i class="fa-regular fa-calendar"></i>
+                        </span>
+                        <span>
+                            <strong>{{ today_date_long }}</strong>
+                            <small>Hari ini</small>
+                        </span>
+                    </div>
+                </div>
             </div>
 
+            <div class="edux-hero-visual">
+                <div class="edux-visual-glow"></div>
+                <div class="edux-visual-ring edux-ring-one"></div>
+                <div class="edux-visual-ring edux-ring-two"></div>
 
-            <div class="td-agenda-bottom">
-
-                <span>
-                    <i class="fas fa-calendar-check"></i>
-                    Menampilkan {{ agenda_sekolah[:5] | length }}
-                    agenda
-                </span>
-
-                <a href="/agenda">
-                    Lihat seluruh kegiatan
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-
-            </div>
-
-            {% else %}
-
-            <div class="td-empty-state td-agenda-empty">
-
-                <div class="td-empty-icon">
-                    <i class="far fa-calendar-times"></i>
+                <div class="edux-floating-card edux-float-class">
+                    <span class="edux-float-icon">
+                        <i class="fa-solid fa-book-open"></i>
+                    </span>
+                    <span>
+                        <strong>Teaching time</strong>
+                        <small>Make every lesson count</small>
+                    </span>
                 </div>
 
-                <h4>Belum ada agenda sekolah</h4>
+                <img
+                    src="{{ url_for('static', filename='img/teacher-3d.png') }}"
+                    alt="Ilustrasi guru"
+                    class="edux-teacher-image"
+                    onerror="this.style.display='none';"
+                >
 
-                <p>
-                    Agenda kegiatan akan muncul di sini setelah
-                    dibuat oleh pengelola sekolah.
-                </p>
+                <div class="edux-floating-card edux-float-idea">
+                    <span class="edux-idea-icon">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </span>
+                    <span>
+                        <strong>Keep inspiring</strong>
+                        <small>Great teachers, great future</small>
+                    </span>
+                </div>
 
+                <div class="edux-visual-caption">
+                    <span class="edux-caption-dot"></span>
+                    Your teaching journey starts here
+                </div>
             </div>
-
-            {% endif %}
-
         </div>
 
-
-        <!-- KALENDER -->
-        <div
-            class="td-agenda-view td-agenda-calendar d-none"
-            id="tampilanKalender"
-        >
-
-            <div class="td-calendar-container">
-
-                <div id="kalenderDashboard"></div>
-
+        <div class="edux-hero-bottom">
+            <div class="edux-hero-bottom-left">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Make today a meaningful learning experience.</span>
             </div>
-
+            <div class="edux-hero-bottom-right">
+                <span>EDUCATION WORKSPACE</span>
+                <i class="fa-solid fa-arrow-down"></i>
+            </div>
         </div>
-
     </section>
 
 
+    <!-- WORKSPACE HEADING -->
+    <section class="edux-section-heading">
+        <div>
+            <div class="edux-section-kicker">YOUR OVERVIEW</div>
+            <h2>Teaching overview</h2>
+            <p>Ringkasan aktivitas dan tanggung jawab mengajar Anda.</p>
+        </div>
+
+        <div class="edux-semester-badge">
+            <span class="edux-semester-dot"></span>
+            <span>{{ semester or 'Semester berjalan' }}</span>
+        </div>
+    </section>
+
+
+    <!-- TEACHING METRICS -->
+    <section class="edux-metrics">
+        <article class="edux-metric-card edux-metric-primary">
+            <div class="edux-metric-top">
+                <div class="edux-metric-icon">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <span class="edux-metric-label">AKADEMIK</span>
+            </div>
+
+            <div class="edux-metric-value">
+                {{ jumlah_mapel_diampu|default(0) }}
+                <small>Mapel</small>
+            </div>
+
+            <div class="edux-metric-description">
+                Mata pelajaran yang Anda ampu
+            </div>
+
+            <div class="edux-metric-bottom">
+                <span>Teaching subjects</span>
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+        </article>
+
+        <article class="edux-metric-card">
+            <div class="edux-metric-top">
+                <div class="edux-metric-icon edux-icon-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <span class="edux-metric-label">PESERTA DIDIK</span>
+            </div>
+
+            <div class="edux-metric-value">
+                {{ jumlah_siswa_diajar|default(0) }}
+                <small>Siswa</small>
+            </div>
+
+            <div class="edux-metric-description">
+                Total siswa yang Anda ajar
+            </div>
+
+            <div class="edux-metric-bottom">
+                <span>Students overview</span>
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </article>
+
+        <article class="edux-metric-card">
+            <div class="edux-metric-top">
+                <div class="edux-metric-icon edux-icon-gold">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <span class="edux-metric-label">KEHADIRAN</span>
+            </div>
+
+            <div class="edux-metric-value">
+                {{ persen_kehadiran_mengajar|default(0) }}<small>%</small>
+            </div>
+
+            <div class="edux-metric-description">
+                Persentase kehadiran mengajar
+            </div>
+
+            <div class="edux-metric-progress">
+                <span style="width: {{ [[persen_kehadiran_mengajar|default(0)|float, 0]|max, 100]|min }}%"></span>
+            </div>
+
+            <div class="edux-metric-bottom">
+                <span>Teaching attendance</span>
+                <i class="fa-solid fa-check-circle"></i>
+            </div>
+        </article>
+
+        <article class="edux-metric-card">
+            <div class="edux-metric-top">
+                <div class="edux-metric-icon edux-icon-purple">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <span class="edux-metric-label">BEBAN MENGAJAR</span>
+            </div>
+
+            <div class="edux-metric-value">
+                {{ jumlah_jam_minggu|default(0) }}
+                <small>Jam</small>
+            </div>
+
+            <div class="edux-metric-description">
+                Total jam mengajar per minggu
+            </div>
+
+            <div class="edux-metric-bottom">
+                <span>Weekly workload</span>
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+        </article>
+    </section>
+
+
+    <!-- MAIN TEACHING WORKSPACE -->
+    <section class="edux-main-grid">
+
+        <!-- LEFT: CLASS SCHEDULE -->
+        <div class="edux-panel edux-schedule-panel">
+            <div class="edux-panel-header">
+                <div>
+                    <div class="edux-panel-kicker">
+                        <span class="edux-live-dot"></span>
+                        DAILY WORKSPACE
+                    </div>
+                    <h3>Jadwal mengajar hari ini</h3>
+                    <p>Agenda kelas dan aktivitas mengajar Anda.</p>
+                </div>
+
+                <a href="/jadwal" class="edux-panel-link">
+                    Jadwal lengkap
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="edux-schedule-date">
+                <div class="edux-schedule-date-icon">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </div>
+                <div>
+                    <strong>{{ today_date }}</strong>
+                    <span>Today's teaching schedule</span>
+                </div>
+            </div>
+
+            <div class="edux-schedule-list">
+                {% if jadwal_hari_ini %}
+                    {% for item in jadwal_hari_ini %}
+                    <article class="edux-class-item">
+                        <div class="edux-class-time">
+                            <strong>{{ item.jam }}</strong>
+                            <span>WITA</span>
+                        </div>
+
+                        <div class="edux-class-track">
+                            <span class="edux-track-dot"></span>
+                            {% if not loop.last %}
+                            <span class="edux-track-line"></span>
+                            {% endif %}
+                        </div>
+
+                        <div class="edux-class-content">
+                            <div class="edux-class-card">
+                                <div class="edux-class-card-top">
+                                    <span class="edux-class-tag">
+                                        <i class="fa-solid fa-book"></i>
+                                        CLASS SESSION
+                                    </span>
+                                    <span class="edux-class-number">
+                                        {{ '%02d'|format(loop.index) }}
+                                    </span>
+                                </div>
+
+                                <h4>{{ item.mapel }}</h4>
+
+                                <div class="edux-class-meta">
+                                    <span>
+                                        <i class="fa-solid fa-door-open"></i>
+                                        {{ item.kelas }}
+                                    </span>
+                                    <span>
+                                        <i class="fa-solid fa-chalkboard-user"></i>
+                                        Kegiatan mengajar
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                {% else %}
+                    <div class="edux-empty-state">
+                        <div class="edux-empty-illustration">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <h4>Belum ada jadwal mengajar</h4>
+                        <p>Belum ada kelas yang dijadwalkan untuk hari ini. Gunakan waktu ini untuk menyiapkan materi pembelajaran.</p>
+                        <a href="/jadwal">
+                            Lihat jadwal lengkap
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="edux-schedule-footer">
+                <div>
+                    <span class="edux-footer-icon">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </span>
+                    <span>
+                        <strong>Teaching tip</strong>
+                        <small>Persiapkan materi sebelum kelas dimulai.</small>
+                    </span>
+                </div>
+                <span class="edux-footer-decoration">MAKE IT COUNT</span>
+            </div>
+        </div>
+
+
+        <!-- RIGHT: ANNOUNCEMENTS + QUICK ACCESS -->
+        <aside class="edux-side-column">
+
+            <div class="edux-panel edux-announcement-panel">
+                <div class="edux-panel-header">
+                    <div>
+                        <div class="edux-panel-kicker">SCHOOL UPDATES</div>
+                        <h3>Pengumuman</h3>
+                        <p>Informasi terbaru dari sekolah.</p>
+                    </div>
+
+                    <a href="/pengumuman" class="edux-icon-link" title="Semua pengumuman">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+
+                <div class="edux-announcement-list">
+                    {% if pengumuman %}
+                        {% for item in pengumuman %}
+                        <article class="edux-announcement-item">
+                            <div class="edux-announcement-icon">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+
+                            <div class="edux-announcement-content">
+                                <span class="edux-announcement-date">
+                                    <i class="fa-regular fa-clock"></i>
+                                    {{ item.tanggal }}
+                                </span>
+                                <h4>{{ item.judul }}</h4>
+                                <p>{{ item.isi|striptags|truncate(105, True, '...') }}</p>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="edux-announcement-empty">
+                            <i class="fa-regular fa-envelope-open"></i>
+                            <strong>Belum ada pengumuman</strong>
+                            <span>Informasi sekolah akan tampil di sini.</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <a href="/pengumuman" class="edux-all-announcements">
+                    Lihat semua pengumuman
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+
+            <div class="edux-quick-panel">
+                <div class="edux-quick-heading">
+                    <div>
+                        <div class="edux-panel-kicker">QUICK ACCESS</div>
+                        <h3>Akses cepat</h3>
+                    </div>
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+
+                <div class="edux-quick-links">
+                    <a href="/jadwal" class="edux-quick-link">
+                        <span class="edux-quick-icon edux-quick-green">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </span>
+                        <span>
+                            <strong>Jadwal mengajar</strong>
+                            <small>Kelola jadwal kelas</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a href="/agenda" class="edux-quick-link">
+                        <span class="edux-quick-icon edux-quick-orange">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </span>
+                        <span>
+                            <strong>Agenda sekolah</strong>
+                            <small>Acara dan kegiatan</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    <a href="/pengumuman" class="edux-quick-link">
+                        <span class="edux-quick-icon edux-quick-blue">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </span>
+                        <span>
+                            <strong>Pengumuman</strong>
+                            <small>Informasi sekolah</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                    {% if bisa_lihat_kalender %}
+                    <a href="{{ url_for('kalender.halaman_kalender') }}?asal=dashboard" class="edux-quick-link">
+                        <span class="edux-quick-icon edux-quick-purple">
+                            <i class="fa-solid fa-calendar-week"></i>
+                        </span>
+                        <span>
+                            <strong>Kalender akademik</strong>
+                            <small>Lihat kalender sekolah</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+    </section>
+
+
+    <!-- SCHOOL AGENDA WORKSPACE -->
+    <section class="edux-agenda-section">
+        <div class="edux-agenda-heading">
+            <div>
+                <div class="edux-panel-kicker">SCHOOL ACTIVITIES</div>
+                <h2>Agenda & kegiatan sekolah</h2>
+                <p>Pantau kegiatan penting dan agenda sekolah mendatang.</p>
+            </div>
+
+            <div class="edux-agenda-actions">
+                <div class="edux-view-switch">
+                    <button type="button" id="btnTampilanDaftar" class="edux-view-btn active">
+                        <i class="fa-solid fa-list"></i>
+                        Daftar
+                    </button>
+                    <button type="button" id="btnTampilanKalender" class="edux-view-btn">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Kalender
+                    </button>
+                </div>
+
+                <a href="/agenda" class="edux-agenda-all">
+                    Semua agenda
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- AGENDA LIST -->
+        <div id="tampilanDaftar" class="edux-agenda-list-view">
+            {% if agenda_sekolah %}
+            <div class="edux-agenda-grid">
+                {% for agenda in agenda_sekolah %}
+                <article class="edux-agenda-card">
+                    <div class="edux-agenda-date-box">
+                        <strong>{{ agenda.tgl_mulai_obj.strftime('%d') }}</strong>
+                        <span>{{ agenda.tgl_mulai_obj.strftime('%b') }}</span>
+                    </div>
+
+                    <div class="edux-agenda-card-content">
+                        <div class="edux-agenda-card-top">
+                            <span class="edux-agenda-status">
+                                <span class="edux-status-dot"></span>
+                                {{ agenda.status }}
+                            </span>
+                            <span class="edux-agenda-time">
+                                <i class="fa-regular fa-clock"></i>
+                                {{ agenda.tgl_mulai_obj.strftime('%H:%M') }}
+                            </span>
+                        </div>
+
+                        <h3>{{ agenda.judul }}</h3>
+
+                        <div class="edux-agenda-location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            {{ agenda.lokasi or 'Lokasi belum ditentukan' }}
+                        </div>
+
+                        <button
+                            type="button"
+                            class="edux-agenda-detail-btn"
+                            data-agenda-id="{{ agenda.id }}"
+                        >
+                            Lihat detail
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="edux-agenda-card-decoration">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="edux-agenda-empty">
+                <div class="edux-empty-illustration">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <h4>Belum ada agenda sekolah</h4>
+                <p>Agenda kegiatan sekolah yang tersedia akan ditampilkan di area ini.</p>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <!-- AGENDA CALENDAR -->
+        <div id="tampilanKalender" class="edux-calendar-view" hidden>
+            <div class="edux-calendar-toolbar">
+                <div>
+                    <strong>School calendar</strong>
+                    <span>Jadwal dan aktivitas akademik</span>
+                </div>
+                <span class="edux-calendar-legend">
+                    <i></i> Agenda sekolah
+                </span>
+            </div>
+
+            <div id="kalenderDashboard"></div>
+        </div>
+    </section>
+
+
+    <!-- AGENDA DETAIL MODAL -->
+    <div class="edux-modal-overlay" id="modalDetailAgenda" aria-hidden="true">
+        <div class="edux-modal" role="dialog" aria-modal="true" aria-labelledby="eduxModalTitle">
+            <div class="edux-modal-header">
+                <div>
+                    <span class="edux-modal-kicker">SCHOOL EVENT DETAILS</span>
+                    <h3 id="eduxModalTitle">Detail agenda</h3>
+                </div>
+                <button type="button" class="edux-modal-close" id="tutupModalAgenda" aria-label="Tutup">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="edux-modal-body" id="kontenDetailAgenda">
+                <div class="edux-modal-loading">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>Memuat detail agenda...</span>
+                </div>
+            </div>
+
+            <div class="edux-modal-footer">
+                <button type="button" class="edux-modal-dismiss" id="tutupModalAgendaFooter">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
-
-
-<!-- =========================================
-     JAVASCRIPT DATA AGENDA
-========================================== -->
-{% block extra_js %}
 
 <script>
     window.agendaData = {{ agenda_sekolah | default([]) | tojson | safe }};
 </script>
 
 <script src="{{ url_for('static', filename='js/sections/guru/dashboard_guru.js') }}"></script>
-
-{% endblock %}

@@ -135,6 +135,7 @@ a {
     justify-content: center;
     position: relative;
     z-index: 1;
+    margin-top: auto;
 }
 
 .login-layout {

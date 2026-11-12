@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for
 from datetime import datetime
 # ✅ Impor db dan modelnya, sama persis seperti di agenda.py
-from models import db, AgendaKegiatan
+from models import db, AgendaKegiatan, User
 
 dashboard_guru_bp = Blueprint('dashboard_guru', __name__)
 
@@ -10,6 +10,12 @@ def halaman_dashboard_guru():
     # Cek login dan peran
     if not session.get('logged_in') or session.get('role') != 'Guru':
         return redirect(url_for('login.halaman_login'))
+
+
+    akun = User.query.get(session.get('user_id'))
+    guru = akun.guru if akun else None
+
+    jenis_kelamin = guru.jenis_kelamin if guru else ''
 
     sekarang = datetime.now()
 
@@ -54,7 +60,8 @@ def halaman_dashboard_guru():
             'jabatan': session.get('jabatan'),
             'nama': session.get('user_name'),
             'inisial': session.get('user_initials'),
-            'tugas_tambahan': session.get('tugas_tambahan')
+            'tugas_tambahan': session.get('tugas_tambahan'),
+            'jenis_kelamin': jenis_kelamin
         },
         'today_date': sekarang.strftime('%d %b %Y'),
         'today_date_long': sekarang.strftime('%A, %d %B %Y'),
