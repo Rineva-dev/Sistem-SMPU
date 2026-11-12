@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from models import db, Guru, User
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
+from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 
 profil_bp = Blueprint('profil', __name__, url_prefix='/profil')
 
@@ -304,53 +306,226 @@ def ubah_foto():
         return redirect(url_for('profil.biodata'))
 
 # ✅ HALAMAN EDIT BIODATA — DIPERBAIKI
-@profil_bp.route('/edit-biodata', methods=['GET', 'POST'])
+
+# =========================================================
+# EDIT BIODATA GURU — COMPLETE
+# =========================================================
+@profil_bp.route('/edit-biodata', methods=['POST'])
 def edit_biodata():
+
+    # -----------------------------------------------------
+    # IDENTIFIKASI USER
+    # -----------------------------------------------------
     user_id = session.get('user_id') or session.get('absensi_user_id')
+
     if not user_id:
-        flash('Silakan login dulu', 'warning')
+        flash('Silakan login terlebih dahulu.', 'warning')
+
         if session.get('absensi_logged_in'):
             return redirect(url_for('absensi.login_absensi'))
+
         return redirect(url_for('login.halaman_login'))
 
-    if not session.get('user_id'):
-        user = User.query.get(str(user_id))
-        if user and user.guru:
-            session['user_id'] = user.id
-            session['user_name'] = user.guru.nama
-            session['jabatan'] = user.guru.jabatan or 'Guru'
-            session['user_initials'] = ''.join(
-                [nama[0].upper() for nama in user.guru.nama.split()[:2]]
-            )
-    
-    user = User.query.get(str(user_id))
+    user = User.query.get(user_id)
     guru = user.guru if user else None
+
     if not guru:
-        flash('Data guru tidak ditemukan', 'danger')
+        flash('Data guru tidak ditemukan.', 'danger')
+
         if g.sistem_mode == 'absensi':
             return redirect(url_for('absensi_profil.biodata'))
-        else:
+
+        return redirect(url_for('profil.biodata'))
+
+    # -----------------------------------------------------
+    # AMBIL DATA FORM
+    # -----------------------------------------------------
+    def ambil(nama):
+        return request.form.get(nama, '').strip()
+
+    try:
+
+        # =================================================
+        # 1. VALIDASI IDENTITAS WAJIB
+        # =================================================
+        nama = ambil('nama')
+        jenis_kelamin = ambil('jenis_kelamin')
+
+        if not nama:
+            flash('Nama lengkap wajib diisi.', 'danger')
             return redirect(url_for('profil.biodata'))
-    
-    if request.method == 'POST':
-        guru.nik = request.form.get('nik', '').strip() or None
-        guru.gelar_depan = request.form.get('gelar_depan', '').strip() or None
-        guru.gelar_belakang = request.form.get('gelar_belakang', '').strip() or None
-        guru.pendidikan_terakhir = request.form.get('pendidikan_terakhir', '').strip() or None
-        guru.status_pernikahan = request.form.get('status_pernikahan', '').strip() or None
-        guru.no_hp = request.form.get('no_hp', '').strip() or None
-        guru.email = request.form.get('email', '').strip() or None
-        guru.alamat = request.form.get('alamat', '').strip() or None
-        
+
+        if len(nama) > 100:
+            flash('Nama maksimal 100 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if not jenis_kelamin or len(jenis_kelamin) > 20:
+            flash('Jenis kelamin wajib diisi dengan benar.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        # =================================================
+        # 2. AMBIL DAN VALIDASI NIK
+        # =================================================
+        nik = ambil('nik') or None
+
+        if nik and (not nik.isdigit() or len(nik) != 16):
+            flash('NIK harus terdiri dari tepat 16 digit angka.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        # =================================================
+        # 3. VALIDASI TANGGAL LAHIR
+        # =================================================
+        tanggal_lahir_input = ambil('tanggal_lahir')
+
+        if tanggal_lahir_input:
+            try:
+                tanggal_lahir = datetime.strptime(
+                    tanggal_lahir_input, '%Y-%m-%d'
+                ).date()
+            except ValueError:
+                flash('Tanggal lahir tidak valid.', 'danger')
+                return redirect(url_for('profil.biodata'))
+        else:
+            tanggal_lahir = None
+
+        # =================================================
+        # 4. VALIDASI EMAIL UNIK
+        # =================================================
+        email = ambil('email') or None
+
+        if email:
+            if len(email) > 100:
+                flash('Email maksimal 100 karakter.', 'danger')
+                return redirect(url_for('profil.biodata'))
+
+            email_duplikat = Guru.query.filter(
+                Guru.email == email,
+                Guru.id != guru.id
+            ).first()
+
+            if email_duplikat:
+                flash('Email tersebut sudah digunakan guru lain.', 'danger')
+                return redirect(url_for('profil.biodata'))
+
+        # =================================================
+        # 5. VALIDASI PANJANG FIELD
+        # =================================================
+        nip = ambil('nip') or None
+        gelar_depan = ambil('gelar_depan') or None
+        gelar_belakang = ambil('gelar_belakang') or None
+        tempat_lahir = ambil('tempat_lahir') or None
+        pendidikan = ambil('pendidikan_terakhir') or None
+        status_pernikahan = ambil('status_pernikahan') or None
+        no_hp = ambil('no_hp') or None
+
+        if nip and len(nip) > 50:
+            flash('NIP maksimal 50 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if gelar_depan and len(gelar_depan) > 30:
+            flash('Gelar depan maksimal 30 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if gelar_belakang and len(gelar_belakang) > 50:
+            flash('Gelar belakang maksimal 50 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if tempat_lahir and len(tempat_lahir) > 100:
+            flash('Tempat lahir maksimal 100 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if pendidikan and len(pendidikan) > 10:
+            flash('Pendidikan terakhir maksimal 10 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if status_pernikahan and len(status_pernikahan) > 20:
+            flash('Status pernikahan maksimal 20 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        if no_hp and len(no_hp) > 20:
+            flash('Nomor handphone maksimal 20 karakter.', 'danger')
+            return redirect(url_for('profil.biodata'))
+
+        # =================================================
+        # 6. UPDATE IDENTITAS PRIBADI
+        # =================================================
+        guru.nama = nama
+        guru.nip = nip
+        guru.nik = nik
+
+        guru.gelar_depan = gelar_depan
+        guru.gelar_belakang = gelar_belakang
+
+        guru.jenis_kelamin = jenis_kelamin
+        guru.tempat_lahir = tempat_lahir
+        guru.tanggal_lahir = tanggal_lahir
+
+        guru.pendidikan_terakhir = pendidikan
+        guru.status_pernikahan = status_pernikahan
+
+        # =================================================
+        # 7. UPDATE DATA KEPEGAWAIAN
+        # =================================================
+
+        # =================================================
+        # 8. UPDATE DATA KONTAK
+        # =================================================
+        guru.no_hp = no_hp
+        guru.email = email
+        guru.alamat = ambil('alamat') or None
+
+        # =================================================
+        # 9. SINKRONISASI DATA USER
+        # =================================================
+
+        # =================================================
+        # 10. SIMPAN DATABASE
+        # =================================================
         db.session.commit()
-        flash('✅ Biodata berhasil diperbarui!', 'success')
 
-    halaman_aktif = session.get('halaman_aktif', 'utama')
+        # =================================================
+        # 11. UPDATE SESSION
+        # =================================================
+        session['user_name'] = guru.nama
+        session['jabatan'] = guru.jabatan
+        session['email'] = guru.email
+        session['no_hp'] = guru.no_hp
 
-    if not session.get('halaman_aktif'):
-        session['halaman_aktif'] = halaman_aktif
-    
+        nama_parts = guru.nama.split()
+
+        session['user_initials'] = ''.join(
+            bagian[0].upper()
+            for bagian in nama_parts[:2]
+        )
+
+        flash('Biodata berhasil diperbarui!', 'success')
+
+    except IntegrityError as e:
+        db.session.rollback()
+
+        print('[BIODATA] IntegrityError:', str(e))
+
+        flash(
+            'Data gagal disimpan karena ada data unik yang sudah digunakan, '
+            'misalnya alamat email.',
+            'danger'
+        )
+
+    except Exception as e:
+        db.session.rollback()
+
+        print('[BIODATA] ERROR:', str(e))
+
+        flash(
+            'Terjadi kesalahan saat menyimpan biodata. '
+            'Silakan coba kembali.',
+            'danger'
+        )
+
+    # -----------------------------------------------------
+    # KEMBALI KE HALAMAN BIODATA
+    # -----------------------------------------------------
     if g.sistem_mode == 'absensi':
         return redirect(url_for('absensi_profil.biodata'))
-    else:
-        return redirect(url_for('profil.biodata'))
+
+    return redirect(url_for('profil.biodata'))
