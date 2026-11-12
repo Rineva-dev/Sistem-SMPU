@@ -1,576 +1,449 @@
 {% extends "layout.html" %}
-{% set active_page = "rekap_absensi" %}
-{% set halaman_aktif = "absensi" %}
+
 {% block title %}Rekapitulasi Absensi{% endblock %}
+
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/absensi/rekap_absensi.css') }}">
-<div class="rekapitulasi-absensi-wrapper">
-    <header class="hp-fixed-header">
-        <a href="{{ url_for('absensi_guru.dashboard') }}" class="header-kembali-btn">
-            <i class="fas fa-chevron-left"></i>
-        </a>
-        <h1 class="header-judul-halaman">Rekap Absensi</h1>
-        <a href="{{ url_for('absensi.logout_absensi') }}" class="header-keluar-btn" title="Keluar">
-            <i class="fas fa-sign-out-alt"></i>
-        </a>
-    </header>
-    
-    <!-- HEADER HALAMAN PREMIUM -->
-    <div class="page-header">
-        <div class="rekap-breadcrumb">
-            <span><i class="fas fa-th-large"></i> Workspace</span>
-            <i class="fas fa-chevron-right"></i>
-            <span>Absensi</span>
-            <i class="fas fa-chevron-right"></i>
-            <strong>Rekapitulasi</strong>
-        </div>
 
-        <div class="rekap-heading-row">
-            <div class="rekap-heading-content">
-                <span class="rekap-eyebrow">
-                    <span class="rekap-eyebrow-dot"></span>
-                    TEACHER ATTENDANCE ANALYTICS
-                </span>
-                <h3>Rekapitulasi Absensi Guru</h3>
-                <p>
-                    Pantau statistik kehadiran dan kelola laporan absensi
-                    berdasarkan periode yang dipilih.
-                </p>
-            </div>
+<div class="ra-page">
 
-            <div class="rekap-period-card">
-                <div class="rekap-period-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div>
-                    <span>Periode Rekapitulasi</span>
-                    <strong>{{ nama_bulan_terpilih }} {{ filter_tahun }}</strong>
-                    <small>Tahun Pelajaran {{ label_tp }}</small>
-                </div>
-            </div>
+    <!-- MOBILE HEADER -->
+    <div class="ra-mobile-header">
+        <a href="{{ url_for('absensi_guru.dashboard') }}" class="ra-back">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div>
+            <strong>Rekap Absensi</strong>
+            <small>Attendance Analytics</small>
         </div>
+        <a href="{{ url_for('absensi.logout_absensi') }}" class="ra-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
     </div>
 
-    <!-- === FILTER BULAN & TAHUN === -->
-    <div class="filter-card mb-4">
-        <div class="filter-body">
-            <form method="get" class="row g-3 align-items-center justify-content-center" id="formFilterUtama">
-                <div class="col-auto">
-                    <label class="filter-label"><i class="fas fa-calendar-alt me-1"></i> Bulan:</label>
+    <!-- PAGE INTRO -->
+    <section class="ra-intro">
+        <div class="ra-intro-content">
+            <div class="ra-breadcrumb">
+                <span>Workspace</span>
+                <i class="fa-solid fa-chevron-right"></i>
+                <span>Absensi</span>
+                <i class="fa-solid fa-chevron-right"></i>
+                <strong>Rekapitulasi</strong>
+            </div>
+
+            <div class="ra-eyebrow">
+                <span class="ra-eyebrow-dot"></span>
+                TEACHER ATTENDANCE ANALYTICS
+            </div>
+
+            <h1>Rekapitulasi <span>Absensi Guru.</span></h1>
+            <p>
+                Pantau kedisiplinan, kehadiran, dan riwayat aktivitas
+                presensi guru dalam satu tampilan.
+            </p>
+        </div>
+
+        <div class="ra-period-box">
+            <div class="ra-period-icon">
+                <i class="fa-regular fa-calendar-days"></i>
+            </div>
+            <div class="ra-period-info">
+                <small>PERIODE TERPILIH</small>
+                <strong>{{ nama_bulan_terpilih }} {{ filter_tahun }}</strong>
+                <span>{{ label_tp }}</span>
+            </div>
+            <button type="button" id="btn-pilih-bulan-tahun" class="ra-period-change">
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+
+            <div id="kalenderBulanTahunHP" class="ra-period-popover">
+                <div class="ra-popover-head">
+                    <strong>Pilih Periode</strong>
+                    <button type="button" id="ra-close-period">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-                <div class="col-auto">
-                    <select name="bulan" id="filterBulanSelect" class="filter-select" onchange="this.form.submit()">
+                <form method="GET" id="formFilterUtama">
+                    <label for="filterBulanSelect">Bulan</label>
+                    <select name="filter_bulan" id="filterBulanSelect">
                         {% set bulan_list = [
-                            ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
-                            ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
-                            ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
+                            'Januari', 'Februari', 'Maret', 'April',
+                            'Mei', 'Juni', 'Juli', 'Agustus',
+                            'September', 'Oktober', 'November', 'Desember'
                         ] %}
-                        {% for val, nama in bulan_list %}
-                        <option value="{{val}}" {% if val|int == filter_bulan %}selected{% endif %}>
-                            {{nama}}
+                        {% for i in range(1, 13) %}
+                        <option value="{{ i }}" {% if filter_bulan|int == i %}selected{% endif %}>
+                            {{ bulan_list[i-1] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="filterTahunSelect">Tahun</label>
+                    <select name="filter_tahun" id="filterTahunSelect">
+                        {% for tahun in range(filter_tahun|int - 4, filter_tahun|int + 2) %}
+                        <option value="{{ tahun }}" {% if filter_tahun|int == tahun %}selected{% endif %}>
+                            {{ tahun }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="ra-apply-period">
+                        Terapkan Periode
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- HERO ANALYTICS -->
+    <section class="ra-hero">
+        <div class="ra-hero-decoration ra-decoration-one"></div>
+        <div class="ra-hero-decoration ra-decoration-two"></div>
+        <div class="ra-hero-grid"></div>
+
+        <div class="ra-hero-main">
+            <div class="ra-hero-label">
+                <span class="ra-live-dot"></span>
+                ATTENDANCE PERFORMANCE
+            </div>
+
+            <div class="ra-hero-title">
+                <span>Persentase Kehadiran</span>
+                <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+
+            <div class="ra-hero-score">
+                <strong class="ra-count" data-count="{{ persen_hadir|default(0)|float }}">
+                    {{ persen_hadir|default(0) }}%
+                </strong>
+                <span>tepat waktu</span>
+            </div>
+
+            <div class="ra-hero-progress">
+                <div class="ra-hero-progress-fill"
+                     data-progress="{{ persen_hadir|default(0)|float }}"
+                     style="width: {{ persen_hadir|default(0)|float }}%">
+                </div>
+            </div>
+
+            <div class="ra-hero-foot">
+                <span><i class="fa-solid fa-calendar-check"></i> {{ total_hari|default(0) }} hari tercatat</span>
+                <span>{{ nama_bulan_terpilih }} {{ filter_tahun }}</span>
+            </div>
+        </div>
+
+        <div class="ra-hero-ring-wrap">
+            <div class="ra-ring"
+                 style="--ra-progress: {{ persen_hadir|default(0)|float }}%">
+                <div class="ra-ring-inner">
+                    <i class="fa-solid fa-award"></i>
+                    <strong>{{ persen_hadir|default(0) }}%</strong>
+                    <span>ON TIME</span>
+                </div>
+            </div>
+            <div class="ra-ring-caption">
+                <strong>Disiplin Kehadiran</strong>
+                <span>Performa periode ini</span>
+            </div>
+        </div>
+
+        <div class="ra-hero-watermark">SMPU</div>
+    </section>
+
+    <!-- KPI GRID -->
+    <section class="ra-kpi-layout">
+        <div class="ra-section-heading">
+            <div>
+                <span class="ra-section-kicker">OVERVIEW</span>
+                <h2>Ringkasan Kehadiran</h2>
+                <p>Statistik presensi pada periode terpilih.</p>
+            </div>
+            <span class="ra-period-chip">
+                <i class="fa-regular fa-calendar"></i>
+                {{ nama_bulan_terpilih }} {{ filter_tahun }}
+            </span>
+        </div>
+
+        <div class="ra-kpi-grid">
+            <article class="ra-kpi-card ra-kpi-present">
+                <div class="ra-kpi-top">
+                    <div class="ra-kpi-icon"><i class="fa-solid fa-user-check"></i></div>
+                    <span class="ra-kpi-tag">ON TIME</span>
+                </div>
+                <div class="ra-kpi-number ra-count" data-count="{{ jml_hadir|default(0) }}">
+                    {{ jml_hadir|default(0) }}
+                </div>
+                <div class="ra-kpi-label">Hadir Tepat Waktu</div>
+                <div class="ra-kpi-bottom">
+                    <span>Presensi sesuai jadwal</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </div>
+            </article>
+
+            <article class="ra-kpi-card ra-kpi-late">
+                <div class="ra-kpi-top">
+                    <div class="ra-kpi-icon"><i class="fa-solid fa-clock"></i></div>
+                    <span class="ra-kpi-tag">LATE</span>
+                </div>
+                <div class="ra-kpi-number ra-count" data-count="{{ jml_terlambat|default(0) }}">
+                    {{ jml_terlambat|default(0) }}
+                </div>
+                <div class="ra-kpi-label">Terlambat</div>
+                <div class="ra-kpi-bottom">
+                    <span>Presensi melewati jadwal</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </div>
+            </article>
+
+            <article class="ra-kpi-card ra-kpi-leave">
+                <div class="ra-kpi-top">
+                    <div class="ra-kpi-icon"><i class="fa-solid fa-calendar-minus"></i></div>
+                    <span class="ra-kpi-tag">ABSENCE</span>
+                </div>
+                <div class="ra-kpi-number ra-count" data-count="{{ jml_izin|default(0) }}">
+                    {{ jml_izin|default(0) }}
+                </div>
+                <div class="ra-kpi-label">Izin / Sakit</div>
+                <div class="ra-kpi-bottom">
+                    <span>Ketidakhadiran tercatat</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- INSIGHT -->
+    <section class="ra-insight-card">
+        <div class="ra-insight-copy">
+            <div class="ra-section-kicker">ATTENDANCE INSIGHT</div>
+            <h2>Gambaran Presensi</h2>
+            <p>
+                Distribusi kehadiran berdasarkan data presensi yang tercatat
+                pada periode ini.
+            </p>
+            <div class="ra-insight-total">
+                <strong>{{ total_hari|default(0) }}</strong>
+                <span>Total hari tercatat</span>
+            </div>
+        </div>
+
+        <div class="ra-insight-chart">
+            <div class="ra-donut"
+                 id="raDonut"
+                 data-hadir="{{ jml_hadir|default(0) }}"
+                 data-terlambat="{{ jml_terlambat|default(0) }}"
+                 data-izin="{{ jml_izin|default(0) }}">
+                <div class="ra-donut-center">
+                    <strong id="raDonutTotal">0</strong>
+                    <span>AKTIVITAS</span>
+                </div>
+            </div>
+            <div class="ra-legend">
+                <div><span class="ra-legend-dot present"></span><span>Hadir tepat waktu</span><strong>{{ jml_hadir|default(0) }}</strong></div>
+                <div><span class="ra-legend-dot late"></span><span>Terlambat</span><strong>{{ jml_terlambat|default(0) }}</strong></div>
+                <div><span class="ra-legend-dot leave"></span><span>Izin / Sakit</span><strong>{{ jml_izin|default(0) }}</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="ra-history-card">
+        <div class="ra-history-header">
+            <div>
+                <span class="ra-section-kicker">ATTENDANCE LOG</span>
+                <h2>Riwayat Kehadiran</h2>
+                <p>Detail aktivitas presensi pada bulan terpilih.</p>
+            </div>
+            <div class="ra-history-count">
+                <strong>{{ riwayat_bulan_ini|length }}</strong>
+                <span>DATA</span>
+            </div>
+        </div>
+
+        <div class="ra-table-toolbar">
+            <div class="ra-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="raSearch" placeholder="Cari tanggal, status, keterangan...">
+            </div>
+            <select id="raStatusFilter" class="ra-status-filter">
+                <option value="">Semua Status</option>
+                <option value="hadir">Hadir</option>
+                <option value="terlambat">Terlambat</option>
+                <option value="izin">Izin</option>
+                <option value="sakit">Sakit</option>
+            </select>
+        </div>
+
+        <div class="ra-table-wrap">
+            <table class="ra-table">
+                <thead>
+                    <tr>
+                        <th>TANGGAL</th>
+                        <th>JAM MASUK</th>
+                        <th>JAM PULANG</th>
+                        <th>STATUS</th>
+                        <th>KETERANGAN</th>
+                    </tr>
+                </thead>
+                <tbody id="raTableBody">
+                    {% for item in riwayat_bulan_ini %}
+                    <tr data-status="{{ item.status|lower }}">
+                        <td>
+                            <div class="ra-date-cell">
+                                <span class="ra-date-icon"><i class="fa-regular fa-calendar"></i></span>
+                                <strong>{{ item.tanggal.strftime('%d/%m/%Y') }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="ra-time">
+                                <i class="fa-regular fa-clock"></i>
+                                {{ item.jam_masuk or '—' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="ra-time">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                {{ item.jam_pulang or '—' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if item.status == 'hadir' %}
+                                <span class="ra-status status-hadir"><i class="fa-solid fa-circle-check"></i> Hadir</span>
+                            {% elif item.status == 'terlambat' %}
+                                <span class="ra-status status-terlambat"><i class="fa-solid fa-clock"></i> Terlambat</span>
+                            {% elif item.status == 'izin' %}
+                                <span class="ra-status status-izin"><i class="fa-solid fa-envelope"></i> Izin</span>
+                            {% elif item.status == 'sakit' %}
+                                <span class="ra-status status-sakit"><i class="fa-solid fa-heart-pulse"></i> Sakit</span>
+                            {% else %}
+                                <span class="ra-status status-other">{{ item.status|replace('_', ' ')|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="ra-description">{{ item.keterangan or '—' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="ra-empty">
+                                <div><i class="fa-regular fa-folder-open"></i></div>
+                                <strong>Belum ada data presensi</strong>
+                                <span>Tidak ada riwayat untuk periode yang dipilih.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div id="raNoResult" class="ra-no-result" hidden>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Tidak ada data yang sesuai dengan pencarian.
+            </div>
+        </div>
+        <div class="ra-table-footer">
+            <span>Menampilkan data periode <strong>{{ nama_bulan_terpilih }} {{ filter_tahun }}</strong></span>
+            <span><i class="fa-solid fa-shield-halved"></i> Data presensi tersimpan</span>
+        </div>
+    </section>
+
+    <!-- EXPORT CENTER -->
+    <section class="ra-export-card">
+        <div class="ra-export-decoration"></div>
+        <div class="ra-export-intro">
+            <div class="ra-export-icon"><i class="fa-solid fa-file-export"></i></div>
+            <div>
+                <span class="ra-section-kicker">REPORT CENTER</span>
+                <h2>Export Laporan</h2>
+                <p>Unduh rekapitulasi absensi untuk kebutuhan administrasi dan dokumentasi.</p>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('absensi_guru.export_rekap_absensi') }}" class="ra-export-form">
+            <input type="hidden" name="jenis_export" id="jenisExport" value="perbulan">
+
+            <div class="ra-export-select-wrap">
+                <label>Jenis Laporan</label>
+                <div class="ra-export-select" id="exportSelectTrigger" tabindex="0" role="button" aria-expanded="false">
+                    <span><i class="fa-regular fa-calendar"></i> <b id="exportSelectLabel">Rekap Bulanan</b></span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="ra-export-dropdown" id="exportSelectDropdown">
+                    <button type="button" data-value="perbulan" data-label="Rekap Bulanan">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span><strong>Rekap Bulanan</strong><small>Unduh satu bulan tertentu</small></span>
+                    </button>
+                    <button type="button" data-value="semua" data-label="Semua Data">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span><strong>Semua Data</strong><small>Unduh seluruh riwayat tersedia</small></span>
+                    </button>
+                    <button type="button" data-value="rentang" data-label="Rentang Bulan">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span><strong>Rentang Bulan</strong><small>Unduh berdasarkan periode pilihan</small></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ra-export-fields">
+                <div class="ra-export-field perbulan-field">
+                    <label>Bulan</label>
+                    <select name="bulan_pilih">
+                        {% for i in range(1, 13) %}
+                        <option value="{{ i }}" {% if filter_bulan|int == i %}selected{% endif %}>
+                            {{ bulan_list[i-1] if bulan_list is defined else i }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-auto">
-                    <label class="filter-label"><i class="fas fa-calendar-check me-1"></i> Tahun:</label>
+                <div class="ra-export-field perbulan-field">
+                    <label>Tahun</label>
+                    <input type="number" name="tahun_pilih" value="{{ filter_tahun }}" min="2000" max="2100">
                 </div>
-                <div class="col-auto">
-                    <select name="tahun" id="filterTahunSelect" class="filter-select" onchange="this.form.submit()">
-                        {% set thn_sekarang = filter_tahun %}
-                        {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
-                        <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
+
+                <div class="ra-export-field semua-field" hidden>
+                    <label>Tahun awal data</label>
+                    <input type="number" name="tahun_semua" value="{{ filter_tahun }}" min="2000" max="2100">
+                </div>
+
+                <div class="ra-export-field rentang-field" hidden>
+                    <label>Bulan awal</label>
+                    <select name="bulan_awal">
+                        {% for i in range(1, 13) %}
+                        <option value="{{ i }}" {% if filter_bulan|int == i %}selected{% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            </form>
-        </div>
-    </div>
-    <div class="hp-datetime-bar">
-        <div class="hp-time-display"></div>
-        <div class="hp-date-selector">
-            <span class="hp-date-text" id="hp-bulan-tahun-teks">{{nama_bulan_terpilih}} {{filter_tahun}}</span>
-            <button class="hp-calendar-btn" id="btn-pilih-bulan-tahun">
-                <i class="fas fa-calendar-alt"></i>
+                <div class="ra-export-field rentang-field" hidden>
+                    <label>Tahun awal</label>
+                    <input type="number" name="tahun_awal" value="{{ filter_tahun }}" min="2000" max="2100">
+                </div>
+                <div class="ra-export-field rentang-field" hidden>
+                    <label>Bulan akhir</label>
+                    <select name="bulan_akhir" {% if false %}disabled{% endif %}>
+                        {% for i in range(1, 13) %}
+                        <option value="{{ i }}" {% if filter_bulan|int == i %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="ra-export-field rentang-field" hidden>
+                    <label>Tahun akhir</label>
+                    <input type="number" name="tahun_akhir" value="{{ filter_tahun }}" min="2000" max="2100">
+                </div>
+            </div>
+
+            <button type="submit" class="ra-export-button">
+                <i class="fa-solid fa-download"></i>
+                Unduh Laporan
+                <i class="fa-solid fa-arrow-right"></i>
             </button>
-            <div id="kalenderBulanTahunHP" class="kalender-bulan-tahun-popup"></div>
+        </form>
+        <div class="ra-export-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Laporan akan diproses sesuai jenis dan periode yang dipilih.
         </div>
-    </div>
-    <!-- === KARTU RINGKASAN STATISTIK — TANPA ALFA === -->
-    <div class="row g-4 mb-5">
-        <!-- HADIR TEPAT WAKTU -->
-        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-            <div class="stat-card stat-hadir">
-                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                <div class="stat-content">
-                    <p class="stat-label">Hadir Tepat Waktu</p>
-                    <h3 class="stat-value">{{jml_hadir}}</h3>
-                    <p class="stat-unit">hari</p>
-                </div>
-            </div>
-        </div>
-        <!-- TERLAMBAT -->
-        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-            <div class="stat-card stat-terlambat">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-content">
-                    <p class="stat-label">Terlambat</p>
-                    <h3 class="stat-value">{{jml_terlambat}}</h3>
-                    <p class="stat-unit">hari</p>
-                </div>
-            </div>
-        </div>
-        <!-- IZIN/SAKIT -->
-        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-            <div class="stat-card stat-izin">
-                <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="stat-content">
-                    <p class="stat-label">Izin / Sakit</p>
-                    <h3 class="stat-value">{{jml_izin}}</h3>
-                    <p class="stat-unit">hari</p>
-                </div>
-            </div>
-        </div>
-        <!-- PERSENTASE KEHADIRAN -->
-        <div class="col-xl-3 col-md-12 col-sm-12">
-            <div class="stat-card stat-persen">
-                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                <div class="stat-content">
-                    <p class="stat-label">Persentase Tepat Waktu</p>
-                    <h2 class="stat-value-big">{{persen_hadir}}%</h2>
-                    <p class="stat-unit">Dari {{total_hari}} hari tercatat</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- === TABEL RIWAYAT ABSENSI === -->
-    <div class="table-card">
-        <div class="table-header">
-            <h6 class="table-title"><i class="fas fa-list-alt me-2"></i>Riwayat Absensi {{nama_bulan_terpilih}} {{filter_tahun}}</h6>
-            <span class="table-badge"><i class="fas fa-database me-1"></i> {{riwayat_bulan_ini|length}} Data</span>
-        </div>
-        <div class="table-body">
-            <div class="table-responsive">
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <!-- ✅ Ikon + Teks TETAP 1 BARIS, tidak dipisah -->
-                            <th class="th-tanggal"><i class="fas fa-calendar-day me-1"></i> Tanggal</th>
-                            <th class="th-jam"><i class="fas fa-sign-in-alt me-1"></i> Masuk</th>
-                            <th class="th-jam"><i class="fas fa-sign-out-alt me-1"></i> Pulang</th>
-                            <th class="th-status"><i class="fas fa-tag me-1"></i> Status</th>
-                            <th class="th-ket"><i class="fas fa-sticky-note me-1"></i> Keterangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if riwayat_bulan_ini %}
-                            {% for item in riwayat_bulan_ini %}
-                            <tr>
-                                <td class="td-tanggal">{{ item.tanggal.strftime('%d/%m/%Y') }}</td>
-                                <td class="td-jam">{{ item.jam_masuk or '-' }}</td>
-                                <td class="td-jam">{{ item.jam_pulang or '-' }}</td>
-                                <td>
-                                    {% set status_class = {
-                                        'hadir': 'badge-hadir',
-                                        'terlambat': 'badge-terlambat',
-                                        'izin': 'badge-izin',
-                                        'sakit': 'badge-sakit',
-                                    } %}
-                                    {% set badge_class = status_class.get(item.status, 'badge-default') %}
-                                    <span class="status-badge {{ badge_class }}">
-                                        {{ item.status|upper }}
-                                    </span>
-                                </td>
-                                <td class="td-keterangan">{{ item.keterangan or '-' }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="td-empty">
-                                    <i class="fas fa-inbox me-2"></i> Belum ada data absensi untuk bulan ini
-                                </td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <!-- === 📤 CARD EXPORT REKAPITULASI === -->
-    <div class="export-card mb-5">
-        <div class="export-card-decoration"></div>
-        <div class="export-card-body">
-            <div class="export-header">
-                <div class="export-icon-wrap">
-                    <i class="fas fa-file-excel"></i>
-                </div>
-                <div class="export-heading">
-                    <h5 class="export-title">Export Rekapitulasi Absensi</h5>
-                    <p class="export-subtitle">Unduh data dalam format Excel (.xlsx)</p>
-                </div>
-            </div>
-            <form action="{{ url_for('absensi_guru.export_rekap_absensi') }}" method="post" id="exportForm">
-                <input type="hidden" name="jenis_export" id="jenis_export" value="perbulan">
-                <div class="export-form-grid">
-                    <!-- PILIHAN JENIS EXPORT -->
-                    <div class="form-group-wrap">
-                        <label class="form-label-export">
-                            <i class="fas fa-cog me-2"></i>Jenis Export
-                        </label>
-                        <div class="custom-select-trigger" id="exportSelectTrigger" onclick="toggleCustomSelect()">
-                            <span class="trigger-icon"><i class="fas fa-calendar"></i></span>
-                            <span class="trigger-text">Per Bulan</span>
-                            <i class="fas fa-chevron-down trigger-arrow"></i>
-                        </div>
-                        <div class="custom-select-dropdown" id="exportSelectDropdown">
-                            <div class="custom-option active" data-value="perbulan" data-icon="fa-calendar" data-text="Per Bulan" onclick="selectExportOption(this)">
-                                <i class="fas fa-calendar option-icon"></i>
-                                <span>Per Bulan</span>
-                            </div>
-                            <div class="custom-option" data-value="semua" data-icon="fa-calendar-check" data-text="Semua Bulan" onclick="selectExportOption(this)">
-                                <i class="fas fa-calendar-check option-icon"></i>
-                                <span>Semua Bulan</span>
-                            </div>
-                            <div class="custom-option" data-value="rentang" data-icon="fa-arrows-left-right-to-line" data-text="Rentang Bulan & Tahun" onclick="selectExportOption(this)">
-                                <i class="fas fa-arrows-left-right-to-line option-icon"></i>
-                                <span>Rentang Bulan & Tahun</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- === PER BULAN: PILIH BULAN + TAHUN === -->
-                    <div class="form-group-wrap perbulan-field" id="group_perbulan_bulan">
-                        <label class="form-label-export">
-                            <i class="fas fa-calendar-day me-2"></i>Pilih Bulan
-                        </label>
-                        <select name="bulan_pilih" class="form-select-export">
-                            {% set bulan_list = [
-                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
-                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
-                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
-                            ] %}
-                            {% for val, nama in bulan_list %}
-                            <option value="{{val}}" {% if val|int == filter_bulan %}selected{% endif %}>{{nama}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group-wrap perbulan-field" id="group_perbulan_tahun">
-                        <label class="form-label-export">
-                            <i class="fas fa-calendar-alt me-2"></i>Tahun
-                        </label>
-                        <select name="tahun_pilih" class="form-select-export">
-                            {% set thn_sekarang = filter_tahun %}
-                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
-                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <!-- === SEMUA BULAN: PILIH TAHUN === -->
-                    <div class="form-group-wrap semua-field" id="group_semua_tahun">
-                        <label class="form-label-export">
-                            <i class="fas fa-calendar-check me-2"></i>Tahun
-                        </label>
-                        <select name="tahun_semua" class="form-select-export">
-                            {% set thn_sekarang = filter_tahun %}
-                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
-                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <!-- === RENTANG: DARI BULAN + TAHUN === -->
-                    <div class="form-group-wrap rentang-field" id="group_bulan_awal">
-                        <label class="form-label-export">
-                            <i class="fas fa-arrow-right-from-bracket me-2"></i>Dari Bulan
-                        </label>
-                        <select name="bulan_awal" class="form-select-export">
-                            {% set bulan_list = [
-                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
-                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
-                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
-                            ] %}
-                            {% for val, nama in bulan_list %}
-                            <option value="{{val}}">{{nama}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group-wrap rentang-field" id="group_tahun_awal">
-                        <label class="form-label-export">
-                            <i class="fas fa-calendar me-2"></i>Tahun Awal
-                        </label>
-                        <select name="tahun_awal" class="form-select-export">
-                            {% set thn_sekarang = filter_tahun %}
-                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
-                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group-wrap rentang-field" id="group_bulan_akhir">
-                        <label class="form-label-export">
-                            <i class="fas fa-arrow-right-to-bracket me-2"></i>Sampai Bulan
-                        </label>
-                        <select name="bulan_akhir" class="form-select-export">
-                            {% set bulan_list = [
-                                ('01','Januari'),('02','Pebruari'),('03','Maret'),('04','April'),
-                                ('05','Mei'),('06','Juni'),('07','Juli'),('08','Agustus'),
-                                ('09','September'),('10','Oktober'),('11','Nopember'),('12','Desember')
-                            ] %}
-                            {% for val, nama in bulan_list %}
-                            <option value="{{val}}" {% if val == '12' %}selected{% endif %}>{{nama}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group-wrap rentang-field" id="group_tahun_akhir">
-                        <label class="form-label-export">
-                            <i class="fas fa-calendar me-2"></i>Tahun Akhir
-                        </label>
-                        <select name="tahun_akhir" class="form-select-export">
-                            {% set thn_sekarang = filter_tahun %}
-                            {% for t in range(thn_sekarang-2, thn_sekarang+3) %}
-                            <option value="{{t}}" {% if t == filter_tahun %}selected{% endif %}>{{t}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <!-- TOMBOL EXPORT -->
-                    <div class="form-group-wrap btn-wrap">
-                        <button type="submit" class="btn-export-xl">
-                            <span class="btn-icon"><i class="fas fa-download"></i></span>
-                            <span class="btn-text">Unduh Excel</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+    </section>
+
 </div>
-<!-- === JAVASCRIPT === -->
-<script>
-function toggleCustomSelect() {
-    const trigger = document.getElementById('exportSelectTrigger');
-    const dropdown = document.getElementById('exportSelectDropdown');
-    const wrap = document.querySelector('.form-group-wrap');
-    if (dropdown.classList.contains('open')) {
-        trigger.classList.remove('open');
-        dropdown.classList.remove('open');
-        setTimeout(() => {
-            dropdown.classList.remove('up', 'down');
-            dropdown.style.top = '';
-            dropdown.style.bottom = '';
-        }, 350);
-    } else {
-        const rect = wrap.getBoundingClientRect();
-        const ruangBawah = window.innerHeight - rect.bottom;
-        const tinggiDaftar = 200;
-        trigger.classList.add('open');
-        dropdown.classList.add('open');
-        if (ruangBawah < tinggiDaftar) {
-            dropdown.classList.remove('down');
-            dropdown.classList.add('up');
-            dropdown.style.top = 'auto';
-            dropdown.style.bottom = 'calc(100% + 4px)';
-        } else {
-            dropdown.classList.remove('up');
-            dropdown.classList.add('down');
-            dropdown.style.top = 'calc(100% + 4px)';
-            dropdown.style.bottom = 'auto';
-        }
-    }
-}
-function selectExportOption(el) {
-    document.getElementById('exportSelectTrigger').classList.remove('open');
-    document.getElementById('exportSelectDropdown').classList.remove('open');
-    setTimeout(() => {
-        document.getElementById('exportSelectDropdown').classList.remove('up', 'down');
-        document.getElementById('exportSelectDropdown').style.top = '';
-        document.getElementById('exportSelectDropdown').style.bottom = '';
-    }, 350);
-    document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('active'));
-    el.classList.add('active');
-    const value = el.dataset.value;
-    const icon = el.dataset.icon;
-    const text = el.dataset.text;
-    document.querySelector('.trigger-icon i').className = `fas ${icon}`;
-    document.querySelector('.trigger-text').textContent = text;
-    document.getElementById('jenis_export').value = value;
-    tampilkanFieldSesuaiJenis(value);
-}
-function tampilkanFieldSesuaiJenis(jenis) {
-    const perbulan = document.querySelectorAll('.perbulan-field');
-    const semua = document.querySelectorAll('.semua-field');
-    const rentang = document.querySelectorAll('.rentang-field');
-    [perbulan, semua, rentang].forEach(grup => {
-        grup.forEach(el => {
-            el.classList.remove('active');
-        });
-    });
-    if (jenis === 'perbulan') {
-        perbulan.forEach(el => el.classList.add('active'));
-    } else if (jenis === 'semua') {
-        semua.forEach(el => el.classList.add('active'));
-    } else if (jenis === 'rentang') {
-        rentang.forEach(el => el.classList.add('active'));
-    }
-}
-document.addEventListener('click', function(e) {
-    const trigger = document.getElementById('exportSelectTrigger');
-    const dropdown = document.getElementById('exportSelectDropdown');
-    if (!e.target.closest('.form-group-wrap')) {
-        trigger.classList.remove('open');
-        dropdown.classList.remove('open');
-        setTimeout(() => {
-            dropdown.classList.remove('up', 'down');
-            dropdown.style.top = '';
-            dropdown.style.bottom = '';
-        }, 350);
-    }
-});
-document.addEventListener('DOMContentLoaded', () => {
-    tampilkanFieldSesuaiJenis('perbulan');
-});
 
-// === KALENDER PILIH BULAN/TAHUN HANYA BAGIAN HP ===
-document.addEventListener('DOMContentLoaded', function () {
-    const bulanNama = [
-        'Januari', 'Pebruari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'Nopember', 'Desember'
-    ];
-
-    // Ambil nilai dari variabel Jinja — aman
-    let tampilanAwal = { 
-        bulan: {{filter_bulan}}, 
-        tahun: {{filter_tahun}} 
-    };
-
-    // Elemen yang BENAR-BENAR ADA di halaman
-    const teksHP = document.getElementById('hp-bulan-tahun-teks');
-    const btnBukaHP = document.getElementById('btn-pilih-bulan-tahun');
-    const popupKalenderHP = document.getElementById('kalenderBulanTahunHP');
-    const selectBulan = document.getElementById('filterBulanSelect');
-    const selectTahun = document.getElementById('filterTahunSelect');
-    const formFilter = document.getElementById('formFilterUtama');
-
-    function perbaruiTeks() {
-        const namaBulan = bulanNama[tampilanAwal.bulan - 1];
-        const teks = `${namaBulan} ${tampilanAwal.tahun}`;
-        if (teksHP) teksHP.textContent = teks;
-    }
-
-    function tampilkanKalender(container) {
-        const tahun = tampilanAwal.tahun;
-        const bulanAktif = tampilanAwal.bulan - 1;
-        let html = `
-            <div class="calendar-header">
-                <button type="button" class="calendar-nav prev">&larr;</button>
-                <div class="calendar-title">${tahun}</div>
-                <button type="button" class="calendar-nav next">&rarr;</button>
-            </div>
-            <div class="calendar-months">
-        `;
-        bulanNama.forEach((nama, indeks) => {
-            const aktif = indeks === bulanAktif ? 'active' : '';
-            html += `<div class="month-item ${aktif}" data-bulan="${indeks + 1}">${nama}</div>`;
-        });
-        html += `</div>`;
-        container.innerHTML = html;
-
-        // Navigasi Tahun
-        container.querySelector('.prev').onclick = e => {
-            e.stopPropagation();
-            tampilanAwal.tahun--;
-            tampilkanKalender(container);
-        };
-        container.querySelector('.next').onclick = e => {
-            e.stopPropagation();
-            tampilanAwal.tahun++;
-            tampilkanKalender(container);
-        };
-        container.querySelector('.calendar-title').onclick = e => {
-            e.stopPropagation();
-            tampilkanPemilihTahun(container);
-        };
-
-        // ✅ SAAT PILIH BULAN → UBAH SELECT DI FORM LALAN SUBMIT
-        container.querySelectorAll('.month-item').forEach(el => {
-            el.onclick = e => {
-                e.stopPropagation();
-                const bulanTerpilih = parseInt(el.dataset.bulan);
-                const tahunTerpilih = tampilanAwal.tahun;
-
-                // Ubah nilai di <select> yang sudah ada di halaman
-                if (selectBulan) selectBulan.value = String(bulanTerpilih).padStart(2, '0');
-                if (selectTahun) selectTahun.value = tahunTerpilih;
-
-                perbaruiTeks();
-                tutupKalender();
-
-                // Kirim form → halaman refresh dengan bulan/tahun baru
-                if (formFilter) formFilter.submit();
-            };
-        });
-    }
-
-    function tampilkanPemilihTahun(container) {
-        const mulai = Math.floor(tampilanAwal.tahun / 10) * 10;
-        const akhir = mulai + 9;
-        let html = `
-            <div class="calendar-header">
-                <button type="button" class="calendar-nav prev">&larr;</button>
-                <div class="calendar-title">${mulai} - ${akhir}</div>
-                <button type="button" class="calendar-nav next">&rarr;</button>
-            </div>
-            <div class="calendar-years">
-        `;
-        for (let t = mulai; t <= akhir; t++) {
-            const aktif = t === tampilanAwal.tahun ? 'active' : '';
-            html += `<div class="year-item ${aktif}" data-tahun="${t}">${t}</div>`;
-        }
-        html += `</div>`;
-        container.innerHTML = html;
-
-        container.querySelector('.prev').onclick = e => {
-            e.stopPropagation();
-            container.querySelectorAll('.year-item').forEach(y => {
-                y.dataset.tahun = parseInt(y.dataset.tahun) - 10;
-                y.textContent = parseInt(y.textContent) - 10;
-            });
-        };
-        container.querySelector('.next').onclick = e => {
-            e.stopPropagation();
-            container.querySelectorAll('.year-item').forEach(y => {
-                y.dataset.tahun = parseInt(y.dataset.tahun) + 10;
-                y.textContent = parseInt(y.textContent) + 10;
-            });
-        };
-        container.querySelectorAll('.year-item').forEach(el => {
-            el.onclick = e => {
-                e.stopPropagation();
-                tampilanAwal.tahun = parseInt(el.dataset.tahun);
-                tampilkanKalender(container);
-            };
-        });
-    }
-
-    function tutupKalender() {
-        popupKalenderHP?.classList.remove('buka');
-    }
-
-    // Buka kalender saat tombol diklik
-    if (btnBukaHP && popupKalenderHP) {
-        btnBukaHP.onclick = e => {
-            e.stopPropagation();
-            const sedangBuka = popupKalenderHP.classList.contains('buka');
-            tutupKalender();
-            if (!sedangBuka) {
-                tampilkanKalender(popupKalenderHP);
-                popupKalenderHP.classList.add('buka');
-            }
-        };
-    }
-
-    // Tutup saat klik di luar
-    document.addEventListener('click', e => {
-        if (!e.target.closest('.hp-date-selector')) {
-            tutupKalender();
-        }
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='js/absensi/rekap_absensi.js') }}" defer></script>
 {% endblock %}

@@ -1,1858 +1,554 @@
-/* =====================================================
-   REKAPITULASI ABSENSI — TEMA MODERN WARNA PENUH
-   SEMUA IKON: FONT AWESOME (fas fa-...)
-   ===================================================== */
-/* -- Animasi Muncul -- */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-  50% { box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-  100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-}
-/* -- Judul Halaman -- */
-.page-header {
-  animation: fadeInUp 0.6s ease-out;
-}
-.page-header h3 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-}
-
-.page-header i {
-  -webkit-text-fill-color: #4f46e5;
-  color: #4f46e5;
-}
-
-.page-header p {
-    color: #64748b;
-    margin: 8px 0 0;
-    font-size: 14px;
-}
-/* -- Kartu Filter -- */
-.filter-card {
-  background: linear-gradient(135deg, #f6f8fb 0%, #eef2f7 100%);
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  padding: 1.25rem 1.5rem;
-  animation: fadeInUp 0.7s ease-out;
-}
-.filter-body { padding: 0; }
-.filter-label {
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-}
-.filter-select {
-  padding: 0.5rem 2rem 0.5rem 1rem;
-  border-radius: 10px;
-  border: 2px solid #e5e7eb;
-  background: #fff;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-.filter-select:focus {
-  outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-}
-/* -- KARTU STATISTIK BERWARNA — 4 KARTU -- */
-.stat-card {
-  border-radius: 20px;
-  padding: 1.5rem;
-  color: #fff;
-  border: none;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  animation: fadeInUp 0.8s ease-out;
-  position: relative;
-  overflow: hidden;
-}
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: -50%; right: -10%;
-  width: 120px; height: 120px;
-  background: rgba(255,255,255,0.12);
-  border-radius: 50%;
-}
-.stat-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
-}
-.stat-icon {
-  font-size: 2.2rem;
-  opacity: 0.92;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 14px;
-  flex-shrink: 0;
-}
-.stat-icon i {
-  line-height: 1;
-}
-.stat-content { flex: 1; min-width: 0; }
-.stat-label {
-  font-size: 0.85rem;
-  opacity: 0.85;
-  margin: 0 0 0.25rem 0;
-  font-weight: 500;
-  color: #f1f5f9;
-  line-height: 1.2;
-}
-.stat-value {
-  font-size: 2.2rem;
-  font-weight: 800;
-  line-height: 1;
-  margin: 0;
-}
-.stat-value-big {
-  font-size: 2.5rem;
-  font-weight: 800;
-  line-height: 1;
-  margin: 0;
-}
-.stat-unit {
-  font-size: 0.8rem;
-  opacity: 0.75;
-  margin: 0.25rem 0 0 0;
-  color: #f1f5f9;
-}
-/* WARNA PER KARTU — TANPA ALFA */
-.stat-hadir       { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-.stat-terlambat   { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-.stat-izin        { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-.stat-persen      { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
-/* -- KARTU TABEL -- */
-.table-card {
-  background: #fff;
-  border-radius: 20px;
-  border: none;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.07);
-  overflow: hidden;
-  animation: fadeInUp 0.9s ease-out;
-  margin-bottom: 1.5rem;
-}
-.table-header {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 1.25rem 1.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.table-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-.table-badge {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: #fff;
-  padding: 0.3rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-}
-.table-body { padding: 0; }
-/* -- TABEL -- */
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-}
-.custom-table thead {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-}
-.custom-table th {
-  padding: 1rem 1.25rem;
-  text-align: left;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: #334155;
-  border-bottom: 2px solid #cbd5e1;
-}
-.custom-table th i {
-  color: #6366f1;
-  font-size: 0.85rem;
-}
-.custom-table tbody tr {
-  border-bottom: 1px solid #f1f5f9;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-.custom-table tbody tr:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
-}
-.custom-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.92rem;
-  color: #475569;
-}
-
-.td-keterangan { color: #64748b; font-size: 0.88rem; }
-.td-empty {
-  text-align: center;
-  padding: 2.5rem !important;
-  color: #94a3b8 !important;
-  font-style: italic;
-}
-.td-empty i {
-  color: #cbd5e1;
-  font-size: 1.1rem;
-}
-/* -- BADGE STATUS -- */
-.status-badge {
-  display: inline-block;
-  padding: 0.35rem 0.9rem;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-.badge-hadir     { background: #d1fae5; color: #065f46; }
-.badge-terlambat { background: #fef3c7; color: #92400e; }
-.badge-izin      { background: #dbeafe; color: #1e40af; }
-.badge-sakit     { background: #e0e7ff; color: #3730a3; }
-.badge-alfa      { background: #fee2e2; color: #b91c1c; }
-.badge-default   { background: #f3f4f6; color: #4b5563; }
-/* -- RESPONSIF — DISESUAIKAN UNTUK 4 KARTU -- */
-@media (max-width: 1200px) {
-  .stat-value { font-size: 1.75rem; }
-  .stat-value-big { font-size: 2rem; }
-  .stat-label { font-size: 0.8rem; }
-}
-@media (max-width: 991px) {
-  .stat-value { font-size: 1.6rem; }
-  .stat-value-big { font-size: 1.85rem; }
-}
-@media (max-width: 767px) {
-  .page-title { 
-    font-size: 1.4rem;
-  }
-
-  .stat-unit {
-    display: none;
-  }
-  .stat-value { font-size: 1.8rem; }
-  .stat-value-big { font-size: 2rem; }
-  .custom-table th, .custom-table td {
-    padding: 0.75rem 0.55rem;
-    font-size: 0.85rem;
-  }
-}
-@media (max-width: 575px) {
-  .filter-card { padding: 1rem; }
-  .table-header {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-    padding: 0.75rem 1.25rem;
-  }
-  .stat-icon {
-    width: 52px;
-    height: 52px;
-    font-size: 1.8rem;
-    border-radius: 6px;
-  }
-}
-/* =====================================================
-   📤 EXPORT CARD — DESAIN PREMIUM MODERN
-   ===================================================== */
-.export-card {
-  position: relative;
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-  border-radius: 24px;
-  border: 1px solid rgba(16, 185, 129, 0.18);
-  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.12),
-              0 2px 12px rgba(0, 0, 0, 0.04);
-  padding: 2rem;
-  animation: fadeInUp 0.8s ease-out;
-}
-.export-card-decoration {
-  position: absolute;
-  top: -60px;
-  right: -40px;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.export-card-body {
-  position: relative;
-  z-index: 1;
-}
-.export-header {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 1.75rem;
-}
-.export-icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
-  flex-shrink: 0;
-}
-.export-icon-wrap i {
-  font-size: 1.85rem;
-  color: #fff;
-}
-.export-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #064e3b;
-  margin: 0 ;
-}
-.export-subtitle {
-  font-size: 14px;
-  color: #047857;
-  margin: 0;
-  opacity: 0.8;
-}
-.export-form-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  align-items: flex-end;
-  justify-content: flex-start;
-}
-.export-form-grid > .form-group-wrap {
-  flex: 0 0 auto;
-  min-width: 160px;
-}
-.export-form-grid > .btn-wrap {
-  flex: 0 0 auto;
-  min-width: 180px;
-}
-.perbulan-field,
-.semua-field,
-.rentang-field {
-  display: none;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-}
-.perbulan-field.active,
-.semua-field.active,
-.rentang-field.active {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-}
-.form-label-export {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #065f46;
-  margin-bottom: 0.5rem;
-}
-.form-label-export i {
-  font-size: 0.75rem;
-  opacity: 0.7;
-}
-.form-select-export {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  border-radius: 12px;
-  border: 2px solid #a7f3d0;
-  background: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #064e3b;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23059669' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 6l6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.85rem center;
-  background-size: 1.15em;
-}
-.form-select-export:hover {
-  border-color: #6ee7b7;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
-}
-.form-select-export:focus {
-  outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.18);
-  background-color: #f0fdf4;
-}
-.btn-wrap {
-  display: flex;
-  align-items: flex-end;
-}
-.btn-export-xl {
-  width: 100%;
-  height: 50px;
-  padding: 0 1.5rem;
-  border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  box-shadow: 0 8px 22px rgba(16, 185, 129, 0.35);
-  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-  position: relative;
-  overflow: hidden;
-}
-.btn-export-xl::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-  transition: left 0.5s ease;
-}
-.btn-export-xl:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.45);
-}
-.btn-export-xl:hover::before {
-  left: 100%;
-}
-.btn-export-xl:active {
-  transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
-}
-.btn-export-xl .btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.22);
-}
-.btn-export-xl .btn-icon i {
-  font-size: 0.95rem;
-}
-@media (max-width: 992px) {
-  .export-form-grid {
-    gap: 1rem;
-  }
-}
-@media (max-width: 640px) {
-  .export-card {
-    padding: 1.5rem 1.25rem;
-  }
-
-  .export-form-grid {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .export-icon-wrap {
-    width: 42px;
-    height: 42px;
-    border-radius: 8px;
-  }
-
-  .export-icon-wrap i {
-      font-size: 1.4rem;
-  }
-
-  .form-select-export,
-  .custom-select-trigger {
-    padding: 0.6rem 1rem !important;
-    border-radius: 8px !important;
-    border: 1px solid #a7f3d0 !important;
-  }
-
-  .custom-select-trigger.open {
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
-  }
-
-  .trigger-icon i {
-    font-size: 12px !important;
-  }
-
-  .trigger-icon {
-    width: 20px;
-    height: 20px;
-  }
-}
-/* =====================================================
-   📋 CUSTOM SELECT
-   ===================================================== */
-.custom-select-trigger {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  border: 2px solid #a7f3d0;
-  background: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #064e3b;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: all 0.3s ease;
-  user-select: none;
-  gap: 10px;
-}
-.custom-select-trigger:hover {
-  border-color: #6ee7b7;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
-}
-.custom-select-trigger.open {
-  border-color: #10b981;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.18);
-}
-.trigger-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  flex-shrink: 0;
-}
-.trigger-text {
-  flex: 1;
-}
-.trigger-arrow {
-  font-size: 0.85rem;
-  color: #059669;
-  transition: transform 0.3s ease;
-}
-.custom-select-trigger.open .trigger-arrow {
-  transform: rotate(180deg);
-}
-.custom-select-dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-top: 2px;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
-  z-index: 9999;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.35s ease, padding 0.2s ease, top 0.35s ease;
-}
-.custom-select-dropdown.open {
-  max-height: 300px;
-  padding: 0.5rem 0;
-  border-top: 2px solid #10b981;
-}
-.custom-select-dropdown.down {
-  top: 100%;
-  margin-top: 4px;
-}
-.custom-select-dropdown.up {
-  bottom: 100%;
-  top: auto;
-  margin-bottom: 4px;
-  margin-top: 0;
-  border-top: none;
-  border-bottom: none;
-}
-.custom-option {
-  padding: 0.7rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #064e3b;
-}
-.custom-option:hover {
-  background: #f0fdf4;
-  padding-left: 1.25rem;
-}
-.custom-option.active {
-  background: #d1fae5;
-  font-weight: 700;
-  color: #065f46;
-}
-.option-icon {
-  width: 20px;
-  text-align: center;
-  color: #059669;
-  font-size: 0.95rem;
-}
-.form-group-wrap {
-  position: relative;
-}
-
-.hp-datetime-bar,
-.hp-fixed-header {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .stat-hadir, .stat-terlambat, .stat-izin,
-    .filter-card,
-    .page-header,
-    .header {
-        display: none !important;
-    }
-
-    .col-sm-6 {
-        margin: 0 !important;
-    }
-    .mb-5 {
-        margin-bottom: 1rem !important;
-    }
-
-    .hp-datetime-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-
-    .hp-date-selector {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        position: relative;
-    }
-    .hp-date-text {
-        font-size: 12px;
-        font-weight: 500;
-        color: #0f172a;
-    }
-    .hp-calendar-btn {
-        width: 22px;
-        height: 22px;
-        border-radius: 4px;
-        border: none;
-        color: #2563eb;
-        font-size: 12px;
-        cursor: pointer !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-
-    .hp-calendar-btn:active {
-        transform: scale(0.92);
-        background: #bfdbfe;
-    }
-
-    #input-tanggal-pilih {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-    }
-
-    .table-title {
-      font-size: 13px;
-    }
-
-    .rekapitulasi-absensi-wrapper {
-        padding: 40px 0 70px 0 !important;
-    }
-
-    .hp-fixed-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 56px;
-        padding: 0 16px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        z-index: 950;
-    }
-
-    .header-judul-halaman {
-        font-size: 17px;
-        font-weight: 600;
-        color: #00152a;
-        margin: 0;
-        letter-spacing: 0.3px;
-    }
-
-    .header-keluar-btn {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #f87171;
-        font-size: 18px;
-        text-decoration: none;
-        border-radius: 10px;
-        transition: all 0.2s ease;
-    }
-
-    .header-keluar-btn:active {
-        background: rgba(220, 38, 38, 0.25);
-        transform: scale(0.94);
-    }
-
-    .stat-card,
-    .filter-card,
-    .table-card,
-    .export-card {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        border-radius: 6px;
-        gap: 1.5rem;
-        min-height: 10px !important;
-        border-radius: 6px !important;
-    }
-
-    .stat-card::before {
-      top: -30%;
-    }
-
-    .export-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .export-subtitle {
-      font-size: 12px;
-    }
-
-}
-
-/* =====================================================
-    🔧 PERBAIKAN LEBAR KONTEN SAMA DENGAN LAYAR
-   ===================================================== */
-
-/* Pastikan semua elemen hitung lebar dengan benar */
-*, *::before, *::after {
-    box-sizing: border-box !important;
-}
-
-html, body {
-    width: 100% !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Pembungkus utama — wajib sama lebar dengan header HP */
-.rekapitulasi-absensi-wrapper,
-.content-wrapper,
-.wrapper,
-.container,
-main {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-}
-
-/* ==========================================
-   PEMILIH BULAN & TAHUN — GAYA SESUAI GAMBAR
-========================================== */
-.bulan-tahun-pilih-wrapper {
-    position: relative;
-    display: inline-block;
-}
-
-.bulan-tahun-pilih-trigger {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-weight: 500;
-    color: #1e293b;
-    transition: all 0.2s;
-}
-
-.bulan-tahun-pilih-trigger:hover {
-    border-color: #cbd5e1;
-    background: #f8fafc;
-}
-
-.bulan-tahun-pilih-trigger i {
-    color: #64748b;
-}
-
-/* Popup Kalender Bulan+Tahun */
-.kalender-bulan-tahun-popup {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%) translateY(-8px);
-    width: 260px;
-    background: #fff;
-    border-radius: 0.5rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    border: 1px solid #e2e8f0;
-    padding: 0.7rem;
-    z-index: 999999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.25s ease;
-}
-
-.kalender-bulan-tahun-popup.buka {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-}
-
-/* Sesuaikan untuk HP */
-.hp-date-selector {
-    position: relative;
-}
-
-.hp-date-selector .kalender-bulan-tahun-popup {
-    left: auto;
-    right: 0;
-    transform: translateY(-8px);
-}
-
-.hp-date-selector .kalender-bulan-tahun-popup.buka {
-    transform: translateY(0);
-}
-
-/* =====================================================
-   📋 TABEL RIWAYAT ABSENSI — OPTIMASI KHUSUS HP
-   ===================================================== */
-
-/* Pastikan ikon + teks header TETAP 1 BARIS */
-.custom-table th {
-    white-space: nowrap !important;
-}
-.custom-table th i {
-    display: inline-block !important;
-    flex-shrink: 0;
-}
-
-/* Pembungkus tabel agar bisa digulir dengan halus */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* ===== KHUSUS LAYAR HP (di bawah 768px) ===== */
-@media (max-width: 767px) {
-    .custom-table {
-        min-width: 600px; /* Lebar minimal agar kolom tidak tumpang */
-    }
-
-    /* Atur lebar kolom agar seimbang & tidak terlalu sempit */
-    .custom-table th.th-tanggal  { width: 18%; min-width: 90px; }
-    .custom-table th.th-jam      { width: 16%; min-width: 80px; }
-    .custom-table th.th-status   { width: 22%; min-width: 100px; }
-    .custom-table th.th-ket      { width: 28%; min-width: 110px; }
-
-    /* Padding lebih lega tapi tidak berlebihan */
-    .custom-table th,
-    .custom-table td {
-        padding: 0.85rem 0.6rem !important;
-        font-size: 0.86rem !important;
-        line-height: 1.4 !important;
-    }
-
-    /* Ikon tetap kecil & rapi */
-    .custom-table th i {
-        font-size: 0.8rem !important;
-        margin-right: 3px !important;
-    }
-
-    /* Badge status tidak melebar */
-    .status-badge {
-        font-size: 0.72rem !important;
-        padding: 0.28rem 0.65rem !important;
-        white-space: nowrap;
-    }
-
-    /* Keterangan lebih ringkas */
-    .td-keterangan {
-        font-size: 0.8rem !important;
-    }
-}
-
-/* Layar HP sangat kecil */
-@media (max-width: 400px) {
-    .custom-table {
-        min-width: 560px;
-    }
-    .custom-table th,
-    .custom-table td {
-        padding: 0.75rem 0.45rem !important;
-        font-size: 0.8rem !important;
-    }
-    .status-badge {
-        padding: 0.22rem 0.5rem !important;
-    }
-}
-
-
 /* =========================================================
-   REKAP ABSENSI — PREMIUM SAAS UI OVERRIDES
-   Tempelkan di bagian paling bawah rekap_absensi.css
+   REKAP ABSENSI — EMERALD SIGNATURE / PREMIUM SAAS
    ========================================================= */
 
-.rekapitulasi-absensi-wrapper {
-    --rekap-primary: #087653;
-    --rekap-primary-dark: #064e3b;
-    --rekap-text: #172b22;
-    --rekap-muted: #718078;
-    --rekap-border: #e6ede8;
-    --rekap-surface: #ffffff;
-    color: var(--rekap-text);
+.ra-page {
+    --ra-emerald: #059669;
+    --ra-emerald-dark: #064e3b;
+    --ra-emerald-deep: #022c22;
+    --ra-mint: #a7f3d0;
+    --ra-text: #172b25;
+    --ra-muted: #82918b;
+    --ra-line: #e8efeb;
+    --ra-bg: #f5f8f6;
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    padding-bottom: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+    color: var(--ra-text);
+    font-family: Inter, "Segoe UI", sans-serif;
+    animation: raPageIn .65s cubic-bezier(.2,.7,.2,1) both;
 }
 
-.rekapitulasi-absensi-wrapper > * {
-    min-width: 0;
+@keyframes raPageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.rekapitulasi-absensi-wrapper .row {
-    --bs-gutter-x: 1.25rem;
-    --bs-gutter-y: 1.25rem;
-}
+.ra-page * { box-sizing: border-box; }
 
-/* ===== HEADER DESKTOP ===== */
+.ra-mobile-header { display: none; }
 
-.rekapitulasi-absensi-wrapper .page-header {
-    display: block;
-    margin: 0 0 25px;
-    padding: 8px 0 22px;
-    border-bottom: 1px solid var(--rekap-border);
-    animation: fadeInUp .45s ease both;
-}
-
-.rekap-breadcrumb {
+/* INTRO */
+.ra-intro {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 23px;
-    color: #87948b;
-    font-size: 12px;
-}
-
-.rekap-breadcrumb span,
-.rekap-breadcrumb strong {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-}
-
-.rekap-breadcrumb > i {
-    font-size: 9px;
-    color: #b2beb6;
-}
-
-.rekap-breadcrumb strong {
-    color: var(--rekap-primary);
-    font-weight: 700;
-}
-
-.rekap-heading-row {
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 28px;
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 26px;
 }
 
-.rekap-heading-content {
-    min-width: 0;
-}
-
-.rekap-eyebrow {
-    display: inline-flex;
+.ra-breadcrumb {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    color: var(--rekap-primary);
+    gap: 10px;
+    color: #9aa8a1;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 23px;
+}
+
+.ra-breadcrumb i { font-size: 8px; color: #c4d0ca; }
+.ra-breadcrumb strong { color: #477563; }
+
+.ra-eyebrow,
+.ra-section-kicker {
+    color: #0b9870;
     font-size: 10px;
     font-weight: 800;
-    letter-spacing: 1.3px;
+    letter-spacing: 1.65px;
 }
 
-.rekap-eyebrow-dot {
+.ra-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+}
+
+.ra-eyebrow-dot,
+.ra-live-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #17a875;
-    box-shadow: 0 0 0 4px #e4f5ec;
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,.12);
 }
 
-.rekapitulasi-absensi-wrapper .page-header h3 {
+.ra-intro h1 {
     margin: 0;
-    color: #173629;
-    font-size: clamp(24px, 2.3vw, 32px);
-    font-weight: 800;
-    letter-spacing: -1px;
-    line-height: 1.25;
+    color: #142b23;
+    font-size: clamp(27px, 3vw, 39px);
+    line-height: 1.15;
+    font-weight: 850;
+    letter-spacing: -1.7px;
 }
 
-.rekapitulasi-absensi-wrapper .page-header h3 i {
-    color: var(--rekap-primary);
-}
+.ra-intro h1 span { color: #07966c; }
 
-.rekapitulasi-absensi-wrapper .page-header p {
-    max-width: 620px;
-    margin: 10px 0 0;
-    color: var(--rekap-muted);
+.ra-intro-content > p {
+    color: #87958e;
     font-size: 13px;
-    line-height: 1.8;
-}
-
-.rekap-period-card {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    flex-shrink: 0;
-    min-width: 230px;
-    padding: 16px 18px;
-    border: 1px solid #dfece3;
-    border-radius: 17px;
-    background: linear-gradient(135deg, #ffffff, #f3faf5);
-    box-shadow: 0 5px 18px rgba(25, 75, 48, .045);
-}
-
-.rekap-period-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 45px;
-    height: 45px;
-    flex-shrink: 0;
-    border-radius: 14px;
-    background: #e1f4e8;
-    color: var(--rekap-primary);
-    font-size: 18px;
-}
-
-.rekap-period-card > div:last-child {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.rekap-period-card span {
-    color: var(--rekap-muted);
-    font-size: 10px;
-}
-
-.rekap-period-card strong {
-    color: #174b34;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.rekap-period-card small {
-    color: #87948b;
-    font-size: 10px;
-}
-
-/* ===== FILTER PERIODE ===== */
-
-.rekapitulasi-absensi-wrapper .filter-card {
-    padding: 19px 23px;
-    border: 1px solid var(--rekap-border);
-    border-radius: 19px;
-    background: #fff;
-    box-shadow: 0 5px 22px rgba(22, 57, 37, .045);
-}
-
-.rekapitulasi-absensi-wrapper .filter-body {
-    width: 100%;
-}
-
-.rekapitulasi-absensi-wrapper .filter-label {
-    gap: 7px;
-    color: #53665a;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.rekapitulasi-absensi-wrapper .filter-label i {
-    color: var(--rekap-primary);
-}
-
-.rekapitulasi-absensi-wrapper .filter-select {
-    min-width: 145px;
-    min-height: 43px;
-    padding: 10px 35px 10px 13px;
-    border: 1px solid #dfe8e1;
-    border-radius: 11px;
-    background-color: #fbfdfb;
-    color: #254333;
-    font-size: 13px;
-    font-weight: 600;
-    appearance: auto;
-    -webkit-appearance: auto;
-    transition: border-color .2s, box-shadow .2s;
-}
-
-.rekapitulasi-absensi-wrapper .filter-select:focus {
-    border-color: #26956b;
-    box-shadow: 0 0 0 3px rgba(8, 118, 83, .1);
-}
-
-/* ===== KARTU STATISTIK ===== */
-
-.rekapitulasi-absensi-wrapper .stat-card {
-    min-height: 150px;
-    height: 100%;
-    padding: 23px;
-    gap: 17px;
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 20px;
-    box-shadow: 0 8px 22px rgba(20, 55, 37, .09);
-    transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.rekapitulasi-absensi-wrapper .stat-card::before {
-    top: -45px;
-    right: -25px;
-    width: 145px;
-    height: 145px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.07);
-}
-
-.rekapitulasi-absensi-wrapper .stat-card::after {
-    content: "";
-    position: absolute;
-    right: 23px;
-    bottom: -48px;
-    width: 105px;
-    height: 105px;
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.rekapitulasi-absensi-wrapper .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 14px 30px rgba(20, 55, 37, .14);
-}
-
-.rekapitulasi-absensi-wrapper .stat-icon {
-    position: relative;
-    z-index: 1;
-    width: 54px;
-    height: 54px;
-    border: 1px solid rgba(255,255,255,.24);
-    border-radius: 16px;
-    background: rgba(255,255,255,.18);
-    font-size: 23px;
-}
-
-.rekapitulasi-absensi-wrapper .stat-content {
-    position: relative;
-    z-index: 1;
-}
-
-.rekapitulasi-absensi-wrapper .stat-label {
-    margin-bottom: 10px;
-    color: rgba(255,255,255,.9);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.5;
-}
-
-.rekapitulasi-absensi-wrapper .stat-value {
-    color: #fff;
-    font-size: clamp(29px, 2.5vw, 37px);
-    font-weight: 800;
-    letter-spacing: -1.2px;
-    font-variant-numeric: tabular-nums;
-}
-
-.rekapitulasi-absensi-wrapper .stat-value-big {
-    color: #fff;
-    font-size: clamp(29px, 2.5vw, 37px);
-    font-weight: 800;
-    letter-spacing: -1px;
-    font-variant-numeric: tabular-nums;
-}
-
-.rekapitulasi-absensi-wrapper .stat-unit {
-    margin-top: 8px;
-    color: rgba(255,255,255,.83);
-    font-size: 11px;
-    line-height: 1.5;
-}
-
-/* ===== KARTU TABEL ===== */
-
-.rekapitulasi-absensi-wrapper .table-card {
-    margin-bottom: 25px;
-    border: 1px solid var(--rekap-border);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 5px 22px rgba(22, 57, 37, .045);
-}
-
-.rekapitulasi-absensi-wrapper .table-header {
-    gap: 12px;
-    padding: 21px 24px;
-    border-bottom: 1px solid var(--rekap-border);
-    background: #fff;
-}
-
-.rekapitulasi-absensi-wrapper .table-title {
-    color: #203d2d;
-    font-size: 15px;
-    font-weight: 800;
-    line-height: 1.6;
-}
-
-.rekapitulasi-absensi-wrapper .table-title i {
-    color: var(--rekap-primary);
-}
-
-.rekapitulasi-absensi-wrapper .table-badge {
-    padding: 7px 11px;
-    border: 1px solid #dceee2;
-    border-radius: 10px;
-    background: #eef8f1;
-    color: #16744b;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-.rekapitulasi-absensi-wrapper .table-responsive {
-    max-width: 100%;
-    border-radius: 0 0 20px 20px;
-    overscroll-behavior-x: contain;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table {
-    min-width: 760px;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table thead {
-    background: #f7faf8;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table th {
-    padding: 15px 18px;
-    border-bottom: 1px solid #e5ece7;
-    background: #f7faf8;
-    color: #64756a;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .25px;
-    white-space: nowrap;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table th i {
-    color: #16815a;
-    font-size: 11px;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table td {
-    padding: 16px 18px;
-    border-bottom: 1px solid #eff3f0;
-    color: #405448;
-    font-size: 12px;
+    margin: 11px 0 0;
     line-height: 1.7;
-    vertical-align: middle;
 }
 
-.rekapitulasi-absensi-wrapper .custom-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.rekapitulasi-absensi-wrapper .custom-table tbody tr:hover {
-    background: #f8fcf9;
-}
-
-.rekapitulasi-absensi-wrapper .td-tanggal {
-    color: #294936;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.rekapitulasi-absensi-wrapper .td-jam {
-    font-variant-numeric: tabular-nums;
-    font-weight: 650;
-    white-space: nowrap;
-}
-
-.rekapitulasi-absensi-wrapper .td-keterangan {
-    min-width: 180px;
-    color: #738078;
-    overflow-wrap: anywhere;
-}
-
-.rekapitulasi-absensi-wrapper .status-badge {
-    display: inline-flex;
+.ra-period-box {
+    position: relative;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 6px 10px;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .2px;
-    white-space: nowrap;
-}
-
-.rekapitulasi-absensi-wrapper .badge-hadir {
-    border-color: #d2efdf;
-    background: #eaf8ef;
-    color: #137447;
-}
-
-.rekapitulasi-absensi-wrapper .badge-terlambat {
-    border-color: #f5e3b8;
-    background: #fff7e5;
-    color: #99600a;
-}
-
-.rekapitulasi-absensi-wrapper .badge-izin {
-    border-color: #d5e7fb;
-    background: #edf6ff;
-    color: #245e9b;
-}
-
-.rekapitulasi-absensi-wrapper .badge-sakit {
-    border-color: #dfdcfb;
-    background: #f1efff;
-    color: #5b4aa0;
-}
-
-.rekapitulasi-absensi-wrapper .badge-alfa {
-    border-color: #f5d8d8;
-    background: #fff0f0;
-    color: #b33e3e;
-}
-
-.rekapitulasi-absensi-wrapper .td-empty {
-    padding: 45px 20px !important;
-    color: #819087 !important;
-    font-size: 13px !important;
-    font-style: normal;
-}
-
-/* ===== EXPORT EXCEL ===== */
-
-.rekapitulasi-absensi-wrapper .export-card {
-    padding: 27px;
-    border: 1px solid #dcece1;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #ffffff 0%, #f5fbf6 100%);
-    box-shadow: 0 7px 25px rgba(20, 80, 46, .055);
-}
-
-.rekapitulasi-absensi-wrapper .export-card-decoration {
-    top: -65px;
-    right: -45px;
-    width: 230px;
-    height: 230px;
-    background: radial-gradient(circle, rgba(16,185,129,.1), transparent 70%);
-}
-
-.rekapitulasi-absensi-wrapper .export-icon-wrap {
-    width: 56px;
-    height: 56px;
-    border: 1px solid rgba(255,255,255,.4);
+    gap: 12px;
+    min-width: 255px;
+    padding: 13px 14px;
+    border: 1px solid #e6eee9;
     border-radius: 17px;
-    background: linear-gradient(145deg, #159b68, #08734d);
-    box-shadow: 0 7px 17px rgba(8, 118, 83, .2);
+    background: rgba(255,255,255,.88);
+    box-shadow: 0 8px 25px rgba(24,60,43,.045);
 }
 
-.rekapitulasi-absensi-wrapper .export-icon-wrap i {
-    font-size: 25px;
-}
-
-.rekapitulasi-absensi-wrapper .export-title {
-    color: #174b34;
-    font-size: 19px;
-    font-weight: 800;
-    line-height: 1.4;
-}
-
-.rekapitulasi-absensi-wrapper .export-subtitle {
-    margin-top: 4px;
-    color: #728178;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.rekapitulasi-absensi-wrapper .export-form-grid {
+.ra-period-icon {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: end;
-    gap: 19px 16px;
-}
-
-.rekapitulasi-absensi-wrapper .export-form-grid > .form-group-wrap {
-    width: 100%;
-    min-width: 0;
-}
-
-.rekapitulasi-absensi-wrapper .form-label-export {
-    margin-bottom: 8px;
-    color: #486454;
-    font-size: 11px;
-    font-weight: 750;
-}
-
-.rekapitulasi-absensi-wrapper .form-select-export,
-.rekapitulasi-absensi-wrapper .custom-select-trigger {
-    min-height: 47px;
-    padding: 11px 14px;
-    border: 1px solid #dce8df;
-    border-radius: 12px;
-    background-color: #fff;
-    color: #294c38;
-    font-size: 12px;
-    font-weight: 650;
-}
-
-.rekapitulasi-absensi-wrapper .form-select-export {
-    padding-right: 38px;
-    background-position: right 13px center;
-}
-
-.rekapitulasi-absensi-wrapper .form-select-export:hover,
-.rekapitulasi-absensi-wrapper .custom-select-trigger:hover {
-    border-color: #91c9a7;
-    box-shadow: 0 0 0 3px rgba(8, 118, 83, .055);
-}
-
-.rekapitulasi-absensi-wrapper .form-select-export:focus {
-    border-color: #16815a;
-    box-shadow: 0 0 0 3px rgba(8, 118, 83, .1);
-}
-
-.rekapitulasi-absensi-wrapper .trigger-icon {
-    width: 29px;
-    height: 29px;
-    border-radius: 9px;
-    background: #e6f5eb;
-    color: #087653;
-}
-
-.rekapitulasi-absensi-wrapper .trigger-arrow {
-    color: #087653;
-}
-
-.rekapitulasi-absensi-wrapper .custom-select-trigger.open {
-    border-color: #16815a;
-    box-shadow: 0 0 0 3px rgba(8, 118, 83, .09);
-}
-
-.rekapitulasi-absensi-wrapper .custom-select-dropdown {
-    border: 1px solid #e0eae3;
+    place-items: center;
+    width: 43px;
+    height: 43px;
     border-radius: 13px;
-    box-shadow: 0 15px 35px rgba(22, 57, 37, .15);
+    background: #e9f8f1;
+    color: #07845f;
+    font-size: 17px;
 }
 
-.rekapitulasi-absensi-wrapper .custom-select-dropdown.open {
-    border-top: 1px solid #d7e9dd;
-}
+.ra-period-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.ra-period-info small { color: #91a098; font-size: 9px; font-weight: 800; letter-spacing: 1px; }
+.ra-period-info strong { color: #183d2e; font-size: 14px; font-weight: 800; }
+.ra-period-info span { color: #94a29b; font-size: 10px; }
 
-.rekapitulasi-absensi-wrapper .custom-option {
-    min-height: 43px;
-    padding: 11px 14px;
-    font-size: 12px;
-}
-
-.rekapitulasi-absensi-wrapper .custom-option:hover {
-    padding-left: 17px;
-    background: #f2faf4;
-}
-
-.rekapitulasi-absensi-wrapper .custom-option.active {
-    background: #e6f5eb;
-    color: #087653;
-}
-
-.rekapitulasi-absensi-wrapper .option-icon {
-    color: #16815a;
-}
-
-.rekapitulasi-absensi-wrapper .btn-export-xl {
-    min-height: 47px;
-    height: auto;
-    padding: 10px 15px;
-    border: 1px solid #08734d;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #159b68, #08734d);
-    box-shadow: 0 6px 15px rgba(8, 118, 83, .17);
-    font-size: 12px;
-    font-weight: 750;
-}
-
-.rekapitulasi-absensi-wrapper .btn-export-xl:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(8, 118, 83, .24);
-}
-
-.rekapitulasi-absensi-wrapper .btn-export-xl .btn-icon {
-    width: 27px;
-    height: 27px;
-    border-radius: 8px;
-}
-
-/* ===== TANGGAL MOBILE ===== */
-
-.rekapitulasi-absensi-wrapper .hp-fixed-header {
-    border-bottom: 1px solid rgba(223, 234, 226, .9);
-    box-shadow: 0 3px 15px rgba(20, 55, 37, .045);
-}
-
-.rekapitulasi-absensi-wrapper .header-kembali-btn,
-.rekapitulasi-absensi-wrapper .header-keluar-btn {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 11px;
-    text-decoration: none;
-}
-
-.rekapitulasi-absensi-wrapper .header-kembali-btn {
-    background: #edf7f0;
-    color: #087653;
-}
-
-.rekapitulasi-absensi-wrapper .header-keluar-btn {
-    background: #fff1f1;
-    color: #c34c4c;
-}
-
-.rekapitulasi-absensi-wrapper .hp-date-text {
-    color: #234632;
-    font-size: 12px;
-    font-weight: 750;
-}
-
-.rekapitulasi-absensi-wrapper .hp-calendar-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: #eaf6ee;
-    color: #087653;
-}
-
-.rekapitulasi-absensi-wrapper .kalender-bulan-tahun-popup {
-    width: min(280px, calc(100vw - 32px));
-    border: 1px solid #e0eae3;
-    border-radius: 16px;
-    box-shadow: 0 18px 45px rgba(20, 55, 37, .18);
-}
-
-.rekapitulasi-absensi-wrapper .calendar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-
-.rekapitulasi-absensi-wrapper .calendar-title {
-    color: #214832;
-    font-weight: 800;
-}
-
-.rekapitulasi-absensi-wrapper .calendar-nav {
+.ra-period-change {
+    border: 0;
     width: 32px;
     height: 32px;
-    border: 1px solid #e1ebe3;
-    border-radius: 9px;
-    background: #f6faf7;
-    color: #087653;
+    border-radius: 10px;
+    color: #087d5b;
+    background: #f0f8f4;
+    cursor: pointer;
+    transition: .2s;
 }
+.ra-period-change:hover { background: #d9f5e8; transform: rotate(180deg); }
 
-.rekapitulasi-absensi-wrapper .calendar-months,
-.rekapitulasi-absensi-wrapper .calendar-years {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
+.ra-period-popover {
+    position: absolute;
+    z-index: 30;
+    right: 0;
+    top: calc(100% + 10px);
+    width: 270px;
+    padding: 17px;
+    background: #fff;
+    border: 1px solid #e6eee9;
+    border-radius: 17px;
+    box-shadow: 0 18px 55px rgba(13,48,33,.16);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: .22s ease;
 }
+.ra-period-popover.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
 
-.rekapitulasi-absensi-wrapper .month-item,
-.rekapitulasi-absensi-wrapper .year-item {
-    padding: 10px 4px;
-    border-radius: 9px;
-    color: #506357;
-    text-align: center;
+.ra-popover-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.ra-popover-head strong { font-size: 13px; }
+.ra-popover-head button { border: 0; background: #f2f6f3; color: #53665c; width: 27px; height: 27px; border-radius: 8px; cursor: pointer; }
+.ra-period-popover label,
+.ra-export-field label,
+.ra-export-select-wrap > label {
+    display: block;
+    margin: 10px 0 6px;
+    color: #77877e;
+    font-size: 10px;
+    font-weight: 750;
+}
+.ra-period-popover select,
+.ra-export-field select,
+.ra-export-field input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    color: #264638;
+    background: #f8fbf9;
+    border: 1px solid #e4ede7;
+    border-radius: 10px;
+    outline: none;
+    font: inherit;
+    font-size: 12px;
+}
+.ra-period-popover select:focus,
+.ra-export-field select:focus,
+.ra-export-field input:focus { border-color: #44bd91; box-shadow: 0 0 0 3px #dff7eb; }
+
+.ra-apply-period {
+    width: 100%;
+    height: 42px;
+    margin-top: 15px;
+    border: 0;
+    border-radius: 10px;
+    background: #087d5b;
+    color: #fff;
     font-size: 11px;
+    font-weight: 750;
     cursor: pointer;
 }
+.ra-apply-period i { margin-left: 8px; }
 
-.rekapitulasi-absensi-wrapper .month-item.active,
-.rekapitulasi-absensi-wrapper .year-item.active {
-    background: #e4f5e9;
-    color: #087653;
-    font-weight: 800;
+/* HERO */
+.ra-hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 270px;
+    padding: clamp(25px, 4vw, 43px);
+    overflow: hidden;
+    border-radius: 25px;
+    color: white;
+    background:
+        radial-gradient(circle at 80% 15%, rgba(66,211,157,.28), transparent 30%),
+        linear-gradient(112deg, #043d2e 0%, #075c43 48%, #087c58 100%);
+    box-shadow: 0 18px 45px rgba(4,78,56,.18);
 }
 
-/* ===== TABLET ===== */
-
-@media (max-width: 1100px) {
-    .rekap-heading-row {
-        align-items: flex-start;
-    }
-
-    .rekap-period-card {
-        min-width: 205px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-form-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-icon {
-        width: 47px;
-        height: 47px;
-        font-size: 20px;
-    }
+.ra-hero-grid {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: .13;
+    background-image: linear-gradient(rgba(255,255,255,.16) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(90deg, transparent, black);
 }
 
-/* ===== MOBILE ===== */
+.ra-hero-decoration {
+    position: absolute;
+    z-index: -1;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: raFloat 9s ease-in-out infinite;
+}
+.ra-decoration-one { width: 360px; height: 360px; right: 12%; top: -220px; }
+.ra-decoration-two { width: 260px; height: 260px; right: 25%; bottom: -205px; animation-delay: -3s; }
 
-@media (max-width: 768px) {
-    /* Header desktop digantikan header HP */
-    .rekapitulasi-absensi-wrapper .page-header,
-    .rekapitulasi-absensi-wrapper .filter-card {
-        display: none !important;
-    }
+@keyframes raFloat {
+    0%,100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(13px) rotate(8deg); }
+}
 
-    .rekapitulasi-absensi-wrapper .hp-fixed-header {
+.ra-hero-main { position: relative; z-index: 1; width: min(58%, 650px); }
+.ra-hero-label { display: flex; align-items: center; gap: 10px; color: #b6f5d9; font-size: 9px; font-weight: 800; letter-spacing: 1.8px; }
+.ra-live-dot { background: #72f3b8; box-shadow: 0 0 0 4px rgba(114,243,184,.15); }
+.ra-hero-title { display: flex; align-items: center; gap: 12px; margin-top: 24px; color: #d0eee0; font-size: 13px; font-weight: 600; }
+.ra-hero-title i { color: #9cf4ca; }
+.ra-hero-score { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 15px; }
+.ra-hero-score strong { font-size: clamp(52px, 7vw, 78px); line-height: 1; letter-spacing: -4px; font-weight: 850; }
+.ra-hero-score span { color: #b9e7d2; font-size: 13px; font-weight: 600; }
+
+.ra-hero-progress { width: min(100%, 430px); height: 7px; overflow: hidden; border-radius: 20px; background: rgba(255,255,255,.18); }
+.ra-hero-progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8bf4c2, #d1ffe8); box-shadow: 0 0 15px rgba(157,255,207,.55); transition: width 1.3s cubic-bezier(.2,.7,.2,1); }
+
+.ra-hero-foot { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 17px; color: #b4dcca; font-size: 10px; }
+.ra-hero-foot i { margin-right: 5px; color: #8cf0bd; }
+
+.ra-hero-ring-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; margin-right: 5%; }
+.ra-ring {
+    display: grid;
+    place-items: center;
+    width: 166px;
+    height: 166px;
+    padding: 11px;
+    border-radius: 50%;
+    background: conic-gradient(#a8f5d0 var(--ra-progress), rgba(255,255,255,.16) 0);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 12px 35px rgba(0,0,0,.12);
+    animation: raRingIn 1.2s ease both;
+}
+@keyframes raRingIn { from { transform: scale(.78) rotate(-35deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+.ra-ring-inner { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: #07563f; box-shadow: inset 0 0 20px rgba(0,0,0,.12); }
+.ra-ring-inner i { color: #a5f4cf; font-size: 17px; margin-bottom: 7px; }
+.ra-ring-inner strong { color: white; font-size: 27px; font-weight: 850; }
+.ra-ring-inner span { color: #b7e6d0; font-size: 8px; font-weight: 800; letter-spacing: 1.6px; margin-top: 2px; }
+.ra-ring-caption { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 13px; }
+.ra-ring-caption strong { font-size: 11px; color: #fff; }
+.ra-ring-caption span { font-size: 9px; color: #b7dccc; }
+.ra-hero-watermark { position: absolute; right: 25px; bottom: -32px; color: rgba(255,255,255,.045); font-size: 105px; font-weight: 900; letter-spacing: -8px; pointer-events: none; }
+
+/* SECTION */
+.ra-kpi-layout { margin-top: 35px; }
+.ra-section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 15px; margin-bottom: 17px; }
+.ra-section-heading h2,
+.ra-history-header h2,
+.ra-insight-copy h2,
+.ra-export-intro h2 { margin: 5px 0 0; color: #19372a; font-size: 20px; font-weight: 820; letter-spacing: -.65px; }
+.ra-section-heading p,
+.ra-history-header p,
+.ra-insight-copy p,
+.ra-export-intro p { margin: 6px 0 0; color: #8a9991; font-size: 11px; line-height: 1.7; }
+.ra-period-chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid #e6eee9; border-radius: 9px; color: #6e8378; background: white; font-size: 10px; font-weight: 700; }
+
+.ra-kpi-grid { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 15px; }
+.ra-kpi-card {
+    position: relative;
+    min-height: 174px;
+    padding: 20px 21px;
+    overflow: hidden;
+    border: 1px solid #e9efeb;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 7px 22px rgba(21,58,39,.035);
+    transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+    animation: raCardIn .6s both;
+}
+.ra-kpi-card:nth-child(2) { animation-delay: .08s; }
+.ra-kpi-card:nth-child(3) { animation-delay: .16s; }
+@keyframes raCardIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.ra-kpi-card:hover { transform: translateY(-5px); box-shadow: 0 15px 32px rgba(21,58,39,.09); border-color: #d5e9dd; }
+.ra-kpi-top { display: flex; align-items: center; justify-content: space-between; }
+.ra-kpi-icon { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 12px; font-size: 15px; }
+.ra-kpi-tag { padding: 5px 8px; border-radius: 6px; font-size: 8px; font-weight: 850; letter-spacing: 1px; }
+.ra-kpi-number { margin-top: 14px; font-size: 34px; font-weight: 850; letter-spacing: -1.6px; line-height: 1; }
+.ra-kpi-label { margin-top: 7px; font-size: 11px; font-weight: 750; color: #4b6257; }
+.ra-kpi-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 13px; padding-top: 11px; border-top: 1px solid #f0f3f1; color: #9aa69f; font-size: 9px; }
+.ra-kpi-bottom i { font-size: 9px; opacity: .6; }
+
+.ra-kpi-present { background: linear-gradient(145deg, #fff 50%, #f0fbf5); }
+.ra-kpi-present .ra-kpi-icon { background: #e2f8ec; color: #079568; }
+.ra-kpi-present .ra-kpi-tag { color: #07855f; background: #e9f8ef; }
+.ra-kpi-present .ra-kpi-number { color: #07845f; }
+.ra-kpi-late .ra-kpi-icon { background: #fff4df; color: #d58a16; }
+.ra-kpi-late .ra-kpi-tag { color: #b87813; background: #fff6e6; }
+.ra-kpi-late .ra-kpi-number { color: #c98519; }
+.ra-kpi-leave .ra-kpi-icon { background: #eaf2ff; color: #477bd1; }
+.ra-kpi-leave .ra-kpi-tag { color: #477bd1; background: #eef4ff; }
+.ra-kpi-leave .ra-kpi-number { color: #477bd1; }
+
+/* INSIGHT */
+.ra-insight-card {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+    padding: 25px 28px;
+    border: 1px solid #e8efeb;
+    border-radius: 19px;
+    background: linear-gradient(120deg, #fff, #fbfdfb);
+    box-shadow: 0 7px 22px rgba(21,58,39,.03);
+}
+.ra-insight-copy h2 { font-size: 18px; }
+.ra-insight-total { display: flex; align-items: baseline; gap: 9px; margin-top: 19px; }
+.ra-insight-total strong { color: #087e5b; font-size: 31px; font-weight: 850; letter-spacing: -1px; }
+.ra-insight-total span { color: #91a098; font-size: 10px; }
+
+.ra-insight-chart { display: flex; align-items: center; justify-content: flex-end; gap: clamp(22px, 5vw, 55px); }
+.ra-donut {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 145px;
+    height: 145px;
+    border-radius: 50%;
+    background: conic-gradient(#07966c 0deg, #e8efeb 0deg);
+    position: relative;
+    transition: background 1s ease;
+}
+.ra-donut::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: white; }
+.ra-donut-center { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+.ra-donut-center strong { color: #193b2b; font-size: 25px; font-weight: 850; }
+.ra-donut-center span { color: #9aa79f; font-size: 8px; font-weight: 800; letter-spacing: 1px; }
+.ra-legend { display: flex; flex-direction: column; gap: 13px; min-width: 190px; }
+.ra-legend > div { display: grid; grid-template-columns: 9px 1fr auto; align-items: center; gap: 8px; color: #73847a; font-size: 10px; }
+.ra-legend strong { color: #314d3e; font-size: 11px; }
+.ra-legend-dot { width: 8px; height: 8px; border-radius: 3px; }
+.ra-legend-dot.present { background: #07966c; }
+.ra-legend-dot.late { background: #f2b544; }
+.ra-legend-dot.leave { background: #6b9be8; }
+
+/* HISTORY */
+.ra-history-card { margin-top: 22px; padding: 25px 26px 0; border: 1px solid #e8efeb; border-radius: 19px; background: white; box-shadow: 0 7px 22px rgba(21,58,39,.035); }
+.ra-history-header { display: flex; justify-content: space-between; align-items: center; }
+.ra-history-header h2 { font-size: 19px; }
+.ra-history-count { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 53px; height: 53px; border-radius: 14px; background: #eff9f3; color: #07845f; }
+.ra-history-count strong { font-size: 18px; line-height: 1; font-weight: 850; }
+.ra-history-count span { margin-top: 4px; font-size: 7px; font-weight: 850; letter-spacing: 1px; }
+
+.ra-table-toolbar { display: flex; justify-content: space-between; gap: 12px; margin: 22px 0 14px; }
+.ra-search { display: flex; align-items: center; gap: 10px; width: min(380px, 100%); height: 40px; padding: 0 13px; border: 1px solid #e7eee9; border-radius: 10px; background: #fbfdfb; color: #8da096; }
+.ra-search i { font-size: 12px; }
+.ra-search input { width: 100%; border: 0; outline: 0; background: transparent; color: #355244; font: inherit; font-size: 11px; }
+.ra-search input::placeholder { color: #a5b0aa; }
+.ra-status-filter { min-width: 145px; height: 40px; padding: 0 12px; border: 1px solid #e7eee9; border-radius: 10px; background: #fbfdfb; color: #526a5d; font: inherit; font-size: 10px; outline: none; }
+
+.ra-table-wrap { overflow-x: auto; }
+.ra-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+.ra-table thead th { padding: 13px 12px; border-bottom: 1px solid #edf2ee; color: #9aa79f; text-align: left; font-size: 8px; font-weight: 850; letter-spacing: 1px; }
+.ra-table tbody td { padding: 14px 12px; border-bottom: 1px solid #f0f3f1; color: #667a6e; font-size: 10px; }
+.ra-table tbody tr { transition: background .2s; }
+.ra-table tbody tr:hover { background: #f8fcf9; }
+.ra-date-cell { display: flex; align-items: center; gap: 9px; color: #355345; }
+.ra-date-cell strong { font-size: 10px; font-weight: 750; }
+.ra-date-icon { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 9px; background: #eff8f2; color: #07845f; }
+.ra-time { color: #597165; font-variant-numeric: tabular-nums; }
+.ra-time i { margin-right: 5px; color: #a2b0a8; font-size: 9px; }
+.ra-status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border-radius: 7px; font-size: 9px; font-weight: 750; }
+.status-hadir { color: #07845f; background: #eaf8ef; }
+.status-terlambat { color: #b77a16; background: #fff6e5; }
+.status-izin { color: #477bd1; background: #edf4ff; }
+.status-sakit { color: #8a63bd; background: #f5efff; }
+.status-other { color: #65756b; background: #f0f3f1; }
+.ra-description { max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+.ra-empty { display: flex; flex-direction: column; align-items: center; padding: 38px 15px; color: #91a097; }
+.ra-empty > div { display: grid; place-items: center; width: 47px; height: 47px; margin-bottom: 12px; border-radius: 15px; background: #f0f7f2; color: #168b67; font-size: 18px; }
+.ra-empty strong { color: #52695c; font-size: 12px; }
+.ra-empty span { margin-top: 5px; font-size: 10px; }
+.ra-no-result { padding: 25px; color: #91a097; text-align: center; font-size: 11px; }
+.ra-no-result i { margin-right: 7px; }
+.ra-table-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; color: #9aa69f; font-size: 9px; }
+.ra-table-footer strong { color: #61796b; }
+.ra-table-footer i { margin-right: 5px; color: #07966c; }
+
+/* EXPORT */
+.ra-export-card {
+    position: relative;
+    margin-top: 22px;
+    padding: 25px 27px;
+    overflow: visible;
+    border: 1px solid #e5eee8;
+    border-radius: 19px;
+    background: linear-gradient(115deg, #f9fcfa, #fff);
+}
+.ra-export-decoration { position: absolute; right: 0; top: 0; width: 190px; height: 100%; border-radius: 0 19px 19px 0; background: radial-gradient(circle at 100% 0%, rgba(16,185,129,.09), transparent 70%); pointer-events: none; }
+.ra-export-intro { display: flex; align-items: center; gap: 13px; position: relative; }
+.ra-export-icon { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 14px; background: #e5f7ed; color: #07845f; font-size: 17px; }
+.ra-export-intro h2 { font-size: 18px; }
+.ra-export-intro p { max-width: 500px; }
+.ra-export-form { position: relative; display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto; align-items: end; gap: 13px; margin-top: 20px; }
+.ra-export-select-wrap { position: relative; }
+.ra-export-select { display: flex; justify-content: space-between; align-items: center; height: 43px; padding: 0 12px; border: 1px solid #e4ede7; border-radius: 10px; background: white; color: #496455; cursor: pointer; font-size: 11px; }
+.ra-export-select > span { display: flex; align-items: center; gap: 9px; }
+.ra-export-select > span i { color: #07966c; }
+.ra-export-select > i { color: #90a198; font-size: 10px; transition: transform .2s; }
+.ra-export-select[aria-expanded="true"] > i { transform: rotate(180deg); }
+.ra-export-dropdown { position: absolute; z-index: 20; top: calc(100% + 7px); left: 0; right: 0; padding: 6px; border: 1px solid #e6eee9; border-radius: 12px; background: white; box-shadow: 0 14px 35px rgba(20,55,37,.13); opacity: 0; visibility: hidden; transform: translateY(6px); transition: .2s; }
+.ra-export-dropdown.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.ra-export-dropdown button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: #16825f; text-align: left; cursor: pointer; }
+.ra-export-dropdown button:hover { background: #f0f8f3; }
+.ra-export-dropdown button > i { width: 20px; text-align: center; }
+.ra-export-dropdown button span { display: flex; flex-direction: column; gap: 3px; }
+.ra-export-dropdown button strong { color: #345344; font-size: 10px; }
+.ra-export-dropdown button small { color: #99a69e; font-size: 9px; }
+
+.ra-export-fields { display: grid; grid-template-columns: repeat(2, minmax(90px, 1fr)); gap: 9px; }
+.ra-export-field { min-width: 0; }
+.ra-export-field label { margin-top: 0; }
+.ra-export-field[hidden] { display: none !important; }
+.ra-export-button { display: flex; align-items: center; justify-content: center; gap: 9px; height: 43px; padding: 0 17px; border: 0; border-radius: 10px; background: linear-gradient(110deg, #087c59, #079b6c); color: white; box-shadow: 0 7px 15px rgba(5,150,105,.18); font-size: 10px; font-weight: 800; white-space: nowrap; cursor: pointer; transition: .22s; }
+.ra-export-button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(5,150,105,.25); }
+.ra-export-button i:last-child { margin-left: 3px; }
+.ra-export-note { position: relative; margin-top: 14px; color: #9aa69f; font-size: 9px; }
+.ra-export-note i { margin-right: 5px; color: #0b9870; }
+
+/* RESPONSIVE */
+@media (max-width: 1050px) {
+    .ra-hero-ring-wrap { margin-right: 1%; }
+    .ra-export-form { grid-template-columns: 1fr 1.5fr; }
+    .ra-export-button { grid-column: 1 / -1; }
+}
+
+@media (max-width: 760px) {
+    .ra-mobile-header {
         display: flex;
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-card:hover {
-        transform: none;
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        font-size: 17px;
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-label {
-        margin-bottom: 7px;
-        font-size: 11px;
-        line-height: 1.45;
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-value,
-    .rekapitulasi-absensi-wrapper .stat-value-big {
-        font-size: clamp(25px, 7vw, 32px);
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-unit {
-        display: block;
-        margin-top: 5px;
-        font-size: 10px;
-    }
-
-    .rekapitulasi-absensi-wrapper .table-card {
-        margin-bottom: 18px;
-        border-radius: 17px;
-    }
-
-    .rekapitulasi-absensi-wrapper .table-header {
         align-items: center;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 16px 13px;
-        text-align: left;
+        gap: 11px;
+        position: sticky;
+        top: 0;
+        z-index: 25;
+        margin: 0 -14px 20px;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eaf0ec;
+        background: rgba(255,255,255,.94);
+        backdrop-filter: blur(15px);
     }
-
-    .rekapitulasi-absensi-wrapper .table-title {
-        align-items: center;
-        font-size: 12px;
-    }
-
-    .rekapitulasi-absensi-wrapper .table-badge {
-        padding: 6px 8px;
-        font-size: 10px;
-    }
-
-    i.fas.fa-list-alt.me-2 {
-        margin-top: 1px;
-    }
-
-    .rekapitulasi-absensi-wrapper .custom-table {
-        min-width: 700px;
-    }
-
-    .rekapitulasi-absensi-wrapper .custom-table th {
-        padding: 13px 12px !important;
-        font-size: 10px !important;
-    }
-
-    .rekapitulasi-absensi-wrapper .custom-table td {
-        padding: 13px 12px !important;
-        font-size: 11px !important;
-    }
-
-    .rekapitulasi-absensi-wrapper .status-badge {
-        padding: 5px 8px !important;
-        font-size: 9px !important;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-card {
-        padding: 19px 15px;
-        margin-bottom: 20px !important;
-        border-radius: 19px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-header {
-        gap: 12px;
-        margin-bottom: 21px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-icon-wrap {
-        width: 45px;
-        height: 45px;
-        border-radius: 13px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-icon-wrap i {
-        font-size: 20px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-title {
-        font-size: 15px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-subtitle {
-        font-size: 11px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-form-grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 17px;
-    }
-
-    .rekapitulasi-absensi-wrapper .export-form-grid > .form-group-wrap {
-        min-width: 0;
-        width: 100%;
-    }
-
-    .rekapitulasi-absensi-wrapper .form-label-export {
-        font-size: 11px;
-    }
-
-    .rekapitulasi-absensi-wrapper .form-select-export,
-    .rekapitulasi-absensi-wrapper .custom-select-trigger {
-        width: 100%;
-        min-height: 47px;
-        padding: 11px 13px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
-
-    .rekapitulasi-absensi-wrapper .form-select-export {
-        padding-right: 38px;
-    }
-
-    .rekapitulasi-absensi-wrapper .custom-select-dropdown {
-        max-width: 100%;
-    }
-
-    .rekapitulasi-absensi-wrapper .btn-export-xl {
-        width: 100%;
-        min-height: 49px;
-        border-radius: 12px;
-        font-size: 13px;
-    }
+    .ra-back, .ra-logout { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; background: #eff8f2; color: #087d5b; text-decoration: none; }
+    .ra-mobile-header > div { display: flex; flex-direction: column; flex: 1; gap: 2px; }
+    .ra-mobile-header strong { color: #244536; font-size: 12px; }
+    .ra-mobile-header small { color: #9aa69f; font-size: 9px; }
+    .ra-intro { display: block; margin-bottom: 18px; }
+    .ra-breadcrumb { margin-bottom: 15px; font-size: 9px; }
+    .ra-intro h1 { font-size: 27px; letter-spacing: -1.2px; }
+    .ra-intro-content > p { max-width: 330px; font-size: 11px; }
+    .ra-period-box { min-width: 0; margin-top: 17px; padding: 10px 11px; }
+    .ra-period-icon { width: 38px; height: 38px; }
+    .ra-period-info strong { font-size: 12px; }
+    .ra-period-popover { width: min(290px, calc(100vw - 28px)); right: 0; }
+    .ra-hero { min-height: 230px; padding: 23px 20px; border-radius: 19px; }
+    .ra-hero-main { width: 100%; }
+    .ra-hero-title { margin-top: 20px; font-size: 11px; }
+    .ra-hero-score strong { font-size: 57px; }
+    .ra-hero-score span { font-size: 11px; }
+    .ra-hero-progress { max-width: 100%; }
+    .ra-hero-foot { gap: 9px 14px; font-size: 9px; }
+    .ra-hero-ring-wrap { display: none; }
+    .ra-hero-watermark { right: 10px; bottom: -20px; font-size: 75px; }
+    .ra-kpi-layout { margin-top: 27px; }
+    .ra-section-heading { align-items: flex-start; }
+    .ra-section-heading h2 { font-size: 17px; }
+    .ra-section-heading p { font-size: 10px; }
+    .ra-period-chip { display: none; }
+    .ra-kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .ra-kpi-card { min-height: 151px; padding: 15px; border-radius: 15px; }
+    .ra-kpi-card:first-child { grid-column: 1 / -1; min-height: 145px; background: linear-gradient(110deg, #fff, #effaf4); }
+    .ra-kpi-number { font-size: 29px; }
+    .ra-kpi-card:first-child .ra-kpi-number { font-size: 37px; }
+    .ra-kpi-label { font-size: 10px; }
+    .ra-kpi-bottom { font-size: 8px; }
+    .ra-insight-card { grid-template-columns: 1fr; gap: 20px; padding: 20px; margin-top: 14px; }
+    .ra-insight-copy h2 { font-size: 17px; }
+    .ra-insight-chart { justify-content: space-around; gap: 14px; }
+    .ra-donut { width: 125px; height: 125px; }
+    .ra-legend { min-width: 0; flex: 1; gap: 11px; }
+    .ra-legend > div { font-size: 9px; }
+    .ra-history-card { margin-top: 15px; padding: 19px 15px 0; border-radius: 16px; }
+    .ra-history-header h2 { font-size: 17px; }
+    .ra-history-header p { max-width: 230px; font-size: 9px; }
+    .ra-history-count { width: 45px; height: 45px; }
+    .ra-table-toolbar { flex-direction: column; margin: 17px 0 12px; }
+    .ra-search { width: 100%; }
+    .ra-status-filter { width: 100%; }
+    .ra-table { min-width: 690px; }
+    .ra-table-footer { flex-direction: column; gap: 6px; font-size: 8px; }
+    .ra-export-card { margin-top: 15px; padding: 19px 16px; border-radius: 16px; }
+    .ra-export-intro { align-items: flex-start; }
+    .ra-export-icon { width: 40px; height: 40px; flex: 0 0 auto; }
+    .ra-export-intro h2 { font-size: 17px; }
+    .ra-export-intro p { font-size: 9px; }
+    .ra-export-form { grid-template-columns: 1fr; gap: 12px; }
+    .ra-export-fields { grid-template-columns: 1fr 1fr; }
+    .ra-export-button { grid-column: auto; width: 100%; }
 }
-
-/* ===== HP SANGAT KECIL ===== */
 
 @media (max-width: 380px) {
-    .rekapitulasi-absensi-wrapper .stat-label {
-        font-size: 10px;
-    }
-
-    .rekapitulasi-absensi-wrapper .stat-value,
-    .rekapitulasi-absensi-wrapper .stat-value-big {
-        font-size: 25px;
-    }
-
-    .rekapitulasi-absensi-wrapper .table-header {
-        gap: 7px;
-        padding: 14px 10px;
-    }
-
-    .rekapitulasi-absensi-wrapper .table-title {
-        font-size: 11px;
+    .ra-kpi-grid { grid-template-columns: 1fr; }
+    .ra-kpi-card:first-child { grid-column: auto; }
+    .ra-insight-chart { flex-direction: column; }
+    .ra-legend { width: 100%; }
+    .ra-export-fields { grid-template-columns: 1fr; }
+    .content-wrapper {
+        padding: 0 1rem 1rem !important;
     }
 }
 
-/* ===== AKSESIBILITAS & ANIMASI ===== */
-
-@media (prefers-reduced-motion: reduce) {
-    .rekapitulasi-absensi-wrapper *,
-    .rekapitulasi-absensi-wrapper *::before,
-    .rekapitulasi-absensi-wrapper *::after {
-        animation-duration: .01ms !important;
-        transition-duration: .01ms !important;
-    }
+.ra-reveal {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1);
 }
 
+.ra-reveal.ra-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
