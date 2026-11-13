@@ -1,269 +1,502 @@
+
 {% extends "layout.html" %}
-{% block title %}Rincian Kehadiran — {{ guru.nama }}{% endblock %}
 
-{% block content %}
-
-<!-- 🔙 Tombol Kembali -->
-<div class="mb-4">
-  <a href="{{ url_for('monitoring_absensi.monitoring_absensi') }}" class="btn-link text-decoration-none d-inline-flex align-items-center gap-2">
-    <i class="fas fa-arrow-left"></i>
-    <span>Kembali ke Monitoring</span>
-  </a>
-</div>
-
-<!-- 👤 Kartu Profil & Ringkasan -->
-<div class="card border-0 shadow-sm mb-4">
-  <div class="card-body p-4">
-    <div class="row align-items-center g-4">
-      <!-- Avatar & Identitas -->
-      <div class="col-lg-7 d-flex align-items-center gap-3">
-        <div class="guru-avatar flex-shrink-0">
-          {% if guru.foto_profil %}
-            <img src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
-                 alt="{{ guru.nama }}">
-          {% else %}
-            <span class="inisial">{{ guru.nama | inisial_avatar }}</span>
-          {% endif %}
-        </div>
-        <div>
-          <h4 class="mb-1 fw-semibold">{{ guru.nama }}</h4>
-          <p class="text-muted small mb-2">
-            {% if guru.nip %}NIP. {{ guru.nip }} •{% endif %}
-            {{ guru.jabatan or '—' }}
-          </p>
-          <span class="badge bg-light text-dark border small">
-            <i class="fas fa-calendar-alt me-1 opacity-50"></i>
-            {{ nama_bulan_terpilih }} {{ filter_tahun }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Statistik Singkat -->
-      <div class="col-lg-5">
-        <div class="row g-2 text-center">
-          <div class="col-3 col-sm-6">
-            <div class="py-2 px-1 rounded-2 bg-success bg-opacity-10">
-              <h5 class="mb-0 text-success fw-bold">{{ ringkasan.hadir }}</h5>
-              <small class="text-muted">Hadir</small>
-            </div>
-          </div>
-          <div class="col-3 col-sm-6">
-            <div class="py-2 px-1 rounded-2 bg-warning bg-opacity-10">
-              <h5 class="mb-0 text-warning fw-bold">{{ ringkasan.terlambat }}</h5>
-              <small class="text-muted">Terlambat</small>
-            </div>
-          </div>
-          <div class="col-3 col-sm-6">
-            <div class="py-2 px-1 rounded-2 bg-info bg-opacity-10">
-              <h5 class="mb-0 text-info fw-bold">{{ ringkasan.izin }}</h5>
-              <small class="text-muted">Izin/Sakit</small>
-            </div>
-          </div>
-          <div class="col-3 col-sm-6">
-            <div class="py-2 px-1 rounded-2 bg-danger bg-opacity-10">
-              <h5 class="mb-0 text-danger fw-bold">{{ ringkasan.alfa }}</h5>
-              <small class="text-muted">Tidak Hadir</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 📅 Filter Periode -->
-<div class="card border-0 shadow-sm mb-4">
-  <div class="card-body p-3">
-    <form method="get" class="row align-items-end g-2">
-      <div class="col-md-4">
-        <label class="form-label small text-muted mb-1">Bulan</label>
-        <select name="bulan" class="form-select form-select-sm" onchange="this.form.submit()">
-          {% for val, nama in daftar_bulan %}
-          <option value="{{ val }}" {% if filter_bulan == val %}selected{% endif %}>{{ nama }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label class="form-label small text-muted mb-1">Tahun</label>
-        <select name="tahun" class="form-select form-select-sm" onchange="this.form.submit()">
-          {% for val in daftar_tahun %}
-          <option value="{{ val }}" {% if filter_tahun == val %}selected{% endif %}>{{ val }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-4">
-        <button type="submit" class="btn btn-primary w-100 btn-sm">
-          <i class="fas fa-filter me-1"></i> Tampilkan
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- 📋 Riwayat Absensi -->
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-white border-0 px-4 pt-4 pb-2 d-flex justify-content-between align-items-center">
-    <h6 class="table-header"><i class="fas fa-history"></i> Riwayat Kehadiran</h6>
-    <div class="d-flex gap-2 align-items-center">
-      <span class="text-muted small">{{ daftar_absensi|length }} hari</span>
-      <form action="{{ url_for('monitoring_absensi.export_rincian_guru', guru_id=guru.id) }}" method="post">
-        <input type="hidden" name="bulan" value="{{ filter_bulan }}">
-        <input type="hidden" name="tahun" value="{{ filter_tahun }}">
-        <button type="submit" class="btn btn-success btn-sm">
-          <i class="fas fa-file-excel me-1"></i> Export
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <div class="card-body p-0">
-    {% if daftar_absensi %}
-    <div class="table-responsive">
-      <table class="table mb-0 align-middle">
-        <thead class="table-light">
-          <tr class="small text-uppercase opacity-70">
-            <th class="ps-4">Tanggal</th>
-            <th>Hari</th>
-            <th>Jam Masuk</th>
-            <th>Jam Pulang</th>
-            <th>Status</th>
-            <th>Keterangan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in daftar_absensi %}
-          <tr class="border-top">
-            <td class="ps-4 small">{{ item.tanggal.strftime('%d-%m-%Y') }}</td>
-            <td class="small">{{ item.nama_hari }}</td>
-            <td>
-              {% if item.jam_masuk %}
-                <span class="fw-medium">{{ item.jam_masuk }}</span>
-              {% else %}
-                <span class="text-muted small">—</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if item.jam_pulang %}
-                <span class="fw-medium">{{ item.jam_pulang }}</span>
-              {% else %}
-                <span class="text-muted small">—</span>
-              {% endif %}
-            </td>
-            <td>
-              {% set badge_style = {
-                'hadir': 'bg-success text-white',
-                'terlambat': 'bg-warning text-dark',
-                'izin': 'bg-info text-white',
-                'sakit': 'bg-primary text-white',
-                'alfa': 'bg-danger text-white'
-              } %}
-              <span class="badge rounded-pill {{ badge_style[item.status] or 'bg-secondary' }}">
-                {{ {
-                  'hadir': 'Tepat Waktu',
-                  'terlambat': 'Terlambat',
-                  'izin': 'Izin',
-                  'sakit': 'Sakit',
-                  'alfa': 'Tidak Hadir'
-                }[item.status] or item.status }}
-              </span>
-            </td>
-            <td class="text-muted small pe-4">
-                {% if item.keterangan %}
-                    {% set bagian_alasan = item.keterangan.split('Alasan: ') %}
-                    {{ bagian_alasan[-1] if bagian_alasan|length > 1 else item.keterangan }}
-                {% else %}
-                    —
-                {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% else %}
-    <div class="text-center py-5 text-muted">
-      <i class="fas fa-calendar-xmark fa-2x mb-2 opacity-25"></i>
-      <p class="mb-0">Belum ada data absensi untuk periode ini.</p>
-    </div>
-    {% endif %}
-  </div>
-</div>
-
-{% endblock %}
+{% block title %}Rincian Kehadiran Guru{% endblock %}
 
 {% block extra_css %}
-<style>
-/* Avatar */
-.guru-avatar {
-  width: 110px;
-  height: 110px;
-  border-radius: 1rem;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.guru-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.guru-avatar .inisial {
-  color: white;
-  font-weight: 700;
-  font-size: 2.5rem;
-}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/absensi/rincian_kehadiran_guru.css') }}"
+      data-spa-page-style="rincian-kehadiran-guru">
+{% endblock %}
 
-/* Kartu umum */
-.card {
-  border-radius: 1rem;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.card:hover {
-  box-shadow: 0 .125rem .5rem rgba(0,0,0,.06) !important;
-}
+{% block content %}
+{% set total_absensi = ringkasan.hadir + ringkasan.terlambat + ringkasan.izin + ringkasan.alfa %}
+{% set total_aman = total_absensi if total_absensi > 0 else 1 %}
+{% set persen_hadir = ((ringkasan.hadir / total_aman) * 100)|round(1) %}
+{% set persen_terlambat = ((ringkasan.terlambat / total_aman) * 100)|round(1) %}
+{% set persen_izin = ((ringkasan.izin / total_aman) * 100)|round(1) %}
+{% set persen_alfa = ((ringkasan.alfa / total_aman) * 100)|round(1) %}
 
-/* Tabel */
-.table {
-  font-size: 0.9rem;
-}
+{% set status_label = {
+    'hadir': 'Tepat Waktu',
+    'terlambat': 'Terlambat',
+    'izin': 'Izin',
+    'sakit': 'Sakit',
+    'alfa': 'Tidak Hadir'
+} %}
 
-.table-header {
-    margin-bottom: 0!important;
-    font-weight: 700;
-}
+{% set status_class = {
+    'hadir': 'is-success',
+    'terlambat': 'is-warning',
+    'izin': 'is-info',
+    'sakit': 'is-primary',
+    'alfa': 'is-danger'
+} %}
 
-.table-header i {
-    margin-right: 8px;
-}
-.table > :not(caption) > * > * {
-  padding: 0.75rem 1rem;
-}
-.table thead {
-  font-size: 0.8rem;
-  letter-spacing: 0.02em;
-}
-.table tbody tr {
-  transition: background-color .15s ease;
-}
-.table tbody tr:hover {
-  background-color: #f8fafc;
-}
+<div class="rkh-page">
 
-/* Tombol link kembali */
-.btn-link {
-  color: #4b5563;
-}
-.btn-link:hover {
-  color: #11181b;
-}
+    <!-- Ambient background -->
+    <div class="rkh-ambient rkh-ambient-one"></div>
+    <div class="rkh-ambient rkh-ambient-two"></div>
+    <div class="rkh-grid-pattern"></div>
 
-/* Badge */
-.badge {
-  font-weight: 500;
-  font-size: 0.75rem;
-  padding: 0.35em 0.75em;
-}
-</style>
+    <!-- TOP NAVIGATION -->
+    <header class="rkh-topbar" data-rkh-reveal>
+        <div class="rkh-topbar-left">
+            <a href="{{ url_for('monitoring_absensi.monitoring_absensi') }}"
+               class="rkh-back-link">
+                <span class="rkh-back-icon">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span>Kembali ke Monitoring</span>
+            </a>
+
+            <div class="rkh-breadcrumb">
+                <span>Monitoring</span>
+                <i class="fas fa-chevron-right"></i>
+                <strong>Rincian Guru</strong>
+            </div>
+        </div>
+
+        <div class="rkh-live-indicator">
+            <span class="rkh-live-dot"></span>
+            <span>ATTENDANCE MANAGEMENT</span>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="rkh-hero" data-rkh-reveal>
+        <div class="rkh-hero-orb rkh-orb-a"></div>
+        <div class="rkh-hero-orb rkh-orb-b"></div>
+        <div class="rkh-hero-orb rkh-orb-c"></div>
+        <div class="rkh-hero-grid"></div>
+        <div class="rkh-hero-shine"></div>
+
+        <div class="rkh-hero-content">
+            <div class="rkh-hero-copy">
+                <div class="rkh-hero-label">
+                    <span class="rkh-label-line"></span>
+                    TEACHER ATTENDANCE PROFILE
+                </div>
+
+                <h1>Rincian <span>Kehadiran.</span></h1>
+                <p>
+                    Pantau performa kehadiran, riwayat presensi, dan
+                    kedisiplinan guru dalam satu tampilan terintegrasi.
+                </p>
+
+                <div class="rkh-hero-tags">
+                    <span><i class="fas fa-shield-alt"></i> Data Terverifikasi</span>
+                    <span><i class="fas fa-chart-line"></i> Attendance Analytics</span>
+                </div>
+            </div>
+
+            <div class="rkh-profile-card">
+                <div class="rkh-profile-card-top">
+                    <span class="rkh-profile-overline">TEACHER PROFILE</span>
+                    <span class="rkh-profile-status">
+                        <span></span> PROFIL GURU
+                    </span>
+                </div>
+
+                <div class="rkh-profile-main">
+                    <div class="rkh-avatar-wrap">
+                        <div class="rkh-avatar-ring"></div>
+                        <div class="rkh-avatar">
+                          {% if guru.foto_profil %}
+                              <img
+                                  src="{{ url_for('tampilkan_foto_profil', filename=guru.foto_profil) }}" 
+                                  alt="Foto {{ guru.nama }}"
+                                  class="rkh-avatar-photo"
+                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                              >
+                              <div class="rkh-avatar-initial" style="display:none;">
+                                  {{ guru.nama | inisial_avatar }}
+                              </div>
+                          {% else %}
+                              <div class="rkh-avatar-initial">
+                                  {{ guru.nama | inisial_avatar }}
+                              </div>
+                          {% endif %}
+                        </div>
+                        <span class="rkh-avatar-check">
+                            <i class="fas fa-check"></i>
+                        </span>
+                    </div>
+
+                    <div class="rkh-profile-info">
+                        <span class="rkh-profile-role">{{ guru.jabatan or 'Tenaga Pendidik' }}</span>
+                        <h2>{{ guru.nama }}</h2>
+                        <div class="rkh-profile-nip">
+                            <i class="fas fa-id-card"></i>
+                            NIP. {{ guru.nip or '-' }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rkh-profile-divider"></div>
+
+                <div class="rkh-profile-bottom">
+                    <div>
+                        <span class="rkh-profile-bottom-label">PERIODE ANALISIS</span>
+                        <strong><i class="far fa-calendar-alt"></i> {{ nama_bulan_terpilih }} {{ filter_tahun }}</strong>
+                    </div>
+                    <div class="rkh-profile-period-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rkh-hero-footer">
+            <span>SMART SCHOOL MANAGEMENT SYSTEM</span>
+            <span>HUMAN RESOURCE ANALYTICS <i class="fas fa-arrow-up-right-from-square"></i></span>
+        </div>
+    </section>
+
+    <!-- SECTION INTRO -->
+    <section class="rkh-section-intro" data-rkh-reveal>
+        <div>
+            <span class="rkh-section-kicker">OVERVIEW / 01</span>
+            <h2>Attendance <span>Insights</span></h2>
+            <p>Ringkasan statistik kehadiran selama periode terpilih.</p>
+        </div>
+        <div class="rkh-period-chip">
+            <span class="rkh-period-chip-dot"></span>
+            {{ nama_bulan_terpilih }} {{ filter_tahun }}
+        </div>
+    </section>
+
+    <!-- KPI -->
+    <section class="rkh-kpi-grid">
+
+        <article class="rkh-kpi-card kpi-emerald" data-rkh-reveal>
+            <div class="rkh-kpi-top">
+                <div class="rkh-kpi-icon"><i class="fas fa-user-check"></i></div>
+                <span class="rkh-kpi-index">01 / PRESENT</span>
+            </div>
+            <div class="rkh-kpi-value" data-rkh-count="{{ ringkasan.hadir }}">0</div>
+            <div class="rkh-kpi-label">Hadir Tepat Waktu</div>
+            <div class="rkh-kpi-bottom">
+                <span class="rkh-kpi-note">Presensi berhasil</span>
+                <span class="rkh-kpi-percent">{{ persen_hadir }}%</span>
+            </div>
+            <div class="rkh-kpi-progress"><span style="width: {{ persen_hadir }}%"></span></div>
+            <i class="fas fa-check-circle rkh-kpi-watermark"></i>
+        </article>
+
+        <article class="rkh-kpi-card kpi-amber" data-rkh-reveal>
+            <div class="rkh-kpi-top">
+                <div class="rkh-kpi-icon"><i class="fas fa-clock"></i></div>
+                <span class="rkh-kpi-index">02 / LATE</span>
+            </div>
+            <div class="rkh-kpi-value" data-rkh-count="{{ ringkasan.terlambat }}">0</div>
+            <div class="rkh-kpi-label">Terlambat</div>
+            <div class="rkh-kpi-bottom">
+                <span class="rkh-kpi-note">Melewati jam masuk</span>
+                <span class="rkh-kpi-percent">{{ persen_terlambat }}%</span>
+            </div>
+            <div class="rkh-kpi-progress"><span style="width: {{ persen_terlambat }}%"></span></div>
+            <i class="fas fa-hourglass-half rkh-kpi-watermark"></i>
+        </article>
+
+        <article class="rkh-kpi-card kpi-blue" data-rkh-reveal>
+            <div class="rkh-kpi-top">
+                <div class="rkh-kpi-icon"><i class="fas fa-calendar-check"></i></div>
+                <span class="rkh-kpi-index">03 / PERMISSION</span>
+            </div>
+            <div class="rkh-kpi-value" data-rkh-count="{{ ringkasan.izin }}">0</div>
+            <div class="rkh-kpi-label">Izin</div>
+            <div class="rkh-kpi-bottom">
+                <span class="rkh-kpi-note">Izin tercatat</span>
+                <span class="rkh-kpi-percent">{{ persen_izin }}%</span>
+            </div>
+            <div class="rkh-kpi-progress"><span style="width: {{ persen_izin }}%"></span></div>
+            <i class="fas fa-clipboard-list rkh-kpi-watermark"></i>
+        </article>
+
+        <article class="rkh-kpi-card kpi-rose" data-rkh-reveal>
+            <div class="rkh-kpi-top">
+                <div class="rkh-kpi-icon"><i class="fas fa-user-times"></i></div>
+                <span class="rkh-kpi-index">04 / ABSENT</span>
+            </div>
+            <div class="rkh-kpi-value" data-rkh-count="{{ ringkasan.alfa }}">0</div>
+            <div class="rkh-kpi-label">Tidak Hadir</div>
+            <div class="rkh-kpi-bottom">
+                <span class="rkh-kpi-note">Tanpa keterangan</span>
+                <span class="rkh-kpi-percent">{{ persen_alfa }}%</span>
+            </div>
+            <div class="rkh-kpi-progress"><span style="width: {{ persen_alfa }}%"></span></div>
+            <i class="fas fa-exclamation-circle rkh-kpi-watermark"></i>
+        </article>
+
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="rkh-analytics-card" data-rkh-reveal>
+        <div class="rkh-analytics-heading">
+            <div>
+                <span class="rkh-section-kicker">PERFORMANCE DISTRIBUTION / 02</span>
+                <h3>Komposisi Kehadiran</h3>
+                <p>Distribusi seluruh catatan presensi pada periode ini.</p>
+            </div>
+            <div class="rkh-analytics-total">
+                <strong>{{ total_absensi }}</strong>
+                <span>Total Catatan</span>
+            </div>
+        </div>
+
+        <div class="rkh-composition-track">
+            <span class="rkh-composition-segment segment-present" style="width: {{ persen_hadir }}%"></span>
+            <span class="rkh-composition-segment segment-late" style="width: {{ persen_terlambat }}%"></span>
+            <span class="rkh-composition-segment segment-permit" style="width: {{ persen_izin }}%"></span>
+            <span class="rkh-composition-segment segment-absent" style="width: {{ persen_alfa }}%"></span>
+        </div>
+
+        <div class="rkh-legend-grid">
+            <div class="rkh-legend-item">
+                <span class="rkh-legend-dot dot-present"></span>
+                <div><strong>{{ ringkasan.hadir }}</strong><span>Hadir</span></div>
+                <small>{{ persen_hadir }}%</small>
+            </div>
+            <div class="rkh-legend-item">
+                <span class="rkh-legend-dot dot-late"></span>
+                <div><strong>{{ ringkasan.terlambat }}</strong><span>Terlambat</span></div>
+                <small>{{ persen_terlambat }}%</small>
+            </div>
+            <div class="rkh-legend-item">
+                <span class="rkh-legend-dot dot-permit"></span>
+                <div><strong>{{ ringkasan.izin }}</strong><span>Izin</span></div>
+                <small>{{ persen_izin }}%</small>
+            </div>
+            <div class="rkh-legend-item">
+                <span class="rkh-legend-dot dot-absent"></span>
+                <div><strong>{{ ringkasan.alfa }}</strong><span>Alfa</span></div>
+                <small>{{ persen_alfa }}%</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTER -->
+    <section class="rkh-filter-panel" data-rkh-reveal>
+        <div class="rkh-filter-heading">
+            <div class="rkh-filter-icon"><i class="fas fa-sliders-h"></i></div>
+            <div>
+                <span class="rkh-section-kicker">DATA EXPLORER / 03</span>
+                <h3>Filter Periode</h3>
+                <p>Sesuaikan periode untuk melihat riwayat presensi.</p>
+            </div>
+        </div>
+
+        <form method="GET" class="rkh-filter-form" data-rkh-filter-form>
+            <div class="rkh-filter-field">
+                <label for="rkh-bulan">Bulan</label>
+                <div class="rkh-select-wrap">
+                    <i class="far fa-calendar"></i>
+                    <select id="rkh-bulan" name="bulan" class="rkh-select">
+                        {% for bulan in daftar_bulan %}
+                            <option value="{{ bulan.value }}"
+                                {% if bulan.value|string == filter_bulan|string %}selected{% endif %}>
+                                {{ bulan.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <i class="fas fa-chevron-down rkh-select-arrow"></i>
+                </div>
+            </div>
+
+            <div class="rkh-filter-field">
+                <label for="rkh-tahun">Tahun</label>
+                <div class="rkh-select-wrap">
+                    <i class="far fa-calendar-alt"></i>
+                    <select id="rkh-tahun" name="tahun" class="rkh-select">
+                        {% for tahun in daftar_tahun %}
+                            <option value="{{ tahun }}"
+                                {% if tahun|string == filter_tahun|string %}selected{% endif %}>
+                                {{ tahun }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <i class="fas fa-chevron-down rkh-select-arrow"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="rkh-filter-submit">
+                <i class="fas fa-sync-alt"></i>
+                <span>Terapkan Filter</span>
+                <i class="fas fa-arrow-right rkh-btn-arrow"></i>
+            </button>
+        </form>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="rkh-history-section" data-rkh-reveal>
+        <div class="rkh-history-heading">
+            <div>
+                <span class="rkh-section-kicker">ATTENDANCE LOGS / 04</span>
+                <h2>Riwayat <span>Presensi</span></h2>
+                <p>Daftar aktivitas kehadiran guru berdasarkan periode terpilih.</p>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('monitoring_absensi.export_rincian_guru', guru_id=guru.id) }}"
+                  class="rkh-export-form"
+                  data-rkh-export-form>
+                <input type="hidden" name="bulan" value="{{ filter_bulan }}">
+                <input type="hidden" name="tahun" value="{{ filter_tahun }}">
+                <button type="submit" class="rkh-export-btn">
+                    <span class="rkh-export-icon"><i class="fas fa-file-excel"></i></span>
+                    <span class="rkh-export-text">
+                        <strong>Export Data</strong>
+                        <small>Unduh laporan</small>
+                    </span>
+                    <i class="fas fa-arrow-down rkh-export-arrow"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="rkh-history-toolbar">
+            <div class="rkh-record-count">
+                <span class="rkh-record-pulse"></span>
+                <strong>{{ daftar_absensi|length }}</strong> catatan ditemukan
+            </div>
+            <div class="rkh-history-period">
+                <i class="far fa-calendar-alt"></i>
+                {{ nama_bulan_terpilih }} {{ filter_tahun }}
+            </div>
+        </div>
+
+        {% if daftar_absensi %}
+        <div class="rkh-table-shell">
+            <div class="rkh-table-scroll">
+                <table class="rkh-table">
+                    <thead>
+                        <tr>
+                            <th>TANGGAL</th>
+                            <th>HARI</th>
+                            <th>JAM MASUK</th>
+                            <th>JAM PULANG</th>
+                            <th>STATUS</th>
+                            <th>KETERANGAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in daftar_absensi %}
+                        <tr>
+                            <td>
+                                <div class="rkh-date-cell">
+                                    <span class="rkh-date-icon"><i class="far fa-calendar"></i></span>
+                                    <strong>{{ item.tanggal.strftime('%d-%m-%Y') }}</strong>
+                                </div>
+                            </td>
+                            <td><span class="rkh-day">{{ item.nama_hari }}</span></td>
+                            <td>
+                                <span class="rkh-time">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    {{ item.jam_masuk or '--:--' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="rkh-time">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    {{ item.jam_pulang or '--:--' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="rkh-status {{ status_class.get(item.status, 'is-muted') }}">
+                                    <span></span>
+                                    {{ status_label.get(item.status, item.status|title) }}
+                                </span>
+                            </td>
+                            <td>
+                                {% set keterangan = (item.keterangan or '') %}
+                                {% if 'Alasan: ' in keterangan %}
+                                    {% set keterangan = keterangan.split('Alasan: ')[-1] %}
+                                {% endif %}
+                                <span class="rkh-note" title="{{ keterangan }}">
+                                    {{ keterangan or '—' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MOBILE ATTENDANCE CARDS -->
+        <div class="rkh-mobile-records">
+            {% for item in daftar_absensi %}
+                {% set keterangan = (item.keterangan or '') %}
+                {% if 'Alasan: ' in keterangan %}
+                    {% set keterangan = keterangan.split('Alasan: ')[-1] %}
+                {% endif %}
+                <article class="rkh-mobile-record">
+                    <div class="rkh-mobile-record-head">
+                        <div class="rkh-mobile-date">
+                            <span class="rkh-mobile-date-icon"><i class="far fa-calendar"></i></span>
+                            <div>
+                                <strong>{{ item.tanggal.strftime('%d-%m-%Y') }}</strong>
+                                <small>{{ item.nama_hari }}</small>
+                            </div>
+                        </div>
+                        <span class="rkh-status {{ status_class.get(item.status, 'is-muted') }}">
+                            <span></span>
+                            {{ status_label.get(item.status, item.status|title) }}
+                        </span>
+                    </div>
+                    <div class="rkh-mobile-times">
+                        <div>
+                            <small>MASUK</small>
+                            <strong><i class="fas fa-sign-in-alt"></i> {{ item.jam_masuk or '--:--' }}</strong>
+                        </div>
+                        <div>
+                            <small>PULANG</small>
+                            <strong><i class="fas fa-sign-out-alt"></i> {{ item.jam_pulang or '--:--' }}</strong>
+                        </div>
+                    </div>
+                    {% if keterangan %}
+                    <div class="rkh-mobile-note">
+                        <i class="far fa-comment-dots"></i>
+                        {{ keterangan }}
+                    </div>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="rkh-empty-state">
+            <div class="rkh-empty-visual">
+                <div class="rkh-empty-orbit orbit-one"></div>
+                <div class="rkh-empty-orbit orbit-two"></div>
+                <div class="rkh-empty-icon"><i class="fas fa-calendar-times"></i></div>
+            </div>
+            <span class="rkh-section-kicker">NO RECORDS FOUND</span>
+            <h3>Belum Ada Data Presensi</h3>
+            <p>Tidak ditemukan catatan kehadiran untuk guru ini pada periode yang dipilih.</p>
+            <span class="rkh-empty-period">{{ nama_bulan_terpilih }} {{ filter_tahun }}</span>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="rkh-footer" data-rkh-reveal>
+        <div class="rkh-footer-brand">
+            <span class="rkh-footer-mark"><i class="fas fa-layer-group"></i></span>
+            <div>
+                <strong>SMPU <span>ATTENDANCE</span></strong>
+                <small>Smart School Management System</small>
+            </div>
+        </div>
+        <div class="rkh-footer-right">
+            <span>TEACHER ANALYTICS</span>
+            <span class="rkh-footer-line"></span>
+            <span>EMERALD EDITION</span>
+        </div>
+    </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/absensi/rincian_kehadiran_guru.js') }}"></script>
 {% endblock %}
