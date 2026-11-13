@@ -1,1040 +1,1291 @@
 {% extends "layout.html" %}
 {% block title %}Monitoring Absensi Guru{% endblock %}
+
 {% block content %}
-
-<div class="page-header">
-    <h3>Monitoring Absensi</h3>
-    <p>Rekapitulasi kehadiran guru secara real-time</p>
-</div>
-
-<div class="card-qr">
-    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div>
-            <h5 class="card-qr-text"><i class="fas fa-qrcode text-primary me-2"></i>QR Absensi Masuk/Pulang</h5>
-            <p class="card-qr-subtext">Buat QR untuk absensi seluruh guru — hanya bisa discan dari Mode Absensi</p>
-        </div>
-        <div class="d-flex gap-2">
-            {# === TOMBOL BUAT QR — 1 QR UNTUK SEMUA === #}
-            <button id="btn-buat-qr" class="btn btn-success">
-                <i class="fas fa-qrcode me-1"></i>Buat QR Absensi
-            </button>
-            {# === TOMBOL SCAN QR === #}
-            <button id="btn-buka-kamera-monitoring" class="btn btn-primary">
-                <i class="fas fa-camera me-1"></i>Scan QR
-            </button>
-        </div>
-    </div>
-</div>
-
-{# ===== KARTU PENGATURAN JAM KERJA — HANYA TAMPIL UNTUK TERTENTU ===== #}
 {% set halaman_aktif_saat_ini = halaman_aktif | default('utama') %}
-{% if 
-  halaman_aktif_saat_ini == 'admin_sistem' 
-  or halaman_aktif_saat_ini in ['tata_usaha', 'tu']
-  or halaman_aktif_saat_ini == 'admin_dev'
-%}
-<div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5><i class="fas fa-clock me-2"></i>Pengaturan Jam Kerja Absensi</h5>
-        <button id="btn-edit-pengaturan" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-pen-to-square me-1"></i>Edit Pengaturan
-        </button>
-        <button id="btn-simpan-pengaturan" class="btn btn-sm btn-success d-none">
-            <i class="fas fa-save me-1"></i>Simpan Pengaturan
-        </button>
-    </div>
-    <div class="card-body">
-        {# === TAB NAVIGASI === #}
-        <ul class="nav nav-tabs mb-3" id="tabPengaturan" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="tab-standar" data-bs-toggle="tab" data-bs-target="#panel-standar" type="button" role="tab">Jam Standar</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="tab-jumat" data-bs-toggle="tab" data-bs-target="#panel-jumat" type="button" role="tab">Khusus Hari Jumat</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="tab-pengecualian" data-bs-toggle="tab" data-bs-target="#panel-pengecualian" type="button" role="tab">Tanggal Khusus</button>
-            </li>
-        </ul>
-        
-        {# === TAB 1: JAM STANDAR — 4 INPUT === #}
-        <div class="tab-content" id="tabContentPengaturan">
-            <div class="tab-pane fade show active" id="panel-standar" role="tabpanel">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-clock"></i> Jam Masuk Tepat</label>
-                        <input type="time" id="jam_masuk" class="form-control" value="{{ jam_masuk }}" disabled>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-exclamation-triangle"></i> Batas Terlambat</label>
-                        <input type="time" id="batas_terlambat" class="form-control" value="{{ batas_terlambat }}" disabled>
-                        <small class="text-muted">Maksimal terlambat 15 menit</small>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-lock"></i> Batas Akhir Absen</label>
-                        <input type="time" id="jam_tutup_absensi" class="form-control" value="{{ jam_tutup_absensi }}" disabled>
-                        <small class="text-muted">Tidak bisa absen setelah jam ini</small>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-home"></i> Jam Pulang Resmi</label>
-                        <input type="time" id="jam_pulang" class="form-control" value="{{ jam_pulang }}" disabled>
-                    </div>
-                </div>
+{% set boleh_atur_jam = halaman_aktif_saat_ini == 'admin_sistem' or halaman_aktif_saat_ini in ['tata_usaha', 'tu', 'admin_dev'] %}
+
+<div class="attendance-page"
+     data-qr-url="{{ url_for('monitoring_absensi.buat_qr_semua_guru') }}"
+     data-scan-url="{{ url_for('absensi_guru.scan_qr_proses') }}"
+     data-save-url="{{ url_for('monitoring_absensi.simpan_pengaturan_jam') }}">
+
+    <!-- INTRO -->
+    <section class="at-intro">
+        <div class="at-intro-copy">
+            <div class="at-eyebrow"><span class="at-live-dot"></span> ATTENDANCE MANAGEMENT SYSTEM</div>
+            <h1>Monitoring <span>Absensi Guru.</span></h1>
+            <p>Pusat kendali kehadiran tenaga pendidik. Pantau aktivitas, kelola jadwal, dan pastikan operasional berjalan tepat waktu.</p>
+            <div class="at-intro-meta">
+                <span><i class="fas fa-calendar-day"></i> {{ hari_ini_nama or 'Hari ini' }}</span>
+                <span class="at-meta-divider"></span>
+                <span><i class="fas fa-clock"></i> Monitoring real-time</span>
             </div>
-            
-            {# === TAB 2: KHUSUS HARI JUMAT === #}
-            <div class="tab-pane fade" id="panel-jumat" role="tabpanel">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-clock"></i> Jam Masuk Jumat</label>
-                        <input type="time" id="jam_masuk_jumat" class="form-control" value="{{ jam_masuk_jumat }}" disabled>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-exclamation-triangle"></i> Batas Terlambat</label>
-                        <input type="time" id="batas_terlambat_jumat" class="form-control" value="{{ batas_terlambat_jumat }}" disabled>
-                        <small class="text-muted">Maksimal terlambat 15 menit</small>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-lock"></i> Batas Akhir Absen</label>
-                        <input type="time" id="jam_tutup_absensi_jumat" class="form-control" value="{{ jam_tutup_absensi_jumat }}" disabled>
-                        <small class="text-muted">Tidak bisa absen setelah jam ini</small>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-home"></i> Jam Pulang Hari Jumat</label>
-                        <input type="time" id="jam_pulang_jumat" class="form-control" value="{{ jam_pulang_jumat }}" disabled>
-                    </div>
-                </div>
+        </div>
+        <div class="at-intro-art" aria-hidden="true">
+            <div class="at-orbit at-orbit-one"></div>
+            <div class="at-orbit at-orbit-two"></div>
+            <div class="at-art-glow"></div>
+            <div class="at-art-icon"><i class="fas fa-fingerprint"></i></div>
+            <div class="at-art-chip at-chip-top"><i class="fas fa-shield-check"></i> Secure Attendance</div>
+            <div class="at-art-chip at-chip-bottom"><span></span> System Active</div>
+        </div>
+    </section>
+
+    <!-- QUICK ACTIONS -->
+    <section class="at-action-strip">
+        <div class="at-action-copy">
+            <span class="at-section-kicker">QUICK OPERATIONS</span>
+            <h2>Kelola absensi dengan mudah.</h2>
+            <p>Gunakan QR terpusat untuk proses absensi masuk maupun pulang.</p>
+        </div>
+        <div class="at-action-buttons">
+            <button type="button" id="btn-buat-qr" class="at-btn at-btn-light">
+                <i class="fas fa-qrcode"></i>
+                <span>Buat QR Absensi</span>
+                <i class="fas fa-arrow-up-right-from-square at-btn-arrow"></i>
+            </button>
+            <button type="button" id="btn-buka-kamera-monitoring" class="at-btn at-btn-glass">
+                <i class="fas fa-camera"></i>
+                <span>Scan QR</span>
+            </button>
+        </div>
+        <div class="at-action-decoration"></div>
+    </section>
+
+    <!-- TODAY OVERVIEW -->
+    <section class="at-overview">
+        <div class="at-section-heading">
+            <div>
+                <span class="at-section-kicker">TODAY'S OVERVIEW</span>
+                <h2>Ringkasan Kehadiran</h2>
+                <p>Distribusi status kehadiran guru hari ini.</p>
             </div>
-            
-            {# === TAB 3: TANGGAL PENGECUALIAN === #}
-            <div class="tab-pane fade" id="panel-pengecualian" role="tabpanel">
-                <div class="mb-3">
-                    <button id="btn-tambah-pengecualian" class="btn btn-sm btn-success" disabled>
-                        <i class="fas fa-plus me-1"></i>Tambah Tanggal Khusus
-                    </button>
+            <div class="at-overview-date">
+                <span class="at-date-icon"><i class="far fa-calendar-check"></i></span>
+                <span><small>PERIODE MONITORING</small><strong>{{ hari_ini_nama or 'Hari ini' }}</strong></span>
+            </div>
+        </div>
+
+        <div class="at-stat-grid">
+            <article class="at-stat-card stat-present">
+                <div class="at-stat-top">
+                    <span class="at-stat-icon"><i class="fas fa-user-check"></i></span>
+                    <span class="at-stat-label">TEPAT WAKTU</span>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Jam Masuk</th>
-                                <th>Jam Pulang</th>
-                                <th>Keterangan</th>
-                                <th width="80">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="daftar-pengecualian">
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-2">Belum ada tanggal khusus ditambahkan</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="at-stat-value">{{ ringkasan_hari_ini.hadir }}</div>
+                <div class="at-stat-bottom"><span class="at-stat-indicator"></span> Guru hadir tepat waktu</div>
+                <div class="at-stat-watermark"><i class="fas fa-check"></i></div>
+            </article>
+
+            <article class="at-stat-card stat-late">
+                <div class="at-stat-top">
+                    <span class="at-stat-icon"><i class="fas fa-clock"></i></span>
+                    <span class="at-stat-label">TERLAMBAT</span>
+                </div>
+                <div class="at-stat-value">{{ ringkasan_hari_ini.terlambat }}</div>
+                <div class="at-stat-bottom"><span class="at-stat-indicator"></span> Melewati jam masuk</div>
+                <div class="at-stat-watermark"><i class="fas fa-hourglass-half"></i></div>
+            </article>
+
+            <article class="at-stat-card stat-excuse">
+                <div class="at-stat-top">
+                    <span class="at-stat-icon"><i class="fas fa-calendar-check"></i></span>
+                    <span class="at-stat-label">IZIN / SAKIT</span>
+                </div>
+                <div class="at-stat-value">{{ ringkasan_hari_ini.izin }}</div>
+                <div class="at-stat-bottom"><span class="at-stat-indicator"></span> Memiliki keterangan</div>
+                <div class="at-stat-watermark"><i class="fas fa-notes-medical"></i></div>
+            </article>
+
+            <article class="at-stat-card stat-pending">
+                <div class="at-stat-top">
+                    <span class="at-stat-icon"><i class="fas fa-user-clock"></i></span>
+                    <span class="at-stat-label">BELUM ABSEN</span>
+                </div>
+                <div class="at-stat-value">{{ ringkasan_hari_ini.belum_absen }}</div>
+                <div class="at-stat-bottom"><span class="at-stat-indicator"></span> Belum tercatat hadir</div>
+                <div class="at-stat-watermark"><i class="fas fa-hourglass-start"></i></div>
+            </article>
+        </div>
+    </section>
+
+    <!-- WORK SCHEDULE CONFIGURATION -->
+    {% if boleh_atur_jam %}
+    <section class="at-settings">
+        <div class="at-settings-heading">
+            <div class="at-settings-symbol"><i class="fas fa-sliders-h"></i></div>
+            <div class="at-settings-title">
+                <span class="at-section-kicker">SYSTEM CONFIGURATION</span>
+                <h2>Pengaturan Jam Kerja</h2>
+                <p>Atur standar waktu absensi dan ketentuan hari kerja guru.</p>
+            </div>
+            <div class="at-settings-actions">
+                <span class="at-config-state" id="at-config-state"><i class="fas fa-lock"></i> Mode baca</span>
+                <button type="button" id="btn-edit-pengaturan" class="at-btn at-btn-outline">
+                    <i class="fas fa-pen"></i> Edit Pengaturan
+                </button>
+                <button type="button" id="btn-simpan-pengaturan" class="at-btn at-btn-primary d-none">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+
+        <div class="at-settings-body">
+            <div class="at-settings-tabs" role="tablist">
+                <button class="at-settings-tab active" data-bs-toggle="tab" data-bs-target="#at-panel-standar" type="button">
+                    <i class="far fa-calendar"></i><span>Hari Standar</span>
+                </button>
+                <button class="at-settings-tab" data-bs-toggle="tab" data-bs-target="#at-panel-jumat" type="button">
+                    <i class="fas fa-mosque"></i><span>Khusus Jumat</span>
+                </button>
+                <button class="at-settings-tab" data-bs-toggle="tab" data-bs-target="#at-panel-khusus" type="button">
+                    <i class="far fa-calendar-alt"></i><span>Tanggal Khusus</span>
+                </button>
+            </div>
+
+            <div class="tab-content at-settings-content">
+                <div class="tab-pane fade show active" id="at-panel-standar">
+                    <div class="at-schedule-intro">
+                        <div><strong>Jadwal operasional reguler</strong><small>Berlaku untuk hari kerja selain Jumat.</small></div>
+                        <span class="at-schedule-badge"><i class="fas fa-check-circle"></i> Jadwal aktif</span>
+                    </div>
+                    <div class="at-time-grid">
+                        <label class="at-time-field"><span><i class="fas fa-sign-in-alt"></i> Jam Masuk Tepat</span><input type="time" id="jam_masuk" value="{{ jam_masuk }}" disabled></label>
+                        <label class="at-time-field"><span><i class="fas fa-exclamation-circle"></i> Batas Terlambat</span><input type="time" id="batas_terlambat" value="{{ batas_terlambat }}" disabled><small>Batas toleransi keterlambatan</small></label>
+                        <label class="at-time-field"><span><i class="fas fa-lock"></i> Batas Akhir Absen</span><input type="time" id="jam_tutup_absensi" value="{{ jam_tutup_absensi }}" disabled><small>Absensi masuk ditutup setelah waktu ini</small></label>
+                        <label class="at-time-field"><span><i class="fas fa-sign-out-alt"></i> Jam Pulang Resmi</span><input type="time" id="jam_pulang" value="{{ jam_pulang }}" disabled></label>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="at-panel-jumat">
+                    <div class="at-schedule-intro">
+                        <div><strong>Jadwal khusus hari Jumat</strong><small>Ketentuan waktu khusus untuk hari Jumat.</small></div>
+                        <span class="at-schedule-badge"><i class="fas fa-mosque"></i> Jadwal Jumat</span>
+                    </div>
+                    <div class="at-time-grid">
+                        <label class="at-time-field"><span><i class="fas fa-sign-in-alt"></i> Jam Masuk Jumat</span><input type="time" id="jam_masuk_jumat" value="{{ jam_masuk_jumat }}" disabled></label>
+                        <label class="at-time-field"><span><i class="fas fa-exclamation-circle"></i> Batas Terlambat</span><input type="time" id="batas_terlambat_jumat" value="{{ batas_terlambat_jumat }}" disabled><small>Batas toleransi keterlambatan</small></label>
+                        <label class="at-time-field"><span><i class="fas fa-lock"></i> Batas Akhir Absen</span><input type="time" id="jam_tutup_absensi_jumat" value="{{ jam_tutup_absensi_jumat }}" disabled><small>Absensi masuk ditutup setelah waktu ini</small></label>
+                        <label class="at-time-field"><span><i class="fas fa-sign-out-alt"></i> Jam Pulang Jumat</span><input type="time" id="jam_pulang_jumat" value="{{ jam_pulang_jumat }}" disabled></label>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="at-panel-khusus">
+                    <div class="at-special-header">
+                        <div><strong>Kalender pengecualian</strong><small>Ketentuan waktu khusus pada tanggal tertentu.</small></div>
+                        <button type="button" id="btn-tambah-pengecualian" class="at-btn at-btn-primary" disabled><i class="fas fa-plus"></i> Tambah Tanggal</button>
+                    </div>
+                    <div class="at-special-table-wrap">
+                        <table class="at-special-table">
+                            <thead><tr><th>TANGGAL</th><th>JAM MASUK</th><th>JAM PULANG</th><th>KETERANGAN</th><th>AKSI</th></tr></thead>
+                            <tbody id="daftar-pengecualian">
+                                <tr><td colspan="5" class="at-empty-cell">Belum ada tanggal khusus ditambahkan.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-{% endif %}
+    </section>
+    {% endif %}
 
-{# ===== FILTER PERIODE — KARTU RAPI ===== #}
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label">Tahun Pelajaran</label>
-                <select name="tahun" class="form-select">
+    <!-- PERIOD TOOLBAR -->
+    <section class="at-period">
+        <div class="at-period-copy">
+            <span class="at-section-kicker">ATTENDANCE ARCHIVE</span>
+            <h2>Rekapitulasi Kehadiran</h2>
+            <p>Pilih periode untuk melihat performa kehadiran setiap guru.</p>
+        </div>
+        <form method="get" class="at-filter-form">
+            <label><span>Tahun Pelajaran</span>
+                <select name="tahun">
                     {% for val, nama in daftar_tahun %}
                     <option value="{{ val }}" {% if filter_tahun == val %}selected{% endif %}>{{ val }}/{{ val+1 }}</option>
                     {% endfor %}
                 </select>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label">Bulan</label>
-                <select name="bulan" class="form-select">
+            </label>
+            <label><span>Bulan</span>
+                <select name="bulan">
                     {% for val, nama in daftar_bulan %}
                     <option value="{{ val }}" {% if filter_bulan == val %}selected{% endif %}>{{ nama }}</option>
                     {% endfor %}
                 </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search"></i> Tampilkan
-                </button>
-            </div>
+            </label>
+            <button class="at-btn at-btn-primary" type="submit"><i class="fas fa-filter"></i> Terapkan</button>
         </form>
-    </div>
-</div>
+    </section>
 
-{# ===== KARTU STATISTIK — HARI INI SAJA ===== #}
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon bg-success">
-            <i class="fas fa-check-circle"></i>
+    <!-- TEACHER DIRECTORY -->
+    <section class="at-directory">
+        <div class="at-directory-heading">
+            <div>
+                <span class="at-section-kicker">TEACHER DIRECTORY</span>
+                <h2>Monitoring Per Guru</h2>
+                <p>Rekap kehadiran individu berdasarkan periode terpilih.</p>
+            </div>
+            <form action="{{ url_for('monitoring_absensi.export_monitoring') }}" method="post" id="exportForm">
+                <input type="hidden" name="bulan" value="{{ filter_bulan }}">
+                <input type="hidden" name="tahun" value="{{ filter_tahun }}">
+                <button type="submit" class="at-btn at-btn-export"><i class="fas fa-file-excel"></i> Export Excel</button>
+            </form>
         </div>
-        <div class="stat-info">
-            <p>Tepat Waktu</p>
-            <h3>{{ ringkasan_hari_ini.hadir }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon bg-warning">
-            <i class="fas fa-user-clock"></i>
-        </div>
-        <div class="stat-info">
-            <p>Terlambat</p>
-            <h3>{{ ringkasan_hari_ini.terlambat }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon bg-info">
-            <i class="fas fa-calendar-check"></i>
-        </div>
-        <div class="stat-info">
-            <p>Izin/Sakit</p>
-            <h3>{{ ringkasan_hari_ini.izin }}</h3>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon bg-secondary">
-            <i class="fas fa-hourglass-start"></i>
-        </div>
-        <div class="stat-info">
-            <p>Belum Absen</p>
-            <h3>{{ ringkasan_hari_ini.belum_absen }}</h3>
-        </div>
-    </div>
-</div>
 
-{# ===== KARTU REKAP PER GURU — GAYA ID CARD ===== #}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Daftar Rekapitulasi Absensi</h5>
-    <form action="{{ url_for('monitoring_absensi.export_monitoring') }}" method="post" id="exportForm" class="d-inline">
-        <input type="hidden" name="bulan" value="{{ filter_bulan }}">
-        <input type="hidden" name="tahun" value="{{ filter_tahun }}">
-        <button type="submit" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-file-excel me-1"></i> Export Excel
-        </button>
-    </form>
-</div>
+        <div class="at-directory-tools">
+            <div class="at-search-box"><i class="fas fa-search"></i><input type="search" id="at-search-teacher" placeholder="Cari nama atau jabatan guru..."><kbd>⌕</kbd></div>
+            <div class="at-directory-count"><span class="at-count-dot"></span> {{ daftar_guru|length }} Guru Terdaftar</div>
+        </div>
 
-{% if daftar_guru %}
-<div class="guru-cards-grid">
-    {% for item in daftar_guru %}
-    {# === Tentukan status + ambil jam batas tutup sesuai hari === #}
-    {% set status = item.status_hari_ini %}
+        {% if daftar_guru %}
+        <div class="at-teacher-grid" id="at-teacher-grid">
+            {% for item in daftar_guru %}
+                {% set status = item.status_hari_ini %}
+                {% set hari_ini = hari_ini_nama or '' %}
+                {% if hari_ini == 'Jumat' %}{% set jam_batas = jam_tutup_absensi_jumat %}{% else %}{% set jam_batas = jam_tutup_absensi %}{% endif %}
+                {% set sudah_lewat_batas = waktu_sekarang >= jam_batas %}
 
-    {# Ambil jam batas tutup sesuai hari kerja #}
-    {% set hari_ini = hari_ini_nama or '' %}
-    {% if hari_ini == 'Jumat' %}
-        {% set jam_batas = jam_tutup_absensi_jumat %}
-    {% else %}
-        {% set jam_batas = jam_tutup_absensi %}
-    {% endif %}
-
-    {# Cek apakah sekarang sudah lewat jam batas tutup #}
-    {% set sudah_lewat_batas = waktu_sekarang >= jam_batas %}
-
-    {# Tentukan status tampilan #}
-    {% if status == 'hadir' %}
-        {% set warna_border = 'success' %}
-        {% set warna_progress = '#16a34a' %}
-        {% set teks_status = 'Hadir' %}
-    {% elif status == 'terlambat' %}
-        {% set warna_border = 'warning' %}
-        {% set warna_progress = '#d97706' %}
-        {% set teks_status = 'Terlambat' %}
-    {% elif status == 'izin' or status == 'sakit' %}
-        {% set warna_border = 'info' %}
-        {% set warna_progress = '#0284c7' %}
-        {% set teks_status = 'Izin/Sakit' %}
-    {% else %}
-        {# Belum ada record absensi #}
-        {% if sudah_lewat_batas %}
-            {% set warna_border = 'danger' %}
-            {% set warna_progress = '#dc2626' %}
-            {% set teks_status = 'Tidak Hadir' %}
-        {% else %}
-            {% set warna_border = 'secondary' %}
-            {% set warna_progress = '#6b7280' %}
-            {% set teks_status = 'Belum Absen' %}
-        {% endif %}
-    {% endif %}
-    <div class="guru-card card-border-{{ warna_border }}">
-        {# Bagian Kepala Kartu — Mirip ID Card #}
-        <div class="guru-card-header">
-            <div class="guru-avatar">
-                {% if item.foto_profil %}
-                    <img src="{{ url_for('tampilkan_foto_profil', filename=item.foto_profil) }}" 
-                        alt="{{ item.nama }}"
-                        style="width:100%; height:100%; object-fit:cover; border-radius:0.85rem;"
-                        onerror="this.style.display='none'; this.parentElement.innerHTML='{{ item.nama | inisial_avatar }}';">
+                {% if status == 'hadir' %}
+                    {% set status_class = 'present' %}{% set teks_status = 'Hadir Tepat Waktu' %}
+                {% elif status == 'terlambat' %}
+                    {% set status_class = 'late' %}{% set teks_status = 'Terlambat' %}
+                {% elif status == 'izin' or status == 'sakit' %}
+                    {% set status_class = 'excuse' %}{% set teks_status = 'Izin / Sakit' %}
+                {% elif sudah_lewat_batas %}
+                    {% set status_class = 'absent' %}{% set teks_status = 'Tidak Hadir' %}
                 {% else %}
-                    {{ item.nama | inisial_avatar }}
+                    {% set status_class = 'pending' %}{% set teks_status = 'Belum Absen' %}
                 {% endif %}
-            </div>
-            <div class="guru-identitas">
-                <h6 class="guru-nama">{{ item.nama }}</h6>
-                <span class="guru-meta">
-                    {% if item.jabatan %} • {{ item.jabatan }}{% endif %}
-                </span>
-            </div>
-        </div>
 
-        {# Garis Pemisah #}
-        <div class="guru-card-divider"></div>
+                <article class="at-teacher-card" data-search="{{ (item.nama ~ ' ' ~ (item.jabatan or ''))|lower }}">
+                    <div class="at-teacher-top">
+                        <div class="at-teacher-profile">
+                            <div class="at-avatar">
+                                {% if item.foto_profil %}
+                                <img src="{{ url_for('tampilkan_foto_profil', filename=item.foto_profil) }}" alt="{{ item.nama }}" onerror="this.style.display='none';this.parentElement.classList.add('at-avatar-fallback');this.parentElement.textContent='{{ item.nama | inisial_avatar }}'">
+                                {% else %}{{ item.nama | inisial_avatar }}{% endif %}
+                            </div>
+                            <div class="at-teacher-identity">
+                                <h3>{{ item.nama }}</h3>
+                                <p>{{ item.jabatan or 'Tenaga Pendidik' }}</p>
+                            </div>
+                        </div>
+                        <span class="at-status-pill {{ status_class }}"><i></i>{{ teks_status }}</span>
+                    </div>
 
-        {# Statistik Angka #}
-        <div class="guru-stats">
-            <div class="stat-item">
-                <span class="label">Hadir Tepat Waktu</span>
-                <span class="nilai text-success">{{ item.hadir }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="label">Terlambat</span>
-                <span class="nilai text-warning">{{ item.terlambat }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="label">Izin</span>
-                <span class="nilai text-info">{{ item.izin }}</span>
-            </div>
-        </div>
+                    <div class="at-teacher-divider"></div>
 
-        {# Indikator Kehadiran — Warna Ikut Status Hari Ini #}
-        <div class="progress-section">
-            <div class="progress-header">
-                <span class="progress-label">Status Hari Ini</span>
-                <span class="progress-persen" style="color: {{ warna_progress }}">
-                    {{ teks_status }}
-                </span>
-            </div>
-            <div class="progress-bar-wrapper">
-                <div class="progress-bar-fill" style="width: 100%; background: {{ warna_progress }};"></div>
-            </div>
-        </div>
+                    <div class="at-teacher-metrics">
+                        <div><span>TEPAT WAKTU</span><strong>{{ item.hadir }}</strong></div>
+                        <div><span>TERLAMBAT</span><strong>{{ item.terlambat }}</strong></div>
+                        <div><span>IZIN</span><strong>{{ item.izin }}</strong></div>
+                    </div>
 
-        {# Footer — Total & Tombol #}
-        <div class="guru-card-footer">
-            <span class="total-hari">
-                <i class="fas fa-calendar-alt me-1"></i>
-                {{ item.total_hari }} hari
-            </span>
-            <a href="{{ url_for('monitoring_absensi.rincian_kehadiran', guru_id=item.id) }}" class="btn btn-sm btn-primary btn-rincian">
-                <i class="fas fa-eye"></i> Rincian
-            </a>
+                    <div class="at-teacher-bottom">
+                        <span><i class="far fa-calendar-alt"></i> {{ item.total_hari }} hari tercatat</span>
+                        <a href="{{ url_for('monitoring_absensi.rincian_kehadiran', guru_id=item.id) }}">Lihat rincian <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<div class="card py-5">
-    <div class="text-center text-muted">
-        <i class="fas fa-inbox fa-2x mb-2"></i>
-        <p class="mb-0">Data rekapitulasi tidak ditemukan untuk periode yang dipilih.</p>
-    </div>
-</div>
-{% endif %}
-
-{# ==============================================
-   MODAL QR ABSENSI — TAMPILAN RAPI & TIDAK TERHALANG
-   ============================================== #}
-<div id="modal-qr-overlay" class="modal-overlay"></div>
-<div id="modal-qr" class="modal-card modal-qr-styled">
-    <div class="modal-header">
-        <div class="modal-icon blue">
-            <i class="fas fa-qrcode"></i>
-        </div>
-        <div class="modal-header-content">
-            <h4>QR Absensi</h4>
-            <p id="qr-keterangan">Memuat...</p>
-        </div>
-        <button type="button" id="btn-tutup-qr-x" class="btn-tutup-silang" title="Tutup">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="modal-body">
-        <div class="qr-tampil-wrapper">
-            <div id="qr-tempat-tampil"></div>
-        </div>
-        <div class="qr-info">
-            <div class="qr-info-baris">
-                <span class="qr-info-label"><i class="fas fa-user-check me-1"></i> Berlaku</span>
-                <span class="qr-info-nilai">Seluruh Guru</span>
-            </div>
-            <div class="qr-info-baris">
-                <span class="qr-info-label"><i class="fas fa-calendar-day me-1"></i> Tanggal</span>
-                <span id="qr-tanggal" class="qr-info-nilai">—</span>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button id="btn-tutup-qr" class="btn-modal btn-cancel">
-            <i class="fas fa-times me-1"></i> Tutup
-        </button>
-    </div>
+        <div class="at-no-search" id="at-no-search" hidden><i class="fas fa-search"></i><strong>Guru tidak ditemukan</strong><span>Coba kata kunci nama atau jabatan lainnya.</span></div>
+        {% else %}
+        <div class="at-empty-state"><div><i class="fas fa-folder-open"></i></div><h3>Belum Ada Data Rekap</h3><p>Data kehadiran tidak ditemukan untuk periode yang dipilih.</p></div>
+        {% endif %}
+    </section>
 </div>
 
-{# Tetap simpan modal kamera di bawah dengan z-index lebih rendah #}
-<div id="modal-kamera-overlay" class="modal-overlay"></div>
-<div id="modal-kamera" class="modal-card modal-kamera-styled">
-    <div class="modal-header">
-        <div class="modal-icon green">
-            <i class="fas fa-camera"></i>
-        </div>
-        <div class="modal-header-content">
-            <h4>Scan QR Absen</h4>
-            <p><span id="kamera-status">Arahkan kamera ke QR Code...</span></p>
-        </div>
-        <button type="button" id="btn-tutup-kamera-x" class="btn-tutup-silang" title="Tutup">
-            <i class="fas fa-times"></i>
-        </button>
+<!-- QR MODAL -->
+<div id="modal-qr-overlay" class="at-modal-overlay"></div>
+<div id="modal-qr" class="at-modal at-qr-modal" role="dialog" aria-modal="true" aria-labelledby="at-qr-title">
+    <div class="at-modal-head">
+        <div class="at-modal-symbol"><i class="fas fa-qrcode"></i></div>
+        <div><span>ATTENDANCE ACCESS</span><h3 id="at-qr-title">QR Absensi</h3><p id="qr-keterangan">Menyiapkan QR Code...</p></div>
+        <button type="button" id="btn-tutup-qr-x" class="at-modal-close"><i class="fas fa-times"></i></button>
     </div>
-    <div class="modal-body">
-        <div class="kamera-frame">
+    <div class="at-modal-content">
+        <div class="at-qr-frame"><div id="qr-tempat-tampil"><div class="at-qr-loading"><span></span><small>Menyiapkan QR Code</small></div></div></div>
+        <div class="at-qr-details">
+            <div><span><i class="fas fa-users"></i> Berlaku untuk</span><strong>Seluruh Guru</strong></div>
+            <div><span><i class="far fa-calendar"></i> Tanggal</span><strong id="qr-tanggal">—</strong></div>
+        </div>
+        <div class="at-qr-note"><i class="fas fa-shield-alt"></i> QR hanya digunakan melalui Mode Absensi yang telah ditentukan.</div>
+    </div>
+    <div class="at-modal-foot"><button type="button" id="btn-tutup-qr" class="at-btn at-btn-primary">Tutup</button></div>
+</div>
+
+<!-- CAMERA MODAL -->
+<div id="modal-kamera-overlay" class="at-modal-overlay"></div>
+<div id="modal-kamera" class="at-modal at-camera-modal" role="dialog" aria-modal="true" aria-labelledby="at-camera-title">
+    <div class="at-modal-head">
+        <div class="at-modal-symbol camera-symbol"><i class="fas fa-camera"></i></div>
+        <div><span>QR RECOGNITION</span><h3 id="at-camera-title">Scan QR Absensi</h3><p id="kamera-status">Arahkan kamera ke QR Code.</p></div>
+        <button type="button" id="btn-tutup-kamera-x" class="at-modal-close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="at-camera-content">
+        <div class="at-camera-frame">
             <video id="video-kamera-monitoring" autoplay playsinline></video>
-            <canvas id="kanvas-pemindai-monitoring"></canvas>
+            <div class="at-camera-overlay"><span></span></div>
         </div>
+        <canvas id="kanvas-pemindai-monitoring" hidden></canvas>
+        <p class="at-camera-hint"><i class="fas fa-crosshairs"></i> Posisikan QR Code tepat di dalam area pemindaian.</p>
     </div>
-    <div class="modal-footer">
-        <button id="btn-tutup-kamera-monitoring" class="btn-modal btn-cancel">
-            <i class="fas fa-times me-1"></i> Tutup
-        </button>
-    </div>
+    <div class="at-modal-foot"><button type="button" id="btn-tutup-kamera-monitoring" class="at-btn at-btn-outline">Tutup Kamera</button></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-// ==============================================
-// FUNGSI BANTU: TUTUP MODAL
-// ==============================================
-function tutupModalQR() {
-    document.getElementById('modal-qr-overlay').style.display = 'none';
-    document.getElementById('modal-qr').style.display = 'none';
-}
-function tutupModalKamera() {
-    pemindaianAktif = false;
-    if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-    document.getElementById('modal-kamera-overlay').style.display = 'none';
-    document.getElementById('modal-kamera').style.display = 'none';
-}
+(() => {
+    'use strict';
 
-// ==============================================
-// TOMBOL BUKA MODAL
-// ==============================================
-document.getElementById('btn-buat-qr').addEventListener('click', async () => {
-    document.getElementById('modal-qr-overlay').style.display = 'block';
-    document.getElementById('modal-qr').style.display = 'flex';
-    document.getElementById('qr-keterangan').textContent = 'Memuat QR...';
-    document.getElementById('qr-tempat-tampil').innerHTML = '';
-    document.getElementById('qr-tanggal').textContent = '—';
+    const KEY = '__SMPU_MONITORING_ABSENSI__';
 
-    const res = await fetch("{{ url_for('monitoring_absensi.buat_qr_semua_guru') }}", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: ''
-    });
-    const hasil = await res.json();
+    // Bersihkan instance lama ketika halaman dimuat ulang oleh SPA.
+    window[KEY]?.destroy?.();
 
-    if (hasil.status === 'sukses') {
-        document.getElementById('qr-keterangan').textContent = 'Masuk dan Pulang otomatis';
-        document.getElementById('qr-tanggal').textContent = hasil.hari_ini;
-        document.getElementById('qr-tempat-tampil').innerHTML =
-            '<img src="data:image/png;base64,' + hasil.qr_code + '" alt="QR Absensi">';
-    } else {
-        alert(hasil.pesan || 'Gagal membuat QR');
-        tutupModalQR();
-    }
-});
+    const page = document.querySelector('.attendance-page');
+    if (!page) return;
 
-document.getElementById('btn-buka-kamera-monitoring').addEventListener('click', async () => {
-    document.getElementById('modal-kamera-overlay').style.display = 'block';
-    document.getElementById('modal-kamera').style.display = 'flex';
-    document.getElementById('kamera-status').textContent = 'Mengaktifkan kamera...';
-    await mulaiScan();
-});
+    const controller = new AbortController();
+    const { signal } = controller;
 
-// ==============================================
-// ✅ HANYA BISA TUTUP DARI TOMBOL — TIDAK BISA DARI KLIK LUAR
-// ==============================================
-// === TUTUP MODAL QR ===
-document.getElementById('btn-tutup-qr').addEventListener('click', tutupModalQR);
-document.getElementById('btn-tutup-qr-x').addEventListener('click', tutupModalQR);
-// ❌ TIDAK BISA TUTUP DENGAN KLIK LATAR BELAKANG — dihapus
+    const $ = id => document.getElementById(id);
+    const listen = (el, event, callback) => {
+        el?.addEventListener(event, callback, { signal });
+    };
 
-// === TUTUP MODAL KAMERA ===
-document.getElementById('btn-tutup-kamera-monitoring').addEventListener('click', tutupModalKamera);
-document.getElementById('btn-tutup-kamera-x').addEventListener('click', tutupModalKamera);
-// ❌ TIDAK BISA TUTUP DENGAN KLIK LATAR BELAKANG — dihapus
+    const qrOverlay = $('modal-qr-overlay');
+    const qrModal = $('modal-qr');
+    const cameraOverlay = $('modal-kamera-overlay');
+    const cameraModal = $('modal-kamera');
 
-// ==============================================
-// FUNGSI SCAN QR — TETAP BERJALAN NORMAL
-// ==============================================
-const video = document.getElementById('video-kamera-monitoring');
-const canvas = document.getElementById('kanvas-pemindai-monitoring');
-const ctx = canvas.getContext('2d');
-let pemindaianAktif = false;
+    const video = $('video-kamera-monitoring');
+    const canvas = $('kanvas-pemindai-monitoring');
+    const ctx = canvas?.getContext('2d');
 
-async function mulaiScan() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        video.srcObject = stream;
-        await video.play();
-        pemindaianAktif = true;
-        document.getElementById('kamera-status').textContent = 'Memindai... arahkan ke QR Code';
-        pindaiBingkai();
-    } catch (e) {
-        alert("❌ Tidak dapat mengakses kamera: " + e.message);
-        document.getElementById('kamera-status').textContent = 'Gagal akses kamera';
-    }
-}
+    let pemindaianAktif = false;
+    let streamKamera = null;
+    let animationFrame = null;
+    let kameraSedangDibuka = false;
 
-function pindaiBingkai() {
-    if (!pemindaianAktif) return;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-    const gambar = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const urls = {
+        qr: page.dataset.qrUrl,
+        scan: page.dataset.scanUrl,
+        save: page.dataset.saveUrl
+    };
 
-    // ✅ Pastikan library ada
-    if (!window.jsQR) {
-        requestAnimationFrame(pindaiBingkai);
-        return;
+    const inputJam = [
+        'jam_masuk',
+        'batas_terlambat',
+        'jam_tutup_absensi',
+        'jam_pulang',
+        'jam_masuk_jumat',
+        'batas_terlambat_jumat',
+        'jam_tutup_absensi_jumat',
+        'jam_pulang_jumat'
+    ];
+
+    const semuaInput = () => inputJam.map($).filter(Boolean);
+
+    function tampilkanModal(overlay, modal) {
+        if (!overlay || !modal) return;
+        overlay.style.display = 'block';
+        modal.style.display = 'flex';
+        document.body.classList.add('at-modal-open');
     }
 
-    const hasilQR = window.jsQR(gambar);
-    if (hasilQR && hasilQR.data) {
+    function sembunyikanModal(overlay, modal) {
+        if (!overlay || !modal) return;
+        overlay.style.display = 'none';
+        modal.style.display = 'none';
+
+        if (
+            qrModal?.style.display !== 'flex' &&
+            cameraModal?.style.display !== 'flex'
+        ) {
+            document.body.classList.remove('at-modal-open');
+        }
+    }
+
+    function tutupModalQR() {
+        sembunyikanModal(qrOverlay, qrModal);
+    }
+
+    function hentikanKamera() {
         pemindaianAktif = false;
-        prosesHasilScan(hasilQR.data);
-    } else {
-        requestAnimationFrame(pindaiBingkai);
+        kameraSedangDibuka = false;
+
+        if (animationFrame !== null) {
+            cancelAnimationFrame(animationFrame);
+            animationFrame = null;
+        }
+
+        if (streamKamera) {
+            streamKamera.getTracks().forEach(track => track.stop());
+            streamKamera = null;
+        }
+
+        if (video) {
+            video.pause();
+            video.srcObject = null;
+        }
     }
-}
 
-async function prosesHasilScan(qr_teks) {
-    document.getElementById('kamera-status').textContent = '✅ QR Terdeteksi! Memproses...';
+    function tutupModalKamera() {
+        hentikanKamera();
+        sembunyikanModal(cameraOverlay, cameraModal);
+    }
 
-    try {
-        const res = await fetch("{{ url_for('absensi_guru.scan_qr_proses') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data_qr: qr_teks }) // ✅ Kirim JSON
+    function setStatusKamera(pesan) {
+        const status = $('kamera-status');
+        if (status) status.textContent = pesan;
+    }
+
+    // =====================================================
+    // GENERATE QR
+    // =====================================================
+
+    listen($('btn-buat-qr'), 'click', async () => {
+        tampilkanModal(qrOverlay, qrModal);
+
+        const keterangan = $('qr-keterangan');
+        const tempatQR = $('qr-tempat-tampil');
+        const tanggal = $('qr-tanggal');
+        const tombol = $('btn-buat-qr');
+
+        if (keterangan) keterangan.textContent = 'Sedang membuat QR absensi...';
+
+        if (tempatQR) {
+            tempatQR.innerHTML = `
+                <div class="at-qr-loading">
+                    <span></span>
+                    <small>Menyiapkan QR Code</small>
+                </div>`;
+        }
+
+        if (tanggal) tanggal.textContent = '—';
+        if (tombol) tombol.disabled = true;
+
+        try {
+            const response = await fetch(urls.qr, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: ''
+            });
+
+            const hasil = await response.json();
+
+            if (!response.ok || hasil.status !== 'sukses') {
+                throw new Error(hasil.pesan || 'Gagal membuat QR absensi.');
+            }
+
+            if (keterangan) {
+                keterangan.textContent = 'QR siap digunakan untuk absensi masuk dan pulang.';
+            }
+
+            if (tanggal) tanggal.textContent = hasil.hari_ini || 'Hari ini';
+
+            if (tempatQR) {
+                const img = document.createElement('img');
+                img.src = `data:image/png;base64,${hasil.qr_code}`;
+                img.alt = 'QR Absensi Guru';
+                tempatQR.replaceChildren(img);
+            }
+
+        } catch (error) {
+            tutupModalQR();
+            alert(error.message || 'Terjadi kesalahan saat membuat QR.');
+        } finally {
+            if (tombol) tombol.disabled = false;
+        }
+    });
+
+    listen($('btn-tutup-qr'), 'click', tutupModalQR);
+    listen($('btn-tutup-qr-x'), 'click', tutupModalQR);
+
+    // =====================================================
+    // SCANNER KAMERA
+    // =====================================================
+
+    listen($('btn-buka-kamera-monitoring'), 'click', async () => {
+        tampilkanModal(cameraOverlay, cameraModal);
+        setStatusKamera('Mengaktifkan kamera...');
+        await mulaiScan();
+    });
+
+    listen($('btn-tutup-kamera-monitoring'), 'click', tutupModalKamera);
+    listen($('btn-tutup-kamera-x'), 'click', tutupModalKamera);
+
+    async function mulaiScan() {
+        if (kameraSedangDibuka) return;
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setStatusKamera('Browser tidak mendukung akses kamera.');
+            alert('Browser tidak mendukung akses kamera. Gunakan browser modern dan koneksi HTTPS.');
+            return;
+        }
+
+        try {
+            if (!window.jsQR) {
+                throw new Error('Library pemindai QR belum berhasil dimuat.');
+            }
+
+            kameraSedangDibuka = true;
+
+            streamKamera = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            });
+
+            if (!video) throw new Error('Elemen video kamera tidak ditemukan.');
+
+            video.srcObject = streamKamera;
+            await video.play();
+
+            pemindaianAktif = true;
+            setStatusKamera('Kamera aktif. Arahkan ke QR Code.');
+            pindaiBingkai();
+
+        } catch (error) {
+            hentikanKamera();
+            setStatusKamera('Gagal mengakses kamera.');
+            alert('Tidak dapat mengakses kamera: ' + error.message);
+        }
+    }
+
+    function pindaiBingkai() {
+        if (!pemindaianAktif || !video || !ctx || !canvas) return;
+
+        if (video.readyState < video.HAVE_CURRENT_DATA ||
+            !video.videoWidth || !video.videoHeight) {
+            animationFrame = requestAnimationFrame(pindaiBingkai);
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const gambar = ctx.getImageData(
+            0, 0, canvas.width, canvas.height
+        );
+
+        const hasilQR = window.jsQR(
+            gambar.data,
+            gambar.width,
+            gambar.height,
+            { inversionAttempts: 'attemptBoth' }
+        );
+
+        if (hasilQR?.data) {
+            pemindaianAktif = false;
+            hentikanKamera();
+            prosesHasilScan(hasilQR.data);
+            return;
+        }
+
+        animationFrame = requestAnimationFrame(pindaiBingkai);
+    }
+
+    async function prosesHasilScan(qrTeks) {
+        setStatusKamera('QR terdeteksi. Sedang memproses...');
+
+        try {
+            const response = await fetch(urls.scan, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ data_qr: qrTeks })
+            });
+
+            const hasil = await response.json();
+
+            alert(hasil.pesan || hasil.message || 'QR selesai diproses.');
+
+            tutupModalKamera();
+
+            if (
+                hasil.status === 'sukses' ||
+                hasil.sukses ||
+                hasil.success
+            ) {
+                window.location.reload();
+            }
+
+        } catch (error) {
+            alert('Kesalahan jaringan: ' + error.message);
+            tutupModalKamera();
+        }
+    }
+
+    // =====================================================
+    // PENGATURAN JAM KERJA
+    // =====================================================
+
+    const btnEdit = $('btn-edit-pengaturan');
+    const btnSimpan = $('btn-simpan-pengaturan');
+    const configState = $('at-config-state');
+    const btnPengecualian = $('btn-tambah-pengecualian');
+
+    function aturModeEdit(modeEdit) {
+        semuaInput().forEach(input => {
+            input.disabled = !modeEdit;
         });
 
-        const hasil = await res.json();
-
-        // ✅ TAMPILKAN PESAN JELAS
-        alert(hasil.pesan || hasil.message || 'Tidak ada pesan dari server');
-
-        tutupModalKamera(); // ✅ TUTUP OTOMATIS
-
-        if (hasil.status === 'sukses' || hasil.sukses || hasil.success) {
-            setTimeout(() => window.location.reload(), 800); // ✅ REFRESH
+        if (btnPengecualian) {
+            btnPengecualian.disabled = !modeEdit;
         }
-    } catch (err) {
-        alert('❌ Kesalahan jaringan: ' + err.message);
-        tutupModalKamera();
+
+        btnEdit?.classList.toggle('d-none', modeEdit);
+        btnSimpan?.classList.toggle('d-none', !modeEdit);
+
+        if (configState) {
+            configState.innerHTML = modeEdit
+                ? '<i class="fas fa-pen"></i> Mode edit aktif'
+                : '<i class="fas fa-lock"></i> Mode baca';
+        }
     }
-}
 
-// ==============================================
-// ✅ EDIT ↔ SIMPAN PENGATURAN JAM — DIPERBARUI
-// ==============================================
-let modeEdit = false;
-
-// Daftar SEMUA input — ditambah jam_tutup_absensi
-const elemenInputJam = [
-    document.getElementById('jam_masuk'),
-    document.getElementById('batas_terlambat'),
-    document.getElementById('jam_tutup_absensi'),  // ✅ BARU
-    document.getElementById('jam_pulang'),
-    document.getElementById('jam_masuk_jumat'),
-    document.getElementById('batas_terlambat_jumat'),
-    document.getElementById('jam_tutup_absensi_jumat'),
-    document.getElementById('jam_pulang_jumat'),
-    document.getElementById('btn-tambah-pengecualian')
-];
-
-const btnEdit = document.getElementById('btn-edit-pengaturan');
-const btnSimpan = document.getElementById('btn-simpan-pengaturan');
-
-// Fungsi: Kunci / Buka Semua Input
-function setKunciInput(kunci) {
-    elemenInputJam.forEach(el => {
-        if (el) el.disabled = kunci;
-    });
-}
-
-// ✅ HANYA pasang listener jika elemen ADA di halaman
-if (btnEdit && btnSimpan) {
-    btnEdit.addEventListener('click', () => {
-        modeEdit = true;
-        setKunciInput(false);
-        btnEdit.classList.add('d-none');
-        btnSimpan.classList.remove('d-none');
+    listen(btnEdit, 'click', () => {
+        aturModeEdit(true);
     });
 
-    btnSimpan.addEventListener('click', async () => {
-        const data = {
-            jam_masuk: document.getElementById('jam_masuk').value,
-            batas_terlambat: document.getElementById('batas_terlambat').value,
-            jam_tutup_absensi: document.getElementById('jam_tutup_absensi').value,
-            jam_pulang: document.getElementById('jam_pulang').value,
-            jam_masuk_jumat: document.getElementById('jam_masuk_jumat').value,
-            batas_terlambat_jumat: document.getElementById('batas_terlambat_jumat').value,
-            jam_tutup_absensi_jumat: document.getElementById('jam_tutup_absensi_jumat').value,
-            jam_pulang_jumat: document.getElementById('jam_pulang_jumat').value
-        };
+    listen(btnSimpan, 'click', async () => {
+        const data = {};
+
+        for (const id of inputJam) {
+            const input = $(id);
+
+            if (!input) {
+                alert('Input pengaturan tidak lengkap: ' + id);
+                return;
+            }
+
+            if (!input.value) {
+                alert('Mohon lengkapi semua pengaturan jam kerja.');
+                input.focus();
+                return;
+            }
+
+            data[id] = input.value;
+        }
+
+        btnSimpan.disabled = true;
+        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
         try {
-            const res = await fetch("{{ url_for('monitoring_absensi.simpan_pengaturan_jam') }}", {
+            const response = await fetch(urls.save, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(data)
             });
-            const hasil = await res.json();
-            if (hasil.status === 'sukses') {
-                alert('✅ Pengaturan berhasil disimpan!');
-                modeEdit = false;
-                setKunciInput(true);
-                btnSimpan.classList.add('d-none');
-                btnEdit.classList.remove('d-none');
-            } else {
-                alert('❌ Gagal: ' + hasil.pesan);
+
+            const hasil = await response.json();
+
+            if (!response.ok || hasil.status !== 'sukses') {
+                throw new Error(hasil.pesan || 'Gagal menyimpan pengaturan.');
             }
-        } catch (err) {
-            alert('❌ Kesalahan jaringan: ' + err.message);
+
+            aturModeEdit(false);
+            alert(hasil.pesan || 'Pengaturan jam kerja berhasil disimpan.');
+
+        } catch (error) {
+            alert(error.message || 'Terjadi kesalahan saat menyimpan.');
+        } finally {
+            btnSimpan.disabled = false;
+            btnSimpan.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
         }
     });
-}
+
+    // =====================================================
+    // PENCARIAN DIREKTORI GURU
+    // =====================================================
+
+    const searchInput = $('at-search-teacher');
+    const teacherCards = Array.from(
+        document.querySelectorAll('.at-teacher-card')
+    );
+    const noSearch = $('at-no-search');
+
+    listen(searchInput, 'input', () => {
+        const keyword = searchInput.value.trim().toLowerCase();
+        let jumlahTampil = 0;
+
+        teacherCards.forEach(card => {
+            const cocok = (card.dataset.search || '').includes(keyword);
+            card.hidden = !cocok;
+
+            if (cocok) jumlahTampil++;
+        });
+
+        if (noSearch) {
+            noSearch.hidden = jumlahTampil !== 0;
+        }
+    });
+
+    // =====================================================
+    // SPA CLEANUP
+    // =====================================================
+
+    window[KEY] = {
+        destroy() {
+            controller.abort();
+            hentikanKamera();
+
+            tutupModalQR();
+            tutupModalKamera();
+
+            delete window[KEY];
+        }
+    };
+})();
 </script>
 
 {% endblock %}
 
 {% block extra_css %}
 <style data-spa-page-style="monitoring-absensi">
-.page-header h3,
-.page-header {
-    margin: 0;
+/* =========================================================
+   SMPU — EMERALD ATTENDANCE CONTROL CENTER
+   Semua selector diisolasi di .attendance-page / modal at-
+========================================================= */
+
+.attendance-page {
+    --at-ink: #12352b;
+    --at-muted: #81938c;
+    --at-green: #087653;
+    --at-deep: #064b39;
+    --at-mint: #e8f6ef;
+    --at-line: #e7eee9;
+    --at-paper: #ffffff;
+    --at-bg: #f7faf8;
+    color: var(--at-ink);
+    padding-bottom: 42px;
+    font-family: inherit;
 }
 
-.welcome-box {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #3b82f6 70%, #60a5fa 100%);
-    color: #ffffff;
-    border-radius: 1.25rem;
-    padding: 2rem 2.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.75rem;
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22), 0 3px 8px rgba(37, 99, 235, 0.15);
-    position: relative;
-    overflow: hidden;
-}
-.welcome-box .garis-1, .welcome-box .garis-2 {
-    position: absolute;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.06);
-}
-.welcome-box .garis-1 { top: 30%; left: -50px; width: 200px; height: 200px; }
-.welcome-box .garis-2 { bottom: 20%; right: 25%; width: 150px; height: 150px; border-width: 1px; }
-.welcome-box .titik {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-}
-.welcome-box .titik-1 { width:12px; height:12px; top:25%; left:20%; }
-.welcome-box .titik-2 { width:8px; height:8px; top:65%; right:30%; }
-.welcome-box .titik-3 { width:15px; height:15px; bottom:20%; left:40%; }
-.welcome-box h2 { font-size: 1.9rem; font-weight:700; margin:0 0 0.6rem; position:relative; z-index:2; }
-.welcome-box p { opacity:0.92; font-size:1.05rem; position:relative; z-index:2; color:#fffbeb !important; }
-.welcome-box .text-primary { color:#dbeafe !important; font-weight:500; }
-.date-box {
-    background: rgba(255,255,255,0.18);
-    padding:1.25rem 1.75rem;
-    border-radius:1rem;
-    text-align:center;
-    backdrop-filter: blur(12px);
-    border:1px solid rgba(255,255,255,0.28);
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
-    min-width:125px;
-    position:relative; z-index:2;
-    color:#fff !important;
-    display:flex; flex-direction:column;
-}
-.date-box i { font-size:1.7rem; margin-bottom:0.4rem; opacity:0.95; }
-.date-box span { font-size:1.15rem; font-weight:600; letter-spacing:0.5px; }
+.attendance-page * { box-sizing: border-box; }
+.attendance-page button,
+.attendance-page input,
+.attendance-page select { font: inherit; }
 
-.form-label {
-    margin-bottom: .5rem;
-    display: flex;
+.attendance-page .at-eyebrow,
+.attendance-page .at-section-kicker {
+    display: inline-flex;
     align-items: center;
-    flex-direction: row;
     gap: 8px;
+    color: #7b9388;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.55px;
 }
 
-/* Grid kartu statistik */
-.stats-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)) !important;
-    gap: 1.5rem !important;
-    margin-bottom: 1.75rem !important;
-}
-.stat-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 1.25rem;
-    padding: 1.75rem 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.08);
-    border: 1px solid rgba(226,232,240,0.8);
-    display: flex; align-items: center; gap: 1.25rem;
-    transition: all 0.3s ease;
-    position: relative; overflow: hidden;
-}
-.stat-card::before {
-    content: ""; position: absolute; top: -20px; right: -20px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(37,99,235,0.05); z-index:0;
-}
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    border-color: rgba(191,219,254,0.6);
-}
-.stat-icon {
-    width: 64px; height: 64px; border-radius: 1rem;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem; color: #fff; flex-shrink:0;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.12); position:relative; z-index:1;
-}
-.stat-icon.bg-primary { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-.stat-icon.bg-success { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.stat-icon.bg-info { background: linear-gradient(135deg, #0284c7, #38bdf8); }
-.stat-icon.bg-warning { background: linear-gradient(135deg, #d97706, #fbbf24); }
-.stat-icon.bg-danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
-.stat-info { position:relative; z-index:1; }
-.stat-info p { margin:0 0 0.4rem; color:#64748b; font-weight:500; }
-.stat-info h3 { margin:0; font-size:2rem; font-weight:700; color:#0f172a; }
-
-/* Kartu & Tabel */
-.card { border: none; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.card-header { background:#fff; border-bottom:1px solid #f1f5f9; padding:1rem 1.25rem; }
-.card-header h5 { font-size:1.1rem; font-weight:600; color:#2d3748; margin:0; }
-
-.card-qr {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #2563eb, #1e40af);
-    padding: 1.5rem 2rem;
-    border-radius: 16px;
-    box-shadow: var(--kelas-shadow-md);
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(226, 232, 240, 0.6);
+.at-intro {
+    min-height: 260px;
+    padding: 38px 44px;
+    margin-bottom: 25px;
     position: relative;
-    overflow: hidden;
-}
-
-.card-qr-text {
-    color: #ffffff;
-}
-
-.card-qr-subtext {
-    color: #ffffff;
-    margin: 0;
-}
-
-.card-qr-text i {
-    color: #ffffff !important;
-}
-
-#btn-buka-kamera-monitoring,
-#btn-buat-qr {
-    background-color: #ffffff1c !important;
-    color: #ffffff !important;
-    border: 1px solid #ffffff30 !important;
-}
-
-/* ===== GRID KARTU GURU ===== */
-.guru-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.25rem;
-}
-
-/* ===== KARTU UTAMA ===== */
-.guru-card {
-    background: #fff;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    border-top: 4px solid #cbd5e1;
-    transition: all 0.3s ease;
-}
-/* Warna garis atas sesuai persentase */
-.guru-card.card-border-success { border-top-color: #16a34a; }
-.guru-card.card-border-warning { border-top-color: #d97706; }
-.guru-card.card-border-danger  { border-top-color: #dc2626; }
-.guru-card.card-border-secondary { border-top-color: #6b7280; }
-.guru-card.card-border-info { border-top-color: #0284c7; }
-
-.guru-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* ===== KEPALA KARTU — AVATAR + IDENTITAS ===== */
-.guru-card-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
+    overflow: hidden;
+    border: 1px solid #e5eee8;
+    border-radius: 25px;
+    background:
+        radial-gradient(ellipse at 80% 20%, rgba(183, 231, 202, .34), transparent 35%),
+        linear-gradient(115deg, #ffffff 0%, #f3faf5 65%, #eaf7ef 100%);
+    box-shadow: 0 12px 35px rgba(24, 73, 52, .045);
 }
-.guru-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 0.85rem;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
+
+.at-intro-copy { position: relative; z-index: 2; max-width: 660px; }
+.at-live-dot, .at-count-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    display: inline-block; background: #1eb77a;
+    box-shadow: 0 0 0 4px rgba(30, 183, 122, .12);
+    animation: atPulse 2s infinite;
+}
+
+.at-intro h1 {
+    margin: 19px 0 12px;
+    font-size: clamp(30px, 4vw, 47px);
+    line-height: 1.08;
+    font-weight: 850;
+    letter-spacing: -2px;
+    color: #12382c;
+}
+.at-intro h1 span { color: #0b9365; }
+.at-intro-copy > p {
+    max-width: 590px; margin: 0;
+    color: #71877c; font-size: 14px; line-height: 1.8;
+}
+.at-intro-meta {
+    display: flex; align-items: center; gap: 13px;
+    margin-top: 23px; color: #638073; font-size: 12px; font-weight: 650;
+}
+.at-intro-meta span { display: inline-flex; align-items: center; gap: 7px; }
+.at-meta-divider { height: 15px; width: 1px; background: #d8e5dc; }
+
+.at-intro-art {
+    position: absolute; right: 5%; top: 50%;
+    width: 290px; height: 240px;
+    transform: translateY(-50%);
+}
+.at-art-glow {
+    position: absolute; width: 180px; height: 180px;
+    left: 55px; top: 30px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(52, 185, 126, .2), rgba(52, 185, 126, 0));
+    filter: blur(6px); animation: atGlow 4s ease-in-out infinite;
+}
+.at-orbit {
+    position: absolute; border: 1px solid rgba(8, 118, 83, .15);
+    border-radius: 50%; left: 24px; top: 0;
+    width: 240px; height: 240px;
+    animation: atRotate 22s linear infinite;
+}
+.at-orbit::after {
+    content: ""; position: absolute; width: 9px; height: 9px;
+    border-radius: 50%; background: #70c99c;
+    top: 35px; left: 25px; box-shadow: 0 0 16px #70c99c;
+}
+.at-orbit-two {
+    width: 185px; height: 185px; left: 52px; top: 28px;
+    border-style: dashed; animation-direction: reverse; animation-duration: 32s;
+}
+.at-art-icon {
+    position: absolute; left: 104px; top: 80px;
+    width: 88px; height: 88px; border-radius: 27px;
+    display: grid; place-items: center; font-size: 36px;
     color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.1rem;
-    flex-shrink: 0;
+    background: linear-gradient(145deg, #11966b, #07563f);
+    box-shadow: 0 18px 35px rgba(7, 94, 65, .25), inset 0 1px 1px #ffffff70;
+    animation: atFloat 4s ease-in-out infinite;
 }
+.at-art-chip {
+    position: absolute; z-index: 2; padding: 10px 13px;
+    border: 1px solid #e2eee6; border-radius: 12px;
+    background: rgba(255,255,255,.88); backdrop-filter: blur(10px);
+    color: #416c57; font-size: 10px; font-weight: 750;
+    box-shadow: 0 8px 22px rgba(20, 74, 50, .08);
+}
+.at-chip-top { top: 25px; right: -5px; }
+.at-chip-top i { color: #0b9868; margin-right: 5px; }
+.at-chip-bottom { bottom: 18px; left: 0; }
+.at-chip-bottom span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #24bb79; margin-right: 5px; }
 
-.guru-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
-}
-
-.guru-identitas {
-    flex: 1;
-    min-width: 0;
-}
-.guru-nama {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1e293b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.guru-meta {
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
-/* ===== GARIS PEMISAH ===== */
-.guru-card-divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-    margin: 0.85rem 0;
-}
-
-/* ===== STATISTIK ANGKA ===== */
-.guru-stats {
-    display: flex;
-    justify-content: space-between;
-    text-align: center;
-    margin-bottom: 0.85rem;
-}
-.stat-item {
-    display: flex;
-    flex-direction: column;
-}
-.stat-item .label {
-    font-size: 0.78rem;
-    color: #94a3b8;
-    margin-bottom: 0.2rem;
-}
-.stat-item .nilai {
-    font-size: 1.15rem;
-    font-weight: 700;
-}
-
-/* ===== PROGRESS BAR ===== */
-.progress-section {
-    margin: 0.5rem 0 0.85rem;
-}
-.progress-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.35rem;
-}
-.progress-label {
-    font-size: 0.82rem;
-    color: #64748b;
-}
-.progress-persen {
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-.progress-bar-wrapper {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.progress-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s ease;
-}
-
-/* ===== FOOTER KARTU ===== */
-.guru-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px dashed #f1f5f9;
-}
-.total-hari {
-    font-size: 0.85rem;
-    color: #64748b;
-}
-.btn-rincian {
-    border-radius: 0.5rem;
-    font-size: 0.85rem;
-}
-
-/* ===== RESPONSIF ===== */
-@media (max-width: 768px) {
-    .guru-cards-grid {
-        grid-template-columns: 1fr;
-    }
-    .guru-stats {
-        justify-content: space-around;
-    }
-}
-
-/* Responsif */
-@media (max-width:768px) {
-    .welcome-box { flex-direction:column; text-align:center; gap:1.5rem; padding:1.75rem 1.5rem; }
-    .welcome-box h2 { font-size:1.5rem; }
-    .stats-grid { grid-template-columns:1fr !important; }
-}
-
-/* ==============================================
-   MODAL — DASAR
-   ============================================== */
-.modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(4px);
-    z-index: 9997;
-    display: none;
-}
-.modal-card {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff; border-radius: 1.25rem;
-    box-shadow: 0 20px 45px rgba(15,23,42,0.25);
-    border: 1px solid rgba(226,232,240,0.9);
-    display: none; flex-direction: column;
-    max-height: 90vh;
-}
-/* Z-INDEX DIPISAH AGAR TIDAK SALING TUTUP */
-.modal-qr-styled    { z-index: 9999; max-width: 380px; width: 92%; }
-.modal-kamera-styled{ z-index: 9998; max-width: 480px; width: 92%; }
-
-/* ==============================================
-   HEADER MODAL
-   ============================================== */
-.modal-header {
-    display: flex; align-items: center; gap: 0.85rem;
-    padding: 1.25rem 1.25rem 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    position: relative;
-}
-.modal-icon {
-    width: 44px; height: 44px; border-radius: 0.85rem;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.15rem; flex-shrink: 0;
-}
-.modal-icon.blue  { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1d4ed8; }
-.modal-icon.green { background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #16a34a; }
-.modal-header-content { flex: 1; min-width: 0; }
-.modal-header-content h4 { margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e293b; }
-.modal-header-content p { margin: 0.15rem 0 0; font-size: 0.88rem; color: #64748b; }
-
-/* TOMBOL TUTUP DI POJOK */
-.btn-tutup-silang {
-    border: none; background: transparent; padding: 0.25rem 0.4rem;
-    font-size: 1rem; color: #94a3b8; cursor: pointer;
-    border-radius: 0.375rem; transition: all 0.2s;
-}
-.btn-tutup-silang:hover { background: #f1f5f9; color: #475569; }
-
-/* ==============================================
-   BADAN MODAL QR — RAPI TENGAH
-   ============================================== */
-.modal-body {
-    padding: 1rem 1.25rem;
-    flex: 1;
-    overflow-y: auto;
-    border-bottom: 1px solid #ededed;
-}
-
-.qr-tampil-wrapper {
-    display: flex; justify-content: center; align-items: center;
-    padding: 1rem; background: #f8fafc;
-    border-radius: 0.85rem; border: 1px solid #e2e8f0;
-    margin-bottom: 1rem;
-}
-
-#qr-tempat-tampil img {
-    width: 240px !important; height: 240px !important;
-    border-radius: 0.5rem; display: block;
-}
-
-.qr-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.qr-info-baris {
+/* ACTION STRIP */
+.at-action-strip {
+    min-height: 135px; position: relative; overflow: hidden;
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.5rem 0.75rem; background: #f8fafc;
-    border-radius: 0.5rem; font-size: 0.9rem;
+    gap: 24px; padding: 26px 30px; margin-bottom: 34px;
+    border-radius: 20px;
+    color: white;
+    background: linear-gradient(110deg, #07513d 0%, #087653 55%, #10966a 100%);
+    box-shadow: 0 13px 30px rgba(5, 98, 66, .15);
 }
-.qr-info-label { color: #64748b; font-weight: 500; }
-.qr-info-nilai { color: #1e293b; font-weight: 600; text-align: right; }
-
-/* ==============================================
-   KAMERA MODAL
-   ============================================== */
-.kamera-frame { border-radius: 0.75rem; overflow: hidden; }
-.kamera-frame video { width: 100%; display: block; border-radius: 0.75rem; }
-#kanvas-pemindai-monitoring { display: none; }
-
-/* ==============================================
-   KAKI MODAL
-   ============================================== */
-.modal-footer {
-    padding: 0.75rem 1.25rem 1.25rem;
-    border-top: 1px solid #f1f5f9;
-    display: flex; justify-content: center; gap: 0.75rem;
+.at-action-copy, .at-action-buttons { position: relative; z-index: 2; }
+.at-action-copy .at-section-kicker { color: #a7ddc3; }
+.at-action-copy h2 { margin: 8px 0 5px; font-size: 21px; color: #fff; font-weight: 800; letter-spacing: -.5px; }
+.at-action-copy p { margin: 0; color: #c2e4d2; font-size: 12px; }
+.at-action-buttons { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.at-action-decoration {
+    position: absolute; right: 25%; top: -110px; width: 260px; height: 260px;
+    border: 1px solid rgba(255,255,255,.1); border-radius: 50%;
 }
-.btn-modal {
-    padding: 0.5rem 1.25rem; border-radius: 0.6rem;
-    font-weight: 500; border: none; cursor: pointer;
-    transition: all 0.2s; font-size: 0.9rem;
-    width: 100%
+.at-action-decoration::after {
+    content: ""; position: absolute; inset: 22px;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 50%;
 }
-.btn-cancel { background: #f1f5f9; color: #475569; }
-.btn-cancel:hover { background: #e2e8f0; color: #1e293b; }
+.at-btn {
+    min-height: 43px; border: 0 !important; border-radius: 11px;
+    padding: 0 17px; display: inline-flex; align-items: center;
+    justify-content: center; gap: 9px; cursor: pointer !important;
+    font-size: 12px !important; font-weight: 750 !important; text-decoration: none;
+    transition: transform .22s, box-shadow .22s, background .22s;
+}
+.at-btn:hover { transform: translateY(-2px); }
+.at-btn:active { transform: translateY(0) scale(.98); }
+.at-btn-light { color: #07563e; background: #fff; box-shadow: 0 6px 16px #003c2c25; }
+.at-btn-light:hover { color: #087653; box-shadow: 0 10px 22px #003c2c35; }
+.at-btn-glass { color: #fff; background: #ffffff15; border: 1px solid #ffffff48; }
+.at-btn-glass:hover { background: #ffffff25; }
+.at-btn-arrow { font-size: 10px; opacity: .5; }
+.at-btn-primary { color: #fff; background: linear-gradient(135deg, #0a9468, #087653); box-shadow: 0 5px 13px #08765320; }
+.at-btn-primary:hover { color: #fff; box-shadow: 0 8px 18px #08765335; }
+.at-btn-outline { background: #fff; border: 1px solid #dce9e1; color: #39745b; }
+.at-btn-outline:hover { border-color: #7ab99a; background: #f5fbf7; }
+.at-btn-export { color: #087653; background: #eff8f2; border: 1px solid #d7ebdf; }
+.at-btn-export:hover { background: #e2f4e9; color: #07563e; }
 
-/* RESPONSIF HP */
-@media (max-width: 480px) {
-    .modal-qr-styled { max-width: 340px; }
-    #qr-tempat-tampil img { width: 200px !important; height: 200px !important; }
-    .qr-info-baris { flex-direction: column; gap: 0.25rem; text-align: center; }
-    .qr-info-nilai { text-align: right; width: 100%; }
+/* SECTION HEADINGS */
+.at-overview, .at-directory { margin-bottom: 36px; }
+.at-section-heading, .at-directory-heading {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 18px; margin-bottom: 17px;
+}
+.at-section-heading h2, .at-directory-heading h2,
+.at-period-copy h2 {
+    margin: 6px 0 4px; font-size: 21px; font-weight: 820;
+    letter-spacing: -.65px; color: #183d30;
+}
+.at-section-heading p, .at-directory-heading p, .at-period-copy p {
+    margin: 0; color: #87968e; font-size: 12px;
+}
+.at-overview-date {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: #fff;
+    border: 1px solid var(--at-line); border-radius: 12px;
+}
+.at-date-icon {
+    width: 34px; height: 34px; display: grid; place-items: center;
+    border-radius: 10px; color: #07825a; background: #eaf7ef;
+}
+.at-overview-date small, .at-overview-date strong { display: block; }
+.at-overview-date small { font-size: 8px; letter-spacing: 1px; color: #91a198; font-weight: 800; }
+.at-overview-date strong { margin-top: 3px; font-size: 12px; color: #345e49; }
+
+.at-stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+.at-stat-card {
+    position: relative; min-height: 150px; overflow: hidden;
+    padding: 19px 20px; border: 1px solid var(--at-line);
+    border-radius: 17px; background: #fff;
+    box-shadow: 0 5px 18px rgba(24, 73, 52, .035);
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.at-stat-card:hover { transform: translateY(-5px); box-shadow: 0 13px 25px rgba(24,73,52,.08); border-color: #cce5d5; }
+.at-stat-top { display: flex; align-items: center; justify-content: space-between; }
+.at-stat-icon {
+    width: 37px; height: 37px; display: grid; place-items: center;
+    border-radius: 12px; font-size: 14px;
+}
+.at-stat-label { color: #8b9b92; font-size: 9px; letter-spacing: 1px; font-weight: 850; }
+.at-stat-value { margin-top: 13px; font-size: 34px; line-height: 1; font-weight: 850; letter-spacing: -1.5px; color: #173d2e; }
+.at-stat-bottom { margin-top: 9px; color: #8a9b91; font-size: 10px; }
+.at-stat-indicator { display: inline-block; width: 5px; height: 5px; border-radius: 50%; margin-right: 5px; vertical-align: 2px; }
+.at-stat-watermark { position: absolute; right: 15px; bottom: -15px; font-size: 72px; opacity: .045; transform: rotate(-15deg); }
+.stat-present .at-stat-icon { background: #e7f7ee; color: #119366; }
+.stat-present .at-stat-indicator { background: #19a66e; }
+.stat-late .at-stat-icon { background: #fff4e3; color: #d68b22; }
+.stat-late .at-stat-indicator { background: #e8a23b; }
+.stat-excuse .at-stat-icon { background: #eaf3ff; color: #4b8bd1; }
+.stat-excuse .at-stat-indicator { background: #4b8bd1; }
+.stat-pending .at-stat-icon { background: #f0f1f2; color: #7b8790; }
+.stat-pending .at-stat-indicator { background: #8c969d; }
+
+/* SETTINGS */
+.at-settings {
+    margin-bottom: 36px; border: 1px solid #e4eee7;
+    border-radius: 20px; overflow: hidden; background: #fff;
+    box-shadow: 0 8px 26px rgba(24,73,52,.045);
+}
+.at-settings-heading {
+    padding: 22px 25px; display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid #edf2ee;
+    background: linear-gradient(100deg, #fbfefc, #f5faf6);
+}
+.at-settings-symbol {
+    width: 47px; height: 47px; display: grid; place-items: center;
+    border-radius: 15px; color: #0b875e; background: #e5f5eb; font-size: 19px;
+}
+.at-settings-title { flex: 1; min-width: 0; }
+.at-settings-title h2 { margin: 4px 0; font-size: 17px; font-weight: 820; color: #183d30; }
+.at-settings-title p { margin: 0; color: #899990; font-size: 11px; }
+.at-settings-actions { display: flex; align-items: center; gap: 9px; }
+.at-config-state {
+    color: #789084; background: #eff5f0; border-radius: 30px;
+    padding: 8px 11px; font-size: 10px; font-weight: 750;
+}
+.at-settings-body { padding: 0 25px 25px; }
+.at-settings-tabs {
+    display: flex; gap: 7px; padding: 18px 0;
+    border-bottom: 1px solid #edf2ee; margin-bottom: 21px;
+}
+.at-settings-tab {
+    border: 0; border-radius: 9px; padding: 10px 14px !important;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent !important; color: #82938a !important;
+    font-size: 11px !important; font-weight: 750 !important; transition: .2s !important;
+}
+.at-settings-tab:hover { color: #087653; background: #f3faf5; }
+.at-settings-tab.active { color: #087653; background: #eaf6ee; }
+.at-schedule-intro, .at-special-header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 15px; margin-bottom: 18px;
+}
+.at-schedule-intro strong, .at-special-header strong { display: block; color: #315c47; font-size: 12px; }
+.at-schedule-intro small, .at-special-header small { display: block; margin-top: 4px; color: #98a69e; font-size: 10px; }
+.at-schedule-badge {
+    border-radius: 30px; padding: 7px 10px; background: #eff8f2;
+    color: #18845c; font-size: 9px; font-weight: 800;
+}
+.at-time-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 13px; }
+.at-time-field {
+    display: flex; flex-direction: column; gap: 9px;
+    padding: 15px; border: 1px solid #e9f0eb;
+    border-radius: 13px; background: #fcfefc;
+}
+.at-time-field > span { color: #617a6c; font-size: 10px; font-weight: 750; }
+.at-time-field > span i { margin-right: 5px; color: #149369; }
+.at-time-field input {
+    width: 100%; min-height: 42px; padding: 0 11px;
+    border: 1px solid #e0ebe3; border-radius: 9px;
+    background: #fff; color: #214a36; font-size: 16px; font-weight: 800;
+    outline: none; transition: .2s;
+}
+.at-time-field input:disabled { background: #f5f8f5; color: #688174; opacity: 1; }
+.at-time-field input:not(:disabled):focus { border-color: #2da878; box-shadow: 0 0 0 3px #2da87818; }
+.at-time-field small { color: #a0ada5; font-size: 9px; min-height: 12px; }
+.at-special-table-wrap { overflow-x: auto; border: 1px solid #e8efe9; border-radius: 12px; }
+.at-special-table { width: 100%; border-collapse: collapse; min-width: 570px; }
+.at-special-table th {
+    padding: 12px 14px; text-align: left; color: #82958a;
+    background: #f7faf7; font-size: 9px; letter-spacing: .8px;
+}
+.at-special-table td { padding: 13px 14px; border-top: 1px solid #edf2ee; color: #60776a; font-size: 11px; }
+.at-empty-cell { text-align: center !important; color: #a0ada5 !important; padding: 25px !important; }
+
+/* PERIOD FILTER */
+.at-period {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; padding: 21px 23px; margin-bottom: 34px;
+    background: #fff; border: 1px solid var(--at-line);
+    border-radius: 17px; box-shadow: 0 5px 18px rgba(24,73,52,.035);
+}
+.at-filter-form { display: flex; align-items: flex-end; gap: 10px; }
+.at-filter-form label { display: flex; flex-direction: column; gap: 6px; }
+.at-filter-form label > span { color: #83948a; font-size: 9px; font-weight: 800; letter-spacing: .5px; }
+.at-filter-form select {
+    min-width: 145px; height: 41px; padding: 0 32px 0 12px;
+    border: 1px solid #e3ece5; border-radius: 9px;
+    background-color: #fbfdfb; color: #3e6550;
+    font-size: 11px; font-weight: 700; outline: none;
+}
+.at-filter-form select:focus { border-color: #4eae80; box-shadow: 0 0 0 3px #4eae8018; }
+
+/* DIRECTORY */
+.at-directory-heading { align-items: center; }
+.at-directory-tools {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 15px; margin-bottom: 16px;
+}
+.at-search-box {
+    display: flex; align-items: center; gap: 10px;
+    width: min(380px, 100%); height: 43px; padding: 0 13px;
+    border: 1px solid #e4ede6; border-radius: 11px; background: #fff;
+    color: #91a197; transition: .2s;
+}
+.at-search-box:focus-within { border-color: #55b587; box-shadow: 0 0 0 3px #55b58715; }
+.at-search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: #315b46; font-size: 11px; }
+.at-search-box input::placeholder { color: #a5b1a9; }
+.at-search-box kbd { padding: 2px 6px; border: 1px solid #e8eee9; border-radius: 5px; font-size: 10px; }
+.at-directory-count { color: #82948a; font-size: 10px; font-weight: 750; }
+.at-count-dot { width: 6px; height: 6px; margin-right: 5px; box-shadow: none; }
+
+.at-teacher-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; }
+.at-teacher-card {
+    min-width: 0; padding: 18px;
+    border: 1px solid #e6eee8; border-radius: 16px;
+    background: #fff; box-shadow: 0 4px 16px rgba(24,73,52,.035);
+    transition: transform .24s, box-shadow .24s, border-color .24s;
+    animation: atReveal .5s both;
+}
+.at-teacher-card:hover {
+    transform: translateY(-4px); border-color: #c5e3d0;
+    box-shadow: 0 14px 27px rgba(24,73,52,.08);
+}
+.at-teacher-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.at-teacher-profile { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.at-avatar {
+    flex-shrink: 0; width: 47px; height: 47px; display: grid;
+    place-items: center; overflow: hidden; border-radius: 14px;
+    background: linear-gradient(145deg, #d9f1e2, #b7e4c9);
+    color: #087653; font-size: 14px; font-weight: 850;
+}
+.at-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.at-avatar-fallback { font-size: 14px; }
+.at-teacher-identity { min-width: 0; }
+.at-teacher-identity h3 {
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    margin: 0 0 5px; color: #244c38; font-size: 12px; font-weight: 800;
+}
+.at-teacher-identity p { margin: 0; color: #9aa79f; font-size: 10px; }
+.at-status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    flex-shrink: 0; padding: 6px 8px; border-radius: 30px;
+    font-size: 8px; font-weight: 800; white-space: nowrap;
+}
+.at-status-pill i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.at-status-pill.present { color: #16885d; background: #eaf7ef; }
+.at-status-pill.late { color: #b77920; background: #fff5e5; }
+.at-status-pill.excuse { color: #4384bd; background: #edf5ff; }
+.at-status-pill.absent { color: #c65353; background: #fff0f0; }
+.at-status-pill.pending { color: #78858c; background: #f0f2f3; }
+.at-teacher-divider { height: 1px; margin: 17px 0; background: #edf2ee; }
+.at-teacher-metrics { display: grid; grid-template-columns: repeat(3,1fr); }
+.at-teacher-metrics > div { display: flex; flex-direction: column; gap: 6px; }
+.at-teacher-metrics > div + div { padding-left: 14px; border-left: 1px solid #edf2ee; }
+.at-teacher-metrics span { color: #9aa79f; font-size: 8px; font-weight: 800; letter-spacing: .35px; }
+.at-teacher-metrics strong { color: #315c45; font-size: 19px; font-weight: 850; }
+.at-teacher-metrics > div:nth-child(2) strong { color: #c28b36; }
+.at-teacher-metrics > div:nth-child(3) strong { color: #4c8cbd; }
+.at-teacher-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-top: 18px; padding-top: 13px;
+    border-top: 1px dashed #e7eee8;
+}
+.at-teacher-bottom span { color: #9aa79f; font-size: 9px; }
+.at-teacher-bottom span i { margin-right: 4px; }
+.at-teacher-bottom a {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: #0a8b61; font-size: 10px; font-weight: 800; text-decoration: none;
+}
+.at-teacher-bottom a i { transition: transform .2s; }
+.at-teacher-bottom a:hover i { transform: translateX(4px); }
+.at-empty-state, .at-no-search {
+    padding: 50px 20px; text-align: center;
+    border: 1px dashed #dce9df; border-radius: 17px; background: #fbfdfb;
+}
+.at-empty-state > div { width: 54px; height: 54px; margin: auto; display: grid; place-items: center; border-radius: 17px; background: #eaf6ee; color: #17865d; font-size: 21px; }
+.at-empty-state h3, .at-no-search strong { display: block; margin: 14px 0 5px; color: #3d654e; font-size: 14px; font-weight: 800; }
+.at-empty-state p, .at-no-search span { margin: 0; color: #9aa89f; font-size: 11px; }
+.at-no-search { margin-top: 12px; color: #8ca094; }
+.at-no-search > i { font-size: 23px; }
+
+/* MODALS — deliberately not Bootstrap .modal classes */
+.at-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9997;
+    background: rgba(7, 30, 22, .65); backdrop-filter: blur(8px);
+}
+.at-modal {
+    display: none; position: fixed; z-index: 9998;
+    top: 50%; left: 50%; transform: translate(-50%,-48%);
+    width: min(440px, calc(100vw - 28px)); max-height: 90vh;
+    overflow: auto; border: 1px solid #e1ece4; border-radius: 22px;
+    background: #fff; box-shadow: 0 30px 90px rgba(0,0,0,.22);
+    flex-direction: column; animation: atModalIn .25s ease forwards;
+}
+.at-modal-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 21px; border-bottom: 1px solid #edf2ee;
+}
+.at-modal-symbol {
+    flex-shrink: 0; width: 43px; height: 43px; display: grid;
+    place-items: center; border-radius: 14px;
+    color: #087653; background: #e8f6ed; font-size: 18px;
+}
+.at-modal-head > div:nth-child(2) { min-width: 0; flex: 1; }
+.at-modal-head > div:nth-child(2) > span { color: #8da195; font-size: 8px; font-weight: 850; letter-spacing: 1.1px; }
+.at-modal-head h3 { margin: 3px 0; color: #234b37; font-size: 16px; font-weight: 850; }
+.at-modal-head p { margin: 0; color: #8d9b92; font-size: 10px; }
+.at-modal-close {
+    width: 32px; height: 32px; flex-shrink: 0;
+    border: 0; border-radius: 9px; color: #82938a; background: #f2f6f3;
+}
+.at-modal-close:hover { color: #b64b4b; background: #fff0f0; }
+.at-modal-content, .at-camera-content { padding: 21px; }
+.at-qr-frame {
+    display: grid; place-items: center; min-height: 270px;
+    padding: 15px; border: 1px solid #e6eee8; border-radius: 17px;
+    background: radial-gradient(circle at center, #f1faf4, #f9fcfa);
+}
+#qr-tempat-tampil img {
+    display: block; width: 235px; height: 235px;
+    object-fit: contain; border-radius: 8px;
+}
+.at-qr-loading { display: flex; align-items: center; flex-direction: column; gap: 12px; color: #8ba195; font-size: 10px; }
+.at-qr-loading span { width: 30px; height: 30px; border: 3px solid #d9ece0; border-top-color: #0a8a61; border-radius: 50%; animation: atRotate .8s linear infinite; }
+.at-qr-details { margin-top: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.at-qr-details > div { padding: 11px; border-radius: 10px; background: #f5f9f6; }
+.at-qr-details span, .at-qr-details strong { display: block; }
+.at-qr-details span { color: #91a097; font-size: 9px; }
+.at-qr-details span i { margin-right: 4px; }
+.at-qr-details strong { margin-top: 5px; color: #42654f; font-size: 11px; }
+.at-qr-note { margin-top: 12px; color: #83958a; font-size: 9px; line-height: 1.6; }
+.at-qr-note i { color: #0a9366; margin-right: 5px; }
+.at-modal-foot { padding: 0 21px 20px; }
+.at-modal-foot .at-btn { width: 100%; }
+.camera-symbol { color: #087653; }
+.at-camera-frame {
+    position: relative; overflow: hidden; border-radius: 15px;
+    background: #071b13; min-height: 220px;
+}
+.at-camera-frame video { width: 100%; display: block; max-height: 360px; object-fit: cover; }
+.at-camera-overlay { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.at-camera-overlay span {
+    width: 64%; aspect-ratio: 1; max-width: 230px;
+    border: 2px solid #78e1a8; border-radius: 17px;
+    box-shadow: 0 0 0 999px rgba(0,0,0,.25), 0 0 20px #55d99455;
+}
+.at-camera-hint { margin: 13px 0 0; color: #84968c; text-align: center; font-size: 10px; }
+.at-camera-hint i { color: #0a9366; margin-right: 5px; }
+
+@keyframes atPulse { 0%,100% { box-shadow: 0 0 0 4px rgba(30,183,122,.12); } 50% { box-shadow: 0 0 0 7px rgba(30,183,122,.04); } }
+@keyframes atFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+@keyframes atGlow { 0%,100% { opacity: .65; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes atRotate { to { transform: rotate(360deg); } }
+@keyframes atReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes atModalIn { to { transform: translate(-50%,-50%); } }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    .at-stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .at-teacher-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .at-intro-art { right: 1%; opacity: .75; }
+    .at-time-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 768px) {
+    .attendance-page { padding-bottom: 25px; }
+    .at-intro { min-height: 230px; padding: 28px 23px; }
+    .at-intro-art { right: -105px; opacity: .22; }
+    .at-intro h1 { font-size: 34px; letter-spacing: -1.5px; }
+    .at-intro-copy > p { max-width: 100%; font-size: 12px; }
+    .at-action-strip { align-items: flex-start; flex-direction: column; padding: 23px; }
+    .at-action-buttons { width: 100%; }
+    .at-action-buttons .at-btn { flex: 1; }
+    .at-section-heading, .at-directory-heading { align-items: flex-start; }
+    .at-overview-date { display: none; }
+    .at-settings-heading { flex-wrap: wrap; padding: 18px; }
+    .at-settings-title { flex: 1 1 calc(100% - 65px); }
+    .at-settings-actions { width: 100%; justify-content: flex-end; }
+    .at-settings-body { padding: 0 17px 18px; }
+    .at-period { align-items: stretch; flex-direction: column; }
+    .at-filter-form { display: grid; grid-template-columns: 1fr 1fr; }
+    .at-filter-form .at-btn { grid-column: 1 / -1; }
+    .at-filter-form select { width: 100%; min-width: 0; }
+    .at-directory-tools { align-items: flex-start; flex-direction: column; }
+    .at-search-box { width: 100%; }
+}
+@media (max-width: 560px) {
+    .at-stat-grid { gap: 9px; }
+    .at-stat-card { min-height: 132px; padding: 14px; }
+    .at-stat-value { font-size: 29px; }
+    .at-stat-label { font-size: 8px; }
+    .at-stat-bottom { font-size: 9px; }
+    .at-teacher-grid { grid-template-columns: 1fr; }
+    .at-time-grid { grid-template-columns: 1fr; }
+    .at-settings-tabs { overflow-x: auto; }
+    .at-settings-tab { flex-shrink: 0; padding: 9px 11px; }
+    .at-settings-tab span { font-size: 10px; }
+    .at-schedule-intro, .at-special-header { align-items: flex-start; flex-direction: column; }
+    .at-directory-heading { flex-direction: column; }
+    .at-directory-heading form, .at-directory-heading .at-btn { width: 100%; }
+    .at-intro-meta { flex-wrap: wrap; font-size: 10px; }
+    .at-action-copy h2 { font-size: 18px; }
+    .at-action-buttons { flex-direction: column; }
+    .at-action-buttons .at-btn { width: 100%; }
+    .at-status-pill { font-size: 7px; padding: 6px; }
+    .at-teacher-card { padding: 15px; }
+    .at-modal { width: calc(100vw - 22px); }
+    #qr-tempat-tampil img { width: 205px; height: 205px; }
+    .at-qr-frame { min-height: 235px; }
 }
 
 </style>
