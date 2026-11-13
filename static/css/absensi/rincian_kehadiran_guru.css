@@ -996,8 +996,8 @@
     border: 1px solid #dce9e1;
     border-radius: 10px;
     outline: none;
-    font-size: 10px;
-    font-weight: 750;
+    font-size: 11px !important;
+    font-weight: 750 !important;
     cursor: pointer;
     transition: .2s ease;
 }
@@ -1029,8 +1029,8 @@
     border: 0;
     border-radius: 10px;
     box-shadow: 0 7px 16px rgba(5,150,105,.2);
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 11px !important;
+    font-weight: 750 !important;
     white-space: nowrap;
     cursor: pointer;
     transition: .25s ease;
@@ -1820,7 +1820,6 @@
         font-size: 7px;
     }
 }
-
 
 .content-wrapper {
     margin: 0;

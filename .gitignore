@@ -23,3 +23,5 @@ uploads
 *.jpg
 *.jpeg
 *.png
+
+!static/img/teacher-3d.png

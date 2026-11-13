@@ -933,7 +933,7 @@ def rekap_absensi():
     # Nama Bulan
     nama_bulan = [
         'Januari','Pebruari','Maret','April','Mei','Juni',
-        'Juli','Agustus','September','Oktober','Nopember','Desember'
+        'Juli','Agustus','September','Oktober','November','Desember'
     ]
     nama_bulan_terpilih = nama_bulan[filter_bulan - 1]
     
@@ -1015,7 +1015,7 @@ def export_rekap_absensi():
 
     # === 3. Susun QUERY sesuai JENIS EXPORT ===
     nama_bulan = ['Januari','Pebruari','Maret','April','Mei','Juni',
-                  'Juli','Agustus','September','Oktober','Nopember','Desember']
+                  'Juli','Agustus','September','Oktober','November','Desember']
     nama_bulan_label = ""
     data_absensi = []
 

@@ -133,7 +133,7 @@ def monitoring_absensi():
 
     # === Daftar Bulan & Tahun untuk Dropdown ===
     nama_bulan_list = ['Januari','Februari','Maret','April','Mei','Juni',
-                       'Juli','Agustus','September','Oktober','Nopember','Desember']
+                       'Juli','Agustus','September','Oktober','November','Desember']
     daftar_bulan = [(i+1, nama_bulan_list[i]) for i in range(12)]
     daftar_tahun = []
     for thn in range(tgl_mulai_tp.year, tgl_selesai_tp.year + 2):
@@ -320,7 +320,7 @@ def export_monitoring():
     # Ambil data & hitung
     semua_guru = Guru.query.order_by(Guru.nama).all()
     nama_bulan_list = ['Januari','Pebruari','Maret','April','Mei','Juni',
-                       'Juli','Agustus','September','Oktober','Nopember','Desember']
+                       'Juli','Agustus','September','Oktober','November','Desember']
     nama_bulan_terpilih = nama_bulan_list[filter_bulan - 1]
 
     rows = []
@@ -531,7 +531,7 @@ def rincian_kehadiran(guru_id):
 
     hadir = terlambat = izin = sakit = alfa = 0
     nama_bulan_list = ['Januari','Pebruari','Maret','April','Mei','Juni',
-                        'Juli','Agustus','September','Oktober','Nopember','Desember']
+                        'Juli','Agustus','September','Oktober','November','Desember']
 
     daftar_tahun = []
     for thn in range(tgl_mulai_tp.year, tgl_selesai_tp.year + 2):
@@ -618,7 +618,7 @@ def export_rincian_guru(guru_id):
     ).order_by(AbsensiGuru.tanggal.desc()).all()
 
     nama_bulan_list = ['Januari','Pebruari','Maret','April','Mei','Juni',
-                       'Juli','Agustus','September','Oktober','Nopember','Desember']
+                       'Juli','Agustus','September','Oktober','November','Desember']
     nama_bulan_terpilih = nama_bulan_list[filter_bulan - 1]
 
     rows = []
