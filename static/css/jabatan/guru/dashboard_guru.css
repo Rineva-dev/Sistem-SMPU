@@ -1857,14 +1857,3 @@
         padding-left: 17px;
     }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    .edux-workspace *,
-    .edux-workspace *::before,
-    .edux-workspace *::after {
-        scroll-behavior: auto !important;
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-    }
-}
