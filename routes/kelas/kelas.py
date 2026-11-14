@@ -406,6 +406,41 @@ def daftar_siswa_di_kelas(id):
         else:
             daftar_tugas = list(user.tugas_tambahan) if user.tugas_tambahan else []
 
+    # ==========================================
+    # DEBUG PENGATURAN MAPEL DAN GURU
+    # ==========================================
+    print("\n========== DEBUG PENGATURAN MAPEL ==========")
+    print("KELAS ID       :", kelas.id)
+    print("TAHUN DIPILIH  :", kode_tahun_dipilih)
+
+    for m in daftar_mapel:
+        aturan = PengaturanMapelKelas.query.filter_by(
+            kelas_id=kelas.id,
+            mata_pelajaran_id=m.id,
+            tahun_pelajaran=kode_tahun_dipilih
+        ).first()
+
+        print({
+            "mapel_id": m.id,
+            "mapel": m.nama_pelajaran,
+            "guru_terpilih_di_template": m.guru_terpilih,
+            "guru_id_database": aturan.guru_id if aturan else None,
+            "nama_guru_database": aturan.guru.nama if aturan and aturan.guru else None,
+            "jumlah_jp": aturan.jumlah_jp if aturan else None
+        })
+
+    print("\n========== DEBUG AKUN GURU ==========")
+
+    for guru in Guru.query.order_by(Guru.nama).all():
+        print({
+            "guru_id": guru.id,
+            "nama": guru.nama,
+            "user_id": guru.akun.id if guru.akun else None,
+            "username": guru.akun.username if guru.akun else None
+        })
+
+    print("=========================================\n")
+
     return render_template(
         'index.html',
         active_page='data_kelas',
@@ -655,171 +690,333 @@ def simpan_pengaturan_mapel(kelas_id):
 # --------------------------
 # Halaman Atur Jadwal Kelas
 # --------------------------
+
+# --------------------------
+# Halaman Atur Jadwal Kelas
+# --------------------------
 @kelas_bp.route('/<int:id>/jadwal', methods=['GET', 'POST'])
 @bisa_kelola_kelas
 def jadwal_kelas(id):
     user = User.query.get(session.get('user_id'))
     kelas = Kelas.query.get_or_404(id)
-    kode_tahun_dipilih = request.args.get('tahun') or session.get('tahun_pelajaran')
+
+    kode_tahun_dipilih = (
+        request.args.get('tahun')
+        or session.get('tahun_pelajaran')
+    )
+
     if not kode_tahun_dipilih:
         tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
         kode_tahun_dipilih = tahun_aktif.kode if tahun_aktif else None
-    
-    daftar_mapel = MataPelajaran.query.order_by(MataPelajaran.kode).all()
+
+    daftar_mapel = MataPelajaran.query.order_by(
+        MataPelajaran.kode
+    ).all()
+
     for m in daftar_mapel:
         aturan = PengaturanMapelKelas.query.filter_by(
             kelas_id=kelas.id,
             mata_pelajaran_id=m.id,
             tahun_pelajaran=kode_tahun_dipilih
         ).first()
-        m.guru_terpilih = aturan.guru if aturan and aturan.guru_id else None
+
+        m.guru_terpilih = (
+            aturan.guru if aturan and aturan.guru_id else None
+        )
         m.guru_id_terpilih = aturan.guru_id if aturan else None
         m.jumlah_jp = aturan.jumlah_jp if aturan else 0
-    
-    daftar_mapel_aktif = [m for m in daftar_mapel if m.guru_id_terpilih and m.jumlah_jp > 0]
 
+    daftar_mapel_aktif = [
+        m for m in daftar_mapel
+        if m.guru_id_terpilih and m.jumlah_jp > 0
+    ]
+
+    # ==========================================
+    # PROSES SIMPAN JADWAL
+    # ==========================================
     if request.method == 'POST':
         try:
             hari_list = request.form.getlist('hari[]')
             jam_mulai_list = request.form.getlist('jam_mulai[]')
             jam_selesai_list = request.form.getlist('jam_selesai[]')
             mapel_id_list = request.form.getlist('mapel_id[]')
-            
-            if not hari_list:
-                flash("<i class='fas fa-calendar-week'></i> Silakan atur jadwal terlebih dahulu!", "warning")
+
+            urutan_hari = [
+                'Senin', 'Selasa', 'Rabu', 'Kamis',
+                'Jumat', 'Sabtu', 'Minggu'
+            ]
+
+            # 1. Pastikan semua data sejajar
+            jumlah_data = len(hari_list)
+
+            if jumlah_data == 0:
+                flash(
+                    "Silakan tambahkan minimal satu sesi jadwal.",
+                    "warning"
+                )
                 return redirect(request.url)
-            
-            # Hapus jadwal lama
+
+            if not (
+                len(jam_mulai_list) == jumlah_data
+                and len(jam_selesai_list) == jumlah_data
+                and len(mapel_id_list) == jumlah_data
+            ):
+                flash(
+                    "Data jadwal tidak lengkap atau tidak sejajar. "
+                    "Silakan periksa kembali jadwal.",
+                    "danger"
+                )
+                return redirect(request.url)
+
+            # 2. Validasi dan normalisasi semua sesi
+            from datetime import datetime
+
+            def waktu_dtk(teks):
+                waktu = datetime.strptime(teks, '%H:%M')
+                return waktu.hour * 60 + waktu.minute
+
+            daftar_sesi = []
+            per_hari = {}
+
+            for i in range(jumlah_data):
+                hari = hari_list[i].strip()
+                mulai = jam_mulai_list[i].strip()
+                selesai = jam_selesai_list[i].strip()
+                mapel_raw = mapel_id_list[i].strip()
+
+                if hari not in urutan_hari:
+                    raise ValueError(
+                        f"Hari pembelajaran tidak valid: {hari}"
+                    )
+
+                if not mulai or not selesai or not mapel_raw:
+                    raise ValueError(
+                        f"Data jadwal hari {hari} belum lengkap."
+                    )
+
+                try:
+                    menit_mulai = waktu_dtk(mulai)
+                    menit_selesai = waktu_dtk(selesai)
+                except ValueError:
+                    raise ValueError(
+                        f"Format waktu hari {hari} tidak valid."
+                    )
+
+                if menit_selesai <= menit_mulai:
+                    raise ValueError(
+                        f"Hari {hari}: jam selesai harus lebih "
+                        "besar dari jam mulai."
+                    )
+
+                # 3. Validasi mata pelajaran dan guru
+                if mapel_raw in ('imtaq', 'upacara'):
+                    mapel_id = None
+                    jenis_khusus = mapel_raw
+                    guru_id = None
+
+                else:
+                    try:
+                        mapel_id = int(mapel_raw)
+                    except (ValueError, TypeError):
+                        raise ValueError(
+                            f"Mata pelajaran hari {hari} tidak valid."
+                        )
+
+                    aturan = PengaturanMapelKelas.query.filter_by(
+                        kelas_id=kelas.id,
+                        mata_pelajaran_id=mapel_id,
+                        tahun_pelajaran=kode_tahun_dipilih
+                    ).first()
+
+                    if not aturan or not aturan.guru_id:
+                        raise ValueError(
+                            f"Mata pelajaran pada hari {hari} "
+                            "belum memiliki guru pengampu."
+                        )
+
+                    if not aturan.jumlah_jp or aturan.jumlah_jp <= 0:
+                        raise ValueError(
+                            f"Mata pelajaran pada hari {hari} "
+                            "belum memiliki alokasi JP."
+                        )
+
+                    jenis_khusus = None
+                    guru_id = aturan.guru_id
+
+                sesi = {
+                    'hari': hari,
+                    'mulai': mulai,
+                    'selesai': selesai,
+                    'menit_mulai': menit_mulai,
+                    'menit_selesai': menit_selesai,
+                    'mapel_id': mapel_id,
+                    'jenis_khusus': jenis_khusus,
+                    'guru_id': guru_id
+                }
+
+                daftar_sesi.append(sesi)
+                per_hari.setdefault(hari, []).append(sesi)
+
+            # 4. Validasi jadwal bertabrakan
+            for hari, sesi_hari in per_hari.items():
+                sesi_hari.sort(
+                    key=lambda x: x['menit_mulai']
+                )
+
+                for i in range(len(sesi_hari) - 1):
+                    sekarang = sesi_hari[i]
+                    berikutnya = sesi_hari[i + 1]
+
+                    if (
+                        berikutnya['menit_mulai']
+                        < sekarang['menit_selesai']
+                    ):
+                        raise ValueError(
+                            f"Jadwal bertabrakan pada hari {hari}: "
+                            f"{sekarang['mulai']}–{sekarang['selesai']} "
+                            f"dengan "
+                            f"{berikutnya['mulai']}–{berikutnya['selesai']}."
+                        )
+
+            # ==========================================
+            # 5. SEMUA VALIDASI LOLOS
+            # Baru hapus jadwal lama dan simpan yang baru
+            # ==========================================
+
             JadwalPelajaran.query.filter_by(
                 kelas_id=kelas.id,
                 tahun_pelajaran=kode_tahun_dipilih
-            ).delete()
-            
-            # === VALIDASI: Cek Tumpang Tindih ===
-            from datetime import datetime
-            
-            def waktu_dtk(teks):
-                """Ubah '07:30' ke menit sejak tengah malam"""
-                jm, dt = teks.split(':')
-                return int(jm)*60 + int(dt)
-            
-            # Kelompokkan input per hari
-            per_hari = {}
-            for i in range(len(hari_list)):
-                h = hari_list[i]
-                if h not in per_hari:
-                    per_hari[h] = []
-                per_hari[h].append({
-                    'mulai': jam_mulai_list[i],
-                    'selesai': jam_selesai_list[i],
-                    'mapel': mapel_id_list[i]
-                })
-            
-            # Cek tiap hari
-            for hari, daftar_jam in per_hari.items():
-                # Urutkan berdasarkan jam mulai
-                daftar_jam_sorted = sorted(daftar_jam, key=lambda x: x['mulai'])
-                
-                for i in range(len(daftar_jam_sorted)):
-                    mulai_i = waktu_dtk(daftar_jam_sorted[i]['mulai'])
-                    selesai_i = waktu_dtk(daftar_jam_sorted[i]['selesai'])
-                    
-                    # Validasi: selesai harus > mulai
-                    if selesai_i <= mulai_i:
-                        flash(f"<i class='fas fa-exclamation-circle'></i> Hari {hari}: Jam selesai harus lebih besar dari jam mulai!", "danger")
-                        return redirect(request.url)
+            ).delete(synchronize_session=False)
 
-                    for j in range(i + 1, len(daftar_jam_sorted)):
-                        mulai_j = waktu_dtk(daftar_jam_sorted[j]['mulai'])
-                        selesai_j = waktu_dtk(daftar_jam_sorted[j]['selesai'])
-
-                        if mulai_i < selesai_j and selesai_i > mulai_j:
-                            flash(
-                                f"<i class='fas fa-exclamation-circle'></i> JAM TUMPANG TINDIH di {hari}: "
-                                f"{daftar_jam_sorted[i]['mulai']}–{daftar_jam_sorted[i]['selesai']} "
-                                f"bertabrakan dengan "
-                                f"{daftar_jam_sorted[j]['mulai']}–{daftar_jam_sorted[j]['selesai']}",
-                                "danger"
-                            )
-                            return redirect(request.url)
-            
-            # Simpan semua jika lolos validasi
-            for i in range(len(hari_list)):
-                mapel_id_raw = mapel_id_list[i]
-                hari = hari_list[i]
-                jam_mulai = jam_mulai_list[i]
-                jam_selesai = jam_selesai_list[i]
-                
-                if mapel_id_raw in ['imtaq', 'upacara']:
-                    jadwal_baru = JadwalPelajaran(
-                        kelas_id=kelas.id,
-                        tahun_pelajaran=kode_tahun_dipilih,
-                        hari=hari,
-                        jam_mulai=jam_mulai,
-                        jam_selesai=jam_selesai,
-                        mata_pelajaran_id=None,
-                        guru_id=None,
-                        jenis_khusus=mapel_id_raw
-                    )
-                    db.session.add(jadwal_baru)
-                    continue
-                
-                try:
-                    mapel_id = int(mapel_id_raw)
-                except (ValueError, TypeError):
-                    continue
-                
-                aturan = PengaturanMapelKelas.query.filter_by(
-                    kelas_id=kelas.id,
-                    mata_pelajaran_id=mapel_id,
-                    tahun_pelajaran=kode_tahun_dipilih
-                ).first()
-                
-                if not aturan or not aturan.guru_id:
-                    continue
-                
+            for sesi in daftar_sesi:
                 jadwal_baru = JadwalPelajaran(
                     kelas_id=kelas.id,
                     tahun_pelajaran=kode_tahun_dipilih,
-                    hari=hari,
-                    jam_mulai=jam_mulai,
-                    jam_selesai=jam_selesai,
-                    mata_pelajaran_id=mapel_id,
-                    guru_id=aturan.guru_id
+                    hari=sesi['hari'],
+                    jam_mulai=sesi['mulai'],
+                    jam_selesai=sesi['selesai'],
+                    mata_pelajaran_id=sesi['mapel_id'],
+                    guru_id=sesi['guru_id'],
+                    jenis_khusus=sesi['jenis_khusus']
                 )
+
                 db.session.add(jadwal_baru)
-            
+
             db.session.commit()
-            flash(f"<i class='fas fa-check-circle'></i> Jadwal Pelajaran {kelas.nama_kelas} berhasil disimpan!", "success")
+
+            
+            print("\n========== HASIL SIMPAN ULANG JADWAL ==========")
+
+            jadwal_debug = JadwalPelajaran.query.filter_by(
+                kelas_id=kelas.id,
+                tahun_pelajaran=kode_tahun_dipilih
+            ).order_by(
+                JadwalPelajaran.id
+            ).all()
+
+            for j in jadwal_debug:
+
+                mapel = (
+                    MataPelajaran.query.get(j.mata_pelajaran_id)
+                    if j.mata_pelajaran_id else None
+                )
+
+                guru = (
+                    Guru.query.get(j.guru_id)
+                    if j.guru_id else None
+                )
+
+                print({
+                    "jadwal_id": j.id,
+                    "hari": j.hari,
+                    "jam_mulai": j.jam_mulai,
+                    "jam_selesai": j.jam_selesai,
+                    "mapel": (
+                        mapel.nama_pelajaran
+                        if mapel else j.jenis_khusus
+                    ),
+                    "mapel_id": j.mata_pelajaran_id,
+                    "guru_id": j.guru_id,
+                    "nama_guru": guru.nama if guru else None
+                })
+
+            print("Total jadwal tersimpan:", len(jadwal_debug))
+            print("===============================================\n")
+
+
+            flash(
+                f"Jadwal pelajaran {kelas.nama_kelas} berhasil disimpan! "
+                f"Total {len(daftar_sesi)} sesi pembelajaran.",
+                "success"
+            )
+
+        except ValueError as e:
+            db.session.rollback()
+            flash(str(e), "danger")
+
         except Exception as e:
             db.session.rollback()
-            flash(f"<i class='fas fa-times-circle'></i> Gagal menyimpan jadwal: {str(e)}", "danger")
-        
-        return redirect(url_for('data_kelas.jadwal_kelas', id=id, tahun=kode_tahun_dipilih))
-    
-    # Ambil data tersimpan
+            print(f"[JADWAL KELAS ERROR] {str(e)}")
+            flash(
+                f"Gagal menyimpan jadwal: {str(e)}",
+                "danger"
+            )
+
+        return redirect(
+            url_for(
+                'data_kelas.jadwal_kelas',
+                id=id,
+                tahun=kode_tahun_dipilih
+            )
+        )
+
+    # ==========================================
+    # AMBIL JADWAL TERSIMPAN
+    # ==========================================
+    urutan_hari = [
+        'Senin', 'Selasa', 'Rabu', 'Kamis',
+        'Jumat', 'Sabtu', 'Minggu'
+    ]
+
+    ekspresi_urutan = db.case(
+        *[
+            (JadwalPelajaran.hari == hari, nomor)
+            for nomor, hari in enumerate(urutan_hari, start=1)
+        ],
+        else_=99
+    )
+
     jadwal_tersimpan = JadwalPelajaran.query.filter_by(
         kelas_id=kelas.id,
         tahun_pelajaran=kode_tahun_dipilih
     ).order_by(
-        # Urutkan: Senin, Selasa, Rabu, Kamis, Jumat
-        db.case(
-            (JadwalPelajaran.hari == 'Senin', 1),
-            (JadwalPelajaran.hari == 'Selasa', 2),
-            (JadwalPelajaran.hari == 'Rabu', 3),
-            (JadwalPelajaran.hari == 'Kamis', 4),
-            (JadwalPelajaran.hari == 'Jumat', 5),
-            else_=99
-        ),
+        ekspresi_urutan,
         JadwalPelajaran.jam_mulai
     ).all()
-    
-    # Kelompokkan per hari untuk ditampilkan di form
+
+    # ==========================================
+    # KELOMPOKKAN JADWAL PER HARI
+    # ==========================================
     from collections import defaultdict
+
     jadwal_per_hari = defaultdict(list)
-    for j in jadwal_tersimpan:
-        jadwal_per_hari[j.hari].append(j)
-    
+
+    for jadwal in jadwal_tersimpan:
+        jadwal_per_hari[jadwal.hari].append(jadwal)
+
+    # Senin-Jumat selalu tersedia.
+    # Sabtu-Minggu tampil jika sudah memiliki jadwal.
+    hari_tampil = [
+        'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'
+    ]
+
+    for hari in urutan_hari:
+        if (
+            hari in jadwal_per_hari
+            and hari not in hari_tampil
+        ):
+            hari_tampil.append(hari)
+
     return render_template(
         'index.html',
         active_page='data_kelas',
@@ -828,6 +1025,7 @@ def jadwal_kelas(id):
         daftar_mapel=daftar_mapel_aktif,
         jadwal_tersimpan=jadwal_tersimpan,
         jadwal_per_hari=dict(jadwal_per_hari),
+        hari_tampil=hari_tampil,
         tahun_dipilih=kode_tahun_dipilih,
         user=user,
         user_name=session.get('user_name'),

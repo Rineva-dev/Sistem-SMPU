@@ -1,0 +1,434 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Absensi Siswa{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/absensi_siswa.css') }}">
+
+<div class="as-page"
+     id="absensiSiswaPage"
+     data-total="{{ total_siswa }}"
+     data-jurnal-id="{{ jurnal.id }}">
+
+    <!-- Dekorasi background -->
+    <div class="as-orb as-orb-one"></div>
+    <div class="as-orb as-orb-two"></div>
+
+    <!-- HEADER -->
+    <section class="as-header">
+        <div class="as-header-main">
+            <div class="as-breadcrumb">
+                <a href="{{ url_for('jurnal_mengajar.halaman_jurnal') }}">
+                    <i class="fa-solid fa-book-open"></i>
+                    Jurnal Mengajar
+                </a>
+                <i class="fa-solid fa-chevron-right"></i>
+                <span>Absensi Siswa</span>
+            </div>
+
+            <div class="as-heading">
+                <div class="as-heading-icon">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+
+                <div>
+                    <div class="as-eyebrow">
+                        <span class="as-eyebrow-dot"></span>
+                        CLASSROOM ATTENDANCE
+                    </div>
+
+                    <h1>Absensi Siswa</h1>
+
+                    <p>
+                        Catat dan kelola kehadiran siswa dalam kegiatan
+                        pembelajaran secara praktis.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="as-header-decoration">
+            <div class="as-decoration-circle">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <span>TEACHING<br>MANAGEMENT</span>
+        </div>
+    </section>
+
+    <!-- INFORMASI JURNAL -->
+    <section class="as-session-card">
+        <div class="as-session-top">
+            <div class="as-session-label">
+                <span class="as-live-dot"></span>
+                SESI PEMBELAJARAN
+            </div>
+
+            <span class="as-session-id">
+                JURNAL #{{ jurnal.id }}
+            </span>
+        </div>
+
+        <div class="as-session-content">
+            <div class="as-session-subject">
+                <span class="as-info-icon">
+                    <i class="fa-solid fa-book"></i>
+                </span>
+                <div>
+                    <small>MATA PELAJARAN</small>
+                    <strong>{{ mapel.nama_pelajaran if mapel else '-' }}</strong>
+                </div>
+            </div>
+
+            <div class="as-session-divider"></div>
+
+            <div class="as-session-subject">
+                <span class="as-info-icon as-info-gold">
+                    <i class="fa-solid fa-users"></i>
+                </span>
+                <div>
+                    <small>KELAS</small>
+                    <strong>{{ kelas.nama_kelas if kelas else '-' }}</strong>
+                </div>
+            </div>
+
+            <div class="as-session-divider"></div>
+
+            <div class="as-session-subject">
+                <span class="as-info-icon as-info-blue">
+                    <i class="fa-regular fa-calendar"></i>
+                </span>
+                <div>
+                    <small>TANGGAL PEMBELAJARAN</small>
+                    <strong>{{ jurnal.tanggal.strftime('%d %B %Y') }}</strong>
+                </div>
+            </div>
+
+            <div class="as-session-divider"></div>
+
+            <div class="as-session-subject">
+                <span class="as-info-icon as-info-purple">
+                    <i class="fa-regular fa-clock"></i>
+                </span>
+                <div>
+                    <small>WAKTU</small>
+                    <strong>{{ jurnal.jam_mulai }} – {{ jurnal.jam_selesai }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="as-session-material">
+            <span><i class="fa-solid fa-bookmark"></i> Materi pembelajaran</span>
+            <p>{{ jurnal.materi }}</p>
+        </div>
+    </section>
+
+    <!-- STATISTIK -->
+    <section class="as-stat-grid">
+
+        <div class="as-stat-card as-stat-total">
+            <div class="as-stat-icon">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="as-stat-info">
+                <span>Total Siswa</span>
+                <strong id="asTotal">{{ total_siswa }}</strong>
+                <small>Peserta kelas</small>
+            </div>
+        </div>
+
+        <div class="as-stat-card as-stat-hadir">
+            <div class="as-stat-icon">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div class="as-stat-info">
+                <span>Hadir</span>
+                <strong id="asHadir">{{ jumlah_status.hadir }}</strong>
+                <small>Hadir di kelas</small>
+            </div>
+        </div>
+
+        <div class="as-stat-card as-stat-izin">
+            <div class="as-stat-icon">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="as-stat-info">
+                <span>Izin</span>
+                <strong id="asIzin">{{ jumlah_status.izin }}</strong>
+                <small>Memiliki izin</small>
+            </div>
+        </div>
+
+        <div class="as-stat-card as-stat-sakit">
+            <div class="as-stat-icon">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="as-stat-info">
+                <span>Sakit</span>
+                <strong id="asSakit">{{ jumlah_status.sakit }}</strong>
+                <small>Sedang sakit</small>
+            </div>
+        </div>
+
+        <div class="as-stat-card as-stat-alpha">
+            <div class="as-stat-icon">
+                <i class="fa-solid fa-user-xmark"></i>
+            </div>
+            <div class="as-stat-info">
+                <span>Alpa</span>
+                <strong id="asAlpha">{{ jumlah_status.alpha }}</strong>
+                <small>Tanpa keterangan</small>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FORM ABSENSI -->
+    <form id="asAttendanceForm"
+          action="{{ url_for('absensi_siswa.simpan_absensi', jurnal_id=jurnal.id) }}"
+          method="POST">
+
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+
+        <section class="as-workspace">
+
+            <div class="as-workspace-header">
+                <div>
+                    <div class="as-section-eyebrow">STUDENT ROSTER</div>
+                    <h2>Daftar Kehadiran</h2>
+                    <p>
+                        Pilih status kehadiran setiap siswa sesuai kondisi
+                        pada sesi pembelajaran ini.
+                    </p>
+                </div>
+
+                <div class="as-roster-total">
+                    <strong>{{ total_siswa }}</strong>
+                    <span>Siswa</span>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="as-toolbar">
+
+                <div class="as-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search"
+                           id="asSearch"
+                           placeholder="Cari nama atau NIS siswa..."
+                           autocomplete="off">
+                    <kbd>⌕</kbd>
+                </div>
+
+                <div class="as-toolbar-actions">
+
+                    <div class="as-filter">
+                        <i class="fa-solid fa-filter"></i>
+                        <select id="asFilter">
+                            <option value="all">Semua Status</option>
+                            <option value="hadir">Hadir</option>
+                            <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="alpha">Alpa</option>
+                        </select>
+                    </div>
+
+                    <button type="button"
+                            class="as-btn-all-present"
+                            id="asAllPresent">
+                        <i class="fa-solid fa-check-double"></i>
+                        Semua Hadir
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- LEGEND -->
+            <div class="as-legend">
+                <span><i class="as-legend-dot hadir"></i> Hadir</span>
+                <span><i class="as-legend-dot izin"></i> Izin</span>
+                <span><i class="as-legend-dot sakit"></i> Sakit</span>
+                <span><i class="as-legend-dot alpha"></i> Alpa</span>
+            </div>
+
+            <!-- TABLE -->
+            <div class="as-table-wrapper">
+                <table class="as-table">
+                    <thead>
+                        <tr>
+                            <th class="as-col-number">NO</th>
+                            <th class="as-col-student">IDENTITAS SISWA</th>
+                            <th class="as-col-gender">L/P</th>
+                            <th class="as-col-status">STATUS KEHADIRAN</th>
+                            <th class="as-col-note">KETERANGAN</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="asStudentList">
+
+                        {% for siswa in daftar_siswa %}
+                        <tr class="as-student-row"
+                            data-name="{{ siswa.nama|lower }}"
+                            data-nis="{{ siswa.nis|lower }}"
+                            data-status="{{ siswa.status_absensi }}">
+
+                            <td class="as-number">
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                <div class="as-student-identity">
+                                    <div class="as-avatar
+                                        {% if siswa.jenis_kelamin == 'Laki-laki' %}as-avatar-male
+                                        {% else %}as-avatar-female{% endif %}">
+                                        {{ siswa.nama[:1]|upper }}
+                                    </div>
+
+                                    <div class="as-student-detail">
+                                        <strong>{{ siswa.nama }}</strong>
+                                        <span>NIS {{ siswa.nis }}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="as-gender">
+                                    {% if siswa.jenis_kelamin == 'Laki-laki' %}
+                                        L
+                                    {% elif siswa.jenis_kelamin == 'Perempuan' %}
+                                        P
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="as-status-select-wrap">
+                                    <span class="as-status-indicator
+                                        status-{{ siswa.status_absensi }}"></span>
+
+                                    <select class="as-status-select"
+                                            name="status_{{ siswa.id }}"
+                                            data-student-id="{{ siswa.id }}"
+                                            data-status="{{ siswa.status_absensi or 'belum' }}"
+                                            aria-label="Status {{ siswa.nama }}"
+                                            required>
+
+                                        <option value=""
+                                            disabled
+                                            {% if not siswa.status_absensi %}selected{% endif %}>
+                                            Pilih Status
+                                        </option>
+
+                                        <option value="hadir"
+                                            {% if siswa.status_absensi == 'hadir' %}selected{% endif %}>
+                                            Hadir
+                                        </option>
+
+                                        <option value="izin"
+                                            {% if siswa.status_absensi == 'izin' %}selected{% endif %}>
+                                            Izin
+                                        </option>
+
+                                        <option value="sakit"
+                                            {% if siswa.status_absensi == 'sakit' %}selected{% endif %}>
+                                            Sakit
+                                        </option>
+
+                                        <option value="alpha"
+                                            {% if siswa.status_absensi == 'alpha' %}selected{% endif %}>
+                                            Alpa
+                                        </option>
+
+                                    </select>
+                                </div>
+                            </td>
+
+                            <td>
+                                <input type="text"
+                                       class="as-note-input"
+                                       name="keterangan_{{ siswa.id }}"
+                                       value="{{ siswa.keterangan }}"
+                                       placeholder="Tambahkan keterangan..."
+                                       maxlength="255">
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="as-empty">
+                                    <div class="as-empty-icon">
+                                        <i class="fa-solid fa-users-slash"></i>
+                                    </div>
+                                    <strong>Belum ada siswa di kelas ini</strong>
+                                    <p>
+                                        Data siswa untuk kelas dan tahun pelajaran
+                                        jurnal ini belum ditemukan.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                <div class="as-no-results" id="asNoResults" hidden>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <strong>Siswa tidak ditemukan</strong>
+                    <span>Coba gunakan kata kunci atau filter lain.</span>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="as-workspace-footer">
+                <div class="as-footer-info">
+                    <span class="as-footer-check">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </span>
+                    <div>
+                        <strong>Data absensi tersimpan per sesi jurnal</strong>
+                        <small>Perubahan dapat diperbarui kembali selama diperlukan.</small>
+                    </div>
+                </div>
+
+                <div class="as-footer-actions">
+                    <a href="{{ url_for('jurnal_mengajar.halaman_jurnal') }}"
+                       class="as-btn-back">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Kembali
+                    </a>
+
+                    <button type="submit"
+                            class="as-btn-save"
+                            id="asSaveButton"
+                            {% if not daftar_siswa %}disabled{% endif %}>
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Simpan Absensi</span>
+                        <i class="fa-solid fa-arrow-right as-save-arrow"></i>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </form>
+
+    <div class="as-bottom-note">
+        <i class="fa-solid fa-circle-info"></i>
+        Pastikan status kehadiran sudah benar sebelum menyimpan absensi.
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/sections/guru/absensi_siswa.js') }}"></script>
+{% endblock %}

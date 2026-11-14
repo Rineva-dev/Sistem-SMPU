@@ -1106,40 +1106,233 @@ class RataKehadiranGuru(db.Model):
         return f"<RataKehadiran {self.guru.nama} {self.bulan}/{self.tahun}: {self.persen_kehadiran}%>"
 
 # ==========================================
-# ✅ TABEL JURNAL MENGAJAR GURU
+# JURNAL MENGAJAR GURU
+# Terhubung langsung dengan jadwal pelajaran
 # ==========================================
 class JurnalMengajar(db.Model):
     __tablename__ = 'jurnal_mengajar'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    guru_id = db.Column(db.String(6), db.ForeignKey('guru.id'), nullable=False)
-    mata_pelajaran_id = db.Column(db.Integer, db.ForeignKey('mata_pelajaran.id'), nullable=False)
-    kelas_id = db.Column(db.Integer, db.ForeignKey('kelas.id'), nullable=True)
-    tahun_pelajaran = db.Column(db.String(30), nullable=False)
-    
-    tanggal = db.Column(db.Date, nullable=False)
-    jam_pelajaran = db.Column(db.String(20), nullable=False)  # contoh: "1-2"
+
+    # Relasi utama ke jadwal
+    jadwal_id = db.Column(
+        db.Integer,
+        db.ForeignKey('jadwal_pelajaran.id'),
+        nullable=False,
+        index=True
+    )
+
+    guru_id = db.Column(
+        db.String(6),
+        db.ForeignKey('guru.id'),
+        nullable=False,
+        index=True
+    )
+
+    mata_pelajaran_id = db.Column(
+        db.Integer,
+        db.ForeignKey('mata_pelajaran.id'),
+        nullable=False
+    )
+
+    kelas_id = db.Column(
+        db.Integer,
+        db.ForeignKey('kelas.id'),
+        nullable=False
+    )
+
+    tahun_pelajaran = db.Column(
+        db.String(50),
+        nullable=False,
+        index=True
+    )
+
+    tanggal = db.Column(
+        db.Date,
+        nullable=False,
+        index=True
+    )
+
+    # Waktu disimpan sebagai snapshot jadwal ketika jurnal dibuat
+    jam_mulai = db.Column(db.String(10), nullable=False)
+    jam_selesai = db.Column(db.String(10), nullable=False)
+
+    # Isi jurnal
     materi = db.Column(db.Text, nullable=False)
     kegiatan = db.Column(db.Text, nullable=True)
     metode = db.Column(db.String(100), nullable=True)
-    kehadiran = db.Column(db.String(100), nullable=True)
     catatan = db.Column(db.Text, nullable=True)
-    
-    dibuat_pada = db.Column(db.DateTime, default=datetime.utcnow)
-    diperbarui_pada = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relasi — cocokkan dengan struktur yang sudah ada
-    guru = db.relationship('Guru', backref=db.backref('jurnal_mengajar', lazy=True, cascade='all, delete-orphan'))
-    mata_pelajaran = db.relationship('MataPelajaran', backref=db.backref('jurnal_mengajar', lazy=True))
-    kelas = db.relationship('Kelas', backref=db.backref('jurnal_mengajar', lazy=True))
-    
-    __table_args__ = (
-        db.UniqueConstraint('guru_id', 'mata_pelajaran_id', 'kelas_id', 'tanggal',
-                            name='_jurnal_guru_mapel_kelas_tanggal_unik'),
+
+    # Status jurnal
+    status = db.Column(
+        db.String(30),
+        nullable=False,
+        default='jurnal_tersimpan'
     )
-    
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    # Relasi
+    jadwal = db.relationship(
+        'JadwalPelajaran',
+        backref=db.backref('daftar_jurnal', lazy=True)
+    )
+
+    guru = db.relationship(
+        'Guru',
+        backref=db.backref('jurnal_mengajar', lazy=True)
+    )
+
+    mata_pelajaran = db.relationship('MataPelajaran')
+    kelas = db.relationship('Kelas')
+
+    daftar_absensi = db.relationship(
+        'AbsensiJurnalMengajar',
+        back_populates='jurnal',
+        lazy='selectin',
+        cascade='all, delete-orphan',
+        order_by='AbsensiJurnalMengajar.siswa_id'
+    )
+
+    # Satu jadwal hanya boleh memiliki satu jurnal per tanggal
+    __table_args__ = (
+        db.UniqueConstraint(
+            'jadwal_id',
+            'tanggal',
+            name='_jurnal_jadwal_tanggal_unik'
+        ),
+    )
+
+    @property
+    def jumlah_hadir(self):
+        return sum(
+            1 for a in self.daftar_absensi
+            if a.status == 'hadir'
+        )
+
+    @property
+    def jumlah_sakit(self):
+        return sum(
+            1 for a in self.daftar_absensi
+            if a.status == 'sakit'
+        )
+
+    @property
+    def jumlah_izin(self):
+        return sum(
+            1 for a in self.daftar_absensi
+            if a.status == 'izin'
+        )
+
+    @property
+    def jumlah_alpha(self):
+        return sum(
+            1 for a in self.daftar_absensi
+            if a.status == 'alpha'
+        )
+
     def __repr__(self):
-        return f"<JurnalMengajar {self.tanggal} - {self.mata_pelajaran.nama_pelajaran} - {self.kelas.nama_kelas if self.kelas else ''}>"
+        return (
+            f"<JurnalMengajar {self.tanggal} - "
+            f"{self.mata_pelajaran.nama_pelajaran} - "
+            f"{self.kelas.nama_kelas}>"
+        )
+
+
+# ==========================================
+# ABSENSI SISWA PER JURNAL MENGAJAR
+# ==========================================
+class AbsensiJurnalMengajar(db.Model):
+    __tablename__ = 'absensi_jurnal_mengajar'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    jurnal_id = db.Column(
+        db.Integer,
+        db.ForeignKey('jurnal_mengajar.id'),
+        nullable=False,
+        index=True
+    )
+
+    siswa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    # hadir / sakit / izin / alpha
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default='hadir'
+    )
+
+    keterangan = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    jurnal = db.relationship(
+        'JurnalMengajar',
+        back_populates='daftar_absensi'
+    )
+
+    siswa = db.relationship(
+        'Siswa',
+        backref=db.backref(
+            'absensi_jurnal_mengajar',
+            lazy=True
+        )
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            'jurnal_id',
+            'siswa_id',
+            name='_jurnal_mengajar_siswa_unik'
+        ),
+        db.CheckConstraint(
+            "status IN ('hadir', 'sakit', 'izin', 'alpha')",
+            name='_absensi_jurnal_mengajar_status_valid'
+        ),
+    )
+
+    def __repr__(self):
+        return (
+            f"<AbsensiJurnalMengajar "
+            f"Jurnal:{self.jurnal_id} "
+            f"Siswa:{self.siswa_id} "
+            f"Status:{self.status}>"
+        )
 
 # ==========================================
 # ✅ TABEL RIWAYAT SEMESTER

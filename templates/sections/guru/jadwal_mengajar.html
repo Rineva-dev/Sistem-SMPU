@@ -217,7 +217,7 @@
 
                                 <h4>{{ j.nama_mapel }}</h4>
 
-                                <div class="tjm-class-info">
+                                                                <div class="tjm-class-info">
 
                                     <span>
                                         <i class="fas fa-door-open"></i>
@@ -232,6 +232,32 @@
                                     {% endif %}
 
                                 </div>
+
+                                <!-- ACTION JURNAL MENGAJAR -->
+                                {% if not j.khusus and j.mata_pelajaran_id %}
+                                <div class="tjm-class-actions"
+                                    data-journal-action
+                                    hidden>
+
+                                    <button
+                                        type="button"
+                                        class="tjm-journal-btn"
+                                        data-schedule-id="{{ j.id }}"
+                                        data-mapel-id="{{ j.mata_pelajaran_id }}"
+                                        data-kelas-id="{{ j.kelas_id }}"
+                                        data-mapel="{{ j.nama_mapel }}"
+                                        data-kelas="{{ j.nama_kelas }}"
+                                        data-jam-mulai="{{ j.jam_mulai }}"
+                                        data-jam-selesai="{{ j.jam_selesai }}"
+                                        data-hari="{{ j.hari }}"
+                                    >
+                                        <i class="fas fa-book-open"></i>
+                                        <span>Isi Jurnal Mengajar</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+
+                                </div>
+                                {% endif %}
 
                             </div>
 
@@ -370,6 +396,594 @@
     </footer>
 
 </div>
+
+
+<!-- =====================================================
+     TEACHING JOURNAL STUDIO — PREMIUM MODAL
+===================================================== -->
+<div class="modal fade tjm-studio-overlay"
+     id="tjmJournalModal"
+     tabindex="-1"
+     aria-labelledby="tjmJournalModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered tjm-studio-dialog">
+        <div class="modal-content tjm-studio-modal">
+
+            <!-- FIXED HEADER -->
+            <header class="tjm-studio-header">
+                <div class="tjm-studio-header-glow"></div>
+                <div class="tjm-studio-header-grid"></div>
+
+                <div class="tjm-studio-header-top">
+                    <div class="tjm-studio-brand">
+                        <div class="tjm-studio-brand-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div>
+                            <span>ACADEMIC WORKSPACE</span>
+                            <strong>TEACHING JOURNAL</strong>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            class="tjm-studio-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Tutup">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="tjm-studio-heading">
+                    <div>
+                        <div class="tjm-studio-overline">
+                            <span></span>
+                            CLASSROOM DOCUMENTATION
+                        </div>
+                        <h2 id="tjmJournalModalLabel">
+                            Jurnal <em>Mengajar.</em>
+                        </h2>
+                        <p>
+                            Catat perjalanan pembelajaran dan aktivitas
+                            kelas dalam satu dokumentasi.
+                        </p>
+                    </div>
+
+                    <div class="tjm-studio-header-symbol">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                </div>
+
+                <div class="tjm-studio-header-bottom">
+                    <span><i class="fas fa-shield-halved"></i> Dokumen akademik guru</span>
+                    <span><i class="fas fa-circle"></i> SMPU HAMZANWADI</span>
+                </div>
+            </header>
+
+            <form method="POST"
+                  action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}"
+                  id="tjmJournalForm">
+
+                <!-- SCROLLABLE BODY -->
+                <div class="tjm-studio-body">
+
+                    <input type="hidden"
+                           name="jadwal_id"
+                           id="tjmScheduleId">
+
+                    <!-- SCHEDULE IDENTITY -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">01</div>
+                            <div>
+                                <span>CLASS INFORMATION</span>
+                                <h3>Informasi pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-class-card">
+                            <div class="tjm-studio-class-icon">
+                                <i class="fas fa-book-bookmark"></i>
+                            </div>
+
+                            <div class="tjm-studio-class-info">
+                                <span>MATA PELAJARAN</span>
+                                <h3 id="tjmJournalMapel">-</h3>
+
+                                <div class="tjm-studio-class-meta">
+                                    <span>
+                                        <i class="fas fa-users"></i>
+                                        <b id="tjmJournalKelas">-</b>
+                                    </span>
+                                    <span class="tjm-studio-meta-divider"></span>
+                                    <span>
+                                        <i class="fas fa-calendar-day"></i>
+                                        <b id="tjmJournalHari">-</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-class-decoration">
+                                <i class="fas fa-shapes"></i>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- DATE & TIME -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">02</div>
+                            <div>
+                                <span>SESSION SETTINGS</span>
+                                <h3>Waktu pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-date-card">
+                            <div class="tjm-studio-date-icon">
+                                <i class="far fa-calendar-check"></i>
+                            </div>
+
+                            <div class="tjm-studio-date-info">
+                                <span>TANGGAL JURNAL</span>
+                                <strong id="tjmJournalTanggalDisplay">-</strong>
+                                <small>
+                                    <i class="fas fa-lock"></i>
+                                    Mengikuti tanggal hari ini dan tidak dapat diubah
+                                </small>
+                            </div>
+
+                            <div class="tjm-studio-locked">
+                                <i class="fas fa-lock"></i>
+                                TERKUNCI
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-time-panel">
+                            <div class="tjm-studio-time-heading">
+                                <div>
+                                    <span class="tjm-studio-mini-label">DURASI SESI</span>
+                                    <strong>Atur rentang waktu mengajar</strong>
+                                </div>
+
+                                <div class="tjm-studio-duration">
+                                    <i class="far fa-clock"></i>
+                                    <strong id="tjmJournalDuration">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-time-fields">
+                                <div class="tjm-studio-time-field">
+                                    <label for="tjmJournalJamMulai">
+                                        <span>JAM MULAI</span>
+                                        <i class="fas fa-play"></i>
+                                    </label>
+
+                                    <div class="tjm-studio-time-input-wrap">
+                                        <input type="time"
+                                               id="tjmJournalJamMulai"
+                                               name="jam_mulai"
+                                               required>
+                                    </div>
+                                    <small>Waktu awal pembelajaran</small>
+                                </div>
+
+                                <div class="tjm-studio-time-connector">
+                                    <span></span>
+                                    <i class="fas fa-arrow-right"></i>
+                                    <span></span>
+                                </div>
+
+                                <div class="tjm-studio-time-field">
+                                    <label for="tjmJournalJamSelesai">
+                                        <span>JAM SELESAI</span>
+                                        <i class="fas fa-flag-checkered"></i>
+                                    </label>
+
+                                    <div class="tjm-studio-time-input-wrap">
+                                        <input type="time"
+                                               id="tjmJournalJamSelesai"
+                                               name="jam_selesai"
+                                               required>
+                                    </div>
+                                    <small>Waktu akhir pembelajaran</small>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-break-note">
+                                <div class="tjm-studio-break-icon">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <p>
+                                    <strong>Jadwal berlanjut setelah istirahat?</strong>
+                                    Anda dapat memperpanjang jam selesai untuk
+                                    mencatat satu rangkaian pembelajaran dalam satu jurnal.
+                                </p>
+                            </div>
+
+                            <div class="tjm-studio-time-error"
+                                 id="tjmJournalTimeError"
+                                 role="alert"
+                                 hidden>
+                                <i class="fas fa-circle-exclamation"></i>
+                                <span>Jam selesai harus lebih besar dari jam mulai.</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- LEARNING CONTENT -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">03</div>
+                            <div>
+                                <span>LEARNING CONTENT</span>
+                                <h3>Dokumentasi pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalMateri">
+                                    Materi pembelajaran
+                                    <span class="tjm-studio-required">*</span>
+                                </label>
+                                <span>WAJIB DIISI</span>
+                            </div>
+
+                            <textarea id="tjmJournalMateri"
+                                      name="materi"
+                                      rows="3"
+                                      maxlength="5000"
+                                      placeholder="Tuliskan pokok materi, kompetensi, atau topik yang disampaikan kepada peserta didik..."
+                                      required></textarea>
+
+                            <div class="tjm-studio-field-foot">
+                                <span>Materi yang benar-benar diajarkan di kelas.</span>
+                                <span><b id="tjmMateriCount">0</b> karakter</span>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalKegiatan">
+                                    Kegiatan pembelajaran
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <textarea id="tjmJournalKegiatan"
+                                      name="kegiatan"
+                                      rows="3"
+                                      maxlength="5000"
+                                      placeholder="Ceritakan aktivitas pembelajaran, proses diskusi, praktik, tanya jawab, atau kegiatan peserta didik..."></textarea>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalMetode">
+                                    Metode pembelajaran
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <div class="tjm-studio-input-icon">
+                                <i class="fas fa-chalkboard"></i>
+                                <input type="text"
+                                       id="tjmJournalMetode"
+                                       name="metode"
+                                       maxlength="255"
+                                       placeholder="Contoh: Diskusi, demonstrasi, project based learning">
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field tjm-studio-field-last">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalCatatan">
+                                    Catatan tambahan
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <textarea id="tjmJournalCatatan"
+                                      name="catatan"
+                                      rows="2"
+                                      maxlength="3000"
+                                      placeholder="Kendala, tindak lanjut, atau catatan penting lainnya..."></textarea>
+                        </div>
+                    </section>
+
+                    <div class="tjm-studio-privacy-note">
+                        <i class="fas fa-lock"></i>
+                        <span>
+                            Data jurnal tersimpan sebagai dokumentasi akademik
+                            dan terhubung dengan jadwal mengajar Anda.
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- FIXED FOOTER -->
+                <footer class="tjm-studio-footer">
+                    <div class="tjm-studio-footer-hint">
+                        <i class="fas fa-circle-check"></i>
+                        <span>Pastikan materi sudah benar sebelum menyimpan.</span>
+                    </div>
+
+                    <div class="tjm-studio-footer-actions">
+                        <button type="button"
+                                class="tjm-studio-cancel"
+                                data-bs-dismiss="modal">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                class="tjm-studio-submit"
+                                id="tjmJournalSubmit">
+                            <span class="tjm-studio-submit-icon">
+                                <i class="fas fa-floppy-disk"></i>
+                            </span>
+                            <span>Simpan Jurnal</span>
+                            <i class="fas fa-arrow-right tjm-studio-submit-arrow"></i>
+                        </button>
+                    </div>
+                </footer>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+/* =========================================================
+   TEACHING JOURNAL STUDIO
+   SPA SAFE — PREMIUM MODAL CONTROLLER
+========================================================= */
+(function () {
+    'use strict';
+
+    function initTjmJournalStudio() {
+        const modalElement = document.getElementById('tjmJournalModal');
+        const form = document.getElementById('tjmJournalForm');
+
+        if (!modalElement || !form) return;
+
+        // Hindari inisialisasi ganda pada DOM yang sama.
+        if (modalElement.dataset.studioInitialized === '1') return;
+
+        if (!window.bootstrap || !bootstrap.Modal) {
+            console.error('[TJM Journal] Bootstrap Modal belum tersedia.');
+            return;
+        }
+
+        modalElement.dataset.studioInitialized = '1';
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        const el = {
+            scheduleId: document.getElementById('tjmScheduleId'),
+            mapel: document.getElementById('tjmJournalMapel'),
+            kelas: document.getElementById('tjmJournalKelas'),
+            hari: document.getElementById('tjmJournalHari'),
+            tanggalDisplay: document.getElementById('tjmJournalTanggalDisplay'),
+
+            jamMulai: document.getElementById('tjmJournalJamMulai'),
+            jamSelesai: document.getElementById('tjmJournalJamSelesai'),
+            duration: document.getElementById('tjmJournalDuration'),
+            timeError: document.getElementById('tjmJournalTimeError'),
+
+            materi: document.getElementById('tjmJournalMateri'),
+            kegiatan: document.getElementById('tjmJournalKegiatan'),
+            metode: document.getElementById('tjmJournalMetode'),
+            catatan: document.getElementById('tjmJournalCatatan'),
+
+            materiCount: document.getElementById('tjmMateriCount'),
+            submit: document.getElementById('tjmJournalSubmit')
+        };
+
+        const submitDefault = `
+            <span class="tjm-studio-submit-icon">
+                <i class="fas fa-floppy-disk"></i>
+            </span>
+            <span>Simpan Jurnal</span>
+            <i class="fas fa-arrow-right tjm-studio-submit-arrow"></i>
+        `;
+
+        function getTodayLabel() {
+            return new Intl.DateTimeFormat('id-ID', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }).format(new Date());
+        }
+
+        function timeToMinutes(value) {
+            if (!value || !/^\d{2}:\d{2}$/.test(value)) return null;
+
+            const [hour, minute] = value.split(':').map(Number);
+
+            if (
+                hour < 0 || hour > 23 ||
+                minute < 0 || minute > 59
+            ) {
+                return null;
+            }
+
+            return hour * 60 + minute;
+        }
+
+        function updateDuration() {
+            const start = timeToMinutes(el.jamMulai.value);
+            const end = timeToMinutes(el.jamSelesai.value);
+
+            const valid = (
+                start !== null &&
+                end !== null &&
+                end > start
+            );
+
+            el.timeError.hidden = valid;
+
+            if (!valid) {
+                el.duration.textContent = 'Periksa waktu';
+                el.jamSelesai.setCustomValidity(
+                    'Jam selesai harus lebih besar daripada jam mulai.'
+                );
+                return false;
+            }
+
+            el.jamSelesai.setCustomValidity('');
+
+            const total = end - start;
+            const hours = Math.floor(total / 60);
+            const minutes = total % 60;
+
+            let label = '';
+
+            if (hours > 0) label += `${hours} jam`;
+            if (minutes > 0) {
+                label += `${label ? ' ' : ''}${minutes} menit`;
+            }
+
+            el.duration.textContent = label || '0 menit';
+
+            return true;
+        }
+
+        function updateMateriCount() {
+            el.materiCount.textContent = el.materi.value.length;
+        }
+
+        function resetForm() {
+            form.reset();
+
+            el.scheduleId.value = '';
+            el.mapel.textContent = '-';
+            el.kelas.textContent = '-';
+            el.hari.textContent = '-';
+            el.tanggalDisplay.textContent = getTodayLabel();
+
+            el.duration.textContent = '-';
+            el.timeError.hidden = true;
+
+            el.jamSelesai.setCustomValidity('');
+
+            updateMateriCount();
+
+            el.submit.disabled = false;
+            el.submit.innerHTML = submitDefault;
+        }
+
+        function openJournal(button) {
+            resetForm();
+
+            el.scheduleId.value = button.dataset.scheduleId || '';
+
+            el.mapel.textContent = button.dataset.mapel || '-';
+            el.kelas.textContent = button.dataset.kelas || '-';
+            el.hari.textContent = button.dataset.hari || '-';
+
+            // Tanggal ditampilkan saja, bukan input yang bisa diedit.
+            // Backend tetap menentukan tanggal resmi jurnal.
+            el.tanggalDisplay.textContent = getTodayLabel();
+
+            // Jam otomatis mengikuti jadwal, tetapi dapat disesuaikan.
+            el.jamMulai.value = button.dataset.jamMulai || '';
+            el.jamSelesai.value = button.dataset.jamSelesai || '';
+
+            updateDuration();
+
+            modal.show();
+
+            // Fokus ke materi setelah animasi modal selesai.
+            modalElement.addEventListener('shown.bs.modal', function focusMateri() {
+                el.materi.focus();
+                modalElement.removeEventListener(
+                    'shown.bs.modal',
+                    focusMateri
+                );
+            }, { once: true });
+        }
+
+        // Delegated click: aman untuk navigasi SPA.
+        document.addEventListener('click', function (event) {
+            const button = event.target.closest('.tjm-journal-btn');
+
+            if (!button) return;
+
+            if (!modalElement.isConnected) return;
+
+            event.preventDefault();
+            openJournal(button);
+        });
+
+        el.jamMulai.addEventListener('input', updateDuration);
+        el.jamSelesai.addEventListener('input', updateDuration);
+        el.materi.addEventListener('input', updateMateriCount);
+
+        form.addEventListener('submit', function (event) {
+            if (!el.scheduleId.value) {
+                event.preventDefault();
+                alert('Jadwal pembelajaran tidak ditemukan.');
+                return;
+            }
+
+            if (!el.materi.value.trim()) {
+                event.preventDefault();
+                el.materi.focus();
+                return;
+            }
+
+            if (!updateDuration()) {
+                event.preventDefault();
+                el.jamSelesai.focus();
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                form.reportValidity();
+                return;
+            }
+
+            el.submit.disabled = true;
+            el.submit.innerHTML = `
+                <span class="tjm-studio-submit-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </span>
+                <span>Menyimpan jurnal...</span>
+            `;
+        });
+
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            el.submit.disabled = false;
+            el.submit.innerHTML = submitDefault;
+        });
+
+        updateMateriCount();
+
+        console.log('[TJM Journal] Studio berhasil diinisialisasi.');
+    }
+
+    // Inisialisasi halaman normal dan halaman SPA.
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            initTjmJournalStudio,
+            { once: true }
+        );
+    } else {
+        initTjmJournalStudio();
+    }
+
+    document.addEventListener(
+        'spa:page-loaded',
+        initTjmJournalStudio
+    );
+
+})();
+</script>
 
 <script src="{{ url_for('static', filename='js/sections/guru/jadwal_mengajar.js') }}" defer></script>
 

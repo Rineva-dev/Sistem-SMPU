@@ -112,9 +112,7 @@
 
             <div class="nova-day-list" id="wadahDaftarHari">
 
-                {% set hari_awal = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"] %}
-
-                {% for hari in hari_awal %}
+                {% for hari in hari_tampil %}
                 <section class="nova-day" data-day="{{ hari }}">
 
                     <input type="hidden" class="nova-day-value" value="{{ hari }}">

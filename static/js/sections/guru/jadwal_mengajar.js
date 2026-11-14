@@ -164,6 +164,79 @@
         },
 
         // ==========================================
+        // VISIBILITAS TOMBOL JURNAL MENGAJAR
+        // ==========================================
+        updateJournalButtons() {
+            if (!this.root || !this.root.isConnected) return;
+
+            const now = new Date();
+
+            const namaHari = [
+                'Minggu',
+                'Senin',
+                'Selasa',
+                'Rabu',
+                'Kamis',
+                'Jumat',
+                'Sabtu'
+            ];
+
+            const hariSekarang = namaHari[now.getDay()];
+
+            const currentMinutes =
+                now.getHours() * 60 + now.getMinutes();
+
+            this.root.querySelectorAll('[data-journal-action]')
+                .forEach(action => {
+
+                    const card = action.closest('.tjm-class-card');
+
+                    if (!card) {
+                        action.hidden = true;
+                        return;
+                    }
+
+                    const button = action.querySelector('.tjm-journal-btn');
+
+                    if (!button) {
+                        action.hidden = true;
+                        return;
+                    }
+
+                    const hariJadwal = (
+                        button.dataset.hari || ''
+                    ).trim().toLowerCase();
+
+                    const hariIni = hariSekarang.toLowerCase();
+
+                    const start = this.getMinutes(
+                        button.dataset.jamMulai
+                    );
+
+                    const end = this.getMinutes(
+                        button.dataset.jamSelesai
+                    );
+
+                    const hariSesuai = hariJadwal === hariIni;
+
+                    const waktuSesuai =
+                        start !== null &&
+                        end !== null &&
+                        currentMinutes >= start &&
+                        currentMinutes < end;
+
+                    const jadwalValid =
+                        !card.classList.contains('special');
+
+                    action.hidden = !(
+                        hariSesuai &&
+                        waktuSesuai &&
+                        jadwalValid
+                    );
+                });
+        },
+
+        // ==========================================
         // UPDATE STATUS JADWAL
         // ==========================================
         updateStatus() {
@@ -176,6 +249,8 @@
 
             const currentMinutes =
                 now.getHours() * 60 + now.getMinutes();
+            
+            this.updateJournalButtons();
 
             // --------------------------------------
             // KARTU JADWAL MINGGUAN
@@ -297,7 +372,7 @@
 
             this.interval = window.setInterval(() => {
                 this.updateStatus();
-            }, 60000);
+            }, 1000);
         },
 
         // ==========================================

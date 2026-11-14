@@ -379,6 +379,7 @@ from routes.sections.kepsek.dashboard_kepsek import dashboard_kepsek_bp
 from routes.sections.kepsek.agenda import agenda_bp
 from routes.sections.guru.dashboard_guru import dashboard_guru_bp
 from routes.sections.guru.jadwal_mengajar import jadwal_mengajar_bp
+from routes.sections.guru.absensi_siswa import absensi_siswa_bp
 from routes.umum import umum_bp
 from routes.kalender_pendidikan import kalender_bp
 from routes.sections.waka_kurikulum.dashboard_wakakur import bp as dashboard_wakakur_bp
@@ -436,6 +437,7 @@ app.register_blueprint(rincian_gaji_bp)
 app.register_blueprint(monitoring_bp)
 app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)
+app.register_blueprint(absensi_siswa_bp)
 app.register_blueprint(payment_public_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok

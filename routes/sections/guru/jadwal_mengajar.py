@@ -57,22 +57,34 @@ def halaman_jadwal_mengajar():
     if not guru_data:
         flash('Data guru tidak ditemukan.', 'warning')
         return redirect(url_for('dashboard_guru.halaman_dashboard_guru'))
-
+    
     # ==========================================
     # TAHUN PELAJARAN AKTIF
     # ==========================================
-    tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+    tahun_aktif = TahunPelajaran.query.filter_by(
+        aktif=True
+    ).first()
 
+    # Jadwal guru mengikuti tahun pelajaran aktif sekolah.
+    # Session hanya menjadi fallback jika belum ada tahun aktif.
     kode_tahun = (
-        session.get('tahun_pelajaran')
-        or (tahun_aktif.kode if tahun_aktif else None)
+        tahun_aktif.kode
+        if tahun_aktif
+        else session.get('tahun_pelajaran')
     )
 
     nama_tahun = (
         tahun_aktif.nama
-        if tahun_aktif and tahun_aktif.kode == kode_tahun
+        if tahun_aktif
         else kode_tahun or 'Belum tersedia'
     )
+
+    semester = (
+        tahun_aktif.semester
+        if tahun_aktif
+        else '-'
+)
+
 
     semester = (
         tahun_aktif.semester
@@ -80,30 +92,73 @@ def halaman_jadwal_mengajar():
         else '-'
     )
 
+    
     # ==========================================
-    # AMBIL JADWAL KHUSUS MILIK GURU
+    # AMBIL JADWAL MILIK GURU
     # ==========================================
-    jadwal_query = JadwalPelajaran.query.filter_by(
-        guru_id=guru_data.id,
-        tahun_pelajaran=kode_tahun
-    ) if kode_tahun else JadwalPelajaran.query.filter(
-        JadwalPelajaran.guru_id == guru_data.id,
-        JadwalPelajaran.tahun_pelajaran == None
-    )
+    guru_id_login = str(guru_data.id)
 
-    jadwal_database = jadwal_query.order_by(
-        JadwalPelajaran.jam_mulai.asc()
-    ).all()
+    print("\n========== DEBUG JADWAL GURU ==========")
+    print("User ID       :", user_db.id)
+    print("Nama Guru     :", guru_data.nama)
+    print("Guru ID       :", guru_id_login)
+    print("Tahun Dipakai :", kode_tahun)
 
-    daftar_hari = [
+    if kode_tahun:
+        jadwal_database = (
+            JadwalPelajaran.query
+            .filter(
+                JadwalPelajaran.guru_id == guru_id_login,
+                JadwalPelajaran.tahun_pelajaran == kode_tahun
+            )
+            .order_by(
+                JadwalPelajaran.hari.asc(),
+                JadwalPelajaran.jam_mulai.asc()
+            )
+            .all()
+        )
+    else:
+        jadwal_database = []
+
+    print("Jumlah jadwal ditemukan:", len(jadwal_database))
+
+    for item in jadwal_database:
+        mapel = (
+            MataPelajaran.query.get(item.mata_pelajaran_id)
+            if item.mata_pelajaran_id else None
+        )
+
+        kelas = (
+            Kelas.query.get(item.kelas_id)
+            if item.kelas_id else None
+        )
+
+        print({
+            "jadwal_id": item.id,
+            "guru_id": item.guru_id,
+            "tahun": item.tahun_pelajaran,
+            "hari": item.hari,
+            "jam_mulai": format_jam(item.jam_mulai),
+            "jam_selesai": format_jam(item.jam_selesai),
+            "mapel": mapel.nama_pelajaran if mapel else item.jenis_khusus,
+            "kelas": kelas.nama_kelas if kelas else None
+        })
+
+    print("=======================================\n")
+
+
+    # Semua kemungkinan hari, termasuk Sabtu dan Minggu
+    SEMUA_HARI = [
         'Senin',
         'Selasa',
         'Rabu',
         'Kamis',
-        'Jumat'
+        'Jumat',
+        'Sabtu',
+        'Minggu'
     ]
 
-    jadwal_per_hari = {hari: [] for hari in daftar_hari}
+    jadwal_per_hari = {hari: [] for hari in SEMUA_HARI}
     semua_jadwal = []
 
     for item in jadwal_database:
@@ -143,16 +198,26 @@ def halaman_jadwal_mengajar():
         )
 
         data_jadwal = {
+            # ID utama jadwal_pelajaran
             'id': item.id,
+
+            # ID relasi
+            'mata_pelajaran_id': item.mata_pelajaran_id,
+            'kelas_id': item.kelas_id,
+
+            # Informasi jadwal
             'hari': hari,
             'jam_mulai': jam_mulai,
             'jam_selesai': jam_selesai,
+
+            # Informasi mata pelajaran dan kelas
             'nama_mapel': nama_mapel,
             'nama_kelas': kelas.nama_kelas if kelas else '-',
-            'jenis_khusus': jenis_khusus,
-            'khusus': bool(jenis_khusus),
             'kode_mapel': mapel.kode if mapel else '',
-            'kelas_id': item.kelas_id
+
+            # Informasi kegiatan khusus
+            'jenis_khusus': jenis_khusus,
+            'khusus': bool(jenis_khusus)
         }
 
         jadwal_per_hari[hari].append(data_jadwal)
@@ -163,6 +228,12 @@ def halaman_jadwal_mengajar():
         jadwal_per_hari[hari].sort(
             key=lambda x: x['jam_mulai'] or '99:99'
         )
+
+    # Tampilkan hanya hari yang benar-benar memiliki jadwal
+    daftar_hari = [
+        hari for hari in SEMUA_HARI
+        if jadwal_per_hari[hari]
+    ]
 
     semua_jadwal.sort(
         key=lambda x: (

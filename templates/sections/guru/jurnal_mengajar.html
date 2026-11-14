@@ -245,6 +245,7 @@
                         <button type="button"
                             class="jm-btn-create tombol-buat-jurnal"
                             data-mapel-id="{{ mapel.id }}"
+                            data-kelas-id="{{ mapel.kelas_id }}"
                             data-mapel-nama="{{ mapel.nama_mapel }}"
                             data-kelas="{{ mapel.kelas or '' }}">
                             <i class="fa-solid fa-plus"></i>
@@ -276,139 +277,377 @@
     </div>
 </div>
 
-<!-- JOURNAL MODAL -->
-<div class="modal fade jm-modal" id="modalJurnal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <form method="POST"
-                  action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}"
-                  id="formJurnal">
+<!-- =====================================================
+     TEACHING JOURNAL STUDIO — JURNAL MENGAJAR
+===================================================== -->
+<div class="modal fade tjm-studio-overlay"
+     id="tjmJournalModal"
+     tabindex="-1"
+     aria-labelledby="tjmJournalModalLabel"
+     aria-hidden="true">
 
-                <div class="jm-modal-header">
-                    <div class="jm-modal-symbol">
-                        <i class="fa-solid fa-pen-to-square"></i>
+    <div class="modal-dialog modal-dialog-centered tjm-studio-dialog">
+        <div class="modal-content tjm-studio-modal">
+
+            <!-- HEADER -->
+            <header class="tjm-studio-header">
+                <div class="tjm-studio-header-glow"></div>
+                <div class="tjm-studio-header-grid"></div>
+
+                <div class="tjm-studio-header-top">
+                    <div class="tjm-studio-brand">
+                        <div class="tjm-studio-brand-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div>
+                            <span>ACADEMIC WORKSPACE</span>
+                            <strong>TEACHING JOURNAL</strong>
+                        </div>
                     </div>
-                    <div>
-                        <span>ACADEMIC DOCUMENTATION</span>
-                        <h3>Buat Jurnal Pembelajaran</h3>
-                        <p>Catat proses pembelajaran secara lengkap dan terstruktur.</p>
-                    </div>
-                    <button type="button" class="jm-modal-close" data-bs-dismiss="modal">
-                        <i class="fa-solid fa-xmark"></i>
+
+                    <button type="button"
+                            class="tjm-studio-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Tutup">
+                        <i class="fas fa-xmark"></i>
                     </button>
                 </div>
 
-                <div class="modal-body jm-modal-body">
-                    {% if csrf_token is defined %}
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    {% endif %}
-                    <input type="hidden" name="mapel_id" id="inputMapelId">
+                <div class="tjm-studio-heading">
+                    <div>
+                        <div class="tjm-studio-overline">
+                            <span></span>
+                            CLASSROOM DOCUMENTATION
+                        </div>
+                        <h2 id="tjmJournalModalLabel">
+                            Jurnal <em>Mengajar.</em>
+                        </h2>
+                        <p>
+                            Catat perjalanan pembelajaran dan aktivitas
+                            kelas dalam satu dokumentasi.
+                        </p>
+                    </div>
 
-                    <section class="jm-form-section">
-                        <div class="jm-form-heading">
-                            <span>01</span>
-                            <div>
-                                <strong>Informasi Pembelajaran</strong>
-                                <small>Identitas kelas dan waktu pelaksanaan.</small>
-                            </div>
-                        </div>
-
-                        <div class="jm-form-grid">
-                            <div class="jm-field">
-                                <label>Mata Pelajaran</label>
-                                <input type="text" id="inputNamaMapel" class="form-control" readonly>
-                            </div>
-                            <div class="jm-field">
-                                <label>Kelas</label>
-                                <input type="text" id="inputKelas" class="form-control" readonly>
-                            </div>
-                            <div class="jm-field">
-                                <label for="tanggal">Tanggal <b>*</b></label>
-                                <input type="date" name="tanggal" id="tanggal" class="form-control" required>
-                            </div>
-                            <div class="jm-field">
-                                <label for="jam_pelajaran">Jam Pelajaran <b>*</b></label>
-                                <input type="text" name="jam_pelajaran" id="jam_pelajaran"
-                                       class="form-control" placeholder="Contoh: 1-2" required>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="jm-form-section">
-                        <div class="jm-form-heading">
-                            <span>02</span>
-                            <div>
-                                <strong>Materi Pembelajaran</strong>
-                                <small>Materi atau kompetensi yang disampaikan.</small>
-                            </div>
-                        </div>
-                        <div class="jm-field">
-                            <label for="materi">Materi <b>*</b></label>
-                            <textarea name="materi" id="materi" class="form-control"
-                                      rows="3" placeholder="Tuliskan materi pembelajaran..." required></textarea>
-                        </div>
-                    </section>
-
-                    <section class="jm-form-section">
-                        <div class="jm-form-heading">
-                            <span>03</span>
-                            <div>
-                                <strong>Pelaksanaan Pembelajaran</strong>
-                                <small>Aktivitas dan metode pembelajaran.</small>
-                            </div>
-                        </div>
-                        <div class="jm-form-grid">
-                            <div class="jm-field">
-                                <label for="kegiatan">Kegiatan Pembelajaran</label>
-                                <textarea name="kegiatan" id="kegiatan" class="form-control"
-                                          rows="3" placeholder="Deskripsikan kegiatan pembelajaran..."></textarea>
-                            </div>
-                            <div class="jm-field">
-                                <label for="metode">Metode Pembelajaran</label>
-                                <textarea name="metode" id="metode" class="form-control"
-                                          rows="3" placeholder="Metode yang digunakan..."></textarea>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="jm-form-section">
-                        <div class="jm-form-heading">
-                            <span>04</span>
-                            <div>
-                                <strong>Kehadiran & Catatan</strong>
-                                <small>Informasi tambahan dan evaluasi.</small>
-                            </div>
-                        </div>
-                        <div class="jm-field">
-                            <label for="kehadiran">Kehadiran Siswa</label>
-                            <textarea name="kehadiran" id="kehadiran" class="form-control"
-                                      rows="2" placeholder="Contoh: 28 hadir, 1 izin, 1 sakit..."></textarea>
-                        </div>
-                        <div class="jm-field">
-                            <label for="catatan">Catatan / Evaluasi</label>
-                            <textarea name="catatan" id="catatan" class="form-control"
-                                      rows="2" placeholder="Kendala, evaluasi, atau tindak lanjut..."></textarea>
-                        </div>
-                    </section>
+                    <div class="tjm-studio-header-symbol">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
                 </div>
 
-                <div class="jm-modal-footer">
-                    <div class="jm-security-note">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        Data jurnal tersimpan melalui sistem akademik.
+                <div class="tjm-studio-header-bottom">
+                    <span>
+                        <i class="fas fa-shield-halved"></i>
+                        Dokumen akademik guru
+                    </span>
+                    <span>
+                        <i class="fas fa-circle"></i>
+                        SMPU HAMZANWADI
+                    </span>
+                </div>
+            </header>
+
+            <form method="POST"
+                  action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}"
+                  id="tjmJournalForm">
+
+                <div class="tjm-studio-body">
+
+                    {% if csrf_token is defined %}
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="{{ csrf_token() }}">
+                    {% endif %}
+
+                    <input type="hidden"
+                           name="mapel_id"
+                           id="tjmJournalMapelId">
+
+                    <input type="hidden"
+                           name="kelas_id"
+                           id="tjmJournalKelasId">
+
+                    <!-- 01 INFORMASI PEMBELAJARAN -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">01</div>
+                            <div>
+                                <span>CLASS INFORMATION</span>
+                                <h3>Informasi pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-class-card">
+                            <div class="tjm-studio-class-icon">
+                                <i class="fas fa-book-bookmark"></i>
+                            </div>
+
+                            <div class="tjm-studio-class-info">
+                                <span>MATA PELAJARAN</span>
+                                <h3 id="tjmJournalMapel">-</h3>
+
+                                <div class="tjm-studio-class-meta">
+                                    <span>
+                                        <i class="fas fa-users"></i>
+                                        <b id="tjmJournalKelas">-</b>
+                                    </span>
+
+                                    <span class="tjm-studio-meta-divider"></span>
+
+                                    <span>
+                                        <i class="fas fa-calendar-day"></i>
+                                        <b id="tjmJournalHari">-</b>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-class-decoration">
+                                <i class="fas fa-shapes"></i>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 02 TANGGAL & WAKTU -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">02</div>
+                            <div>
+                                <span>SESSION SETTINGS</span>
+                                <h3>Waktu pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <!-- TANGGAL BISA DIEDIT -->
+                        <div class="tjm-studio-date-card">
+                            <div class="tjm-studio-date-icon">
+                                <i class="far fa-calendar-check"></i>
+                            </div>
+
+                            <div class="tjm-studio-date-info">
+                                <span>TANGGAL JURNAL</span>
+
+                                <input type="date"
+                                       id="tjmJournalTanggal"
+                                       name="tanggal"
+                                       class="tjm-studio-date-input"
+                                       required>
+
+                                <small>
+                                    <i class="fas fa-calendar-pen"></i>
+                                    Anda dapat memilih tanggal pembelajaran sebelumnya.
+                                </small>
+                            </div>
+
+                            <div class="tjm-studio-locked tjm-studio-date-badge">
+                                <i class="fas fa-pen"></i>
+                                EDITABLE
+                            </div>
+                        </div>
+
+                        <!-- JAM -->
+                        <div class="tjm-studio-time-panel">
+                            <div class="tjm-studio-time-heading">
+                                <div>
+                                    <span class="tjm-studio-mini-label">
+                                        DURASI SESI
+                                    </span>
+                                    <strong>Atur rentang waktu mengajar</strong>
+                                </div>
+
+                                <div class="tjm-studio-duration">
+                                    <i class="far fa-clock"></i>
+                                    <strong id="tjmJournalDuration">-</strong>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-time-fields">
+                                <div class="tjm-studio-time-field">
+                                    <label for="tjmJournalJamMulai">
+                                        <span>JAM MULAI</span>
+                                        <i class="fas fa-play"></i>
+                                    </label>
+
+                                    <div class="tjm-studio-time-input-wrap">
+                                        <input type="time"
+                                               id="tjmJournalJamMulai"
+                                               name="jam_mulai"
+                                               required>
+                                    </div>
+
+                                    <small>Waktu awal pembelajaran</small>
+                                </div>
+
+                                <div class="tjm-studio-time-connector">
+                                    <span></span>
+                                    <i class="fas fa-arrow-right"></i>
+                                    <span></span>
+                                </div>
+
+                                <div class="tjm-studio-time-field">
+                                    <label for="tjmJournalJamSelesai">
+                                        <span>JAM SELESAI</span>
+                                        <i class="fas fa-flag-checkered"></i>
+                                    </label>
+
+                                    <div class="tjm-studio-time-input-wrap">
+                                        <input type="time"
+                                               id="tjmJournalJamSelesai"
+                                               name="jam_selesai"
+                                               required>
+                                    </div>
+
+                                    <small>Waktu akhir pembelajaran</small>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-break-note">
+                                <div class="tjm-studio-break-icon">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+
+                                <p>
+                                    <strong>Jadwal berlanjut setelah istirahat?</strong>
+                                    Anda dapat memperpanjang jam selesai untuk
+                                    mencatat satu rangkaian pembelajaran dalam satu jurnal.
+                                </p>
+                            </div>
+
+                            <div class="tjm-studio-time-error"
+                                 id="tjmJournalTimeError"
+                                 role="alert"
+                                 hidden>
+                                <i class="fas fa-circle-exclamation"></i>
+                                <span>
+                                    Jam selesai harus lebih besar dari jam mulai.
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 03 DOKUMENTASI -->
+                    <section class="tjm-studio-section">
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">03</div>
+                            <div>
+                                <span>LEARNING CONTENT</span>
+                                <h3>Dokumentasi pembelajaran</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalMateri">
+                                    Materi pembelajaran
+                                    <span class="tjm-studio-required">*</span>
+                                </label>
+                                <span>WAJIB DIISI</span>
+                            </div>
+
+                            <textarea id="tjmJournalMateri"
+                                      name="materi"
+                                      rows="3"
+                                      maxlength="5000"
+                                      placeholder="Tuliskan pokok materi, kompetensi, atau topik yang disampaikan kepada peserta didik..."
+                                      required></textarea>
+
+                            <div class="tjm-studio-field-foot">
+                                <span>
+                                    Materi yang benar-benar diajarkan di kelas.
+                                </span>
+                                <span>
+                                    <b id="tjmMateriCount">0</b> karakter
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalKegiatan">
+                                    Kegiatan pembelajaran
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <textarea id="tjmJournalKegiatan"
+                                      name="kegiatan"
+                                      rows="3"
+                                      maxlength="5000"
+                                      placeholder="Ceritakan aktivitas pembelajaran, proses diskusi, praktik, tanya jawab, atau kegiatan peserta didik..."></textarea>
+                        </div>
+
+                        <div class="tjm-studio-field">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalMetode">
+                                    Metode pembelajaran
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <div class="tjm-studio-input-icon">
+                                <i class="fas fa-chalkboard"></i>
+                                <input type="text"
+                                       id="tjmJournalMetode"
+                                       name="metode"
+                                       maxlength="255"
+                                       placeholder="Contoh: Diskusi, demonstrasi, project based learning">
+                            </div>
+                        </div>
+
+                        <div class="tjm-studio-field tjm-studio-field-last">
+                            <div class="tjm-studio-label-row">
+                                <label for="tjmJournalCatatan">
+                                    Catatan tambahan
+                                </label>
+                                <span>OPSIONAL</span>
+                            </div>
+
+                            <textarea id="tjmJournalCatatan"
+                                      name="catatan"
+                                      rows="2"
+                                      maxlength="3000"
+                                      placeholder="Kendala, tindak lanjut, atau catatan penting lainnya..."></textarea>
+                        </div>
+                    </section>
+
+                    <div class="tjm-studio-privacy-note">
+                        <i class="fas fa-lock"></i>
+                        <span>
+                            Data jurnal tersimpan sebagai dokumentasi akademik
+                            dan terhubung dengan jadwal mengajar Anda.
+                        </span>
                     </div>
-                    <div class="jm-modal-actions">
-                        <button type="button" class="jm-btn-cancel" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="jm-btn-submit" id="jmSubmit">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            Simpan Jurnal
+                </div>
+
+                <!-- FOOTER -->
+                <footer class="tjm-studio-footer">
+                    <div class="tjm-studio-footer-hint">
+                        <i class="fas fa-circle-check"></i>
+                        <span>
+                            Pastikan tanggal, waktu, dan materi sudah benar.
+                        </span>
+                    </div>
+
+                    <div class="tjm-studio-footer-actions">
+                        <button type="button"
+                                class="tjm-studio-cancel"
+                                data-bs-dismiss="modal">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                class="tjm-studio-submit"
+                                id="tjmJournalSubmit">
+                            <span class="tjm-studio-submit-icon">
+                                <i class="fas fa-floppy-disk"></i>
+                            </span>
+                            <span>Simpan Jurnal</span>
+                            <i class="fas fa-arrow-right tjm-studio-submit-arrow"></i>
                         </button>
                     </div>
-                </div>
+                </footer>
             </form>
         </div>
     </div>
 </div>
+
 
 <style>
 /* =====================================================
@@ -1281,19 +1520,1108 @@
         scroll-behavior: auto !important;
     }
 }
-</style>
 
+
+/* =========================================================
+   TEACHING JOURNAL STUDIO
+   PREMIUM EMERALD MODAL
+========================================================= */
+
+#tjmJournalModal {
+    --studio-green: #08775b;
+    --studio-deep: #063d30;
+    --studio-dark: #082f27;
+    --studio-gold: #d7b56d;
+    --studio-text: #172b25;
+    --studio-muted: #82918b;
+    --studio-border: #e8eeea;
+    --studio-surface: #f7faf8;
+    --studio-radius: 16px;
+    z-index: 1090;
+}
+
+#tjmJournalModal .modal-dialog {
+    width: min(760px, calc(100vw - 36px));
+    max-width: 760px;
+    margin: 16px auto;
+}
+
+#tjmJournalModal .tjm-studio-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    min-height: 0;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+        0 28px 90px rgba(3, 35, 26, .24),
+        0 5px 18px rgba(3, 35, 26, .08);
+    animation: tjmStudioEnter .35s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes tjmStudioEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* HEADER */
+#tjmJournalModal .tjm-studio-header {
+    position: relative;
+    flex: 0 0 auto;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 22px 28px 17px;
+    color: #fff;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(215,181,109,.19), transparent 27%),
+        linear-gradient(125deg, #052e25 0%, #075541 54%, #08775b 100%);
+}
+
+#tjmJournalModal .tjm-studio-header-glow {
+    position: absolute;
+    z-index: -1;
+    top: -100px;
+    right: 45px;
+    width: 250px;
+    height: 250px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 28px rgba(255,255,255,.025),
+        0 0 0 58px rgba(255,255,255,.02);
+    animation: tjmStudioGlow 12s linear infinite;
+}
+
+@keyframes tjmStudioGlow {
+    to { transform: rotate(360deg); }
+}
+
+#tjmJournalModal .tjm-studio-header-grid {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: .12;
+    background-image:
+        linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: linear-gradient(90deg, transparent, #000);
+}
+
+#tjmJournalModal .tjm-studio-header-top,
+#tjmJournalModal .tjm-studio-brand,
+#tjmJournalModal .tjm-studio-header-bottom,
+#tjmJournalModal .tjm-studio-class-meta,
+#tjmJournalModal .tjm-studio-time-heading,
+#tjmJournalModal .tjm-studio-label-row,
+#tjmJournalModal .tjm-studio-footer,
+#tjmJournalModal .tjm-studio-footer-actions {
+    display: flex;
+    align-items: center;
+}
+
+#tjmJournalModal .tjm-studio-header-top {
+    justify-content: space-between;
+}
+
+#tjmJournalModal .tjm-studio-brand {
+    gap: 11px;
+}
+
+#tjmJournalModal .tjm-studio-brand-icon {
+    display: grid;
+    width: 39px;
+    height: 39px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    color: #f2d99e;
+    background: rgba(255,255,255,.11);
+    font-size: 16px;
+}
+
+#tjmJournalModal .tjm-studio-brand > div:last-child {
+    display: grid;
+    gap: 3px;
+}
+
+#tjmJournalModal .tjm-studio-brand span {
+    color: rgba(255,255,255,.58);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+
+#tjmJournalModal .tjm-studio-brand strong {
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 1.3px;
+}
+
+#tjmJournalModal .tjm-studio-close {
+    display: grid;
+    width: 35px;
+    height: 35px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 11px;
+    color: #fff;
+    background: rgba(255,255,255,.09);
+    transition: .2s ease;
+}
+
+#tjmJournalModal .tjm-studio-close:hover {
+    transform: rotate(90deg);
+    background: rgba(255,255,255,.2);
+}
+
+#tjmJournalModal .tjm-studio-heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+#tjmJournalModal .tjm-studio-overline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c9dfd4;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+#tjmJournalModal .tjm-studio-overline span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e2c17d;
+    box-shadow: 0 0 0 4px rgba(226,193,125,.13);
+}
+
+#tjmJournalModal .tjm-studio-heading h2 {
+    margin: 8px 0 5px;
+    color: #fff;
+    font-size: clamp(25px, 4vw, 32px);
+    font-weight: 800;
+    letter-spacing: -1.4px;
+}
+
+#tjmJournalModal .tjm-studio-heading h2 em {
+    color: #e4c783;
+    font-style: normal;
+}
+
+#tjmJournalModal .tjm-studio-heading p {
+    max-width: 440px;
+    margin: 0;
+    color: rgba(255,255,255,.68);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+#tjmJournalModal .tjm-studio-header-symbol {
+    display: grid;
+    width: 76px;
+    height: 76px;
+    flex: 0 0 76px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 24px;
+    color: rgba(238,211,153,.9);
+    background: rgba(255,255,255,.07);
+    font-size: 31px;
+    transform: rotate(7deg);
+}
+
+#tjmJournalModal .tjm-studio-header-bottom {
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.13);
+    color: rgba(255,255,255,.6);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+#tjmJournalModal .tjm-studio-header-bottom i {
+    margin-right: 5px;
+    color: #e5c681;
+}
+
+/* FORM LAYOUT — BODY ONLY SCROLLS */
+#tjmJournalModal #tjmJournalForm {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#tjmJournalModal .tjm-studio-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 23px 28px 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #cbdad2 transparent;
+}
+
+#tjmJournalModal .tjm-studio-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+#tjmJournalModal .tjm-studio-body::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: #cbdad2;
+}
+
+#tjmJournalModal .tjm-studio-section + .tjm-studio-section {
+    margin-top: 25px;
+}
+
+#tjmJournalModal .tjm-studio-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 13px;
+}
+
+#tjmJournalModal .tjm-studio-section-number {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    place-items: center;
+    border: 1px solid #dcebe3;
+    border-radius: 11px;
+    color: var(--studio-green);
+    background: #eff8f3;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-studio-section-heading > div:last-child {
+    display: grid;
+    gap: 3px;
+}
+
+#tjmJournalModal .tjm-studio-section-heading span {
+    color: #91a29a;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.25px;
+}
+
+#tjmJournalModal .tjm-studio-section-heading h3 {
+    margin: 0;
+    color: var(--studio-text);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+}
+
+/* CLASS CARD */
+#tjmJournalModal .tjm-studio-class-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    overflow: hidden;
+    padding: 16px;
+    border: 1px solid #e0ece5;
+    border-radius: 15px;
+    background: linear-gradient(110deg, #f1f9f4, #fbfdfb);
+}
+
+#tjmJournalModal .tjm-studio-class-icon {
+    display: grid;
+    width: 47px;
+    height: 47px;
+    flex: 0 0 47px;
+    place-items: center;
+    border-radius: 14px;
+    color: #fff;
+    background: linear-gradient(145deg, #0a8966, #07543f);
+    box-shadow: 0 7px 15px rgba(8,119,91,.2);
+    font-size: 18px;
+}
+
+#tjmJournalModal .tjm-studio-class-info {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+#tjmJournalModal .tjm-studio-class-info > span {
+    color: #8a9d93;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+#tjmJournalModal .tjm-studio-class-info h3 {
+    margin: 3px 0 7px;
+    color: #123c2e;
+    font-size: 18px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+#tjmJournalModal .tjm-studio-class-meta {
+    flex-wrap: wrap;
+    gap: 9px;
+    color: #71877b;
+    font-size: 10px;
+}
+
+#tjmJournalModal .tjm-studio-class-meta i {
+    margin-right: 4px;
+    color: var(--studio-green);
+}
+
+#tjmJournalModal .tjm-studio-class-meta b {
+    font-weight: 700;
+}
+
+#tjmJournalModal .tjm-studio-meta-divider {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #b6c5bc;
+}
+
+#tjmJournalModal .tjm-studio-class-decoration {
+    position: absolute;
+    right: 15px;
+    bottom: -15px;
+    color: rgba(8,119,91,.07);
+    font-size: 76px;
+    transform: rotate(-15deg);
+}
+
+/* DATE CARD */
+#tjmJournalModal .tjm-studio-date-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1px solid #e7ece9;
+    border-radius: 13px;
+    background: #fff;
+}
+
+#tjmJournalModal .tjm-studio-date-icon {
+    display: grid;
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    place-items: center;
+    border-radius: 12px;
+    color: #9b7736;
+    background: #fbf5e9;
+    font-size: 16px;
+}
+
+#tjmJournalModal .tjm-studio-date-info {
+    display: grid;
+    flex: 1;
+    gap: 3px;
+    min-width: 0;
+}
+
+#tjmJournalModal .tjm-studio-date-info > span {
+    color: #9aa79f;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+#tjmJournalModal .tjm-studio-date-info strong {
+    color: #243c31;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-studio-date-info small {
+    color: #89978f;
+    font-size: 9px;
+}
+
+#tjmJournalModal .tjm-studio-date-info small i {
+    color: #b28a42;
+}
+
+#tjmJournalModal .tjm-studio-locked {
+    padding: 6px 9px;
+    border: 1px solid #f0e5cb;
+    border-radius: 7px;
+    color: #9b7736;
+    background: #fffaf0;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .4px;
+    white-space: nowrap;
+}
+
+/* TIME PANEL */
+#tjmJournalModal .tjm-studio-time-panel {
+    margin-top: 12px;
+    padding: 17px;
+    border: 1px solid #e5ece7;
+    border-radius: 15px;
+    background: #f8fbf9;
+}
+
+#tjmJournalModal .tjm-studio-time-heading {
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+#tjmJournalModal .tjm-studio-time-heading > div:first-child {
+    display: grid;
+    gap: 4px;
+}
+
+#tjmJournalModal .tjm-studio-mini-label {
+    color: #93a49a;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+#tjmJournalModal .tjm-studio-time-heading > div:first-child strong {
+    color: #274336;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-studio-duration {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 1px solid #dcece2;
+    border-radius: 9px;
+    color: #08775b;
+    background: #eff8f2;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+#tjmJournalModal .tjm-studio-duration strong {
+    font-size: 10px;
+}
+
+#tjmJournalModal .tjm-studio-time-fields {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 30px minmax(0,1fr);
+    align-items: center;
+    gap: 9px;
+}
+
+#tjmJournalModal .tjm-studio-time-field {
+    min-width: 0;
+}
+
+#tjmJournalModal .tjm-studio-time-field label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    color: #74877c;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .9px;
+}
+
+#tjmJournalModal .tjm-studio-time-field label i {
+    color: #0b8966;
+}
+
+#tjmJournalModal .tjm-studio-time-input-wrap {
+    overflow: hidden;
+    border: 1px solid #dce7df;
+    border-radius: 11px;
+    background: #fff;
+    transition: .2s ease;
+}
+
+#tjmJournalModal .tjm-studio-time-input-wrap:focus-within {
+    border-color: #0a9470;
+    box-shadow: 0 0 0 3px rgba(8,119,91,.1);
+}
+
+#tjmJournalModal .tjm-studio-time-input-wrap input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 47px;
+    padding: 8px 11px;
+    border: 0;
+    outline: 0;
+    color: #124532;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+}
+
+#tjmJournalModal .tjm-studio-time-field > small {
+    display: block;
+    margin-top: 6px;
+    color: #9aa79f;
+    font-size: 9px;
+}
+
+#tjmJournalModal .tjm-studio-time-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding-top: 22px;
+    color: #a2b3a9;
+    font-size: 10px;
+}
+
+#tjmJournalModal .tjm-studio-time-connector span {
+    display: none;
+}
+
+#tjmJournalModal .tjm-studio-break-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 11px 12px;
+    border: 1px solid #f0e7d2;
+    border-radius: 11px;
+    background: #fffaf0;
+}
+
+#tjmJournalModal .tjm-studio-break-icon {
+    display: grid;
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+    place-items: center;
+    border-radius: 8px;
+    color: #a27b35;
+    background: #f5e9ce;
+    font-size: 11px;
+}
+
+#tjmJournalModal .tjm-studio-break-note p {
+    margin: 0;
+    color: #8d7b58;
+    font-size: 10px;
+    line-height: 1.65;
+}
+
+#tjmJournalModal .tjm-studio-break-note strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #80632e;
+    font-size: 10px;
+}
+
+#tjmJournalModal .tjm-studio-time-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #f5d0d0;
+    border-radius: 9px;
+    color: #b42318;
+    background: #fff4f3;
+    font-size: 10px;
+}
+
+#tjmJournalModal .tjm-studio-time-error[hidden] {
+    display: none !important;
+}
+
+/* FORM FIELDS */
+#tjmJournalModal .tjm-studio-field {
+    margin-bottom: 17px;
+}
+
+#tjmJournalModal .tjm-studio-field-last {
+    margin-bottom: 0;
+}
+
+#tjmJournalModal .tjm-studio-label-row {
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 7px;
+}
+
+#tjmJournalModal .tjm-studio-label-row label {
+    margin: 0;
+    color: #30463b;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-studio-label-row > span {
+    color: #a1ada5;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .6px;
+}
+
+#tjmJournalModal .tjm-studio-required {
+    color: #d74b45;
+}
+
+#tjmJournalModal .tjm-studio-field textarea,
+#tjmJournalModal .tjm-studio-input-icon input {
+    display: block;
+    width: 100%;
+    border: 1px solid #e1e9e3;
+    border-radius: 11px;
+    outline: 0;
+    color: #243c31;
+    background: #fff;
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 1.7;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+#tjmJournalModal .tjm-studio-field textarea {
+    min-height: 85px;
+    padding: 12px 13px;
+    resize: vertical;
+}
+
+#tjmJournalModal .tjm-studio-field textarea::placeholder,
+#tjmJournalModal .tjm-studio-input-icon input::placeholder {
+    color: #b0bbb4;
+}
+
+#tjmJournalModal .tjm-studio-field textarea:focus,
+#tjmJournalModal .tjm-studio-input-icon input:focus {
+    border-color: #0a9470;
+    box-shadow: 0 0 0 3px rgba(8,119,91,.08);
+}
+
+#tjmJournalModal .tjm-studio-input-icon {
+    position: relative;
+}
+
+#tjmJournalModal .tjm-studio-input-icon > i {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    color: #0a8966;
+    font-size: 12px;
+    transform: translateY(-50%);
+}
+
+#tjmJournalModal .tjm-studio-input-icon input {
+    height: 43px;
+    padding: 9px 12px 9px 37px;
+}
+
+#tjmJournalModal .tjm-studio-field-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 6px;
+    color: #9aa79f;
+    font-size: 9px;
+}
+
+#tjmJournalModal .tjm-studio-field-foot b {
+    color: #698276;
+}
+
+#tjmJournalModal .tjm-studio-privacy-note {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 22px;
+    padding: 12px;
+    border: 1px solid #e6eee8;
+    border-radius: 10px;
+    color: #819188;
+    background: #f8fbf9;
+    font-size: 9px;
+    line-height: 1.6;
+}
+
+#tjmJournalModal .tjm-studio-privacy-note i {
+    color: #0a8966;
+    font-size: 13px;
+}
+
+/* FIXED FOOTER */
+#tjmJournalModal .tjm-studio-footer {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 25px;
+    border-top: 1px solid #e9efeb;
+    background: rgba(255,255,255,.98);
+    box-shadow: 0 -5px 18px rgba(20,50,35,.025);
+}
+
+#tjmJournalModal .tjm-studio-footer-hint {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #87958d;
+    font-size: 9px;
+}
+
+#tjmJournalModal .tjm-studio-footer-hint i {
+    color: #0a9470;
+}
+
+#tjmJournalModal .tjm-studio-footer-actions {
+    gap: 9px;
+}
+
+#tjmJournalModal .tjm-studio-cancel,
+#tjmJournalModal .tjm-studio-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 0 17px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+#tjmJournalModal .tjm-studio-cancel {
+    border: 1px solid #e3eae5;
+    color: #68786f;
+    background: #fff;
+}
+
+#tjmJournalModal .tjm-studio-cancel:hover {
+    border-color: #cbd9d0;
+    background: #f7faf8;
+}
+
+#tjmJournalModal .tjm-studio-submit {
+    border: 1px solid #08775b;
+    color: #fff;
+    background: linear-gradient(120deg, #08775b, #07513d);
+    box-shadow: 0 5px 13px rgba(8,119,91,.19);
+}
+
+#tjmJournalModal .tjm-studio-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(8,119,91,.25);
+}
+
+#tjmJournalModal .tjm-studio-submit:disabled {
+    cursor: wait;
+    opacity: .72;
+}
+
+#tjmJournalModal .tjm-studio-submit-icon {
+    display: grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    border-radius: 7px;
+    color: #fff;
+    background: rgba(255,255,255,.15);
+}
+
+#tjmJournalModal .tjm-studio-submit-arrow {
+    margin-left: 3px;
+    font-size: 9px;
+}
+
+/* SHORT LAPTOP SCREENS */
+@media (max-height: 760px) {
+    #tjmJournalModal .modal-dialog {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    #tjmJournalModal .tjm-studio-modal {
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+    }
+
+    #tjmJournalModal .tjm-studio-header {
+        padding-top: 15px;
+        padding-bottom: 12px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading {
+        margin-top: 12px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading h2 {
+        margin-top: 5px;
+        font-size: 27px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading p {
+        font-size: 10px;
+    }
+
+    #tjmJournalModal .tjm-studio-header-symbol {
+        width: 60px;
+        height: 60px;
+        flex-basis: 60px;
+        font-size: 25px;
+    }
+
+    #tjmJournalModal .tjm-studio-header-bottom {
+        margin-top: 11px;
+        padding-top: 9px;
+    }
+
+    #tjmJournalModal .tjm-studio-body {
+        padding-top: 17px;
+        padding-bottom: 15px;
+    }
+
+    #tjmJournalModal .tjm-studio-section + .tjm-studio-section {
+        margin-top: 19px;
+    }
+
+    #tjmJournalModal .tjm-studio-field textarea {
+        min-height: 68px;
+    }
+
+    #tjmJournalModal .tjm-studio-footer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    #tjmJournalModal .modal-dialog {
+        width: calc(100vw - 18px);
+        max-width: none;
+        margin: 9px auto;
+    }
+
+    #tjmJournalModal .tjm-studio-modal {
+        max-height: calc(100vh - 18px);
+        max-height: calc(100dvh - 18px);
+        border-radius: 17px;
+    }
+
+    #tjmJournalModal .tjm-studio-header {
+        padding: 16px 17px 13px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading {
+        margin-top: 15px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading h2 {
+        font-size: 25px;
+    }
+
+    #tjmJournalModal .tjm-studio-heading p {
+        max-width: 280px;
+        font-size: 10px;
+    }
+
+    #tjmJournalModal .tjm-studio-header-symbol {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+        border-radius: 15px;
+        font-size: 20px;
+    }
+
+    #tjmJournalModal .tjm-studio-header-bottom {
+        font-size: 8px;
+    }
+
+    #tjmJournalModal .tjm-studio-body {
+        padding: 17px 16px;
+    }
+
+    #tjmJournalModal .tjm-studio-time-panel {
+        padding: 13px;
+    }
+
+    #tjmJournalModal .tjm-studio-time-fields {
+        grid-template-columns: minmax(0,1fr) 20px minmax(0,1fr);
+        gap: 5px;
+    }
+
+    #tjmJournalModal .tjm-studio-time-input-wrap input {
+        height: 43px;
+        padding: 7px;
+        font-size: 17px;
+    }
+
+    #tjmJournalModal .tjm-studio-date-info small {
+        font-size: 8px;
+    }
+
+    #tjmJournalModal .tjm-studio-locked {
+        padding: 5px 6px;
+        font-size: 7px;
+    }
+
+    #tjmJournalModal .tjm-studio-footer {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 16px;
+    }
+
+    #tjmJournalModal .tjm-studio-footer-hint {
+        font-size: 8px;
+    }
+
+    #tjmJournalModal .tjm-studio-footer-actions {
+        display: grid;
+        grid-template-columns: .8fr 1.5fr;
+    }
+
+    #tjmJournalModal .tjm-studio-cancel,
+    #tjmJournalModal .tjm-studio-submit {
+        min-height: 42px;
+        padding: 0 10px;
+    }
+}
+
+/* EXTRA COMPACT */
+@media (max-width: 380px) {
+    #tjmJournalModal .tjm-studio-header-symbol {
+        display: none;
+    }
+
+    #tjmJournalModal .tjm-studio-locked {
+        font-size: 0;
+    }
+
+    #tjmJournalModal .tjm-studio-locked i {
+        font-size: 11px;
+    }
+
+    #tjmJournalModal .tjm-studio-class-meta {
+        gap: 6px;
+    }
+}
+
+
+/* =========================================================
+   JOURNAL STUDIO — EDITABLE DATE
+========================================================= */
+
+#tjmJournalModal .tjm-studio-date-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 3px 0;
+    border: 0;
+    outline: 0;
+    color: #243c31;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#tjmJournalModal .tjm-studio-date-input:focus {
+    color: #08775b;
+}
+
+#tjmJournalModal .tjm-studio-date-badge {
+    border-color: #dcece2;
+    color: #08775b;
+    background: #eff8f2;
+}
+
+#tjmJournalModal .tjm-studio-date-info small {
+    display: block;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    #tjmJournalModal .tjm-studio-date-input {
+        font-size: 12px;
+    }
+}
+
+</style>
 <script>
-(function () {
+/* =====================================================
+   TUNGGU BOOTSTRAP SEBELUM INISIALISASI HALAMAN
+   Kompatibel dengan SPA Navigation
+===================================================== */
+
+let tjmBootstrapAttempts = 0;
+
+(function initJurnalMengajarPage() {
+    'use strict';
+
+    // Tunggu Bootstrap JS tersedia.
+    if (!window.bootstrap || !window.bootstrap.Modal) {
+
+        if (tjmBootstrapAttempts < 60) {
+            tjmBootstrapAttempts++;
+
+            window.setTimeout(
+                initJurnalMengajarPage,
+                50
+            );
+
+            return;
+        }
+
+        console.error(
+            '[Jurnal Studio] Bootstrap gagal dimuat setelah menunggu 3 detik.'
+        );
+
+        return;
+    }
+
     const root = document.getElementById('jurnalWorkspace');
+
     if (!root || root.dataset.initialized === 'true') return;
     root.dataset.initialized = 'true';
 
     const $ = (selector) => root.querySelector(selector);
     const $$ = (selector) => [...root.querySelectorAll(selector)];
 
+    /* =====================================================
+       TANGGAL LOKAL
+    ===================================================== */
     function localDate() {
         const now = new Date();
+
         return [
             now.getFullYear(),
             String(now.getMonth() + 1).padStart(2, '0'),
@@ -1301,8 +2629,12 @@
         ].join('-');
     }
 
+    /* =====================================================
+       TANGGAL HARI INI
+    ===================================================== */
     function updateToday() {
         const now = new Date();
+
         const value = new Intl.DateTimeFormat('id-ID', {
             weekday: 'long',
             day: 'numeric',
@@ -1311,12 +2643,17 @@
         }).format(now);
 
         const element = $('#jmToday');
-        if (element) element.textContent = value;
+
+        if (element) {
+            element.textContent = value;
+        }
     }
 
     updateToday();
 
-    // Search and day filter
+    /* =====================================================
+       SEARCH DAN FILTER HARI
+    ===================================================== */
     const search = $('#jmSearch');
     const filter = $('#jmDayFilter');
     const grid = $('#jmSubjectGrid');
@@ -1327,19 +2664,31 @@
 
         const keyword = (search?.value || '').trim().toLowerCase();
         const day = (filter?.value || '').toLowerCase();
+
         let count = 0;
 
         $$('.jm-subject-card').forEach(card => {
-            const content = `${card.dataset.name || ''} ${card.dataset.class || ''}`;
-            const days = (card.dataset.days || '').split(/\s+/).filter(Boolean);
-            const visible = (!keyword || content.includes(keyword)) &&
-                            (!day || days.includes(day));
+            const content = `
+                ${card.dataset.name || ''}
+                ${card.dataset.class || ''}
+            `.toLowerCase();
+
+            const days = (card.dataset.days || '')
+                .split(/\s+/)
+                .filter(Boolean);
+
+            const visible =
+                (!keyword || content.includes(keyword)) &&
+                (!day || days.includes(day));
 
             card.hidden = !visible;
+
             if (visible) count++;
         });
 
-        if (noResults) noResults.hidden = count > 0;
+        if (noResults) {
+            noResults.hidden = count > 0;
+        }
     }
 
     search?.addEventListener('input', applyFilters);
@@ -1348,79 +2697,415 @@
     $('#jmReset')?.addEventListener('click', () => {
         if (search) search.value = '';
         if (filter) filter.value = '';
+
         applyFilters();
     });
 
-    // Grid and list view
+    /* =====================================================
+       GRID DAN LIST VIEW
+    ===================================================== */
     $$('.jm-view-switch button').forEach(button => {
         button.addEventListener('click', () => {
-            $$('.jm-view-switch button').forEach(item => item.classList.remove('active'));
+            $$('.jm-view-switch button').forEach(item => {
+                item.classList.remove('active');
+            });
+
             button.classList.add('active');
-            grid?.classList.toggle('is-list', button.dataset.view === 'list');
+
+            grid?.classList.toggle(
+                'is-list',
+                button.dataset.view === 'list'
+            );
         });
     });
 
-    // Keyboard shortcut /
+    /* =====================================================
+       KEYBOARD SHORTCUT /
+    ===================================================== */
     root.addEventListener('keydown', event => {
-        if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        const tag = document.activeElement?.tagName;
+
+        if (
+            event.key === '/' &&
+            !['INPUT', 'TEXTAREA'].includes(tag)
+        ) {
             event.preventDefault();
             search?.focus();
         }
     });
 
-    // Modal
-    const modalElement = document.getElementById('modalJurnal');
-    const modal = modalElement && window.bootstrap
-        ? bootstrap.Modal.getOrCreateInstance(modalElement)
-        : null;
+    /* =====================================================
+       TEACHING JOURNAL STUDIO
+       Modal baru — tanggal dan jam dapat diedit
+    ===================================================== */
+    const modalElement = document.getElementById('tjmJournalModal');
+    const form = document.getElementById('tjmJournalForm');
 
-    function openJournal(button) {
-        if (!modal) {
-            console.error('Bootstrap Modal tidak tersedia.');
-            return;
+    let modal = null;
+
+    if (modalElement && form) {
+
+        if (!window.bootstrap || !bootstrap.Modal) {
+            console.error('[Jurnal Studio] Bootstrap Modal belum tersedia.');
+        } else {
+
+            modal = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+
+            const el = {
+                mapelId: document.getElementById('tjmJournalMapelId'),
+                kelasId: document.getElementById('tjmJournalKelasId'),
+
+                mapel: document.getElementById('tjmJournalMapel'),
+                kelas: document.getElementById('tjmJournalKelas'),
+                hari: document.getElementById('tjmJournalHari'),
+
+                tanggal: document.getElementById('tjmJournalTanggal'),
+                jamMulai: document.getElementById('tjmJournalJamMulai'),
+                jamSelesai: document.getElementById('tjmJournalJamSelesai'),
+
+                duration: document.getElementById('tjmJournalDuration'),
+                timeError: document.getElementById('tjmJournalTimeError'),
+
+                materi: document.getElementById('tjmJournalMateri'),
+                kegiatan: document.getElementById('tjmJournalKegiatan'),
+                metode: document.getElementById('tjmJournalMetode'),
+                catatan: document.getElementById('tjmJournalCatatan'),
+
+                materiCount: document.getElementById('tjmMateriCount'),
+                submit: document.getElementById('tjmJournalSubmit')
+            };
+
+            const requiredElements = [
+                'mapelId',
+                'kelasId',
+                'mapel',
+                'kelas',
+                'hari',
+                'tanggal',
+                'jamMulai',
+                'jamSelesai',
+                'duration',
+                'timeError',
+                'materi',
+                'materiCount',
+                'submit'
+            ];
+
+            const missingElements = requiredElements.filter(
+                key => !el[key]
+            );
+
+            if (missingElements.length) {
+                console.error(
+                    '[Jurnal Studio] Elemen modal tidak ditemukan:',
+                    missingElements
+                );
+            } else {
+
+                const submitDefault = `
+                    <span class="tjm-studio-submit-icon">
+                        <i class="fas fa-floppy-disk"></i>
+                    </span>
+                    <span>Simpan Jurnal</span>
+                    <i class="fas fa-arrow-right tjm-studio-submit-arrow"></i>
+                `;
+
+                /* -----------------------------------------
+                   UPDATE HARI BERDASARKAN TANGGAL
+                ----------------------------------------- */
+                function updateSelectedDay() {
+                    const value = el.tanggal.value;
+
+                    if (!value) {
+                        el.hari.textContent = '-';
+                        return;
+                    }
+
+                    const date = new Date(`${value}T12:00:00`);
+
+                    el.hari.textContent = new Intl.DateTimeFormat(
+                        'id-ID',
+                        { weekday: 'long' }
+                    ).format(date);
+                }
+
+                /* -----------------------------------------
+                   KONVERSI JAM KE MENIT
+                ----------------------------------------- */
+                function timeToMinutes(value) {
+                    if (!value || !/^\d{2}:\d{2}$/.test(value)) {
+                        return null;
+                    }
+
+                    const [hour, minute] = value.split(':').map(Number);
+
+                    if (
+                        hour < 0 || hour > 23 ||
+                        minute < 0 || minute > 59
+                    ) {
+                        return null;
+                    }
+
+                    return hour * 60 + minute;
+                }
+
+                /* -----------------------------------------
+                   VALIDASI DAN DURASI JAM
+                ----------------------------------------- */
+                function updateDuration() {
+                    const start = timeToMinutes(el.jamMulai.value);
+                    const end = timeToMinutes(el.jamSelesai.value);
+
+                    const valid = (
+                        start !== null &&
+                        end !== null &&
+                        end > start
+                    );
+
+                    el.timeError.hidden = valid;
+
+                    if (!valid) {
+                        el.duration.textContent = 'Periksa waktu';
+
+                        el.jamSelesai.setCustomValidity(
+                            'Jam selesai harus lebih besar daripada jam mulai.'
+                        );
+
+                        return false;
+                    }
+
+                    el.jamSelesai.setCustomValidity('');
+
+                    const total = end - start;
+                    const hours = Math.floor(total / 60);
+                    const minutes = total % 60;
+
+                    let label = '';
+
+                    if (hours > 0) {
+                        label += `${hours} jam`;
+                    }
+
+                    if (minutes > 0) {
+                        label += `${label ? ' ' : ''}${minutes} menit`;
+                    }
+
+                    el.duration.textContent = label || '0 menit';
+
+                    return true;
+                }
+
+                /* -----------------------------------------
+                   COUNTER MATERI
+                ----------------------------------------- */
+                function updateMateriCount() {
+                    el.materiCount.textContent = el.materi.value.length;
+                }
+
+                /* -----------------------------------------
+                   RESET MODAL
+                ----------------------------------------- */
+                function resetJournalForm() {
+                    form.reset();
+
+                    el.mapelId.value = '';
+                    el.kelasId.value = '';
+
+                    el.mapel.textContent = '-';
+                    el.kelas.textContent = '-';
+                    el.hari.textContent = '-';
+
+                    el.tanggal.value = localDate();
+
+                    el.jamMulai.value = '';
+                    el.jamSelesai.value = '';
+
+                    el.duration.textContent = '-';
+                    el.timeError.hidden = true;
+
+                    el.jamSelesai.setCustomValidity('');
+
+                    updateSelectedDay();
+                    updateMateriCount();
+
+                    el.submit.disabled = false;
+                    el.submit.innerHTML = submitDefault;
+                }
+
+                /* -----------------------------------------
+                   BUKA MODAL JURNAL
+                ----------------------------------------- */
+                function openJournal(button) {
+                    if (!button || !modal) return;
+
+                    resetJournalForm();
+
+                    el.mapelId.value = button.dataset.mapelId || '';
+                    el.kelasId.value = button.dataset.kelasId || '';
+
+                    el.mapel.textContent =
+                        button.dataset.mapelNama || '-';
+
+                    el.kelas.textContent =
+                        button.dataset.kelas || '-';
+
+                    // Tanggal awal hari ini, tetap bisa diubah guru.
+                    el.tanggal.value = localDate();
+
+                    updateSelectedDay();
+
+                    // Jam harus diisi sesuai tanggal jurnal.
+                    el.jamMulai.value = '';
+                    el.jamSelesai.value = '';
+
+                    el.duration.textContent = '-';
+
+                    modal.show();
+
+                    modalElement.addEventListener(
+                        'shown.bs.modal',
+                        function focusMateri() {
+                            el.materi.focus();
+
+                            modalElement.removeEventListener(
+                                'shown.bs.modal',
+                                focusMateri
+                            );
+                        },
+                        { once: true }
+                    );
+                }
+
+                /* -----------------------------------------
+                   EVENT TOMBOL BUAT JURNAL
+                   Delegated agar kompatibel dengan SPA.
+                ----------------------------------------- */
+                document.addEventListener('click', event => {
+                    const target = event.target;
+
+                    if (!(target instanceof Element)) return;
+
+                    const button = target.closest('.tombol-buat-jurnal');
+
+                    if (!button || !modalElement.isConnected) return;
+
+                    event.preventDefault();
+                    openJournal(button);
+                });
+
+                /* -----------------------------------------
+                   EVENT INPUT MODAL
+                ----------------------------------------- */
+                el.tanggal.addEventListener(
+                    'change',
+                    updateSelectedDay
+                );
+
+                el.jamMulai.addEventListener(
+                    'input',
+                    updateDuration
+                );
+
+                el.jamSelesai.addEventListener(
+                    'input',
+                    updateDuration
+                );
+
+                el.materi.addEventListener(
+                    'input',
+                    updateMateriCount
+                );
+
+                /* -----------------------------------------
+                   SUBMIT JURNAL
+                ----------------------------------------- */
+                form.addEventListener('submit', event => {
+
+                    if (!el.mapelId.value || !el.kelasId.value) {
+                        event.preventDefault();
+
+                        alert(
+                            'Mata pelajaran atau kelas tidak ditemukan. Silakan muat ulang halaman.'
+                        );
+
+                        return;
+                    }
+
+                    if (!el.tanggal.value) {
+                        event.preventDefault();
+                        el.tanggal.focus();
+                        return;
+                    }
+
+                    if (!el.materi.value.trim()) {
+                        event.preventDefault();
+                        el.materi.focus();
+                        return;
+                    }
+
+                    if (!updateDuration()) {
+                        event.preventDefault();
+                        el.jamSelesai.focus();
+                        return;
+                    }
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        form.reportValidity();
+                        return;
+                    }
+
+                    el.submit.disabled = true;
+
+                    el.submit.innerHTML = `
+                        <span class="tjm-studio-submit-icon">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                        <span>Menyimpan jurnal...</span>
+                    `;
+                });
+
+                /* -----------------------------------------
+                   RESET TOMBOL SAAT MODAL DITUTUP
+                ----------------------------------------- */
+                modalElement.addEventListener(
+                    'hidden.bs.modal',
+                    () => {
+                        el.submit.disabled = false;
+                        el.submit.innerHTML = submitDefault;
+                    }
+                );
+
+                updateMateriCount();
+
+                console.log(
+                    '[Jurnal Studio] Berhasil diinisialisasi.'
+                );
+            }
         }
-
-        document.getElementById('inputMapelId').value = button.dataset.mapelId || '';
-        document.getElementById('inputNamaMapel').value = button.dataset.mapelNama || '';
-        document.getElementById('inputKelas').value = button.dataset.kelas || '';
-        document.getElementById('tanggal').value = localDate();
-
-        modal.show();
+    } else {
+        console.error(
+            '[Jurnal Studio] Modal #tjmJournalModal atau form #tjmJournalForm tidak ditemukan.'
+        );
     }
 
-    $$('.tombol-buat-jurnal').forEach(button => {
-        button.addEventListener('click', () => openJournal(button));
-    });
-
+    /* =====================================================
+       TOMBOL BUAT JURNAL DI BAGIAN ATAS
+    ===================================================== */
     $('#jmCreateTop')?.addEventListener('click', () => {
-        const firstCard = $$('.jm-subject-card').find(card => !card.hidden);
+        const firstCard = $$('.jm-subject-card')
+            .find(card => !card.hidden);
+
         const button = firstCard?.querySelector('.tombol-buat-jurnal');
 
         if (button) {
-            openJournal(button);
+            // Memicu delegated click yang sama dengan tombol kartu.
+            button.click();
         } else {
             search?.focus();
         }
     });
 
-    // Prevent double submission
-    const form = document.getElementById('formJurnal');
-    form?.addEventListener('submit', () => {
-        const button = document.getElementById('jmSubmit');
-        if (!button) return;
-
-        button.disabled = true;
-        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
-    });
-
-    // Reset submit state if the modal is reopened after a validation failure.
-    modalElement?.addEventListener('show.bs.modal', () => {
-        const button = document.getElementById('jmSubmit');
-        if (!button) return;
-
-        button.disabled = false;
-        button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Jurnal';
-    });
 })();
 </script>
 {% endblock %}

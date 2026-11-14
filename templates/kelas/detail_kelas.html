@@ -671,15 +671,20 @@
                                             </div>
                                         </td>
                                         <td>
+                                            
                                             <select class="cr-subject-select" name="guru_id_{{ mapel.id }}">
                                                 <option value="">Pilih Guru Pengampu</option>
+
                                                 {% for guru in daftar_guru %}
-                                                <option value="{{ guru.id }}"
-                                                    {% if mapel.guru_terpilih == guru.id %}selected{% endif %}>
-                                                    {{ guru.nama }}
-                                                </option>
+                                                    <option value="{{ guru.id|string }}"
+                                                        {% if mapel.guru_terpilih|string == guru.id|string %}
+                                                            selected
+                                                        {% endif %}>
+                                                        {{ guru.nama }}
+                                                    </option>
                                                 {% endfor %}
                                             </select>
+
                                         </td>
                                         <td>
                                             <div class="cr-jp-control">
