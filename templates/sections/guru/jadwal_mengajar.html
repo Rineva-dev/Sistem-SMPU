@@ -1,0 +1,376 @@
+{% extends "layout.html" %}
+
+{% block title %}Jadwal Mengajar{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/jadwal_mengajar.css') }}">
+
+<div class="tjm-page">
+
+    <!-- DECORATIVE BACKGROUND -->
+    <div class="tjm-bg-decoration">
+        <span class="tjm-orb tjm-orb-one"></span>
+        <span class="tjm-orb tjm-orb-two"></span>
+        <span class="tjm-grid-pattern"></span>
+    </div>
+
+    <!-- BREADCRUMB -->
+    <div class="tjm-breadcrumb">
+        <span>Akademik</span>
+        <i class="fas fa-chevron-right"></i>
+        <strong>Jadwal Mengajar</strong>
+    </div>
+
+    <!-- PAGE INTRO -->
+    <section class="tjm-intro">
+
+        <div class="tjm-intro-main">
+            <div class="tjm-kicker">
+                <span class="tjm-kicker-dot"></span>
+                TEACHER WORKSPACE
+            </div>
+
+            <h1>
+                Jadwal <span>Mengajar.</span>
+            </h1>
+
+            <p>
+                Semua agenda pembelajaranmu dalam satu tempat.
+                Pantau jadwal kelas, waktu mengajar, dan aktivitas
+                akademik dengan lebih mudah.
+            </p>
+
+            <div class="tjm-intro-meta">
+                <span>
+                    <i class="far fa-calendar-alt"></i>
+                    {{ nama_tahun }}
+                </span>
+
+                <span class="tjm-meta-divider"></span>
+
+                <span>
+                    <i class="fas fa-book-open"></i>
+                    Semester {{ semester }}
+                </span>
+            </div>
+        </div>
+
+        <div class="tjm-intro-side">
+            <div class="tjm-date-card">
+                <div class="tjm-date-icon">
+                    <i class="far fa-calendar-check"></i>
+                </div>
+
+                <div>
+                    <small>HARI INI</small>
+                    <strong>{{ tanggal_sekarang }}</strong>
+                    <span>{{ nama_hari_sekarang }}</span>
+                </div>
+
+                <div class="tjm-date-decoration"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- SUMMARY STRIP -->
+    <section class="tjm-summary">
+
+        <div class="tjm-summary-item">
+            <div class="tjm-summary-icon icon-green">
+                <i class="fas fa-calendar-week"></i>
+            </div>
+            <div>
+                <small>Total Jadwal</small>
+                <strong>{{ jumlah_jadwal }}</strong>
+                <span>Sesi pembelajaran</span>
+            </div>
+        </div>
+
+        <div class="tjm-summary-separator"></div>
+
+        <div class="tjm-summary-item">
+            <div class="tjm-summary-icon icon-blue">
+                <i class="fas fa-chalkboard"></i>
+            </div>
+            <div>
+                <small>Kelas Diampu</small>
+                <strong>{{ jumlah_kelas }}</strong>
+                <span>Kelas berbeda</span>
+            </div>
+        </div>
+
+        <div class="tjm-summary-separator"></div>
+
+        <div class="tjm-summary-item">
+            <div class="tjm-summary-icon icon-gold">
+                <i class="far fa-clock"></i>
+            </div>
+            <div>
+                <small>Alokasi Waktu</small>
+                <strong>{{ jumlah_jam }} <small>jam</small></strong>
+                <span>Total durasi mingguan</span>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <section class="tjm-workspace">
+
+        <div class="tjm-section-heading">
+            <div>
+                <div class="tjm-section-eyebrow">WEEKLY OVERVIEW</div>
+                <h2>Jadwal mingguan</h2>
+                <p>Pilih hari untuk melihat detail kegiatan pembelajaran.</p>
+            </div>
+
+            <div class="tjm-week-badge">
+                <span class="tjm-live-dot"></span>
+                Jadwal Tahun Pelajaran Aktif
+            </div>
+        </div>
+
+        <!-- DAY NAVIGATION -->
+        <div class="tjm-day-navigation" id="tjmDayNavigation">
+
+            {% for hari in daftar_hari %}
+            <button
+                type="button"
+                class="tjm-day-button {% if hari == nama_hari_sekarang %}active today{% endif %}"
+                data-day="{{ hari }}"
+            >
+                <span class="tjm-day-name">{{ hari }}</span>
+                <strong>{{ jadwal_per_hari.get(hari, [])|length }}</strong>
+                <small>jadwal</small>
+            </button>
+            {% endfor %}
+
+        </div>
+
+        <!-- SCHEDULE CONTENT -->
+        <div class="tjm-schedule-layout">
+
+            <div class="tjm-schedule-main">
+
+                {% for hari in daftar_hari %}
+
+                <div
+                    class="tjm-day-panel {% if hari == nama_hari_sekarang %}active{% endif %}"
+                    data-day-panel="{{ hari }}"
+                >
+
+                    <div class="tjm-panel-heading">
+                        <div>
+                            <span class="tjm-panel-label">DAFTAR PEMBELAJARAN</span>
+                            <h3>{{ hari }}</h3>
+                        </div>
+
+                        <span class="tjm-count-pill">
+                            {{ jadwal_per_hari.get(hari, [])|length }} sesi
+                        </span>
+                    </div>
+
+                    {% if jadwal_per_hari.get(hari) %}
+
+                    <div class="tjm-timeline">
+
+                        {% for j in jadwal_per_hari.get(hari, []) %}
+
+                        <article
+                            class="tjm-class-card {% if j.khusus %}special{% endif %}"
+                            data-start="{{ j.jam_mulai }}"
+                            data-end="{{ j.jam_selesai }}"
+                        >
+
+                            <div class="tjm-time-column">
+                                <strong>{{ j.jam_mulai or '--:--' }}</strong>
+                                <span>{{ j.jam_selesai or '--:--' }}</span>
+                            </div>
+
+                            <div class="tjm-timeline-line">
+                                <span></span>
+                            </div>
+
+                            <div class="tjm-class-content">
+
+                                <div class="tjm-class-topline">
+
+                                    <span class="tjm-subject-type {% if j.khusus %}special-type{% endif %}">
+                                        {% if j.khusus %}
+                                            <i class="fas fa-star"></i>
+                                            KEGIATAN KHUSUS
+                                        {% else %}
+                                            <i class="fas fa-book-open"></i>
+                                            PEMBELAJARAN
+                                        {% endif %}
+                                    </span>
+
+                                    <span class="tjm-class-status">
+                                        <span></span>
+                                        Terjadwal
+                                    </span>
+
+                                </div>
+
+                                <h4>{{ j.nama_mapel }}</h4>
+
+                                <div class="tjm-class-info">
+
+                                    <span>
+                                        <i class="fas fa-door-open"></i>
+                                        {{ j.nama_kelas }}
+                                    </span>
+
+                                    {% if j.kode_mapel %}
+                                    <span>
+                                        <i class="fas fa-hashtag"></i>
+                                        {{ j.kode_mapel }}
+                                    </span>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                            <div class="tjm-class-arrow">
+                                <i class="fas fa-arrow-up-right-from-square"></i>
+                            </div>
+
+                        </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="tjm-empty-day">
+                        <div class="tjm-empty-icon">
+                            <i class="far fa-calendar"></i>
+                        </div>
+                        <h4>Belum ada jadwal mengajar</h4>
+                        <p>
+                            Tidak ada sesi pembelajaran yang dijadwalkan
+                            untuk hari {{ hari }}.
+                        </p>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <aside class="tjm-side-panel">
+
+                <div class="tjm-today-card">
+
+                    <div class="tjm-today-header">
+                        <div>
+                            <span>YOUR DAILY PLAN</span>
+                            <h3>Agenda hari ini</h3>
+                        </div>
+
+                        <div class="tjm-today-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+
+                    <div class="tjm-today-date">
+                        <strong>{{ nama_hari_sekarang }}</strong>
+                        <span>{{ tanggal_sekarang }}</span>
+                    </div>
+
+                    {% if jadwal_hari_ini %}
+
+                    <div class="tjm-today-list">
+
+                        {% for j in jadwal_hari_ini %}
+
+                        <div
+                            class="tjm-today-item"
+                            data-start="{{ j.jam_mulai }}"
+                            data-end="{{ j.jam_selesai }}"
+                        >
+                            <div class="tjm-today-time">
+                                {{ j.jam_mulai }}
+                            </div>
+
+                            <div class="tjm-today-track">
+                                <span></span>
+                            </div>
+
+                            <div class="tjm-today-detail">
+                                <strong>{{ j.nama_mapel }}</strong>
+                                <span>{{ j.nama_kelas }}</span>
+                                <small>
+                                    {{ j.jam_mulai }} – {{ j.jam_selesai }}
+                                </small>
+                            </div>
+
+                            <span class="tjm-today-status">Akan datang</span>
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="tjm-no-today">
+                        <div>
+                            <i class="fas fa-mug-hot"></i>
+                        </div>
+                        <strong>Tidak ada jadwal hari ini</strong>
+                        <p>Manfaatkan waktu untuk mempersiapkan pembelajaran berikutnya.</p>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="tjm-note-card">
+                    <div class="tjm-note-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+
+                    <div>
+                        <strong>Persiapkan pembelajaranmu</strong>
+                        <p>
+                            Periksa kembali jadwal dan pastikan materi
+                            pembelajaran siap sebelum kelas dimulai.
+                        </p>
+                    </div>
+
+                    <span class="tjm-note-decoration"></span>
+                </div>
+
+            </aside>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="tjm-footer">
+        <span>
+            <i class="fas fa-shield-alt"></i>
+            Jadwal pribadi akun guru
+        </span>
+
+        <span>
+            SMP Unggulan Hamzanwadi
+        </span>
+    </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/sections/guru/jadwal_mengajar.js') }}" defer></script>
+
+{% endblock %}

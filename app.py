@@ -378,6 +378,7 @@ from routes.surat import surat_bp as surat_global_bp
 from routes.sections.kepsek.dashboard_kepsek import dashboard_kepsek_bp
 from routes.sections.kepsek.agenda import agenda_bp
 from routes.sections.guru.dashboard_guru import dashboard_guru_bp
+from routes.sections.guru.jadwal_mengajar import jadwal_mengajar_bp
 from routes.umum import umum_bp
 from routes.kalender_pendidikan import kalender_bp
 from routes.sections.waka_kurikulum.dashboard_wakakur import bp as dashboard_wakakur_bp
@@ -415,6 +416,7 @@ app.register_blueprint(surat_global_bp)
 app.register_blueprint(dashboard_kepsek_bp)
 app.register_blueprint(agenda_bp)
 app.register_blueprint(dashboard_guru_bp)
+app.register_blueprint(jadwal_mengajar_bp)
 app.register_blueprint(umum_bp)
 app.register_blueprint(kalender_bp)
 app.register_blueprint(dashboard_wakakur_bp)
