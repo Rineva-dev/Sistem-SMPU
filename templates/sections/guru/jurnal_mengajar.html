@@ -1,322 +1,1426 @@
+
 {% extends "layout.html" %}
-{% block title %}Jurnal Mengajar - Sistem Sekolah{% endblock %}
+{% block title %}Jurnal Mengajar{% endblock %}
+
 {% block content %}
-<style>
-/* === Gaya Modern Kustom === */
-.jurnal-page .page-header {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
+{% set ns = namespace(total_jurnal=0, kelas=[]) %}
+{% for m in daftar_mapel %}
+    {% set ns.total_jurnal = ns.total_jurnal + (m.total_jurnal or 0) %}
+    {% if m.kelas and m.kelas not in ns.kelas %}
+        {% set ns.kelas = ns.kelas + [m.kelas] %}
+    {% endif %}
+{% endfor %}
 
-.jurnal-card {
-    border: none;
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-    background: white;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.04);
-}
+<div class="jm-page" id="jurnalWorkspace">
 
-.jurnal-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(26, 115, 232, 0.15);
-}
+    <!-- Decorative background -->
+    <div class="jm-decoration jm-decoration-a"></div>
+    <div class="jm-decoration jm-decoration-b"></div>
 
-.jurnal-card-header {
-    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
-    padding: 1.25rem 1.5rem;
-    border: none;
-}
+    <!-- PAGE HEADING -->
+    <header class="jm-header">
+        <div class="jm-header-main">
+            <div class="jm-breadcrumb">
+                <span>AKADEMIK</span>
+                <i class="fa-solid fa-chevron-right"></i>
+                <span class="active">JURNAL MENGAJAR</span>
+            </div>
 
-.jadwal-item {
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    background: #f8fafc;
-    margin-bottom: 0.5rem;
-    transition: background 0.2s;
-}
-
-.jadwal-item:hover {
-    background: #eaf2fe;
-}
-
-.stat-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.badge-primary { background: #eaf2fe; color: #1a73e8; }
-.badge-success { background: #e6f7ee; color: #0f9d58; }
-.badge-info { background: #e8f0fe; color: #1a73e8; }
-
-.btn-primary-gradient {
-    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
-    border: none;
-    transition: all 0.3s;
-}
-
-.btn-primary-gradient:hover {
-    background: linear-gradient(135deg, #1557b0 0%, #0b4f9e 100%);
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
-}
-
-.btn-outline-modern {
-    border-color: #cbd5e1;
-    color: #4b5563;
-    transition: all 0.3s;
-}
-
-.btn-outline-modern:hover {
-    border-color: #1a73e8;
-    color: #1a73e8;
-    background: #f0f7ff;
-}
-
-.info-label {
-    font-size: 0.75rem;
-    color: #9ca3af;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.info-value {
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.modal-content {
-    border-radius: 20px;
-    border: none;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-}
-
-.modal-header {
-    background: linear-gradient(135deg, #1a73e8 0%, #0d66d0 100%);
-    border: none;
-}
-
-.form-control, .form-select {
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 0.6rem 1rem;
-    transition: all 0.25s;
-}
-
-.form-control:focus {
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
-}
-
-.empty-state {
-    border-radius: 20px;
-    background: white;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.04);
-}
-</style>
-
-<div class="jurnal-page">
-    <div class="page-header">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <h2 class="mb-1 fw-bold" style="color:#1f2937;">
-                    <i class="fas fa-book text-primary me-2"></i> Jurnal Mengajar
-                </h2>
-                <p class="text-muted mb-0">Catatan kegiatan pembelajaran harian & riwayat per mata pelajaran</p>
+            <div class="jm-title-row">
+                <div class="jm-title-symbol">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span></span>
+                </div>
+                <div>
+                    <h1>Jurnal Mengajar</h1>
+                    <p>Dokumentasikan setiap proses pembelajaran dalam satu ruang kerja.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    {% if daftar_mapel %}
-    <div class="row g-4">
-        {% for mapel in daftar_mapel %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card jurnal-card h-100">
-                <!-- Header Card -->
-                <div class="jurnal-card-header text-white">
-                    <h5 class="mb-1 fw-bold">{{ mapel.nama_mapel }}</h5>
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="badge bg-white bg-opacity-25 rounded-pill px-2 py-1">
-                            <i class="fas fa-building me-1"></i> {{ mapel.kelas }}
+        <button class="jm-btn-primary" type="button" id="jmCreateTop">
+            <i class="fa-solid fa-plus"></i>
+            <span>Buat Jurnal Baru</span>
+            <i class="fa-solid fa-arrow-up-right-from-square jm-btn-arrow"></i>
+        </button>
+    </header>
+
+    <!-- CONTENT WORKSPACE -->
+    <div class="jm-layout">
+
+        <!-- SCHEDULE SIDEBAR -->
+        <aside class="jm-schedule">
+            <div class="jm-panel-heading">
+                <div>
+                    <div class="jm-overline">YOUR TEACHING ROUTINE</div>
+                    <h2>Jadwal Mengajar</h2>
+                    <p>Jadwal mata pelajaran mingguan.</p>
+                </div>
+                <div class="jm-panel-icon">
+                    <i class="fa-regular fa-calendar-days"></i>
+                </div>
+            </div>
+
+            <div class="jm-schedule-date">
+                <span class="jm-date-indicator"></span>
+                <span id="jmToday">Jadwal mingguan</span>
+            </div>
+
+            <div class="jm-schedule-items">
+                {% set hari_urut = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] %}
+                {% for hari in hari_urut %}
+                    {% for mapel in daftar_mapel %}
+                        {% for jadwal in (mapel.jadwal or []) %}
+                            {% if jadwal.hari|lower == hari|lower %}
+                            <div class="jm-schedule-item">
+                                <div class="jm-day-mark">
+                                    <span>{{ hari[:3]|upper }}</span>
+                                </div>
+                                <div class="jm-schedule-detail">
+                                    <strong>{{ mapel.nama_mapel }}</strong>
+                                    <span>{{ mapel.kelas or 'Kelas belum ditentukan' }}</span>
+                                    <small>
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ jadwal.waktu_mulai }} – {{ jadwal.waktu_selesai }}
+                                    </small>
+                                </div>
+                                <i class="fa-solid fa-angle-right jm-schedule-chevron"></i>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+
+                {% if not ns.total_jurnal and not daftar_mapel %}
+                <div class="jm-empty-schedule">
+                    <i class="fa-regular fa-calendar-xmark"></i>
+                    <strong>Belum ada jadwal</strong>
+                    <span>Jadwal akan tampil setelah tersedia.</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="jm-schedule-footer">
+                <span class="jm-footer-icon"><i class="fa-solid fa-circle-info"></i></span>
+                Jadwal ditampilkan berdasarkan penugasan mata pelajaran Anda.
+            </div>
+        </aside>
+
+        <!-- SUBJECT MANAGEMENT -->
+        <main class="jm-main">
+            <div class="jm-main-heading">
+                <div>
+                    <div class="jm-overline">MANAGEMENT WORKSPACE</div>
+                    <h2>Mata Pelajaran</h2>
+                    <p>Pilih mata pelajaran untuk mengelola jurnal pembelajaran.</p>
+                </div>
+                <div class="jm-subject-total">
+                    <span>{{ daftar_mapel|length }} mata pelajaran</span>
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
+            <div class="jm-toolbar">
+                <div class="jm-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="jmSearch"
+                           placeholder="Cari mata pelajaran, kelas...">
+                    <span class="jm-search-shortcut">/</span>
+                </div>
+
+                <div class="jm-toolbar-right">
+                    <div class="jm-filter-wrap">
+                        <i class="fa-regular fa-calendar"></i>
+                        <select id="jmDayFilter">
+                            <option value="">Semua Hari</option>
+                            <option value="senin">Senin</option>
+                            <option value="selasa">Selasa</option>
+                            <option value="rabu">Rabu</option>
+                            <option value="kamis">Kamis</option>
+                            <option value="jumat">Jumat</option>
+                            <option value="sabtu">Sabtu</option>
+                            <option value="minggu">Minggu</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down jm-select-arrow"></i>
+                    </div>
+
+                    <div class="jm-view-switch">
+                        <button type="button" class="active" data-view="grid"
+                                title="Tampilan grid">
+                            <i class="fa-solid fa-grip"></i>
+                        </button>
+                        <button type="button" data-view="list"
+                                title="Tampilan daftar">
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBJECT CARDS -->
+            <div class="jm-subject-grid" id="jmSubjectGrid">
+                {% for mapel in daftar_mapel %}
+                <article class="jm-subject-card"
+                    data-name="{{ mapel.nama_mapel|lower }}"
+                    data-class="{{ (mapel.kelas or '')|lower }}"
+                    data-days="{% for j in (mapel.jadwal or []) %}{{ j.hari|lower }} {% endfor %}">
+
+                    <div class="jm-card-accent"></div>
+
+                    <div class="jm-card-heading">
+                        <div class="jm-subject-icon">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                            <span class="jm-icon-glow"></span>
+                        </div>
+                        <span class="jm-code">
+                            {{ mapel.kode_mapel or 'SUBJECT' }}
                         </span>
-                        {% if mapel.total_jurnal %}
-                        <span class="badge bg-white bg-opacity-25 rounded-pill px-2 py-1">
-                            <i class="fas fa-clipboard-check me-1"></i> {{ mapel.total_jurnal }} Jurnal
-                        </span>
+                    </div>
+
+                    <div class="jm-subject-info">
+                        <div class="jm-category">
+                            <span></span>
+                            {{ mapel.kelompok or 'MATA PELAJARAN' }}
+                        </div>
+                        <h3>{{ mapel.nama_mapel }}</h3>
+                        <div class="jm-class">
+                            <i class="fa-solid fa-users"></i>
+                            {{ mapel.kelas or 'Kelas belum ditentukan' }}
+                        </div>
+                    </div>
+
+                    <div class="jm-card-divider"></div>
+
+                    <div class="jm-card-schedule">
+                        <div class="jm-card-label">
+                            <i class="fa-regular fa-clock"></i>
+                            JADWAL PEMBELAJARAN
+                        </div>
+
+                        {% if mapel.jadwal %}
+                        <div class="jm-day-list">
+                            {% for jadwal in mapel.jadwal %}
+                            <div class="jm-day-pill">
+                                <strong>{{ jadwal.hari[:3] }}</strong>
+                                <span>{{ jadwal.waktu_mulai }}–{{ jadwal.waktu_selesai }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="jm-no-schedule">Belum ada jadwal terdaftar</span>
                         {% endif %}
                     </div>
-                </div>
 
-                <!-- Isi Card -->
-                <div class="card-body">
-                    <!-- Informasi Singkat -->
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <p class="info-label mb-1">Kode Mapel</p>
-                            <p class="info-value mb-0">{{ mapel.kode_mapel or '-' }}</p>
+                    <div class="jm-journal-info">
+                        <div class="jm-journal-count">
+                            <div class="jm-journal-icon">
+                                <i class="fa-regular fa-file-lines"></i>
+                            </div>
+                            <div>
+                                <strong>{{ mapel.total_jurnal or 0 }}</strong>
+                                <span>Jurnal tercatat</span>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <p class="info-label mb-1">Kelompok</p>
-                            <p class="info-value mb-0">{{ mapel.kelompok or '-' }}</p>
+
+                        <div class="jm-last-journal">
+                            <span>TERAKHIR DICATAT</span>
+                            {% if mapel.jurnal_terakhir %}
+                                <strong>{{ mapel.jurnal_terakhir.tanggal }}</strong>
+                                <small>{{ mapel.jurnal_terakhir.materi or 'Tanpa keterangan materi' }}</small>
+                            {% else %}
+                                <strong class="jm-not-yet">Belum tersedia</strong>
+                                <small>Belum ada jurnal pembelajaran.</small>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- Jadwal -->
-                    <h6 class="text-muted mb-2 small fw-semibold">
-                        <i class="fas fa-calendar-alt me-1"></i> Jadwal Mengajar
-                    </h6>
-                    {% if mapel.jadwal %}
-                    <div class="mb-3">
-                        {% for j in mapel.jadwal %}
-                        <div class="jadwal-item d-flex justify-content-between align-items-center">
-                            <span class="fw-medium text-dark">{{ j.hari }}</span>
-                            <span class="text-muted small">
-                                <i class="far fa-clock me-1"></i> {{ j.waktu_mulai }} – {{ j.waktu_selesai }}
-                            </span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-muted small fst-italic mb-3">Belum ada jadwal terdaftar</p>
-                    {% endif %}
-
-                    <!-- Info Terakhir -->
-                    {% if mapel.jurnal_terakhir %}
-                    <div class="p-2 rounded-3 mb-3" style="background:#f0fdf4;">
-                        <p class="small mb-1" style="color:#065f46;">
-                            <i class="fas fa-check-circle me-1"></i> Terakhir dicatat
-                        </p>
-                        <p class="small fw-medium mb-0 text-dark">
-                            {{ mapel.jurnal_terakhir.tanggal }} &mdash; {{ mapel.jurnal_terakhir.materi[:30] }}...
-                        </p>
-                    </div>
-                    {% endif %}
-
-                    <!-- Tombol Aksi -->
-                    <div class="d-grid gap-2 mt-auto pt-2">
-                        <button class="btn btn-primary-gradient text-white tombol-buat-jurnal"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalJurnal"
-                                data-mapel-id="{{ mapel.id }}"
-                                data-mapel-nama="{{ mapel.nama_mapel }}"
-                                data-kelas="{{ mapel.kelas }}">
-                            <i class="fas fa-pen-alt me-1"></i> Buat Jurnal Baru
-                        </button>
-                        <a href="{{ url_for('jurnal_mengajar.daftar_jurnal', mapel_id=mapel.id) }}"
-                           class="btn btn-outline-modern">
-                            <i class="fas fa-history me-1"></i> Lihat Riwayat Lengkap
+                    <div class="jm-card-actions">
+                        <a class="jm-btn-history"
+                           href="{{ url_for('jurnal_mengajar.daftar_jurnal', mapel_id=mapel.id) }}">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            Riwayat
                         </a>
+
+                        <button type="button"
+                            class="jm-btn-create tombol-buat-jurnal"
+                            data-mapel-id="{{ mapel.id }}"
+                            data-mapel-nama="{{ mapel.nama_mapel }}"
+                            data-kelas="{{ mapel.kelas or '' }}">
+                            <i class="fa-solid fa-plus"></i>
+                            Buat Jurnal
+                        </button>
                     </div>
-                </div>
+                </article>
+                {% endfor %}
             </div>
-        </div>
-        {% endfor %}
+
+            <div class="jm-no-results" id="jmNoResults" hidden>
+                <div><i class="fa-solid fa-magnifying-glass"></i></div>
+                <h3>Tidak ditemukan</h3>
+                <p>Tidak ada mata pelajaran yang sesuai dengan pencarian Anda.</p>
+                <button type="button" id="jmReset">Reset pencarian</button>
+            </div>
+
+            {% if not daftar_mapel %}
+            <div class="jm-empty-main">
+                <div class="jm-empty-illustration">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span><i class="fa-solid fa-sparkles"></i></span>
+                </div>
+                <h3>Belum ada mata pelajaran</h3>
+                <p>Mata pelajaran yang ditugaskan kepada Anda akan muncul di sini.</p>
+            </div>
+            {% endif %}
+        </main>
     </div>
-    {% else %}
-    <div class="empty-state p-5 text-center">
-        <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
-        <h5 class="fw-bold text-dark mb-2">Belum Ada Mata Pelajaran yang Diampu</h5>
-        <p class="text-muted mb-0">Anda belum ditugaskan mengajar mata pelajaran apa pun.<br>
-        Silakan hubungi admin untuk penugasan mata pelajaran.</p>
-    </div>
-    {% endif %}
 </div>
 
-<!-- Modal Form Jurnal Mengajar -->
-<div class="modal fade" id="modalJurnal" tabindex="-1" aria-labelledby="modalJurnalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- JOURNAL MODAL -->
+<div class="modal fade jm-modal" id="modalJurnal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content">
-            <form action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}" method="POST">
-                <div class="modal-header text-white">
-                    <h5 class="modal-title fw-bold" id="modalJurnalLabel">
-                        <i class="fas fa-pen-alt me-2"></i> Buat Jurnal Mengajar
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            <form method="POST"
+                  action="{{ url_for('jurnal_mengajar.simpan_jurnal') }}"
+                  id="formJurnal">
+
+                <div class="jm-modal-header">
+                    <div class="jm-modal-symbol">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <span>ACADEMIC DOCUMENTATION</span>
+                        <h3>Buat Jurnal Pembelajaran</h3>
+                        <p>Catat proses pembelajaran secara lengkap dan terstruktur.</p>
+                    </div>
+                    <button type="button" class="jm-modal-close" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
-                <div class="modal-body p-4">
+
+                <div class="modal-body jm-modal-body">
+                    {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% endif %}
                     <input type="hidden" name="mapel_id" id="inputMapelId">
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Mata Pelajaran</label>
-                            <input type="text" id="inputNamaMapel" class="form-control" readonly>
+
+                    <section class="jm-form-section">
+                        <div class="jm-form-heading">
+                            <span>01</span>
+                            <div>
+                                <strong>Informasi Pembelajaran</strong>
+                                <small>Identitas kelas dan waktu pelaksanaan.</small>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kelas / Rombel</label>
-                            <input type="text" id="inputKelas" class="form-control" readonly>
+
+                        <div class="jm-form-grid">
+                            <div class="jm-field">
+                                <label>Mata Pelajaran</label>
+                                <input type="text" id="inputNamaMapel" class="form-control" readonly>
+                            </div>
+                            <div class="jm-field">
+                                <label>Kelas</label>
+                                <input type="text" id="inputKelas" class="form-control" readonly>
+                            </div>
+                            <div class="jm-field">
+                                <label for="tanggal">Tanggal <b>*</b></label>
+                                <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+                            </div>
+                            <div class="jm-field">
+                                <label for="jam_pelajaran">Jam Pelajaran <b>*</b></label>
+                                <input type="text" name="jam_pelajaran" id="jam_pelajaran"
+                                       class="form-control" placeholder="Contoh: 1-2" required>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Tanggal <span class="text-danger">*</span></label>
-                            <input type="date" name="tanggal" class="form-control" required>
+                    </section>
+
+                    <section class="jm-form-section">
+                        <div class="jm-form-heading">
+                            <span>02</span>
+                            <div>
+                                <strong>Materi Pembelajaran</strong>
+                                <small>Materi atau kompetensi yang disampaikan.</small>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Jam Pelajaran <span class="text-danger">*</span></label>
-                            <input type="text" name="jam_pelajaran" class="form-control" placeholder="Contoh: 1-2" required>
+                        <div class="jm-field">
+                            <label for="materi">Materi <b>*</b></label>
+                            <textarea name="materi" id="materi" class="form-control"
+                                      rows="3" placeholder="Tuliskan materi pembelajaran..." required></textarea>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Materi / Topik Pembelajaran <span class="text-danger">*</span></label>
-                        <input type="text" name="materi" class="form-control" placeholder="Misal: Sistem Peredaran Darah" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Kegiatan Pembelajaran</label>
-                        <textarea name="kegiatan" class="form-control" rows="3" placeholder="Uraikan langkah-langkah kegiatan pembelajaran..."></textarea>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Metode Pembelajaran</label>
-                            <input type="text" name="metode" class="form-control" placeholder="Ceramah, Diskusi, Praktik, Tugas Kelompok, dll.">
+                    </section>
+
+                    <section class="jm-form-section">
+                        <div class="jm-form-heading">
+                            <span>03</span>
+                            <div>
+                                <strong>Pelaksanaan Pembelajaran</strong>
+                                <small>Aktivitas dan metode pembelajaran.</small>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Kehadiran Siswa</label>
-                            <input type="text" name="kehadiran" class="form-control" placeholder="35 Hadir, 2 Sakit, 1 Izin, 1 Alfa">
+                        <div class="jm-form-grid">
+                            <div class="jm-field">
+                                <label for="kegiatan">Kegiatan Pembelajaran</label>
+                                <textarea name="kegiatan" id="kegiatan" class="form-control"
+                                          rows="3" placeholder="Deskripsikan kegiatan pembelajaran..."></textarea>
+                            </div>
+                            <div class="jm-field">
+                                <label for="metode">Metode Pembelajaran</label>
+                                <textarea name="metode" id="metode" class="form-control"
+                                          rows="3" placeholder="Metode yang digunakan..."></textarea>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Catatan / Kendala Pembelajaran</label>
-                        <textarea name="catatan" class="form-control" rows="2" placeholder="Kendala, hambatan, atau catatan khusus..."></textarea>
-                    </div>
+                    </section>
+
+                    <section class="jm-form-section">
+                        <div class="jm-form-heading">
+                            <span>04</span>
+                            <div>
+                                <strong>Kehadiran & Catatan</strong>
+                                <small>Informasi tambahan dan evaluasi.</small>
+                            </div>
+                        </div>
+                        <div class="jm-field">
+                            <label for="kehadiran">Kehadiran Siswa</label>
+                            <textarea name="kehadiran" id="kehadiran" class="form-control"
+                                      rows="2" placeholder="Contoh: 28 hadir, 1 izin, 1 sakit..."></textarea>
+                        </div>
+                        <div class="jm-field">
+                            <label for="catatan">Catatan / Evaluasi</label>
+                            <textarea name="catatan" id="catatan" class="form-control"
+                                      rows="2" placeholder="Kendala, evaluasi, atau tindak lanjut..."></textarea>
+                        </div>
+                    </section>
                 </div>
-                <div class="modal-footer bg-light rounded-bottom-4">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-primary-gradient text-white px-4">
-                        <i class="fas fa-save me-1"></i> Simpan Jurnal
-                    </button>
+
+                <div class="jm-modal-footer">
+                    <div class="jm-security-note">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Data jurnal tersimpan melalui sistem akademik.
+                    </div>
+                    <div class="jm-modal-actions">
+                        <button type="button" class="jm-btn-cancel" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="jm-btn-submit" id="jmSubmit">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Simpan Jurnal
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<style>
+/* =====================================================
+   JOURNAL WORKSPACE — PREMIUM SAAS
+===================================================== */
+.jm-page {
+    --green: #087a58;
+    --green-dark: #07543e;
+    --green-light: #eaf6ef;
+    --ink: #1d3328;
+    --muted: #87968e;
+    --line: #e9efeb;
+    position: relative;
+    isolation: isolate;
+    padding: 10px 0 40px;
+    color: var(--ink);
+    font-family: Inter, "Segoe UI", sans-serif;
+}
+.jm-page * { box-sizing: border-box; }
+
+/* Tiny ambient decoration */
+.jm-decoration {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(1px);
+}
+.jm-decoration-a {
+    width: 190px;
+    height: 190px;
+    top: 110px;
+    right: 4%;
+    background: radial-gradient(circle, rgba(15,160,105,.045), transparent 70%);
+    animation: jmAmbient 9s ease-in-out infinite alternate;
+}
+.jm-decoration-b {
+    width: 140px;
+    height: 140px;
+    bottom: 100px;
+    left: -45px;
+    background: radial-gradient(circle, rgba(226,184,99,.045), transparent 70%);
+    animation: jmAmbient 11s ease-in-out infinite alternate-reverse;
+}
+@keyframes jmAmbient {
+    from { transform: translate3d(0,0,0) scale(.9); }
+    to { transform: translate3d(14px,-12px,0) scale(1.12); }
+}
+
+/* Header */
+.jm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    padding: 5px 2px 22px;
+    margin-bottom: 19px;
+    border-bottom: 1px solid var(--line);
+    animation: jmAppear .45s ease both;
+}
+@keyframes jmAppear {
+    from { opacity: 0; transform: translateY(9px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.jm-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #a0ada5;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    margin-bottom: 12px;
+}
+.jm-breadcrumb i { font-size: 7px; color: #c2cdc5; }
+.jm-breadcrumb .active { color: #07835d; }
+.jm-title-row { display: flex; align-items: center; gap: 13px; }
+.jm-title-symbol {
+    width: 47px;
+    height: 47px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    border: 1px solid #dceee2;
+    border-radius: 14px;
+    color: #087a58;
+    background: linear-gradient(145deg,#e6f6ec,#f5faf6);
+    font-size: 18px;
+    box-shadow: 0 5px 13px rgba(8,122,88,.06);
+}
+.jm-title-symbol > span {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    right: 5px;
+    top: 5px;
+    border-radius: 50%;
+    background: #e4b65f;
+    box-shadow: 0 0 0 3px rgba(228,182,95,.14);
+    animation: jmBlink 2.5s ease infinite;
+}
+@keyframes jmBlink {
+    50% { opacity: .45; transform: scale(.7); }
+}
+.jm-title-row h1 {
+    color: #19382b;
+    font-size: 24px;
+    font-weight: 850;
+    letter-spacing: -.9px;
+    margin: 0 0 5px;
+}
+.jm-title-row p { color: #8a9a91; font-size: 11px; margin: 0; }
+.jm-btn-primary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(110deg,#087a58,#0b966a);
+    color: white;
+    box-shadow: 0 6px 16px rgba(8,122,88,.17);
+    font-size: 10px;
+    font-weight: 800;
+    transition: .25s;
+    white-space: nowrap;
+}
+.jm-btn-primary::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: -60%;
+    width: 35%;
+    height: 220%;
+    transform: rotate(25deg);
+    background: rgba(255,255,255,.22);
+    transition: left .65s ease;
+}
+.jm-btn-primary:hover::after { left: 130%; }
+.jm-btn-primary:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 23px rgba(8,122,88,.23);
+}
+.jm-btn-arrow { font-size: 8px; opacity: .65; margin-left: 2px; }
+
+/* Main layout */
+.jm-layout {
+    display: grid;
+    grid-template-columns: minmax(255px,.75fr) minmax(0,2fr);
+    gap: 17px;
+    align-items: start;
+    animation: jmAppear .55s .07s ease both;
+}
+.jm-schedule, .jm-main {
+    min-width: 0;
+    background: rgba(255,255,255,.94);
+    border: 1px solid #e8efea;
+    border-radius: 16px;
+    box-shadow: 0 4px 17px rgba(25,58,42,.028);
+    transition: border-color .25s, box-shadow .25s;
+}
+.jm-schedule { padding: 19px 16px; }
+.jm-main { padding: 21px; }
+.jm-schedule:hover, .jm-main:hover {
+    border-color: #dcebe1;
+    box-shadow: 0 9px 26px rgba(25,58,42,.045);
+}
+.jm-panel-heading, .jm-main-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+.jm-overline {
+    color: #0a9367;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: 1.4px;
+    margin-bottom: 6px;
+}
+.jm-panel-heading h2, .jm-main-heading h2 {
+    color: #20382c;
+    font-size: 17px;
+    font-weight: 850;
+    letter-spacing: -.45px;
+    margin: 0 0 5px;
+}
+.jm-panel-heading p, .jm-main-heading p {
+    color: #93a198;
+    font-size: 10px;
+    line-height: 1.6;
+    margin: 0;
+}
+.jm-panel-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    border-radius: 10px;
+    background: #eaf6ef;
+    color: #087a58;
+    font-size: 13px;
+}
+.jm-schedule-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 11px;
+    margin: 17px 0 12px;
+    border-radius: 9px;
+    color: #37775d;
+    background: #f1f8f3;
+    font-size: 9px;
+    font-weight: 800;
+}
+.jm-date-indicator {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #0c9c69;
+    box-shadow: 0 0 0 4px #dff2e6;
+}
+.jm-schedule-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 565px;
+    overflow: auto;
+    padding-right: 3px;
+}
+.jm-schedule-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    padding: 10px 8px;
+    border: 1px solid #edf1ee;
+    border-radius: 11px;
+    transition: .22s;
+}
+.jm-schedule-item::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 3px;
+    height: 0;
+    border-radius: 0 4px 4px 0;
+    background: #0b966a;
+    transition: .22s;
+}
+.jm-schedule-item:hover {
+    background: #f8fbf9;
+    border-color: #dcebe1;
+    transform: translateX(2px);
+}
+.jm-schedule-item:hover::before { top: 17%; height: 66%; }
+.jm-day-mark {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 39px;
+    flex: none;
+    border-radius: 9px;
+    color: #087a58;
+    background: #eaf6ef;
+    font-size: 9px;
+    font-weight: 850;
+    transition: .2s;
+}
+.jm-schedule-item:hover .jm-day-mark {
+    background: #dff2e6;
+    transform: scale(1.05);
+}
+.jm-schedule-detail {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+.jm-schedule-detail strong {
+    overflow: hidden;
+    color: #293e32;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.jm-schedule-detail > span { color: #8e9b93; font-size: 9px; }
+.jm-schedule-detail small { color: #07835d; font-size: 8px; font-weight: 750; }
+.jm-schedule-chevron { color: #c2cec6; font-size: 9px; }
+.jm-schedule-footer {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eff3f0;
+    color: #99a69e;
+    font-size: 9px;
+    line-height: 1.6;
+}
+.jm-footer-icon { color: #75a98a; }
+.jm-empty-schedule { padding: 25px 8px; text-align: center; color: #a0ada5; }
+.jm-empty-schedule i { display: block; font-size: 22px; margin-bottom: 8px; }
+.jm-empty-schedule strong, .jm-empty-schedule span { display: block; font-size: 10px; margin-top: 4px; }
+
+/* Main workspace */
+.jm-main-heading { align-items: center; margin-bottom: 18px; }
+.jm-subject-total {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 11px;
+    border: 1px solid #e8f0ea;
+    border-radius: 9px;
+    background: #f7faf8;
+    color: #698375;
+    font-size: 9px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+.jm-subject-total i { color: #0a9568; }
+
+/* Toolbar */
+.jm-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.jm-search {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: 1;
+    min-width: 150px;
+    height: 40px;
+    padding: 0 11px;
+    border: 1px solid #e7eee9;
+    border-radius: 9px;
+    background: #fbfcfb;
+    color: #9aa79f;
+    transition: .2s;
+}
+.jm-search:focus-within {
+    border-color: #84bda0;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(8,122,88,.06);
+}
+.jm-search > i { font-size: 11px; }
+.jm-search input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #2d4437;
+    font-size: 10px;
+}
+.jm-search input::placeholder { color: #a7b2aa; }
+.jm-search-shortcut {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 20px;
+    border: 1px solid #e7ece8;
+    border-radius: 5px;
+    color: #a6b1a9;
+    font-size: 11px;
+}
+.jm-toolbar-right { display: flex; align-items: center; gap: 8px; }
+.jm-filter-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #e7eee9;
+    border-radius: 9px;
+    color: #84978b;
+}
+.jm-filter-wrap > i:first-child { font-size: 10px; }
+.jm-filter-wrap select {
+    appearance: none;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #61766a;
+    font-size: 9px;
+    padding-right: 12px;
+    cursor: pointer;
+}
+.jm-filter-wrap .jm-select-arrow {
+    position: absolute;
+    right: 9px;
+    font-size: 7px;
+    pointer-events: none;
+}
+.jm-view-switch {
+    display: flex;
+    gap: 3px;
+    padding: 4px;
+    border-radius: 8px;
+    background: #f1f5f2;
+}
+.jm-view-switch button {
+    width: 28px;
+    height: 27px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #9aa89f;
+    font-size: 10px;
+    transition: .2s;
+}
+.jm-view-switch button.active {
+    color: #087a58;
+    background: white;
+    box-shadow: 0 2px 6px #183d2912;
+}
+
+/* Subject cards */
+.jm-subject-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 12px;
+}
+.jm-subject-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: 15px;
+    border: 1px solid #e8efea;
+    border-radius: 13px;
+    background: white;
+    animation: jmCardIn .4s both;
+    transition: transform .23s, border-color .23s, box-shadow .23s;
+}
+@keyframes jmCardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.jm-card-accent {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 30px;
+    height: 2px;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg,#087a58,#8fd5ae);
+    opacity: .55;
+    transition: width .3s, opacity .3s;
+}
+.jm-subject-card:hover {
+    transform: translateY(-3px);
+    border-color: #cfe5d7;
+    box-shadow: 0 12px 26px rgba(22,70,44,.065);
+}
+.jm-subject-card:hover .jm-card-accent { width: 65px; opacity: 1; }
+.jm-subject-card::after {
+    content: "";
+    position: absolute;
+    top: -55px;
+    right: -55px;
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    background: radial-gradient(circle,rgba(12,157,104,.09),transparent 70%);
+    opacity: 0;
+    transition: .35s;
+    pointer-events: none;
+}
+.jm-subject-card:hover::after { opacity: 1; transform: scale(1.5); }
+.jm-card-heading { display: flex; justify-content: space-between; align-items: center; }
+.jm-subject-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    overflow: hidden;
+    border-radius: 9px;
+    color: #087a58;
+    background: linear-gradient(145deg,#e5f5eb,#f4faf6);
+    font-size: 13px;
+    transition: .25s;
+}
+.jm-subject-card:hover .jm-subject-icon {
+    transform: rotate(-5deg) scale(1.07);
+    box-shadow: 0 5px 13px rgba(8,122,88,.12);
+}
+.jm-icon-glow {
+    position: absolute;
+    top: -20px;
+    left: -30px;
+    width: 20px;
+    height: 70px;
+    transform: rotate(30deg);
+    background: rgba(255,255,255,.65);
+    transition: left .5s;
+}
+.jm-subject-card:hover .jm-icon-glow { left: 55px; }
+.jm-code {
+    padding: 5px 7px;
+    border-radius: 5px;
+    background: #f4f7f5;
+    color: #9ba99f;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .7px;
+}
+.jm-subject-info { padding: 12px 0 13px; }
+.jm-category {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+    color: #0b9367;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: 1px;
+}
+.jm-category span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #0aab75;
+    box-shadow: 0 0 0 3px #e7f6ed;
+}
+.jm-subject-info h3 {
+    margin: 0 0 7px;
+    color: #21392c;
+    font-size: 14px;
+    font-weight: 850;
+    letter-spacing: -.3px;
+    overflow-wrap: anywhere;
+    transition: color .2s;
+}
+.jm-subject-card:hover .jm-subject-info h3 { color: #087a58; }
+.jm-class { color: #899990; font-size: 9px; }
+.jm-class i { color: #a2b3a8; margin-right: 5px; }
+.jm-card-divider { height: 1px; background: #eff3f0; }
+.jm-card-schedule { padding: 11px 0; min-height: 65px; }
+.jm-card-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    color: #a0ada5;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: .8px;
+}
+.jm-card-label i { color: #82a48e; font-size: 9px; }
+.jm-day-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.jm-day-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 7px;
+    border-radius: 5px;
+    background: #f0f7f2;
+    color: #3e795b;
+    font-size: 8px;
+    transition: .2s;
+}
+.jm-day-pill:hover { transform: translateY(-2px); background: #e3f2e8; }
+.jm-day-pill strong { font-size: 8px; }
+.jm-day-pill span { color: #819b8b; font-size: 7px; }
+.jm-no-schedule { color: #b1bcb4; font-size: 8px; font-style: italic; }
+.jm-journal-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0 12px;
+    border-top: 1px solid #eff3f0;
+}
+.jm-journal-count { display: flex; align-items: center; gap: 7px; flex: none; }
+.jm-journal-icon {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: #edf6f0;
+    color: #54866d;
+    font-size: 10px;
+}
+.jm-journal-count strong { display: block; color: #304a39; font-size: 13px; line-height: 1.2; }
+.jm-journal-count span { display: block; color: #9aa79f; font-size: 7px; margin-top: 3px; }
+.jm-last-journal { min-width: 0; text-align: right; }
+.jm-last-journal > span {
+    display: block;
+    color: #a2afa7;
+    font-size: 6px;
+    font-weight: 850;
+    letter-spacing: .6px;
+    margin-bottom: 4px;
+}
+.jm-last-journal strong { display: block; color: #5b7867; font-size: 8px; }
+.jm-last-journal strong.jm-not-yet { color: #a4afa8; }
+.jm-last-journal small {
+    display: block;
+    max-width: 135px;
+    overflow: hidden;
+    color: #9ba79f;
+    font-size: 7px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 3px;
+}
+.jm-card-actions { display: flex; gap: 7px; }
+.jm-btn-history, .jm-btn-create {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    border-radius: 7px;
+    font-size: 8px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: .2s;
+}
+.jm-btn-history {
+    flex: 1;
+    border: 1px solid #e5ece7;
+    background: white;
+    color: #62786b;
+}
+.jm-btn-history:hover {
+    border-color: #b9d9c5;
+    background: #f6fbf7;
+    color: #087a58;
+}
+.jm-btn-create {
+    flex: 1.3;
+    border: 0;
+    background: linear-gradient(110deg,#087a58,#0b966a);
+    color: white;
+}
+.jm-btn-create:hover {
+    background: #07543e;
+    color: white;
+    box-shadow: 0 5px 12px rgba(8,122,88,.17);
+}
+.jm-btn-create i { transition: transform .25s; }
+.jm-btn-create:hover i { transform: rotate(90deg); }
+
+/* List mode */
+.jm-subject-grid.is-list { grid-template-columns: 1fr; }
+.jm-subject-grid.is-list .jm-subject-card {
+    display: grid;
+    grid-template-columns: 38px minmax(130px,1fr) minmax(140px,1.1fr) minmax(130px,.9fr) minmax(145px,auto);
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+}
+.jm-subject-grid.is-list .jm-card-heading { display: contents; }
+.jm-subject-grid.is-list .jm-code { display: none; }
+.jm-subject-grid.is-list .jm-subject-info { padding: 0; }
+.jm-subject-grid.is-list .jm-card-divider { display: none; }
+.jm-subject-grid.is-list .jm-card-schedule { padding: 0; }
+.jm-subject-grid.is-list .jm-journal-info { padding: 0; border: 0; }
+.jm-subject-grid.is-list .jm-card-actions { min-width: 145px; }
+
+/* Empty */
+.jm-no-results, .jm-empty-main { text-align: center; padding: 40px 15px; }
+.jm-no-results > div, .jm-empty-illustration {
+    position: relative;
+    width: 55px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 13px;
+    border-radius: 16px;
+    color: #6caa86;
+    background: #edf7f1;
+    font-size: 19px;
+}
+.jm-empty-illustration > span {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    color: #e4b65f;
+    font-size: 11px;
+    animation: jmBlink 2s infinite;
+}
+.jm-no-results h3, .jm-empty-main h3 { color: #31483a; font-size: 14px; font-weight: 850; }
+.jm-no-results p, .jm-empty-main p { color: #99a69e; font-size: 10px; }
+.jm-no-results button {
+    border: 0;
+    border-radius: 7px;
+    padding: 9px 13px;
+    background: #eaf6ef;
+    color: #087a58;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+/* Modal */
+.jm-modal .modal-content {
+    overflow: hidden;
+    border: 0;
+    border-radius: 17px;
+    box-shadow: 0 25px 80px rgba(10,40,26,.2);
+}
+.jm-modal-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 21px 23px;
+    color: white;
+    background:
+        radial-gradient(circle at 92% 0%,rgba(255,255,255,.12),transparent 28%),
+        linear-gradient(110deg,#064735,#0a805b);
+}
+.jm-modal-symbol {
+    display: grid;
+    place-items: center;
+    width: 41px;
+    height: 41px;
+    flex: none;
+    border-radius: 11px;
+    background: #ffffff20;
+    font-size: 16px;
+}
+.jm-modal-header > div:nth-child(2) { min-width: 0; }
+.jm-modal-header > div:nth-child(2) > span {
+    display: block;
+    color: #b9e8d5;
+    font-size: 7px;
+    font-weight: 850;
+    letter-spacing: 1.4px;
+    margin-bottom: 4px;
+}
+.jm-modal-header h3 { color: white; font-size: 16px; font-weight: 850; margin: 0 0 4px; }
+.jm-modal-header p { color: #d1e7dc; font-size: 9px; margin: 0; }
+.jm-modal-close {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-left: auto;
+    align-self: flex-start;
+    flex: none;
+    border: 0;
+    border-radius: 8px;
+    background: #ffffff20;
+    color: white;
+}
+.jm-modal-body { padding: 21px 23px; max-height: 65vh; }
+.jm-form-section { padding-bottom: 19px; margin-bottom: 18px; border-bottom: 1px solid #edf1ee; }
+.jm-form-section:last-child { padding: 0; margin: 0; border: 0; }
+.jm-form-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.jm-form-heading > span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #eaf6ef;
+    color: #087a58;
+    font-size: 9px;
+    font-weight: 850;
+}
+.jm-form-heading strong { display: block; color: #2b4034; font-size: 11px; font-weight: 850; }
+.jm-form-heading small { display: block; color: #9aa69f; font-size: 8px; margin-top: 3px; }
+.jm-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.jm-field { min-width: 0; margin-bottom: 11px; }
+.jm-field:last-child { margin-bottom: 0; }
+.jm-field label { display: block; color: #52675a; font-size: 9px; font-weight: 750; margin-bottom: 6px; }
+.jm-field label b { color: #e26b56; }
+.jm-field .form-control {
+    min-height: 39px;
+    border: 1px solid #e4ebe6;
+    border-radius: 8px;
+    color: #34483b;
+    font-size: 10px;
+    box-shadow: none;
+}
+.jm-field textarea.form-control { min-height: 75px; resize: vertical; padding-top: 10px; }
+.jm-field .form-control:focus { border-color: #78b99a; box-shadow: 0 0 0 3px #087a5810; }
+.jm-field .form-control[readonly] { background: #f5f8f6; color: #708378; }
+.jm-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 23px;
+    border-top: 1px solid #edf1ee;
+    background: #f9fbf9;
+}
+.jm-security-note { color: #91a097; font-size: 8px; }
+.jm-security-note i { color: #6eaa87; margin-right: 4px; }
+.jm-modal-actions { display: flex; gap: 8px; }
+.jm-btn-cancel, .jm-btn-submit {
+    border-radius: 7px;
+    padding: 10px 13px;
+    font-size: 9px;
+    font-weight: 800;
+}
+.jm-btn-cancel { border: 1px solid #e2eae4; background: white; color: #74847a; }
+.jm-btn-submit {
+    border: 0;
+    background: #087a58;
+    color: white;
+    transition: .2s;
+}
+.jm-btn-submit:hover { background: #07543e; transform: translateY(-1px); box-shadow: 0 5px 12px #087a5825; }
+
+/* Scrollbar */
+.jm-schedule-items::-webkit-scrollbar { width: 4px; }
+.jm-schedule-items::-webkit-scrollbar-thumb { background: #dce9e0; border-radius: 10px; }
+
+/* Responsive */
+@media(max-width:1100px) {
+    .jm-layout { grid-template-columns: 1fr; }
+    .jm-schedule-items { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); max-height: none; }
+}
+@media(max-width:760px) {
+    .jm-header { align-items: flex-start; flex-direction: column; }
+    .jm-btn-primary { width: 100%; }
+    .jm-main, .jm-schedule { padding: 15px; }
+    .jm-schedule-items { grid-template-columns: 1fr; }
+    .jm-subject-grid { grid-template-columns: 1fr; }
+    .jm-toolbar { flex-direction: column; align-items: stretch; }
+    .jm-toolbar-right { justify-content: space-between; }
+    .jm-search { width: 100%; }
+    .jm-filter-wrap { flex: 1; }
+    .jm-filter-wrap select { width: 100%; }
+    .jm-subject-grid.is-list .jm-subject-card { display: block; }
+    .jm-subject-grid.is-list .jm-card-heading { display: flex; }
+    .jm-subject-grid.is-list .jm-code { display: block; }
+    .jm-subject-grid.is-list .jm-subject-info { padding: 12px 0 13px; }
+    .jm-subject-grid.is-list .jm-card-schedule { padding: 11px 0; }
+    .jm-subject-grid.is-list .jm-journal-info { padding: 10px 0 12px; border-top: 1px solid #eff3f0; }
+    .jm-subject-grid.is-list .jm-card-actions { min-width: 0; }
+    .jm-modal-header { padding: 17px; }
+    .jm-modal-body { padding: 17px; }
+    .jm-modal-footer { align-items: flex-start; flex-direction: column; padding: 13px 17px; }
+    .jm-modal-actions { width: 100%; }
+    .jm-modal-actions button { flex: 1; }
+    .jm-form-grid { grid-template-columns: 1fr; gap: 0; }
+}
+@media(max-width:390px) {
+    .jm-title-row h1 { font-size: 21px; }
+    .jm-title-row p { max-width: 230px; line-height: 1.6; }
+    .jm-journal-info { align-items: flex-start; flex-direction: column; }
+    .jm-last-journal { text-align: left; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .jm-page *, .jm-page *::before, .jm-page *::after,
+    .jm-modal *, .jm-modal *::before, .jm-modal *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+</style>
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tombolBuat = document.querySelectorAll('.tombol-buat-jurnal');
-    tombolBuat.forEach(btn => {
-        btn.addEventListener('click', function () {
-            document.getElementById('inputMapelId').value = this.dataset.mapelId;
-            document.getElementById('inputNamaMapel').value = this.dataset.mapelNama;
-            document.getElementById('inputKelas').value = this.dataset.kelas;
-            const hariIni = new Date().toISOString().split('T')[0];
-            const inputTanggal = document.querySelector('input[name="tanggal"]');
-            if (inputTanggal) inputTanggal.value = hariIni;
+(function () {
+    const root = document.getElementById('jurnalWorkspace');
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    const $ = (selector) => root.querySelector(selector);
+    const $$ = (selector) => [...root.querySelectorAll(selector)];
+
+    function localDate() {
+        const now = new Date();
+        return [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, '0'),
+            String(now.getDate()).padStart(2, '0')
+        ].join('-');
+    }
+
+    function updateToday() {
+        const now = new Date();
+        const value = new Intl.DateTimeFormat('id-ID', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(now);
+
+        const element = $('#jmToday');
+        if (element) element.textContent = value;
+    }
+
+    updateToday();
+
+    // Search and day filter
+    const search = $('#jmSearch');
+    const filter = $('#jmDayFilter');
+    const grid = $('#jmSubjectGrid');
+    const noResults = $('#jmNoResults');
+
+    function applyFilters() {
+        if (!grid) return;
+
+        const keyword = (search?.value || '').trim().toLowerCase();
+        const day = (filter?.value || '').toLowerCase();
+        let count = 0;
+
+        $$('.jm-subject-card').forEach(card => {
+            const content = `${card.dataset.name || ''} ${card.dataset.class || ''}`;
+            const days = (card.dataset.days || '').split(/\s+/).filter(Boolean);
+            const visible = (!keyword || content.includes(keyword)) &&
+                            (!day || days.includes(day));
+
+            card.hidden = !visible;
+            if (visible) count++;
+        });
+
+        if (noResults) noResults.hidden = count > 0;
+    }
+
+    search?.addEventListener('input', applyFilters);
+    filter?.addEventListener('change', applyFilters);
+
+    $('#jmReset')?.addEventListener('click', () => {
+        if (search) search.value = '';
+        if (filter) filter.value = '';
+        applyFilters();
+    });
+
+    // Grid and list view
+    $$('.jm-view-switch button').forEach(button => {
+        button.addEventListener('click', () => {
+            $$('.jm-view-switch button').forEach(item => item.classList.remove('active'));
+            button.classList.add('active');
+            grid?.classList.toggle('is-list', button.dataset.view === 'list');
         });
     });
-});
+
+    // Keyboard shortcut /
+    root.addEventListener('keydown', event => {
+        if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+            event.preventDefault();
+            search?.focus();
+        }
+    });
+
+    // Modal
+    const modalElement = document.getElementById('modalJurnal');
+    const modal = modalElement && window.bootstrap
+        ? bootstrap.Modal.getOrCreateInstance(modalElement)
+        : null;
+
+    function openJournal(button) {
+        if (!modal) {
+            console.error('Bootstrap Modal tidak tersedia.');
+            return;
+        }
+
+        document.getElementById('inputMapelId').value = button.dataset.mapelId || '';
+        document.getElementById('inputNamaMapel').value = button.dataset.mapelNama || '';
+        document.getElementById('inputKelas').value = button.dataset.kelas || '';
+        document.getElementById('tanggal').value = localDate();
+
+        modal.show();
+    }
+
+    $$('.tombol-buat-jurnal').forEach(button => {
+        button.addEventListener('click', () => openJournal(button));
+    });
+
+    $('#jmCreateTop')?.addEventListener('click', () => {
+        const firstCard = $$('.jm-subject-card').find(card => !card.hidden);
+        const button = firstCard?.querySelector('.tombol-buat-jurnal');
+
+        if (button) {
+            openJournal(button);
+        } else {
+            search?.focus();
+        }
+    });
+
+    // Prevent double submission
+    const form = document.getElementById('formJurnal');
+    form?.addEventListener('submit', () => {
+        const button = document.getElementById('jmSubmit');
+        if (!button) return;
+
+        button.disabled = true;
+        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+    });
+
+    // Reset submit state if the modal is reopened after a validation failure.
+    modalElement?.addEventListener('show.bs.modal', () => {
+        const button = document.getElementById('jmSubmit');
+        if (!button) return;
+
+        button.disabled = false;
+        button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Jurnal';
+    });
+})();
 </script>
 {% endblock %}
