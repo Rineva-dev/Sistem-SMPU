@@ -1,148 +1,342 @@
-<div class="jadwal-page">
-    <!-- HEADER HALAMAN -->
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-title">
-                <h2><i class="fas fa-calendar-week"></i> Jadwal Pelajaran</h2>
-                <p class="header-subtitle">
-                    <span class="kelas-badge">{{ kelas.nama_kelas }}</span>
-                    <span class="wali-info">
-                        <i class="fas fa-user-tie"></i> Wali Kelas: 
-                        <strong>{{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}</strong>
-                    </span>
-                </p>
-            </div>
-            <div class="header-actions">
-                <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </a>
-            </div>
+
+<div class="nova-timetable">
+
+    <!-- TOP NAVIGATION -->
+    <div class="nova-topline">
+        <div class="nova-breadcrumb">
+            <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke kelas
+            </a>
+            <span class="nova-crumb-slash">/</span>
+            <span>Jadwal pelajaran</span>
+        </div>
+
+        <div class="nova-top-status">
+            <span class="nova-status-light"></span>
+            ACADEMIC WORKSPACE
         </div>
     </div>
 
-    <!-- KONTEN UTAMA -->
-    <div class="main-card">
-        <div class="card-header-custom">
-            <h5><i class="fas fa-sliders-h"></i> Pengaturan Jadwal</h5>
-            <button type="button" class="btn btn-primary btn-sm" id="btnTambahHari">
-                <i class="fas fa-plus"></i> Tambah Hari
-            </button>
+    <!-- PAGE INTRO -->
+    <section class="nova-intro">
+        <div class="nova-intro-main">
+            <div class="nova-pretitle">
+                <span class="nova-pretitle-bar"></span>
+                PENGELOLAAN AKADEMIK
+            </div>
+
+            <h1>Jadwal <span>Pelajaran</span></h1>
+
+            <p>
+                Rancang alur pembelajaran mingguan dan atur alokasi waktu
+                setiap mata pelajaran.
+            </p>
         </div>
 
-        <form method="POST" class="form-jadwal">
-            <div class="card-body-custom">
-                <p class="info-text">
-                    <i class="fas fa-info-circle"></i> 
-                    Atur jam pelajaran per hari. Pilih Mata Pelajaran — Guru akan otomatis mengikuti pengaturan.
-                </p>
+        <div class="nova-class-chip">
+            <div class="nova-class-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="nova-class-detail">
+                <span>KELAS AKTIF</span>
+                <strong>{{ kelas.nama_kelas }}</strong>
+                <small>
+                    <i class="fas fa-user-tie"></i>
+                    {{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}
+                </small>
+            </div>
+            <span class="nova-chip-orbit"></span>
+        </div>
 
-                <!-- DATA MAPEL JSON -->
-                <script type="application/json" id="data-daftar-mapel-json">
-                [
-                    {% for m in daftar_mapel %}
-                    {"id": "{{ m.id }}", "nama": "{{ m.nama_pelajaran }}"}
-                    {% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ]
-                </script>
+        <div class="nova-intro-decoration"></div>
+    </section>
 
-                <!-- WADAH HARI -->
-                <div id="wadahDaftarHari">
-                    {% set hari_awal = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"] %}
-                    {% for hari in hari_awal %}
-                    <div class="hari-card">
-                        <div class="hari-header">
-                            <span class="hari-nama">
-                                <i class="fas fa-sun"></i> {{ hari }}
-                            </span>
-                            <button type="button" class="btn-hapus-hari hapus-hari" data-hari="{{ hari }}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+    <!-- EDITOR TOOLBAR -->
+    <div class="nova-editor-heading">
+        <div>
+            <div class="nova-editor-overline">
+                <span>01</span>
+                <span class="nova-overline-line"></span>
+                WEEKLY SCHEDULE
+            </div>
+            <h2>Susun jadwal mingguan</h2>
+            <p>Kelola hari dan sesi pembelajaran kelas secara terstruktur.</p>
+        </div>
+
+        <button type="button" class="nova-add-day" id="btnTambahHari">
+            <span class="nova-add-icon"><i class="fas fa-plus"></i></span>
+            Tambah hari
+        </button>
+    </div>
+
+    <!-- FORM -->
+    <form method="POST" id="novaJadwalForm" class="nova-form">
+
+        <script type="application/json" id="data-daftar-mapel-json">
+        [
+            {% for m in daftar_mapel %}
+            {
+                "id": {{ m.id|tojson }},
+                "nama": {{ m.nama_pelajaran|tojson }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+        </script>
+
+        <!-- SCHEDULE CANVAS -->
+        <div class="nova-board">
+
+            <div class="nova-board-header">
+                <div class="nova-board-heading">
+                    <div class="nova-board-heading-icon">
+                        <i class="fas fa-calendar-days"></i>
+                    </div>
+                    <div>
+                        <strong>Weekly planner</strong>
+                        <span>Jadwal kegiatan belajar mengajar</span>
+                    </div>
+                </div>
+
+                <div class="nova-board-meta">
+                    <span class="nova-board-meta-dot"></span>
+                    <span id="novaDayTotal">5 hari terjadwal</span>
+                </div>
+            </div>
+
+            <div class="nova-board-labels">
+                <span>HARI</span>
+                <span>WAKTU & MATA PELAJARAN</span>
+                <span>AKSI</span>
+            </div>
+
+            <div class="nova-day-list" id="wadahDaftarHari">
+
+                {% set hari_awal = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"] %}
+
+                {% for hari in hari_awal %}
+                <section class="nova-day" data-day="{{ hari }}">
+
+                    <input type="hidden" class="nova-day-value" value="{{ hari }}">
+
+                    <div class="nova-day-identity">
+                        <span class="nova-day-index">{{ "%02d"|format(loop.index) }}</span>
+                        <div class="nova-day-name-wrap">
+                            <strong class="nova-day-name">{{ hari }}</strong>
+                            <span class="nova-day-caption">Hari pembelajaran</span>
                         </div>
-                        <div class="hari-body">
-                            {% set jadwal_hari = jadwal_per_hari.get(hari, []) %}
-                            
-                            {% if jadwal_hari %}
-                                {% for j in jadwal_hari %}
-                                <div class="baris-jadwal">
-                                    <input type="hidden" name="hari[]" value="{{ hari }}">
-                                    
-                                    <div class="jam-input-group">
-                                        <input type="time" name="jam_mulai[]" class="form-control jam-input" 
-                                               value="{{ j.jam_mulai if j.jam_mulai else '' }}" required>
-                                        <span class="jam-pemisah">s/d</span>
-                                        <input type="time" name="jam_selesai[]" class="form-control jam-input" 
-                                               value="{{ j.jam_selesai if j.jam_selesai else '' }}" required>
-                                    </div>
-                                    
-                                    <div class="mapel-select-group">
-                                        <select name="mapel_id[]" class="form-select mapel-select" required>
-                                            <option value="">-- Pilih Mata Pelajaran --</option>
-                                            <option value="imtaq" {{ 'selected' if j.jenis_khusus == 'imtaq' else '' }}>
-                                                🕌 Imtaq
-                                            </option>
-                                            <option value="upacara" {{ 'selected' if j.jenis_khusus == 'upacara' else '' }}>
-                                                🇮🇩 Upacara Bendera
-                                            </option>
+                        <span class="nova-day-indicator"></span>
+                    </div>
+
+                    <div class="nova-day-sessions">
+                        {% set jadwal_hari = jadwal_per_hari.get(hari, []) %}
+
+                        {% if jadwal_hari %}
+                            {% for j in jadwal_hari %}
+                            <div class="nova-session">
+
+                                <input type="hidden" name="hari[]" value="{{ hari }}">
+
+                                <div class="nova-time-control">
+                                    <label class="nova-time-box">
+                                        <span>MULAI</span>
+                                        <input type="time"
+                                               name="jam_mulai[]"
+                                               value="{{ j.jam_mulai if j.jam_mulai else '' }}"
+                                               required>
+                                    </label>
+
+                                    <span class="nova-time-arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </span>
+
+                                    <label class="nova-time-box">
+                                        <span>SELESAI</span>
+                                        <input type="time"
+                                               name="jam_selesai[]"
+                                               value="{{ j.jam_selesai if j.jam_selesai else '' }}"
+                                               required>
+                                    </label>
+                                </div>
+
+                                <div class="nova-subject-control">
+                                    <span class="nova-mobile-label">MATA PELAJARAN</span>
+                                    <div class="nova-select-wrap">
+                                        <i class="fas fa-book-open"></i>
+                                        <select name="mapel_id[]" required>
+                                            <option value="">Pilih mata pelajaran</option>
+                                            <option value="imtaq" {{ 'selected' if j.jenis_khusus == 'imtaq' else '' }}>Imtaq</option>
+                                            <option value="upacara" {{ 'selected' if j.jenis_khusus == 'upacara' else '' }}>Upacara Bendera</option>
                                             {% for m in daftar_mapel %}
-                                            <option value="{{ m.id }}" 
+                                            <option value="{{ m.id }}"
                                                 {{ 'selected' if j.mata_pelajaran_id == m.id else '' }}>
                                                 {{ m.nama_pelajaran }}
                                             </option>
                                             {% endfor %}
                                         </select>
+                                        <i class="fas fa-chevron-down nova-select-arrow"></i>
                                     </div>
-                                    
-                                    <button type="button" class="btn-hapus-baris hapus-baris" title="Hapus baris">
-                                        <i class="fas fa-times"></i>
-                                    </button>
                                 </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="baris-jadwal">
-                                    <input type="hidden" name="hari[]" value="{{ hari }}">
-                                    
-                                    <div class="jam-input-group">
-                                        <input type="time" name="jam_mulai[]" class="form-control jam-input" required>
-                                        <span class="jam-pemisah">s/d</span>
-                                        <input type="time" name="jam_selesai[]" class="form-control jam-input" required>
-                                    </div>
-                                    
-                                    <div class="mapel-select-group">
-                                        <select name="mapel_id[]" class="form-select mapel-select" required>
-                                            <option value="">-- Pilih Mata Pelajaran --</option>
-                                            <option value="imtaq">🕌 Imtaq</option>
-                                            <option value="upacara">🇮🇩 Upacara Bendera</option>
+
+                                <button type="button"
+                                        class="nova-remove-session hapus-baris"
+                                        title="Hapus sesi">
+                                    <i class="fas fa-xmark"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="nova-session">
+                                <input type="hidden" name="hari[]" value="{{ hari }}">
+
+                                <div class="nova-time-control">
+                                    <label class="nova-time-box">
+                                        <span>MULAI</span>
+                                        <input type="time" name="jam_mulai[]" required>
+                                    </label>
+
+                                    <span class="nova-time-arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </span>
+
+                                    <label class="nova-time-box">
+                                        <span>SELESAI</span>
+                                        <input type="time" name="jam_selesai[]" required>
+                                    </label>
+                                </div>
+
+                                <div class="nova-subject-control">
+                                    <span class="nova-mobile-label">MATA PELAJARAN</span>
+                                    <div class="nova-select-wrap">
+                                        <i class="fas fa-book-open"></i>
+                                        <select name="mapel_id[]" required>
+                                            <option value="">Pilih mata pelajaran</option>
+                                            <option value="imtaq">Imtaq</option>
+                                            <option value="upacara">Upacara Bendera</option>
                                             {% for m in daftar_mapel %}
                                             <option value="{{ m.id }}">{{ m.nama_pelajaran }}</option>
                                             {% endfor %}
                                         </select>
+                                        <i class="fas fa-chevron-down nova-select-arrow"></i>
                                     </div>
-                                    
-                                    <button type="button" class="btn-hapus-baris hapus-baris" title="Hapus baris">
-                                        <i class="fas fa-times"></i>
-                                    </button>
                                 </div>
-                            {% endif %}
-                            
-                            <button type="button" class="btn-tambah-baris tambah-baris">
-                                <i class="fas fa-plus-circle"></i> Tambah Jam
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
 
-                <!-- TOMBOL AKSI -->
-                <div class="form-actions">
-                    <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}" class="btn btn-cancel">
-                        <i class="fas fa-times"></i> Batal
-                    </a>
-                    <button type="submit" class="btn btn-simpan">
-                        <i class="fas fa-save"></i> Simpan Semua Jadwal
-                    </button>
+                                <button type="button"
+                                        class="nova-remove-session hapus-baris"
+                                        title="Hapus sesi">
+                                    <i class="fas fa-xmark"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+
+                        <button type="button" class="nova-add-session tambah-baris">
+                            <i class="fas fa-plus"></i>
+                            Tambah sesi pembelajaran
+                        </button>
+                    </div>
+
+                    <div class="nova-day-actions">
+                        <button type="button"
+                                class="nova-remove-day hapus-hari"
+                                title="Hapus hari">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                </section>
+                {% endfor %}
+
+            </div>
+
+            <div class="nova-empty" id="novaEmpty" hidden>
+                <div class="nova-empty-art">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span></span>
+                </div>
+                <h3>Belum ada jadwal yang disusun</h3>
+                <p>Mulai dengan menambahkan hari pembelajaran pertama.</p>
+                <button type="button" id="btnTambahHariEmpty">
+                    <i class="fas fa-plus"></i> Tambahkan hari
+                </button>
+            </div>
+
+            <div class="nova-board-bottom">
+                <div>
+                    <span class="nova-board-bottom-dot"></span>
+                    Jadwal tersusun berdasarkan urutan hari
+                </div>
+                <span>MON — SUN</span>
+            </div>
+        </div>
+
+        <!-- FORM FOOTER -->
+        <div class="nova-form-footer">
+            <div class="nova-footer-information">
+                <div class="nova-footer-lock">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div>
+                    <strong>Siap menyimpan perubahan?</strong>
+                    <span>Periksa kembali waktu dan mata pelajaran sebelum menyimpan.</span>
                 </div>
             </div>
-        </form>
+
+            <div class="nova-footer-buttons">
+                <a href="{{ url_for('data_kelas.daftar_siswa_di_kelas', id=kelas.id) }}"
+                   class="nova-button-cancel">
+                    Batal
+                </a>
+                <button type="submit" class="nova-button-save">
+                    <span>Simpan jadwal</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<!-- ADD DAY MODAL -->
+<div class="nova-modal" id="novaDayModal" aria-hidden="true">
+    <div class="nova-modal-backdrop" data-nova-close></div>
+
+    <div class="nova-modal-dialog" role="dialog" aria-modal="true">
+        <div class="nova-modal-top">
+            <div class="nova-modal-symbol">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <button type="button" class="nova-modal-x" data-nova-close>
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="nova-modal-body">
+            <span class="nova-modal-kicker">SCHEDULE CONFIGURATION</span>
+            <h3>Hari pembelajaran baru</h3>
+            <p>Pilih hari yang ingin ditambahkan ke dalam jadwal kelas.</p>
+
+            <label for="novaDaySelect">PILIH HARI</label>
+            <select id="novaDaySelect">
+                <option value="">Pilih hari pembelajaran</option>
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat">Jumat</option>
+                <option value="Sabtu">Sabtu</option>
+                <option value="Minggu">Minggu</option>
+            </select>
+            <small id="novaDayError"></small>
+        </div>
+
+        <div class="nova-modal-footer">
+            <button type="button" class="nova-modal-cancel" data-nova-close>
+                Batalkan
+            </button>
+            <button type="button" class="nova-modal-add" id="novaConfirmDay">
+                Tambahkan hari
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
     </div>
 </div>

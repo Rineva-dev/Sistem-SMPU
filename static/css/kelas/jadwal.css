@@ -1,383 +1,1236 @@
-/* === VARIABEL WARNA === */
-:root {
-    --utama: #2563eb;
-    --terang: #eff6ff;
-    --gelap: #1e40af;
-    --sukses: #10b981;
-    --bahaya: #ef4444;
-    --abu: #64748b;
-    --latar: #f8fafc;
-    --kartu: #ffffff;
-    --batas: #e2e8f0;
-    --bayangan: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --bayangan-atas: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
 
-/* === HEADER === */
-.page-header {
-    background: linear-gradient(135deg, var(--utama), var(--gelap));
-    border-radius: 1rem;
-    padding: 1.5rem 2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--bayangan-atas);
-}
+/* ==========================================================
+   NOVA ACADEMIC WORKSPACE
+   Premium timetable interface
+========================================================== */
 
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.header-title h2 {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.header-title h2 i {
-    opacity: 0.9;
-}
-
-.header-subtitle {
-    color: rgba(255, 255, 255, 0.85);
-    margin: 0.5rem 0 0 0;
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    font-size: 0.9rem;
-    align-items: center;
-}
-
-.kelas-badge {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.25rem 1rem;
-    border-radius: 9999px;
-    font-weight: 600;
-}
-
-.wali-info i {
-    margin-right: 0.3rem;
-    opacity: 0.8;
-}
-
-.header-actions .btn-outline-secondary {
-    border-color: rgb(255 255 255 / 30%) !important;
-    color: white;
-    background: #ffffff17;
-}
-
-.header-actions .btn-outline-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: white;
-    color: white;
-}
-
-/* === KARD UTAMA === */
-.main-card {
-    background: var(--kartu);
-    border-radius: 1rem;
-    box-shadow: var(--bayangan);
-    overflow: hidden;
-}
-
-.card-header-custom {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--batas);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to right, #fafafa, white);
-}
-
-.card-header-custom h5 {
-    margin: 0;
-    font-weight: 600;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.card-header-custom h5 i {
-    color: var(--utama);
-}
-
-.card-body-custom {
-    padding: 1.5rem;
-}
-
-.info-text {
-    background: var(--terang);
-    border-left: 3px solid var(--utama);
-    padding: 0.75rem 1rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    color: #1e40af;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-}
-
-.info-text i {
-    margin-right: 0.5rem;
-}
-
-/* === GRID HARI === */
-#wadahDaftarHari {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-}
-
-/* === KARD PER HARI === */
-.hari-card {
-    border: 1px solid var(--batas);
-    border-radius: 0.75rem;
-    overflow: hidden;
-    transition: all 0.25s ease;
-}
-
-.hari-card:hover {
-    border-color: var(--utama);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-    transform: translateY(-2px);
-}
-
-.hari-header {
-    background: linear-gradient(to right, #f1f5f9, #f8fafc);
-    padding: 0.875rem 1.1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--batas);
-}
-
-.hari-nama {
-    font-weight: 700;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-}
-
-.hari-nama i {
-    color: #f59e0b;
-}
-
-.btn-hapus-hari {
-    background: transparent;
-    border: none;
-    color: var(--abu);
-    width: 32px;
-    height: 32px;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-hapus-hari:hover {
-    background: #fef2f2;
-    color: var(--bahaya);
-}
-
-.hari-body {
-    padding: 1.1rem;
-}
-
-/* === BARIS JADWAL === */
-.baris-jadwal {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.875rem;
-    padding: 0.875rem;
-    background: #fafafa;
-    border-radius: 0.6rem;
-    transition: background 0.2s ease;
-    flex-wrap: wrap;
-}
-
-.baris-jadwal:hover {
-    background: #f0f7ff;
-}
-
-.jam-input-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
-}
-
-.jam-input {
-    width: 100px;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid var(--batas);
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.jam-input:focus {
-    outline: none;
-    border-color: var(--utama);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.jam-pemisah {
-    color: var(--abu);
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.mapel-select-group {
-    flex: 1;
-    min-width: 200px;
-}
-
-.mapel-select {
+.nova-timetable {
+    --nv: #08785b;
+    --nv-dark: #064b38;
+    --nv-ink: #172d24;
+    --nv-muted: #84938a;
+    --nv-line: #e9efeb;
+    --nv-soft: #f5f9f6;
     width: 100%;
-    padding: 0.4rem 0.75rem;
-    border: 1px solid var(--batas);
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
+    padding: 12px 0 35px;
+    color: var(--nv-ink);
+    font-family: inherit;
 }
 
-.mapel-select:focus {
-    outline: none;
-    border-color: var(--utama);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+/* TOPLINE */
+
+.nova-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 31px;
 }
 
-.btn-hapus-baris {
-    background: transparent;
-    border: none;
-    color: var(--abu);
+.nova-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #9ba79f;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.nova-breadcrumb a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #718278;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.nova-breadcrumb a:hover {
+    color: var(--nv);
+}
+
+.nova-breadcrumb a i {
+    font-size: 10px;
+}
+
+.nova-crumb-slash {
+    color: #d3ddd6;
+}
+
+.nova-top-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a198;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.nova-status-light {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10a779;
+    box-shadow: 0 0 0 4px rgba(16,167,121,.09);
+    animation: novaPulse 2.5s infinite;
+}
+
+/* INTRO */
+
+.nova-intro {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    overflow: hidden;
+    padding: 0 0 27px;
+    border-bottom: 1px solid var(--nv-line);
+}
+
+.nova-intro-main {
+    position: relative;
+    z-index: 2;
+    animation: novaEnter .65s both;
+}
+
+.nova-pretitle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--nv);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.nova-pretitle-bar {
+    width: 23px;
+    height: 2px;
+    background: #12a77b;
+    animation: novaGrow .7s both;
+}
+
+.nova-intro h1 {
+    margin: 12px 0 8px;
+    color: #18352a;
+    font-size: clamp(35px, 4vw, 49px);
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -2.6px;
+}
+
+.nova-intro h1 span {
+    color: #0a9470;
+}
+
+.nova-intro-main > p {
+    max-width: 510px;
+    margin: 0;
+    color: #87958d;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.nova-class-chip {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 235px;
+    padding: 12px 15px;
+    overflow: hidden;
+    border: 1px solid #e5eee8;
+    border-radius: 12px;
+    background: rgba(255,255,255,.87);
+    box-shadow: 0 5px 20px rgba(13,55,34,.035);
+    animation: novaEnter .75s .1s both;
+}
+
+.nova-class-icon {
+    display: grid;
+    place-items: center;
+    width: 41px;
+    height: 41px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    color: #08785b;
+    background: #eaf6ef;
+    font-size: 16px;
+}
+
+.nova-class-detail {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.nova-class-detail > span {
+    color: #a0ada5;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+}
+
+.nova-class-detail strong {
+    margin-top: 3px;
+    color: #243b30;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.nova-class-detail small {
+    margin-top: 3px;
+    color: #89968e;
+    font-size: 10px;
+}
+
+.nova-class-detail small i {
+    color: var(--nv);
+    margin-right: 4px;
+}
+
+.nova-chip-orbit {
+    position: absolute;
+    right: -19px;
+    top: -25px;
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(8,120,91,.10);
+    border-radius: 50%;
+    animation: novaOrbit 16s linear infinite;
+}
+
+.nova-intro-decoration {
+    position: absolute;
+    top: -80px;
+    right: 30%;
+    width: 190px;
+    height: 190px;
+    border: 1px solid rgba(8,120,91,.045);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.nova-intro-decoration::before,
+.nova-intro-decoration::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(8,120,91,.04);
+    border-radius: 50%;
+}
+
+.nova-intro-decoration::before {
+    inset: 17px;
+}
+
+.nova-intro-decoration::after {
+    inset: 36px;
+}
+
+/* EDITOR HEADING */
+
+.nova-editor-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 31px 0 18px;
+}
+
+.nova-editor-overline {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #9ba79f;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.nova-editor-overline > span:first-child {
+    color: #0b9972;
+}
+
+.nova-overline-line {
+    width: 17px;
+    height: 1px;
+    background: #9bd4b8;
+}
+
+.nova-editor-heading h2 {
+    margin: 8px 0 4px;
+    color: #243a30;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.65px;
+}
+
+.nova-editor-heading p {
+    margin: 0;
+    color: #89968e;
+    font-size: 11px;
+}
+
+.nova-add-day {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 0 15px 0 8px;
+    border: 1px solid #d8e9de;
+    border-radius: 9px;
+    color: #08785b;
+    background: #f5faf6;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    transition: .25s ease;
+    cursor: pointer;
+}
+
+.nova-add-day:hover {
+    transform: translateY(-2px);
+    border-color: #9bcfb0;
+    background: #eaf6ee;
+    box-shadow: 0 6px 18px rgba(8,120,91,.08);
+}
+
+.nova-add-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    color: white;
+    background: #08785b;
+}
+
+/* BOARD */
+
+.nova-board {
+    overflow: hidden;
+    border: 1px solid #e5ece7;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 8px 35px rgba(23,54,36,.035);
+}
+
+.nova-board-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 20px;
+    border-bottom: 1px solid #edf1ee;
+    background: linear-gradient(105deg, #fbfdfb, #fff);
+}
+
+.nova-board-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.nova-board-heading-icon {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    border: 1px solid #e2eee6;
+    border-radius: 10px;
+    color: #08785b;
+    background: #eff7f1;
+    font-size: 13px;
+}
+
+.nova-board-heading strong,
+.nova-board-heading span {
+    display: block;
+}
+
+.nova-board-heading strong {
+    color: #31483a;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.nova-board-heading div:last-child span {
+    margin-top: 3px;
+    color: #9aa69e;
+    font-size: 9px;
+}
+
+.nova-board-meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #86958b;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.nova-board-meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0c9b71;
+}
+
+/* COLUMN LABELS */
+
+.nova-board-labels {
+    display: grid;
+    grid-template-columns: 185px minmax(0,1fr) 52px;
+    align-items: center;
+    gap: 17px;
+    padding: 11px 20px;
+    border-bottom: 1px solid #edf1ee;
+    color: #a2ada6;
+    background: #fbfcfb;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.25px;
+}
+
+/* DAY ROW */
+
+.nova-day {
+    display: grid;
+    grid-template-columns: 185px minmax(0,1fr) 52px;
+    gap: 17px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #edf1ee;
+    animation: novaEnter .5s both;
+    transition: background .25s;
+}
+
+.nova-day:last-child {
+    border-bottom: 0;
+}
+
+.nova-day:hover {
+    background: #fdfefd;
+}
+
+.nova-day-identity {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding-top: 6px;
+}
+
+.nova-day-index {
+    display: grid;
+    place-items: center;
     width: 34px;
     height: 34px;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
     flex-shrink: 0;
+    border: 1px solid #dfeee4;
+    border-radius: 10px;
+    color: #0b8966;
+    background: #eff7f1;
+    font-size: 10px;
+    font-weight: 800;
 }
 
-.btn-hapus-baris:hover {
-    background: #fee2e2;
-    color: var(--bahaya);
+.nova-day-name-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
 }
 
-.btn-tambah-baris {
-    background: transparent;
-    border: 1px dashed var(--utama);
-    color: var(--utama);
+.nova-day-name {
+    color: #263c31;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.nova-day-caption {
+    color: #a1ada5;
+    font-size: 9px;
+}
+
+.nova-day-indicator {
+    position: absolute;
+    left: 16px;
+    top: 45px;
+    bottom: -22px;
+    width: 1px;
+    background: linear-gradient(#dcece2, transparent);
+    pointer-events: none;
+}
+
+/* SESSIONS */
+
+.nova-day-sessions {
+    min-width: 0;
+}
+
+.nova-session {
+    display: grid;
+    grid-template-columns: minmax(240px,.9fr) minmax(190px,1fr) 34px;
+    align-items: center;
+    gap: 13px;
+    padding: 9px;
+    margin-bottom: 7px;
+    border: 1px solid #eaf0ec;
+    border-radius: 10px;
+    background: #fff;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+    animation: novaEnter .3s both;
+}
+
+.nova-session:hover {
+    border-color: #d2e6d9;
+    box-shadow: 0 5px 17px rgba(20,65,39,.045);
+    transform: translateY(-1px);
+}
+
+/* TIME */
+
+.nova-time-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.nova-time-box {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    margin: 0;
+}
+
+.nova-time-box > span {
+    padding-left: 2px;
+    color: #a0aca4;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.nova-time-box input {
     width: 100%;
-    padding: 0.6rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
+    height: 36px;
+    min-width: 0;
+    padding: 0 9px;
+    border: 1px solid #e8eee9;
+    border-radius: 7px;
+    outline: none;
+    color: #354a3e;
+    background: #f9fbf9;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.nova-time-box input:focus {
+    border-color: #85c7a5;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(8,120,91,.07);
+}
+
+.nova-time-arrow {
+    display: grid;
+    place-items: center;
+    align-self: flex-end;
+    width: 18px;
+    height: 36px;
+    color: #b0bcb4;
+    font-size: 9px;
+}
+
+/* SUBJECT */
+
+.nova-subject-control {
+    min-width: 0;
+}
+
+.nova-select-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nova-select-wrap > i:first-child {
+    position: absolute;
+    left: 11px;
+    z-index: 1;
+    color: #8aa396;
+    font-size: 11px;
+    pointer-events: none;
+}
+
+.nova-select-wrap select {
+    width: 100%;
+    height: 38px;
+    min-width: 0;
+    padding: 0 31px 0 32px;
+    border: 1px solid #e8eee9;
+    border-radius: 7px;
+    outline: none;
+    appearance: none;
+    color: #354a3e;
+    background: #f9fbf9;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: .2s;
+}
+
+.nova-select-wrap select:focus {
+    border-color: #85c7a5;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(8,120,91,.07);
+}
+
+.nova-select-arrow {
+    position: absolute;
+    right: 11px;
+    color: #9ba89f;
+    font-size: 9px;
+    pointer-events: none;
+}
+
+.nova-mobile-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #9ba89f;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/* REMOVE SESSION */
+
+.nova-remove-session,
+.nova-remove-day {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #a4b0a8;
+    background: transparent;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.nova-remove-session:hover,
+.nova-remove-day:hover {
+    border-color: #f1dede;
+    color: #d44f52;
+    background: #fff4f3;
+}
+
+.nova-day-actions {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10px;
+}
+
+/* ADD SESSION */
+
+.nova-add-session {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 7px 9px;
+    border: 0;
+    border-radius: 6px;
+    color: #078361;
+    background: transparent;
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.nova-add-session i {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+    border: 1px solid #dcece2;
+    border-radius: 6px;
+    background: #f1f8f3;
+    font-size: 9px;
+}
+
+.nova-add-session:hover {
+    padding-left: 13px;
+    color: #045e43;
+    background: #f1f8f3;
+}
+
+/* BOARD BOTTOM */
+
+.nova-board-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid #edf1ee;
+    background: #fbfcfb;
+    color: #9aa69e;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.nova-board-bottom > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nova-board-bottom-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0c9b71;
+}
+
+/* EMPTY STATE */
+
+.nova-empty {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.nova-empty[hidden] {
+    display: none !important;
+}
+
+.nova-empty-art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border: 1px solid #dcece2;
+    border-radius: 19px;
+    color: #08785b;
+    background: #eff7f1;
+    font-size: 22px;
+}
+
+.nova-empty-art span {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    border: 3px solid white;
+    border-radius: 50%;
+    background: #14a77a;
+    animation: novaPulse 2s infinite;
+}
+
+.nova-empty h3 {
+    margin: 0 0 6px;
+    color: #2b4135;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.nova-empty p {
+    margin: 0 0 16px;
+    color: #8b9990;
+    font-size: 11px;
+}
+
+.nova-empty button {
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #08785b;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* FOOTER */
+
+.nova-form-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 17px;
+    padding: 14px 17px;
+    border: 1px solid #e5ece7;
+    border-radius: 12px;
+    background: rgba(255,255,255,.94);
+    box-shadow: 0 8px 28px rgba(20,55,35,.06);
+    backdrop-filter: blur(14px);
+}
+
+.nova-footer-information {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nova-footer-lock {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    color: #0a8966;
+    background: #edf7f1;
+    font-size: 12px;
+}
+
+.nova-footer-information strong,
+.nova-footer-information span {
+    display: block;
+}
+
+.nova-footer-information strong {
+    color: #405449;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.nova-footer-information div:last-child span {
+    margin-top: 3px;
+    color: #9aa69e;
+    font-size: 9px;
+}
+
+.nova-footer-buttons {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.nova-button-cancel,
+.nova-button-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    min-height: 39px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: .25s;
+}
+
+.nova-button-cancel {
+    border: 1px solid #e4ebe6;
+    color: #75847a;
+    background: #fff;
+}
+
+.nova-button-cancel:hover {
+    color: #344c3d;
+    background: #f7faf8;
+}
+
+.nova-button-save {
+    border: 1px solid #08785b;
+    color: #fff;
+    background: linear-gradient(115deg, #0b9670, #056346);
+    box-shadow: 0 4px 13px rgba(8,120,91,.17);
+    cursor: pointer;
+}
+
+.nova-button-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(8,120,91,.24);
+}
+
+.nova-button-save i {
+    transition: transform .2s;
+}
+
+.nova-button-save:hover i {
+    transform: translateX(3px);
+}
+
+/* MODAL */
+
+.nova-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    padding: 20px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .25s, visibility .25s;
 }
 
-.btn-tambah-baris:hover {
-    background: var(--terang);
-    border-style: solid;
+.nova-modal.is-open {
+    visibility: visible;
+    opacity: 1;
 }
 
-/* === TOMBOL BAWAH === */
-.form-actions {
+.nova-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(7,29,20,.55);
+    backdrop-filter: blur(6px);
+}
+
+.nova-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 23px;
+    border: 1px solid rgba(255,255,255,.75);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 30px 90px rgba(0,0,0,.2);
+    transform: translateY(14px) scale(.98);
+    transition: transform .25s cubic-bezier(.2,.7,.2,1);
+}
+
+.nova-modal.is-open .nova-modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.nova-modal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nova-modal-symbol {
+    display: grid;
+    place-items: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    color: #08785b;
+    background: #edf7f1;
+    font-size: 17px;
+}
+
+.nova-modal-x {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    border: 0;
+    border-radius: 8px;
+    color: #87958c;
+    background: #f3f7f4;
+    cursor: pointer;
+}
+
+.nova-modal-body {
+    padding: 22px 0;
+}
+
+.nova-modal-kicker {
+    color: #0a8965;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.nova-modal-body h3 {
+    margin: 7px 0;
+    color: #20382c;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.7px;
+}
+
+.nova-modal-body p {
+    margin: 0 0 21px;
+    color: #8c9991;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.nova-modal-body label {
+    display: block;
+    margin-bottom: 8px;
+    color: #91a097;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.1px;
+}
+
+.nova-modal-body select {
+    width: 100%;
+    height: 43px;
+    padding: 0 12px;
+    border: 1px solid #e3ebe5;
+    border-radius: 8px;
+    outline: none;
+    color: #354a3e;
+    background: #fafcfb;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.nova-modal-body select:focus {
+    border-color: #83c5a4;
+    box-shadow: 0 0 0 3px rgba(8,120,91,.07);
+}
+
+.nova-modal-body small {
+    display: block;
+    min-height: 17px;
+    margin-top: 7px;
+    color: #d34f52;
+    font-size: 9px;
+}
+
+.nova-modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--batas);
+    gap: 9px;
+    padding-top: 15px;
+    border-top: 1px solid #edf1ee;
 }
 
-.btn-cancel {
-    background: white;
-    border: 1px solid var(--batas);
-    color: var(--abu);
-    padding: 0.6rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+.nova-modal-cancel,
+.nova-modal-add {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
 }
 
-.btn-cancel:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #475569;
+.nova-modal-cancel {
+    border: 1px solid #e4ebe6;
+    color: #738178;
+    background: #fff;
 }
 
-.btn-simpan {
-    background: linear-gradient(135deg, var(--utama), var(--gelap));
-    border: none;
+.nova-modal-add {
+    border: 1px solid #08785b;
     color: white;
-    padding: 0.6rem 1.75rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    background: #08785b;
 }
 
-.btn-simpan:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+.nova-modal-add i {
+    margin-left: 8px;
 }
 
-/* === RESPONSIF === */
-@media (max-width: 992px) {
-    #wadahDaftarHari {
-        grid-template-columns: repeat(2, 1fr);
+/* ANIMATION */
+
+@keyframes novaEnter {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes novaGrow {
+    from { width: 0; }
+    to { width: 23px; }
+}
+
+@keyframes novaPulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(16,167,121,.08); }
+    50% { box-shadow: 0 0 0 7px rgba(16,167,121,.025); }
+}
+
+@keyframes novaOrbit {
+    to { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 950px) {
+    .nova-day,
+    .nova-board-labels {
+        grid-template-columns: 140px minmax(0,1fr) 35px;
+        gap: 12px;
+    }
+
+    .nova-session {
+        grid-template-columns: minmax(190px,.9fr) minmax(150px,1fr) 30px;
+        gap: 8px;
     }
 }
 
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
+@media(max-width: 680px) {
+    .nova-timetable {
+        padding-top: 7px;
+    }
+
+    .nova-topline {
+        margin-bottom: 25px;
+    }
+
+    .nova-top-status {
+        font-size: 7px;
+        letter-spacing: .8px;
+    }
+
+    .nova-intro {
         align-items: flex-start;
-    }
-    .page-header {
-        padding: 1.25rem;
-    }
-    #wadahDaftarHari {
-        grid-template-columns: 1fr;
-    }
-    .baris-jadwal {
         flex-direction: column;
-        align-items: stretch;
+        gap: 18px;
+        padding-bottom: 22px;
     }
-    .jam-input-group {
-        justify-content: center;
+
+    .nova-intro h1 {
+        font-size: 37px;
+        letter-spacing: -1.8px;
     }
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-    .form-actions button, .form-actions a {
+
+    .nova-class-chip {
         width: 100%;
     }
+
+    .nova-editor-heading {
+        align-items: center;
+    }
+
+    .nova-editor-heading h2 {
+        font-size: 16px;
+    }
+
+    .nova-editor-heading p {
+        max-width: 230px;
+        line-height: 1.6;
+    }
+
+    .nova-add-day {
+        width: 41px;
+        min-width: 41px;
+        padding: 0;
+        justify-content: center;
+        font-size: 0;
+    }
+
+    .nova-add-icon {
+        width: 27px;
+        height: 27px;
+    }
+
+    .nova-board-header {
+        padding: 13px;
+    }
+
+    .nova-board-labels {
+        display: none;
+    }
+
+    .nova-day {
+        grid-template-columns: minmax(0,1fr) 32px;
+        gap: 5px;
+        padding: 14px 12px;
+    }
+
+    .nova-day-identity {
+        grid-column: 1 / -1;
+        align-items: center;
+        padding: 0 0 8px;
+        border-bottom: 1px solid #f0f3f1;
+    }
+
+    .nova-day-indicator {
+        display: none;
+    }
+
+    .nova-day-actions {
+        grid-column: 2;
+        grid-row: 1;
+        align-items: center;
+        padding: 0;
+    }
+
+    .nova-day-sessions {
+        grid-column: 1 / -1;
+    }
+
+    .nova-session {
+        grid-template-columns: minmax(0,1fr) 30px;
+        gap: 9px;
+        padding: 11px;
+    }
+
+    .nova-time-control {
+        grid-column: 1 / -1;
+    }
+
+    .nova-subject-control {
+        grid-column: 1;
+    }
+
+    .nova-mobile-label {
+        display: block;
+        margin-bottom: 6px;
+        color: #9ba89f;
+        font-size: 7px;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .nova-remove-session {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: end;
+    }
+
+    .nova-board-bottom {
+        padding: 11px 13px;
+        font-size: 7px;
+    }
+
+    .nova-form-footer {
+        position: sticky;
+        bottom: 7px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .nova-footer-buttons {
+        display: grid;
+        grid-template-columns: .7fr 1.3fr;
+    }
+
+    .nova-button-cancel,
+    .nova-button-save {
+        padding: 0 9px;
+        font-size: 10px;
+    }
 }
 
-@media (max-width: 480px) {
-    .jadwal-page {
-        padding: 0.75rem;
-    }
-    .card-body-custom {
-        padding: 1rem;
-    }
-    .jam-input {
-        width: 90px;
+@media(prefers-reduced-motion: reduce) {
+    .nova-timetable *,
+    .nova-modal,
+    .nova-modal-dialog {
+        animation: none !important;
+        transition: none !important;
     }
 }
