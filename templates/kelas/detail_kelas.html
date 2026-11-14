@@ -1,336 +1,703 @@
-<div class="dashboard-container">
-    <div class="welcome-box">
-        <div>
-            <h2>{{ kelas.nama_kelas }}</h2>
-            <p class="text-muted">Wali Kelas: <strong>{{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}</strong></p>
+<link rel="stylesheet"
+        href="{{ url_for('static', filename='css/kelas/detail_kelas.css') }}">
+
+<div class="classroom-app" id="classroomApp">
+
+    <!-- Ambient background -->
+    <div class="cr-ambient cr-ambient-one"></div>
+    <div class="cr-ambient cr-ambient-two"></div>
+    <div class="cr-grid-pattern"></div>
+
+    <!-- Breadcrumb -->
+    <div class="cr-topline">
+        <div class="cr-breadcrumb">
+            <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}">
+                <i class="fas fa-layer-group"></i> Data Kelas
+            </a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Detail Kelas</span>
         </div>
-        <div class="date-box">
-            <i class="fas fa-users"></i>
-            <span>Jumlah Siswa: {{ daftar_siswa | length }}</span>
+
+        <div class="ch-reference">
+            <span class="ch-reference-dot"></span>
+            CLASSROOM MANAGEMENT
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5><i class="fas fa-list"></i> Daftar Siswa</h5>
-            <div class="d-flex gap-2">
-                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
-                <button type="button" class="btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
-                    <i class="fas fa-users-cog"></i> Kelola Siswa
-                </button>
-                {% endif %}
-                <button type="button" class="btn-header-info" data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
-                    <i class="fas fa-book-open me-1"></i> Pengaturan Mapel
-                </button>
-                
-                <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="btn-header-warning">
-                    <i class="fas fa-calendar-alt me-1"></i> Jadwal Pelajaran
-                </a>
-                
-                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
+    
+    <!-- =====================================================
+        CLASSROOM EDITORIAL HEADER
+    ===================================================== -->
+    <section class="classroom-heading">
+        <div class="ch-main">
+            <div class="ch-title-area">
+                <div class="ch-overline">
+                    <span class="ch-overline-line"></span>
+                    RUANG AKADEMIK
+                    <span class="ch-overline-year">{{ tahun_dipilih }}</span>
+                </div>
+
+                <h1>
+                    {{ kelas.nama_kelas }}
+                    <span class="ch-title-mark">.</span>
+                </h1>
+
+                <p>
+                    Kelola anggota kelas, informasi akademik, dan aktivitas
+                    pembelajaran dalam satu ruang pengelolaan.
+                </p>
+            </div>
+
+            <div class="ch-side-info">
+                <div class="ch-side-item">
+                    <span class="ch-side-label">WALI KELAS</span>
+                    <div class="ch-side-value">
+                        <span class="ch-side-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </span>
+                        <strong>
+                            {{ kelas.wali_kelas.nama if kelas.wali_kelas else 'Belum ditentukan' }}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="ch-side-divider"></div>
+
+                <div class="ch-side-item">
+                    <span class="ch-side-label">ANGGOTA KELAS</span>
+                    <div class="ch-side-value">
+                        <span class="ch-side-icon">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        <strong>{{ daftar_siswa|length }} Siswa</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ch-bottom">
+            <div class="ch-bottom-line">
+                <span class="ch-line-progress"></span>
+            </div>
+
+            <div class="ch-bottom-caption">
+                <span>INFORMASI ROMBONGAN BELAJAR</span>
+                <span class="ch-bottom-status">
+                    <span class="ch-status-pulse"></span>
+                    DATA KELAS
+                </span>
+            </div>
+        </div>
+
+        <div class="ch-decoration ch-decoration-one"></div>
+        <div class="ch-decoration ch-decoration-two"></div>
+        <div class="ch-decoration ch-decoration-three"></div>
+
+    </section>
+
+
+    <!-- Workspace toolbar -->
+    <section class="cr-workspace-bar">
+        <div class="cr-workspace-heading">
+            <div class="cr-heading-icon"><i class="fas fa-sliders"></i></div>
+            <div>
+                <h2>Ruang Administrasi</h2>
+                <p>Pengaturan dan pengelolaan kelas</p>
+            </div>
+        </div>
+
+        <div class="cr-actions">
+            {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
+            <button type="button" class="cr-action cr-action-primary"
+                    data-bs-toggle="modal" data-bs-target="#modalKelolaSiswa">
+                <span class="cr-action-icon"><i class="fas fa-users-gear"></i></span>
+                <span>Kelola Siswa</span>
+                <i class="fas fa-arrow-up-right-from-square cr-action-arrow"></i>
+            </button>
+            {% endif %}
+
+            <button type="button" class="cr-action"
+                    data-bs-toggle="modal" data-bs-target="#modalPengaturanMapel">
+                <span class="cr-action-icon"><i class="fas fa-book-open"></i></span>
+                <span>Pengaturan Mapel</span>
+                <i class="fas fa-arrow-up-right-from-square cr-action-arrow"></i>
+            </button>
+
+            <a href="{{ url_for('data_kelas.jadwal_kelas', id=kelas.id) }}" class="cr-action">
+                <span class="cr-action-icon"><i class="fas fa-calendar-days"></i></span>
+                <span>Jadwal Pelajaran</span>
+                <i class="fas fa-arrow-up-right-from-square cr-action-arrow"></i>
+            </a>
+
+            {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-1') or "Ganjil" in tahun_dipilih %}
-                <button type="button" class="btn-header-success" data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
-                    <i class="fas fa-forward me-1"></i> Lanjutkan ke Genap
+                <button type="button" class="cr-action cr-action-semester"
+                        data-bs-toggle="modal" data-bs-target="#modalLanjutkan">
+                    <span class="cr-action-icon"><i class="fas fa-forward"></i></span>
+                    <span>Lanjut Semester Genap</span>
+                    <i class="fas fa-arrow-up-right-from-square cr-action-arrow"></i>
                 </button>
                 {% endif %}
-                {% endif %}
-                
-                {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
+            {% endif %}
+
+            {% if not ("Waka Kurikulum" in daftar_tugas or jabatan == "Waka Kurikulum") %}
                 {% if tahun_dipilih.endswith('-2') or "Genap" in tahun_dipilih %}
-                <button type="button" class="btn-header-accent" data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
-                    <i class="fas fa-arrow-up me-1"></i> Naik Kelas
+                <button type="button" class="cr-action cr-action-promotion"
+                        data-bs-toggle="modal" data-bs-target="#modalNaikKelas">
+                    <span class="cr-action-icon"><i class="fas fa-arrow-up"></i></span>
+                    <span>Proses Naik Kelas</span>
+                    <i class="fas fa-arrow-up-right-from-square cr-action-arrow"></i>
                 </button>
                 {% endif %}
-                {% endif %}
-                
-                <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="btn-header-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Kembali
-                </a>
+            {% endif %}
+
+            <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" class="cr-back-action">
+                <i class="fas fa-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Student directory -->
+    <section class="cr-directory">
+        <div class="cr-directory-header">
+            <div>
+                <div class="cr-section-kicker">CLASS DIRECTORY</div>
+                <h2>Direktori Siswa</h2>
+                <p>Daftar peserta didik yang terdaftar pada kelas ini.</p>
+            </div>
+
+            <div class="cr-directory-counter">
+                <span class="cr-counter-number">{{ daftar_siswa|length }}</span>
+                <span>
+                    <strong>Total Siswa</strong>
+                    <small>Terdaftar di kelas</small>
+                </span>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>NISN</th>
-                            <th>Nama Lengkap</th>
-                            <th>Jenis Kelamin</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if daftar_siswa %}
-                            {% for siswa in daftar_siswa %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>{{ siswa.nisn }}</td>
-                                <td>{{ siswa.nama }}</td>
-                                <td>{{ siswa.jenis_kelamin }}</td>
-                                <td><span class="badge bg-success">{{ siswa.status }}</span></td>
-                                <td>
-                                    <a href="{{ url_for('data_siswa.detail_siswa', id=siswa.id) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr><td colspan="6" class="text-center text-muted py-4">Belum ada siswa di kelas ini</td></tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+
+        <div class="cr-directory-tools">
+            <div class="cr-search">
+                <i class="fas fa-search"></i>
+                <input type="search" id="crSearchStudent"
+                       placeholder="Cari nama siswa atau NISN...">
+                <kbd>⌕</kbd>
+            </div>
+            <div class="cr-result-label">
+                Menampilkan <strong id="crVisibleCount">{{ daftar_siswa|length }}</strong>
+                dari {{ daftar_siswa|length }} siswa
             </div>
         </div>
-    </div>
-</div>
 
-<!-- ✅ MODAL KELOLA SISWA -->
-<div class="modal fade" id="modalKelolaSiswa" tabindex="-1" aria-labelledby="modalKelolaSiswaLabel" aria-hidden="true"
-    data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalKelolaSiswaLabel">
-                    <i class="fas fa-users-cog me-2"></i>Kelola Siswa - {{ kelas.nama_kelas }}
-                </h5>
-                <button type="button" class="btn-close btn-close-white" id="tombolTutupModal" aria-label="Tutup"></button>
-            </div>
-
-            <form method="POST" action="{{ url_for('data_kelas.kelola_siswa_di_kelas', kelas_id=kelas.id) }}" id="formKelolaSiswa">
-                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
-                <div class="modal-body kelola-siswa" style="min-height: 68vh; overflow-y: auto;">
-                    <div class="row g-4">
-                        <!-- Bagian Kiri: Siswa Belum Masuk Kelas -->
-                        <div class="col-md-6 border-end">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-success mb-0"><i class="fas fa-user-plus"></i> Siswa Belum Masuk Kelas</h6>
-                                <button type="button" id="btnMasukkan" class="btn btn-sm btn-success">
-                                    <i class="fas fa-arrow-right me-1"></i> Masukkan ke Kelas
-                                </button>
-                            </div>
-                            <input type="text" class="form-control form-control-sm mb-3" id="cariBelum" placeholder="Cari NIS / Nama...">
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="pilihSemuaBelum">
-                                <label class="form-check-label fw-bold" for="pilihSemuaBelum">Pilih Semua</label>
-                            </div>
-                            <hr>
-                            <!-- Kontainer untuk data asli -->
-                            <div id="dataAsliBelum" style="display: none;">
-                                {% if siswa_belum_masuk %}
-                                    {% for siswa in siswa_belum_masuk %}
-                                    <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}" data-nama="{{ siswa.nama }}"></div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            <div class="daftar-siswa" id="daftarBelum">
-                                <!-- Akan diisi ulang setiap kali modal dibuka -->
-                            </div>
-                        </div>
-
-                        <!-- Bagian Kanan: Siswa Sudah Ada di Kelas -->
-                        <div class="col-md-6">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-danger mb-0"><i class="fas fa-user-minus"></i> Siswa Sudah di Kelas Ini</h6>
-                                <button type="button" id="btnKeluarkan" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-arrow-left me-1"></i> Keluarkan dari Kelas
-                                </button>
-                            </div>
-                            <input type="text" class="form-control form-control-sm mb-3" id="cariSudah" placeholder="Cari NIS / Nama...">
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="pilihSemuaSudah">
-                                <label class="form-check-label fw-bold" for="pilihSemuaSudah">Pilih Semua</label>
-                            </div>
-                            <hr>
-                            <!-- Kontainer untuk data asli -->
-                            <div id="dataAsliSudah" style="display: none;">
-                                {% if daftar_siswa %}
-                                    {% for siswa in daftar_siswa %}
-                                    <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}" data-nama="{{ siswa.nama }}"></div>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            <div class="daftar-siswa" id="daftarSudah">
-                                <!-- Akan diisi ulang setiap kali modal dibuka -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ✅ Footer tetap di paling bawah -->
-                <div class="modal-footer border-top mt-2">
-                    <button type="button" class="btn btn-secondary" id="tombolBatal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="tombolSimpan">
-                        <i class="fas fa-save me-1"></i> Simpan Perubahan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- ✅ MODAL LANJUTKAN KE SEMESTER GENAP -->
-<div class="modal fade" id="modalLanjutkan" tabindex="-1" aria-labelledby="modalLanjutkanLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalLanjutkanLabel">
-                    <i class="fas fa-forward me-2"></i>Lanjutkan ke Semester Genap - {{ kelas.nama_kelas }}
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ url_for('data_kelas.lanjutkan_semester_genap', kelas_id=kelas.id) }}">
-                <div class="modal-body">
-                    <input type="hidden" name="kode_genap" value="{{ tahun_dipilih.replace('-1','-2') }}">
-                    <p class="text-muted">Pilih siswa yang akan tetap bersekolah di semester Genap. Riwayat Semester Ganjil <strong>tidak akan berubah</strong>.</p>
-                    <hr>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="pilihSemuaLanjut" {% if siswa_lanjutkan %}checked{% endif %}>
-                            <label class="form-check-label fw-bold" for="pilihSemuaLanjut">Pilih Semua Siswa</label>
-                        </div>
-                        <hr>
-
-                        {% if siswa_lanjutkan %}
-                            {% for siswa in siswa_lanjutkan %}
-                            <div class="form-check mb-2">
-                                <input class="form-check-input lanjut-check" type="checkbox" name="siswa_id" value="{{ siswa.id }}" id="l_{{ siswa.id }}" checked>
-                                <label class="form-check-label" for="l_{{ siswa.id }}">{{ siswa.nis }} - {{ siswa.nama }}</label>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-center text-muted py-3">
-                                Semua siswa sudah ada di Semester Genap atau sudah naik tingkat. Hapus dulu dari daftar Genap jika ingin melanjutkan ulang.
-                            </p>
-                        {% endif %}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Lanjutkan Siswa Terpilih</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- ✅ MODAL NAIK KELAS -->
-<div class="modal fade" id="modalNaikKelas" tabindex="-1" aria-labelledby="modalNaikKelasLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="modalNaikKelasLabel">
-                    <i class="fas fa-arrow-up me-2"></i>Naik Kelas - {{ kelas.nama_kelas }}
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ url_for('data_kelas.naik_kelas', kelas_id=kelas.id) }}">
-                <input type="hidden" name="kode_sekarang" value="{{ tahun_dipilih }}">
-                <div class="modal-body">
-                    <p class="text-muted">Pilih siswa yang akan naik ke tingkat berikutnya. Data tahun ini <strong>tetap tersimpan sebagai arsip</strong>.</p>
-                    <hr>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="pilihSemuaNaik" checked>
-                        <label class="form-check-label fw-bold" for="pilihSemuaNaik">Pilih Semua Siswa</label>
-                    </div>
-                    <hr>
+        <div class="cr-table-wrap">
+            <table class="cr-table">
+                <thead>
+                    <tr>
+                        <th class="cr-col-number">NO</th>
+                        <th>IDENTITAS SISWA</th>
+                        <th>NISN</th>
+                        <th>JENIS KELAMIN</th>
+                        <th>STATUS</th>
+                        <th class="cr-col-action">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody id="crStudentRows">
                     {% if daftar_siswa %}
                         {% for siswa in daftar_siswa %}
-                        <div class="form-check mb-2">
-                            <input class="form-check-input naik-check" type="checkbox" name="siswa_id" value="{{ siswa.id }}" id="n_{{ siswa.id }}" checked>
-                            <label class="form-check-label" for="n_{{ siswa.id }}">{{ siswa.nis }} - {{ siswa.nama }}</label>
-                        </div>
+                        <tr class="cr-student-row">
+                            <td class="cr-row-number">{{ loop.index }}</td>
+                            <td>
+                                <div class="cr-student-identity">
+                                    <div class="cr-student-avatar {% if siswa.jenis_kelamin == 'Perempuan' %}female{% endif %}">
+                                        {{ siswa.nama[:1]|upper }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ siswa.nama }}</strong>
+                                        <small>Peserta didik</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="cr-nisn">{{ siswa.nisn or '-' }}</span></td>
+                            <td>
+                                <span class="cr-gender">
+                                    <i class="fas {% if siswa.jenis_kelamin == 'Perempuan' %}fa-venus{% else %}fa-mars{% endif %}"></i>
+                                    {{ siswa.jenis_kelamin or '-' }}
+                                </span>
+                            </td>
+                            <td><span class="cr-student-status">{{ siswa.status }}</span></td>
+                            <td>
+                                <a href="{{ url_for('data_siswa.detail_siswa', id=siswa.id) }}"
+                                   class="cr-detail-button" title="Lihat detail siswa">
+                                    <i class="fas fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </td>
+                        </tr>
                         {% endfor %}
                     {% else %}
-                        <p class="text-center text-muted">Belum ada siswa di kelas ini</p>
+                        <tr>
+                            <td colspan="6">
+                                <div class="cr-empty-state">
+                                    <div class="cr-empty-icon"><i class="fas fa-users"></i></div>
+                                    <strong>Belum ada siswa di kelas ini</strong>
+                                    <span>Tambahkan siswa untuk mulai mengelola kelas.</span>
+                                </div>
+                            </td>
+                        </tr>
                     {% endif %}
+                </tbody>
+            </table>
+
+            <div class="cr-no-search-result" id="crNoSearchResult" hidden>
+                <i class="fas fa-magnifying-glass"></i>
+                <strong>Siswa tidak ditemukan</strong>
+                <span>Coba gunakan nama atau NISN yang berbeda.</span>
+            </div>
+        </div>
+
+        <div class="cr-directory-footer">
+            <span><i class="fas fa-shield-halved"></i> Data siswa dikelola secara internal</span>
+            <span>{{ tahun_dipilih }}</span>
+        </div>
+    </section>
+</div>
+
+
+<!-- =====================================================
+     MODAL 1 — KELOLA SISWA
+===================================================== -->
+<div class="modal fade cr-modal" id="modalKelolaSiswa" tabindex="-1"
+     aria-labelledby="modalKelolaSiswaLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content cr-modal-content cr-transfer-modal">
+
+            <div class="cr-modal-header">
+                <div class="cr-modal-heading">
+                    <div class="cr-modal-symbol symbol-green">
+                        <i class="fas fa-users-gear"></i>
+                    </div>
+                    <div>
+                        <span class="cr-modal-eyebrow">CLASS MEMBERSHIP</span>
+                        <h3 id="modalKelolaSiswaLabel">Kelola Anggota Kelas</h3>
+                        <p>{{ kelas.nama_kelas }} <span>•</span> {{ tahun_dipilih }}</p>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning text-dark">Proses Naik Kelas</button>
+                <button type="button" class="cr-modal-close" id="tombolTutupModal" aria-label="Tutup">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('data_kelas.kelola_siswa_di_kelas', kelas_id=kelas.id) }}"
+                  id="formKelolaSiswa">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+
+                <div class="cr-transfer-summary">
+                    <div>
+                        <span class="cr-summary-pulse"></span>
+                        <span>Atur keanggotaan siswa dengan memindahkan siswa antar panel.</span>
+                    </div>
+                    <div class="cr-change-indicator" id="crChangeIndicator">
+                        <i class="fas fa-check-circle"></i>
+                        Belum ada perubahan
+                    </div>
+                </div>
+
+                <div class="cr-transfer-workspace">
+                    <!-- Available -->
+                    <section class="cr-transfer-panel">
+                        <div class="cr-transfer-panel-head">
+                            <div class="cr-panel-title">
+                                <div class="cr-panel-icon available-icon"><i class="fas fa-user-plus"></i></div>
+                                <div>
+                                    <h4>Belum di Kelas</h4>
+                                    <p>Siswa yang tersedia untuk ditambahkan</p>
+                                </div>
+                            </div>
+                            <span class="cr-panel-count" id="crAvailableCount">0</span>
+                        </div>
+
+                        <div class="cr-panel-search">
+                            <i class="fas fa-search"></i>
+                            <input type="search" id="cariBelum" placeholder="Cari nama atau NIS...">
+                        </div>
+
+                        <div class="cr-panel-selectall">
+                            <label>
+                                <input type="checkbox" id="pilihSemuaBelum">
+                                <span class="cr-custom-check"></span>
+                                Pilih semua yang terlihat
+                            </label>
+                            <span id="crAvailableSelected">0 dipilih</span>
+                        </div>
+
+                        <div class="cr-transfer-list" id="daftarBelum"></div>
+
+                        <div class="cr-panel-foot">
+                            <span><i class="fas fa-circle-info"></i> Pilih siswa, lalu masukkan ke kelas</span>
+                        </div>
+                    </section>
+
+                    <!-- Transfer center -->
+                    <div class="cr-transfer-center">
+                        <div class="cr-transfer-center-line"></div>
+                        <div class="cr-transfer-center-icon"><i class="fas fa-arrows-left-right"></i></div>
+                        <span>TRANSFER</span>
+                    </div>
+
+                    <!-- Members -->
+                    <section class="cr-transfer-panel member-panel">
+                        <div class="cr-transfer-panel-head">
+                            <div class="cr-panel-title">
+                                <div class="cr-panel-icon member-icon"><i class="fas fa-user-check"></i></div>
+                                <div>
+                                    <h4>Anggota Kelas</h4>
+                                    <p>Siswa yang saat ini berada di kelas</p>
+                                </div>
+                            </div>
+                            <span class="cr-panel-count member-count" id="crMemberCount">0</span>
+                        </div>
+
+                        <div class="cr-panel-search">
+                            <i class="fas fa-search"></i>
+                            <input type="search" id="cariSudah" placeholder="Cari nama atau NIS...">
+                        </div>
+
+                        <div class="cr-panel-selectall">
+                            <label>
+                                <input type="checkbox" id="pilihSemuaSudah">
+                                <span class="cr-custom-check"></span>
+                                Pilih semua yang terlihat
+                            </label>
+                            <span id="crMemberSelected">0 dipilih</span>
+                        </div>
+
+                        <div class="cr-transfer-list" id="daftarSudah"></div>
+
+                        <div class="cr-panel-foot">
+                            <span><i class="fas fa-circle-info"></i> Pilih siswa, lalu keluarkan dari kelas</span>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="cr-transfer-actions">
+                    <button type="button" class="cr-transfer-button add" id="btnMasukkan">
+                        <i class="fas fa-arrow-right"></i>
+                        Masukkan ke Kelas
+                    </button>
+                    <button type="button" class="cr-transfer-button remove" id="btnKeluarkan">
+                        <i class="fas fa-arrow-left"></i>
+                        Keluarkan dari Kelas
+                    </button>
+                </div>
+
+                <div class="cr-modal-footer">
+                    <div class="cr-footer-note">
+                        <i class="fas fa-lock"></i>
+                        Perubahan hanya tersimpan setelah Anda menekan Simpan.
+                    </div>
+                    <div class="cr-footer-actions">
+                        <button type="button" class="cr-btn-ghost" id="tombolBatal">Batalkan</button>
+                        <button type="submit" class="cr-btn-primary" id="tombolSimpan">
+                            <i class="fas fa-floppy-disk"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ✅ MODAL PENGATURAN MATA PELAJARAN -->
-<div class="modal fade" id="modalPengaturanMapel" tabindex="-1" aria-labelledby="modalPengaturanMapelLabel" aria-hidden="true"
-     data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content modern-modal-content">
-            <!-- ✅ HEADER — DI LUAR FORM, TETAP DI ATAS -->
-            <div class="modal-header modern-modal-header">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="modal-icon-box">
-                        <i class="fas fa-book-open"></i>
-                    </div>
+<!-- Data sumber siswa untuk modal transfer -->
+<div id="crStudentSource" hidden>
+    <div id="dataAsliBelum">
+        {% if siswa_belum_masuk %}
+            {% for siswa in siswa_belum_masuk %}
+            <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}"
+                 data-nama="{{ siswa.nama }}"></div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div id="dataAsliSudah">
+        {% if daftar_siswa %}
+            {% for siswa in daftar_siswa %}
+            <div class="item-asli" data-id="{{ siswa.id }}" data-nis="{{ siswa.nis }}"
+                 data-nama="{{ siswa.nama }}"></div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL 2 — LANJUT SEMESTER GENAP
+===================================================== -->
+<div class="modal fade cr-modal" id="modalLanjutkan" tabindex="-1"
+     aria-labelledby="modalLanjutkanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content cr-modal-content">
+            <div class="cr-modal-header">
+                <div class="cr-modal-heading">
+                    <div class="cr-modal-symbol symbol-blue"><i class="fas fa-forward"></i></div>
                     <div>
-                        <h5 class="modal-title mb-0" id="modalPengaturanMapelLabel">
-                            Pengaturan Mata Pelajaran
-                        </h5>
-                        <p class="modal-subtitle mb-0">{{ kelas.nama_kelas }} • Tahun Pelajaran {{ tahun_dipilih }}</p>
+                        <span class="cr-modal-eyebrow">SEMESTER TRANSITION</span>
+                        <h3 id="modalLanjutkanLabel">Lanjutkan Semester Genap</h3>
+                        <p>{{ kelas.nama_kelas }} <span>•</span> {{ tahun_dipilih }}</p>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                <button type="button" class="cr-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-xmark"></i>
+                </button>
             </div>
-            
-            <!-- ✅ FORM — HANYA BODY + FOOTER DI DALAMNYA -->
-            <form method="POST" action="{{ url_for('data_kelas.simpan_pengaturan_mapel', kelas_id=kelas.id) }}" style="display:flex; flex-direction:column; flex:1; min-height:0;">
-                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
-                
-                <!-- ✅ BODY — SCROLL DI SINI SAJA -->
-                <div class="modal-body modern-modal-body">
-                    <div class="info-banner">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Masukkan Jumlah Jam Pelajaran (JP). Mapel dengan JP <strong>lebih dari 0</strong> akan aktif dan muncul di jadwal.
+
+            <form method="POST" action="{{ url_for('data_kelas.lanjutkan_semester_genap', kelas_id=kelas.id) }}">
+                <input type="hidden" name="kode_genap" value="{{ tahun_dipilih.replace('-1','-2') }}">
+
+                <div class="cr-modal-body">
+                    <div class="cr-process-banner blue-banner">
+                        <div class="cr-process-banner-icon"><i class="fas fa-circle-info"></i></div>
+                        <div>
+                            <strong>Transisi semester</strong>
+                            <p>Pilih siswa yang akan melanjutkan ke semester Genap. Riwayat semester Ganjil tetap tersimpan sebagai arsip dan tidak akan diubah.</p>
+                        </div>
                     </div>
-                    
-                    <div class="table-wrapper">
-                        <table class="table modern-table align-middle">
+
+                    <div class="cr-selection-toolbar">
+                        <div>
+                            <strong>Pilih peserta didik</strong>
+                            <span id="crLanjutCount">{{ siswa_lanjutkan|length }} siswa tersedia</span>
+                        </div>
+                        <label class="cr-select-all">
+                            <input type="checkbox" id="pilihSemuaLanjut" {% if siswa_lanjutkan %}checked{% endif %}>
+                            <span class="cr-custom-check"></span>
+                            Pilih semua
+                        </label>
+                    </div>
+
+                    <div class="cr-process-list" id="crLanjutList">
+                        {% if siswa_lanjutkan %}
+                            {% for siswa in siswa_lanjutkan %}
+                            <label class="cr-process-student">
+                                <input class="lanjut-check" type="checkbox" name="siswa_id"
+                                       value="{{ siswa.id }}" checked>
+                                <span class="cr-custom-check"></span>
+                                <span class="cr-process-avatar">{{ siswa.nama[:1]|upper }}</span>
+                                <span class="cr-process-name">
+                                    <strong>{{ siswa.nama }}</strong>
+                                    <small>{{ siswa.nis }}</small>
+                                </span>
+                                <span class="cr-process-check-icon"><i class="fas fa-check"></i></span>
+                            </label>
+                            {% endfor %}
+                        {% else %}
+                            <div class="cr-process-empty">
+                                <i class="fas fa-circle-check"></i>
+                                <strong>Tidak ada siswa untuk dilanjutkan</strong>
+                                <span>Semua siswa sudah berada di semester Genap atau sudah naik tingkat.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cr-modal-footer">
+                    <span class="cr-footer-note"><i class="fas fa-shield-halved"></i> Arsip semester sebelumnya tetap aman.</span>
+                    <div class="cr-footer-actions">
+                        <button type="button" class="cr-btn-ghost" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="cr-btn-primary blue-primary" {% if not siswa_lanjutkan %}disabled{% endif %}>
+                            <i class="fas fa-forward"></i> Lanjutkan Siswa
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL 3 — NAIK KELAS
+===================================================== -->
+<div class="modal fade cr-modal" id="modalNaikKelas" tabindex="-1"
+     aria-labelledby="modalNaikKelasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content cr-modal-content">
+            <div class="cr-modal-header">
+                <div class="cr-modal-heading">
+                    <div class="cr-modal-symbol symbol-gold"><i class="fas fa-arrow-up"></i></div>
+                    <div>
+                        <span class="cr-modal-eyebrow">ACADEMIC PROMOTION</span>
+                        <h3 id="modalNaikKelasLabel">Proses Kenaikan Kelas</h3>
+                        <p>{{ kelas.nama_kelas }} <span>•</span> {{ tahun_dipilih }}</p>
+                    </div>
+                </div>
+                <button type="button" class="cr-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ url_for('data_kelas.naik_kelas', kelas_id=kelas.id) }}">
+                <input type="hidden" name="kode_sekarang" value="{{ tahun_dipilih }}">
+
+                <div class="cr-modal-body">
+                    <div class="cr-process-banner gold-banner">
+                        <div class="cr-process-banner-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <strong>Persiapan kenaikan kelas</strong>
+                            <p>Pilih siswa yang akan diproses naik ke tingkat berikutnya. Data tahun pelajaran ini tetap tersimpan sebagai arsip.</p>
+                        </div>
+                    </div>
+
+                    <div class="cr-selection-toolbar">
+                        <div>
+                            <strong>Daftar siswa kelas {{ kelas.nama_kelas }}</strong>
+                            <span>{{ daftar_siswa|length }} siswa terdaftar</span>
+                        </div>
+                        <label class="cr-select-all">
+                            <input type="checkbox" id="pilihSemuaNaik" {% if daftar_siswa %}checked{% endif %}>
+                            <span class="cr-custom-check"></span>
+                            Pilih semua
+                        </label>
+                    </div>
+
+                    <div class="cr-process-list" id="crNaikList">
+                        {% if daftar_siswa %}
+                            {% for siswa in daftar_siswa %}
+                            <label class="cr-process-student">
+                                <input class="naik-check" type="checkbox" name="siswa_id"
+                                       value="{{ siswa.id }}" checked>
+                                <span class="cr-custom-check"></span>
+                                <span class="cr-process-avatar gold-avatar">{{ siswa.nama[:1]|upper }}</span>
+                                <span class="cr-process-name">
+                                    <strong>{{ siswa.nama }}</strong>
+                                    <small>{{ siswa.nis }}</small>
+                                </span>
+                                <span class="cr-process-check-icon"><i class="fas fa-check"></i></span>
+                            </label>
+                            {% endfor %}
+                        {% else %}
+                            <div class="cr-process-empty">
+                                <i class="fas fa-users"></i>
+                                <strong>Belum ada siswa di kelas ini</strong>
+                                <span>Belum ada siswa yang dapat diproses.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cr-modal-footer">
+                    <span class="cr-footer-note"><i class="fas fa-box-archive"></i> Data lama tetap menjadi arsip.</span>
+                    <div class="cr-footer-actions">
+                        <button type="button" class="cr-btn-ghost" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="cr-btn-primary gold-primary" {% if not daftar_siswa %}disabled{% endif %}>
+                            <i class="fas fa-arrow-up"></i> Proses Kenaikan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL 4 — PENGATURAN MATA PELAJARAN
+===================================================== -->
+<div class="modal fade cr-modal" id="modalPengaturanMapel" tabindex="-1"
+     aria-labelledby="modalPengaturanMapelLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content cr-modal-content cr-subject-modal">
+            <div class="cr-modal-header">
+                <div class="cr-modal-heading">
+                    <div class="cr-modal-symbol symbol-violet"><i class="fas fa-book-open"></i></div>
+                    <div>
+                        <span class="cr-modal-eyebrow">CURRICULUM CONFIGURATION</span>
+                        <h3 id="modalPengaturanMapelLabel">Konfigurasi Mata Pelajaran</h3>
+                        <p>{{ kelas.nama_kelas }} <span>•</span> Tahun Pelajaran {{ tahun_dipilih }}</p>
+                    </div>
+                </div>
+                <button type="button" class="cr-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('data_kelas.simpan_pengaturan_mapel', kelas_id=kelas.id) }}"
+                  class="cr-subject-form">
+                <input type="hidden" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+
+                <div class="cr-modal-body">
+                    <div class="cr-process-banner violet-banner">
+                        <div class="cr-process-banner-icon"><i class="fas fa-lightbulb"></i></div>
+                        <div>
+                            <strong>Atur beban pembelajaran kelas</strong>
+                            <p>Tentukan guru pengampu dan jumlah Jam Pelajaran (JP). Mata pelajaran dengan JP lebih dari 0 akan aktif dan dapat dimasukkan ke jadwal.</p>
+                        </div>
+                    </div>
+
+                    <div class="cr-subject-toolbar">
+                        <div>
+                            <strong>Daftar Mata Pelajaran</strong>
+                            <span>{{ daftar_mapel|length }} mata pelajaran tersedia</span>
+                        </div>
+                        <div class="cr-subject-legend">
+                            <span><i class="fas fa-circle"></i> JP 0 = Nonaktif</span>
+                            <span><i class="fas fa-circle"></i> JP aktif = Masuk jadwal</span>
+                        </div>
+                    </div>
+
+                    <div class="cr-subject-table-wrap">
+                        <table class="cr-subject-table">
                             <thead>
                                 <tr>
-                                    <th class="col-no">No</th>
-                                    <th class="col-kode">Kode</th>
-                                    <th class="col-nama">Mata Pelajaran</th>
-                                    <th class="col-guru">Guru Pengampu</th>
-                                    <th class="col-jp text-center">Jumlah JP</th>
+                                    <th>NO</th>
+                                    <th>KODE</th>
+                                    <th>MATA PELAJARAN</th>
+                                    <th>GURU PENGAMPU</th>
+                                    <th>JUMLAH JP</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if daftar_mapel %}
                                     {% for mapel in daftar_mapel %}
-                                    <tr class="mapel-row">
-                                        <td class="col-no fw-medium">{{ loop.index }}</td>
-                                        <td class="col-kode">
-                                            <span class="kode-badge">{{ mapel.kode }}</span>
+                                    <tr class="cr-subject-row">
+                                        <td class="cr-subject-number">{{ loop.index }}</td>
+                                        <td><span class="cr-subject-code">{{ mapel.kode }}</span></td>
+                                        <td>
+                                            <div class="cr-subject-name">
+                                                <span class="cr-subject-mini-icon"><i class="fas fa-book"></i></span>
+                                                <strong>{{ mapel.nama_pelajaran }}</strong>
+                                            </div>
                                         </td>
-                                        <td class="col-nama fw-semibold">{{ mapel.nama_pelajaran }}</td>
-                                        <td class="col-guru">
-                                            <select class="form-select form-select-sm modern-select" name="guru_id_{{ mapel.id }}">
-                                                <option value="">-- Pilih Guru --</option>
+                                        <td>
+                                            <select class="cr-subject-select" name="guru_id_{{ mapel.id }}">
+                                                <option value="">Pilih Guru Pengampu</option>
                                                 {% for guru in daftar_guru %}
-                                                <option value="{{ guru.id }}" {% if mapel.guru_terpilih == guru.id %}selected{% endif %}>
+                                                <option value="{{ guru.id }}"
+                                                    {% if mapel.guru_terpilih == guru.id %}selected{% endif %}>
                                                     {{ guru.nama }}
                                                 </option>
                                                 {% endfor %}
                                             </select>
                                         </td>
-                                        <td class="col-jp">
-                                            <input type="number" name="jp_{{ mapel.id }}" 
-                                                   class="form-control form-control-sm modern-jp-input text-center"
-                                                   min="0" value="{{ mapel.jumlah_jp or 0 }}">
+                                        <td>
+                                            <div class="cr-jp-control">
+                                                <input type="number" name="jp_{{ mapel.id }}"
+                                                       class="cr-jp-input" min="0"
+                                                       value="{{ mapel.jumlah_jp or 0 }}">
+                                                <span>JP</span>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
                                     <tr>
-                                        <td colspan="5" class="text-center py-5">
-                                            <div class="empty-state">
-                                                <i class="fas fa-book-open empty-icon"></i>
-                                                <p class="empty-text">Belum ada data mata pelajaran</p>
+                                        <td colspan="5">
+                                            <div class="cr-process-empty">
+                                                <i class="fas fa-book-open"></i>
+                                                <strong>Belum ada data mata pelajaran</strong>
+                                                <span>Tambahkan data mapel terlebih dahulu.</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -339,174 +706,19 @@
                         </table>
                     </div>
                 </div>
-                <!-- ✅ FOOTER — TETAP DI BAWAH, TIDAK SCROLL -->
-                <div class="modal-footer modern-modal-footer">
-                    <button type="button" class="btn btn-cancel-modern" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Batal
-                    </button>
-                    <button type="submit" class="btn btn-save-modern">
-                        <i class="fas fa-save me-1"></i> Simpan Pengaturan
-                    </button>
+
+                <div class="cr-modal-footer">
+                    <span class="cr-footer-note"><i class="fas fa-circle-check"></i> Pastikan guru dan JP sudah sesuai.</span>
+                    <div class="cr-footer-actions">
+                        <button type="button" class="cr-btn-ghost" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="cr-btn-primary violet-primary">
+                            <i class="fas fa-floppy-disk"></i> Simpan Konfigurasi
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ✅ SCRIPT AKHIR - PASTI BERJALAN -->
-<script>
-let adaPerubahan = false;
-
-// Saat modal dibuka, isi daftar dari data asli
-document.getElementById('modalKelolaSiswa').addEventListener('show.bs.modal', function() {
-    adaPerubahan = false;
-    document.getElementById('cariBelum').value = '';
-    document.getElementById('cariSudah').value = '';
-    document.getElementById('pilihSemuaBelum').checked = false;
-    document.getElementById('pilihSemuaSudah').checked = false;
-
-    const daftarBelum = Array.from(document.querySelectorAll('#dataAsliBelum .item-asli')).map(el => ({
-        id: el.dataset.id, nis: el.dataset.nis, nama: el.dataset.nama
-    }));
-
-    const daftarSudah = Array.from(document.querySelectorAll('#dataAsliSudah .item-asli')).map(el => ({
-        id: el.dataset.id, nis: el.dataset.nis, nama: el.dataset.nama
-    }));
-
-    // Daftar kiri: belum masuk → bisa dipindah
-    const kontenBelum = daftarBelum.length 
-        ? daftarBelum.map(s => `
-            <div class="form-check" data-id="${s.id}">
-                <input class="form-check-input belum-check" type="checkbox" value="${s.id}" id="b_${s.id}">
-                <label class="form-check-label" for="b_${s.id}">${s.nis} - ${s.nama}</label>
-            </div>`).join('')
-        : '<div class="text-muted p-2">Tidak ada siswa</div>';
-
-    // Daftar kanan: sudah masuk → bisa dipindah keluar
-    const kontenSudah = daftarSudah.length 
-        ? daftarSudah.map(s => `
-            <div class="form-check" data-id="${s.id}">
-                <input class="form-check-input sudah-check" type="checkbox" value="${s.id}" id="s_${s.id}">
-                <label class="form-check-label" for="s_${s.id}">${s.nis} - ${s.nama}</label>
-            </div>`).join('')
-        : '<div class="text-muted p-2">Belum ada siswa</div>';
-
-    document.getElementById('daftarBelum').innerHTML = kontenBelum;
-    document.getElementById('daftarSudah').innerHTML = kontenSudah;
-});
-
-function tandai() { adaPerubahan = true; }
-
-// Pilih semua
-document.getElementById('pilihSemuaBelum').addEventListener('change', function() {
-    document.querySelectorAll('#daftarBelum .belum-check').forEach(cb => cb.checked = this.checked);
-});
-document.getElementById('pilihSemuaSudah').addEventListener('change', function() {
-    document.querySelectorAll('#daftarSudah .sudah-check').forEach(cb => cb.checked = this.checked);
-});
-
-// Pencarian
-document.getElementById('cariBelum').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('#daftarBelum .form-check').forEach(el => {
-        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-});
-document.getElementById('cariSudah').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
-    document.querySelectorAll('#daftarSudah .form-check').forEach(el => {
-        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
-    });
-});
-
-// ✅ Pindah KIRI → KANAN = DIMASUKKAN ke kelas
-document.getElementById('btnMasukkan').addEventListener('click', function() {
-    const dipilih = document.querySelectorAll('#daftarBelum .belum-check:checked');
-    if (!dipilih.length) return alert('Pilih siswa dulu!');
-
-    dipilih.forEach(cb => {
-        const item = cb.closest('.form-check');
-        const id = item.dataset.id;
-        const teks = item.querySelector('label').textContent;
-
-        // Pindah ke kanan + TAMBAHKAN name="tambah_id" agar dikirim
-        const baru = document.createElement('div');
-        baru.className = 'form-check';
-        baru.dataset.id = id;
-        baru.innerHTML = `
-            <input type="hidden" name="tambah_id" value="${id}">
-            <input class="form-check-input sudah-check" type="checkbox" value="${id}" id="s_${id}">
-            <label class="form-check-label" for="s_${id}">${teks}</label>`;
-
-        document.getElementById('daftarSudah').appendChild(baru);
-        item.remove();
-    });
-
-    document.getElementById('pilihSemuaBelum').checked = false;
-    tandai();
-});
-
-// ✅ Pindah KANAN → KIRI = DIKELUARKAN dari kelas
-document.getElementById('btnKeluarkan').addEventListener('click', function() {
-    const dipilih = document.querySelectorAll('#daftarSudah .sudah-check:checked');
-    if (!dipilih.length) return alert('Pilih siswa dulu!');
-
-    dipilih.forEach(cb => {
-        const item = cb.closest('.form-check');
-        const id = item.dataset.id;
-        const teks = item.querySelector('label').textContent;
-
-        // Hapus input tambah_id jika ada, lalu beri name="keluarkan_id"
-        const inputTambah = item.querySelector('input[name="tambah_id"]');
-        if (inputTambah) inputTambah.remove();
-
-        const baru = document.createElement('div');
-        baru.className = 'form-check';
-        baru.dataset.id = id;
-        baru.innerHTML = `
-            <input type="hidden" name="keluarkan_id" value="${id}">
-            <input class="form-check-input belum-check" type="checkbox" value="${id}" id="b_${id}">
-            <label class="form-check-label" for="b_${id}">${teks}</label>`;
-
-        document.getElementById('daftarBelum').appendChild(baru);
-        item.remove();
-    });
-
-    document.getElementById('pilihSemuaSudah').checked = false;
-    tandai();
-});
-
-// ✅ Cek sebelum kirim
-document.getElementById('formKelolaSiswa').addEventListener('submit', function(e) {
-    const adaTambah = document.querySelectorAll('input[name="tambah_id"]').length;
-    const adaKeluarkan = document.querySelectorAll('input[name="keluarkan_id"]').length;
-
-    if (!adaTambah && !adaKeluarkan) {
-        alert('Tidak ada perubahan yang akan disimpan!');
-        e.preventDefault();
-        return;
-    }
-
-    const ok = confirm(`Yakin simpan?\n• Masukkan: ${adaTambah} siswa\n• Keluarkan: ${adaKeluarkan} siswa`);
-    if (!ok) e.preventDefault();
-    else adaPerubahan = false;
-});
-
-// ✅ Tutup modal
-function tutupModal() {
-    if (adaPerubahan && !confirm('Perubahan belum disimpan! Yakin menutup?')) return;
-    bootstrap.Modal.getInstance(document.getElementById('modalKelolaSiswa')).hide();
-    adaPerubahan = false;
-}
-document.getElementById('tombolTutupModal').addEventListener('click', tutupModal);
-document.getElementById('tombolBatal').addEventListener('click', tutupModal);
-
-document.getElementById('pilihSemuaLanjut')?.addEventListener('change', function(){
-    document.querySelectorAll('.lanjut-check').forEach(cb => cb.checked = this.checked);
-});
-
-document.getElementById('pilihSemuaNaik')?.addEventListener('change', function(){
-    document.querySelectorAll('.naik-check').forEach(cb => cb.checked = this.checked);
-});
-
-</script>
+<script src="{{ url_for('static', filename='js/kelas/detail_kelas.js') }}" defer></script>
