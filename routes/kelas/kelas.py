@@ -45,9 +45,21 @@ def bisa_kelola_kelas(f):
             return redirect(url_for('dashboard.index'))
         
         # Opsional: Pastikan di halaman yang sesuai
-        if "Waka Kurikulum" in daftar_tugas and halaman_aktif != 'waka_kurikulum':
-            flash("<i class='fas fa-info-circle'></i> Silakan pindah ke Halaman Waka Kurikulum", "info")
-            return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
+        
+        halaman_aktif = session.get('halaman_aktif', 'utama')
+
+        if not punya_akses:
+            flash(
+                "<i class='fas fa-ban'></i> Anda tidak memiliki hak akses untuk mengelola data kelas",
+                "danger"
+            )
+
+            if halaman_aktif == 'waka_kurikulum':
+                return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
+
+            return redirect(url_for('dashboard.index'))
+
+        # Pengguna yang memiliki hak akses boleh membuka Data Kelas
         
         return f(*args, **kwargs)
     return decorator

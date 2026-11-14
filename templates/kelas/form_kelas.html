@@ -1,168 +1,951 @@
-<style>
-/* ==============================================
-   FORM KELAS — Gaya Modern Minimalis
-============================================== */
-/* Judul Halaman */
-.page-heading {
-    text-align: center;
-}
-.page-heading h4 {
-    color: #1e293b;
+
+<style data-spa-page-style>
+/* =========================================================
+   CLASS FORM WORKSPACE — PREMIUM EMERALD
+   Scoped khusus halaman form kelas
+========================================================= */
+
+.kelas-workspace {
+    --kw-emerald: #08785b;
+    --kw-deep: #064e3b;
+    --kw-ink: #172b26;
+    --kw-muted: #82918c;
+    --kw-line: #e8eeeb;
+    --kw-soft: #f4f8f6;
+    color: var(--kw-ink);
+    max-width: 1180px;
+    margin: 0 auto;
+    font-family: Inter, "Segoe UI", sans-serif;
 }
 
-/* Kartu Utama */
-.card.border-0 {
-    background: #ffffff;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card.border-0:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+.kelas-workspace * {
+    box-sizing: border-box;
 }
 
-/* Input & Select — Gaya Lembut */
-.custom-input,
-.custom-select {
-    border: 1.5px solid #e2e8f0;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    font-size: 0.98rem;
-    background-color: #fcfdfe;
-    transition: all 0.25s ease;
-}
-.custom-input:focus,
-.custom-select:focus {
-    border-color: #3b82f6;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.12);
-    outline: none;
+.kelas-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 27px;
 }
 
-/* Label */
-.form-label.fw-medium {
-    color: #334155;
-    font-size: 0.92rem;
-    margin-bottom: 0.5rem;
+.kelas-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #899791;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .025em;
 }
 
-/* Tombol — Efek Halus */
-.btn.rounded-pill {
+.kelas-breadcrumb i {
+    font-size: 10px;
+    color: #b3c0ba;
+}
+
+.kelas-breadcrumb .current {
+    color: var(--kw-emerald);
+}
+
+.kelas-mode-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid #dcebe4;
+    border-radius: 30px;
+    background: #f4faf6;
+    color: #147451;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .045em;
+}
+
+.kelas-mode-label i {
+    font-size: 10px;
+}
+
+.kelas-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, .78fr) minmax(0, 1.55fr);
+    align-items: stretch;
+    gap: 22px;
+}
+
+/* LEFT PANEL */
+
+.kelas-intro-panel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 590px;
+    padding: 34px 30px 28px;
+    border-radius: 23px;
+    color: #fff;
+    background:
+        radial-gradient(circle at 95% 8%, rgba(91, 226, 168, .22), transparent 30%),
+        radial-gradient(circle at 5% 100%, rgba(27, 173, 125, .24), transparent 36%),
+        linear-gradient(145deg, #07563f 0%, #063d31 55%, #052d27 100%);
+    box-shadow: 0 18px 45px rgba(5, 66, 47, .15);
+}
+
+.kelas-intro-panel::before,
+.kelas-intro-panel::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.kelas-intro-panel::before {
+    width: 290px;
+    height: 290px;
+    right: -145px;
+    top: 90px;
+    animation: kelasOrbit 18s linear infinite;
+}
+
+.kelas-intro-panel::after {
+    width: 210px;
+    height: 210px;
+    right: -105px;
+    top: 130px;
+    border-color: rgba(255,255,255,.07);
+    animation: kelasOrbit 24s linear infinite reverse;
+}
+
+@keyframes kelasOrbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.kelas-panel-top {
+    position: relative;
+    z-index: 1;
+}
+
+.kelas-brand-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 47px;
+    height: 47px;
+    margin-bottom: 35px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 15px;
+    background: rgba(255,255,255,.11);
+    color: #b9f4d8;
+    font-size: 20px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+.kelas-panel-eyebrow {
+    margin-bottom: 13px;
+    color: #a9e7cb;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.kelas-panel-title {
+    max-width: 290px;
+    margin: 0;
+    color: #fff;
+    font-size: clamp(25px, 2.5vw, 34px);
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: -.045em;
+}
+
+.kelas-panel-description {
+    max-width: 290px;
+    margin: 16px 0 0;
+    color: rgba(235,255,245,.68);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.kelas-panel-divider {
+    width: 42px;
+    height: 3px;
+    margin: 26px 0;
+    border-radius: 10px;
+    background: #65d6a1;
+}
+
+.kelas-panel-bottom {
+    position: relative;
+    z-index: 1;
+}
+
+.kelas-preview-label {
+    margin-bottom: 12px;
+    color: rgba(226,255,239,.58);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.kelas-preview-card {
+    padding: 18px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 17px;
+    background: rgba(255,255,255,.085);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.kelas-preview-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 17px;
+}
+
+.kelas-preview-card-head span:first-child {
+    color: rgba(255,255,255,.65);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+}
+
+.kelas-preview-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #a9efca;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.kelas-preview-live::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #6be3a5;
+    box-shadow: 0 0 0 4px rgba(107,227,165,.12);
+}
+
+.kelas-preview-name {
+    overflow-wrap: anywhere;
+    margin-bottom: 5px;
+    color: #fff;
+    font-size: 23px;
+    font-weight: 750;
+    letter-spacing: -.04em;
+}
+
+.kelas-preview-level {
+    color: rgba(233,255,244,.65);
+    font-size: 11px;
+}
+
+.kelas-preview-wali {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 19px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.kelas-preview-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 31px;
+    height: 31px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.13);
+    color: #c6f4dc;
+    font-size: 12px;
+}
+
+.kelas-preview-wali small {
+    display: block;
+    margin-bottom: 3px;
+    color: rgba(255,255,255,.52);
+    font-size: 9px;
+}
+
+.kelas-preview-wali strong {
+    display: block;
+    overflow: hidden;
+    max-width: 190px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* RIGHT FORM PANEL */
+
+.kelas-form-panel {
+    min-width: 0;
+    padding: 33px 36px 29px;
+    border: 1px solid #e8eeeb;
+    border-radius: 23px;
+    background: #fff;
+    box-shadow: 0 12px 40px rgba(22, 48, 37, .045);
+    animation: kelasFormIn .55s ease both;
+}
+
+@keyframes kelasFormIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.kelas-form-heading {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--kw-line);
+}
+
+.kelas-form-heading h2 {
+    margin: 0;
+    color: #18372d;
+    font-size: 23px;
+    font-weight: 750;
+    letter-spacing: -.045em;
+}
+
+.kelas-form-heading p {
+    margin: 8px 0 0;
+    color: #87948e;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.kelas-form-section {
+    padding-top: 25px;
+}
+
+.kelas-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 22px;
+}
+
+.kelas-section-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 29px;
+    height: 29px;
+    border-radius: 10px;
+    background: #eaf6ef;
+    color: #087451;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.kelas-section-heading strong {
+    display: block;
+    color: #294138;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.kelas-section-heading small {
+    display: block;
+    margin-top: 3px;
+    color: #98a39e;
+    font-size: 10px;
+}
+
+.kelas-field {
+    margin-bottom: 21px;
+}
+
+.kelas-field label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 9px;
+    color: #344b41;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.kelas-field label .required {
+    color: #e05252;
+}
+
+.kelas-field label .optional {
+    margin-left: 3px;
+    color: #a1aaa5;
+    font-size: 9px;
     font-weight: 500;
-    transition: all 0.25s ease;
-    border: none;
-}
-.btn-primary.rounded-pill {
-    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-.btn-primary.rounded-pill:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
-}
-.btn-light.border.rounded-pill {
-    background: #fcfdff;
-    border-color: #e2e8f0 !important;
-    border: 1px solid #bbbbbb!important;
-}
-.btn-light.border.rounded-pill:hover {
-    background: #e7e7e7;
-    border-color: #cbd5e1 !important;
 }
 
-/* Garis Pemisah dengan Teks */
-hr {
-    border-color: #e2e8f0;
-    opacity: 1;
+.kelas-input-wrap {
+    position: relative;
 }
 
-/* Responsif */
-@media (max-width: 576px) {
-    .card-body {
-        padding: 2rem 1.25rem !important;
+.kelas-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    z-index: 1;
+    color: #91a69b;
+    font-size: 13px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.kelas-control {
+    display: block;
+    width: 100%;
+    min-height: 49px;
+    padding: 12px 15px 12px 42px;
+    border: 1px solid #e2eae5;
+    border-radius: 12px;
+    outline: none;
+    background: #fbfdfb;
+    color: #263d32;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 550;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.kelas-control::placeholder {
+    color: #b0bbb5;
+    font-weight: 400;
+}
+
+.kelas-control:hover {
+    border-color: #c6d9cd;
+    background: #fff;
+}
+
+.kelas-control:focus {
+    border-color: #0b9b6b;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(11,155,107,.09);
+}
+
+select.kelas-control {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+}
+
+.kelas-select-arrow {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    color: #8da198;
+    font-size: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.kelas-field-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 8px;
+    color: #98a49e;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.kelas-field-hint i {
+    margin-top: 2px;
+    color: #7cae91;
+    font-size: 10px;
+}
+
+.kelas-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 29px;
+    padding-top: 23px;
+    border-top: 1px solid var(--kw-line);
+}
+
+.kelas-footer-note {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #9aa69f;
+    font-size: 10px;
+}
+
+.kelas-footer-note i {
+    color: #0a9b6b;
+}
+
+.kelas-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.kelas-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 43px;
+    padding: 0 17px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    text-decoration: none !important;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.kelas-btn:hover {
+    transform: translateY(-2px);
+}
+
+.kelas-btn-cancel {
+    border-color: #e5ebe7;
+    background: #fff;
+    color: #65766d;
+}
+
+.kelas-btn-cancel:hover {
+    border-color: #cbd9d0;
+    background: #f7faf8;
+    color: #315b47;
+}
+
+.kelas-btn-submit {
+    background: linear-gradient(135deg, #0b8c63, #066347);
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(5,117,78,.18);
+}
+
+.kelas-btn-submit:hover {
+    background: linear-gradient(135deg, #0a9c6e, #07563f);
+    color: #fff;
+    box-shadow: 0 9px 20px rgba(5,117,78,.25);
+}
+
+.kelas-btn-submit:active {
+    transform: translateY(0);
+}
+
+.kelas-btn-submit:disabled {
+    opacity: .7;
+    cursor: wait;
+    transform: none;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .kelas-workspace {
+        padding: 24px 18px 38px;
     }
-    .btn.rounded-pill {
-        padding: 0.6rem 1rem !important;
-        font-size: 0.9rem;
+
+    .kelas-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .kelas-intro-panel {
+        min-height: auto;
+        padding: 27px;
+    }
+
+    .kelas-brand-mark {
+        margin-bottom: 23px;
+    }
+
+    .kelas-panel-title {
+        max-width: 500px;
+        font-size: 29px;
+    }
+
+    .kelas-panel-description {
+        max-width: 500px;
+    }
+
+    .kelas-panel-bottom {
+        margin-top: 28px;
+    }
+
+    .kelas-preview-card {
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 576px) {
+    .kelas-workspace {
+        padding: 18px 12px 30px;
+    }
+
+    .kelas-topline {
+        align-items: flex-start;
+        margin-bottom: 17px;
+    }
+
+    .kelas-breadcrumb {
+        flex-wrap: wrap;
+        font-size: 10px;
+    }
+
+    .kelas-mode-label {
+        padding: 7px 9px;
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    .kelas-intro-panel {
+        padding: 24px 22px;
+        border-radius: 18px;
+    }
+
+    .kelas-panel-title {
+        font-size: 26px;
+    }
+
+    .kelas-form-panel {
+        padding: 25px 20px 21px;
+        border-radius: 18px;
+    }
+
+    .kelas-form-heading h2 {
+        font-size: 20px;
+    }
+
+    .kelas-form-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .kelas-footer-note {
+        order: 2;
+    }
+
+    .kelas-actions {
+        width: 100%;
+    }
+
+    .kelas-btn {
+        flex: 1;
+        min-height: 45px;
+        padding: 0 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kelas-intro-panel::before,
+    .kelas-intro-panel::after,
+    .kelas-form-panel {
+        animation: none !important;
+    }
+
+    .kelas-workspace *,
+    .kelas-workspace *::before,
+    .kelas-workspace *::after {
+        transition-duration: .01ms !important;
     }
 }
 </style>
 
-<div class="dashboard-container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-7 col-md-9">
-            <!-- Judul Halaman -->
-            <div class="page-heading mb-4">
-                <h4 class="fw-semibold mb-1">
-                    <i class="fas fa-building text-primary me-2"></i>
-                    {{ 'Ubah Data Kelas' if mode == 'ubah' else 'Tambah Kelas Baru' }}
-                </h4>
-                <p class="text-muted small mb-0">
-                    Lengkapi informasi kelas pada formulir di bawah ini
+<div class="kelas-workspace" data-page="form-kelas">
+
+    <!-- BREADCRUMB -->
+    <div class="kelas-topline">
+        <div class="kelas-breadcrumb">
+            <span>Manajemen Akademik</span>
+            <i class="fas fa-chevron-right"></i>
+            <span>Data Kelas</span>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">
+                {{ 'Ubah Kelas' if mode == 'ubah' else 'Tambah Kelas' }}
+            </span>
+        </div>
+
+        <div class="kelas-mode-label">
+            <i class="fas {{ 'fa-pen-to-square' if mode == 'ubah' else 'fa-circle-plus' }}"></i>
+            {{ 'MODE EDIT' if mode == 'ubah' else 'DATA BARU' }}
+        </div>
+    </div>
+
+    <div class="kelas-layout">
+
+        <!-- PANEL INFORMASI -->
+        <aside class="kelas-intro-panel">
+
+            <div class="kelas-panel-top">
+                <div class="kelas-brand-mark">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+
+                <div class="kelas-panel-eyebrow">Academic Workspace</div>
+
+                <h1 class="kelas-panel-title">
+                    {{ 'Perbarui Informasi Kelas' if mode == 'ubah' else 'Bangun Rombongan Belajar Baru' }}
+                </h1>
+
+                <p class="kelas-panel-description">
+                    {{ 'Periksa dan sesuaikan informasi kelas agar data akademik tetap akurat dan terorganisasi.' if mode == 'ubah' else 'Tambahkan rombongan belajar untuk mengelola siswa, jenjang pendidikan, dan penanggung jawab kelas.' }}
+                </p>
+
+                <div class="kelas-panel-divider"></div>
+            </div>
+
+            <!-- LIVE PREVIEW -->
+            <div class="kelas-panel-bottom">
+                <div class="kelas-preview-label">Live Preview</div>
+
+                <div class="kelas-preview-card">
+                    <div class="kelas-preview-card-head">
+                        <span>IDENTITAS KELAS</span>
+                        <span class="kelas-preview-live">Pratinjau</span>
+                    </div>
+
+                    <div class="kelas-preview-name" data-preview-name>
+                        {{ kelas.nama_kelas if kelas and kelas.nama_kelas else 'Nama Kelas' }}
+                    </div>
+
+                    <div class="kelas-preview-level" data-preview-level>
+                        {% if kelas and kelas.jenjang %}
+                            Kelas {{ kelas.jenjang }}
+                        {% else %}
+                            Jenjang belum dipilih
+                        {% endif %}
+                    </div>
+
+                    <div class="kelas-preview-wali">
+                        <div class="kelas-preview-avatar">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <small>Wali Kelas</small>
+                            <strong data-preview-wali>
+                                {% if kelas and kelas.wali_kelas %}
+                                    {{ kelas.wali_kelas.nama }}
+                                {% else %}
+                                    Belum ditentukan
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- FORM PANEL -->
+        <main class="kelas-form-panel">
+
+            <div class="kelas-form-heading">
+                <h2>{{ 'Edit Data Kelas' if mode == 'ubah' else 'Informasi Kelas' }}</h2>
+                <p>
+                    {{ 'Perbarui informasi yang diperlukan, kemudian simpan perubahan.' if mode == 'ubah' else 'Isi informasi berikut untuk mendaftarkan rombongan belajar baru.' }}
                 </p>
             </div>
 
-            <!-- Kartu Form -->
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-body p-4 p-sm-5">
-                    <form method="POST">
-                        <!-- Nama Kelas -->
-                        <div class="mb-4">
-                            <label class="form-label fw-medium text-dark">Nama Kelas <span class="text-danger">*</span></label>
-                            <input type="text" 
-                                   name="nama_kelas" 
-                                   class="form-control form-control-lg custom-input" 
-                                   required 
-                                   placeholder="Contoh: Al-Majid, Al-Mukmin"
-                                   value="{{ kelas.nama_kelas if kelas else '' }}">
+            <form method="POST" data-kelas-form>
+
+                <!-- BAGIAN 1 -->
+                <section class="kelas-form-section">
+                    <div class="kelas-section-heading">
+                        <div class="kelas-section-number">01</div>
+                        <div>
+                            <strong>Identitas Rombongan Belajar</strong>
+                            <small>Informasi dasar dan tingkat pendidikan</small>
+                        </div>
+                    </div>
+
+                    <div class="kelas-field">
+                        <label for="nama_kelas">
+                            Nama Kelas <span class="required">*</span>
+                        </label>
+
+                        <div class="kelas-input-wrap">
+                            <i class="fas fa-chalkboard kelas-input-icon"></i>
+                            <input
+                                type="text"
+                                id="nama_kelas"
+                                name="nama_kelas"
+                                class="kelas-control"
+                                placeholder="Contoh: Al-Majid, Al-Mukmin"
+                                value="{{ kelas.nama_kelas if kelas else '' }}"
+                                maxlength="100"
+                                autocomplete="off"
+                                required
+                            >
                         </div>
 
-                        <!-- Jenjang -->
-                        <div class="mb-4">
-                            <label class="form-label fw-medium text-dark">Jenjang / Tingkat <span class="text-danger">*</span></label>
-                            <select name="jenjang" class="form-select form-select-lg custom-select" required>
-                                <option value="">-- Pilih jenjang kelas --</option>
-                                <option value="7" {{ 'selected' if kelas and kelas.jenjang == '7' else '' }}>Kelas 7</option>
-                                <option value="8" {{ 'selected' if kelas and kelas.jenjang == '8' else '' }}>Kelas 8</option>
-                                <option value="9" {{ 'selected' if kelas and kelas.jenjang == '9' else '' }}>Kelas 9</option>
+                        <div class="kelas-field-hint">
+                            <i class="fas fa-lightbulb"></i>
+                            Gunakan nama kelas yang mudah dikenali dan konsisten.
+                        </div>
+                    </div>
+
+                    <div class="kelas-field">
+                        <label for="jenjang">
+                            Jenjang / Tingkat <span class="required">*</span>
+                        </label>
+
+                        <div class="kelas-input-wrap">
+                            <i class="fas fa-layer-group kelas-input-icon"></i>
+                            <select
+                                id="jenjang"
+                                name="jenjang"
+                                class="kelas-control"
+                                required
+                            >
+                                <option value="">Pilih jenjang pendidikan</option>
+                                <option value="7" {{ 'selected' if kelas and kelas.jenjang|string == '7' else '' }}>
+                                    Kelas 7
+                                </option>
+                                <option value="8" {{ 'selected' if kelas and kelas.jenjang|string == '8' else '' }}>
+                                    Kelas 8
+                                </option>
+                                <option value="9" {{ 'selected' if kelas and kelas.jenjang|string == '9' else '' }}>
+                                    Kelas 9
+                                </option>
                             </select>
+                            <i class="fas fa-chevron-down kelas-select-arrow"></i>
                         </div>
 
-                        <!-- Wali Kelas -->
-                        <div class="mb-4">
-                            <label class="form-label fw-medium text-dark">Wali Kelas</label>
-                            <select name="wali_kelas_id" class="form-select form-select-lg custom-select">
-                                <option value="">-- Belum ditentukan --</option>
+                        <div class="kelas-field-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Pilih tingkat kelas sesuai jenjang pendidikan SMP.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BAGIAN 2 -->
+                <section class="kelas-form-section">
+                    <div class="kelas-section-heading">
+                        <div class="kelas-section-number">02</div>
+                        <div>
+                            <strong>Penanggung Jawab Kelas</strong>
+                            <small>Penetapan guru wali kelas</small>
+                        </div>
+                    </div>
+
+                    <div class="kelas-field">
+                        <label for="wali_kelas_id">
+                            Wali Kelas
+                            <span class="optional">OPSIONAL</span>
+                        </label>
+
+                        <div class="kelas-input-wrap">
+                            <i class="fas fa-user-tie kelas-input-icon"></i>
+                            <select
+                                id="wali_kelas_id"
+                                name="wali_kelas_id"
+                                class="kelas-control"
+                            >
+                                <option value="">Belum ditentukan</option>
+
                                 {% for guru in daftar_guru %}
-                                <option value="{{ guru.id }}" {{ 'selected' if kelas and kelas.wali_kelas_id == guru.id else '' }}>
+                                <option
+                                    value="{{ guru.id }}"
+                                    {{ 'selected' if kelas and kelas.wali_kelas_id|string == guru.id|string else '' }}
+                                >
                                     {{ guru.nama }}
                                 </option>
                                 {% endfor %}
                             </select>
-                            <div class="form-text text-muted mt-1">
-                                Pilih guru yang bertanggung jawab sebagai wali kelas
-                            </div>
+                            <i class="fas fa-chevron-down kelas-select-arrow"></i>
                         </div>
 
-                        <!-- Garis Pemisah -->
-                        <div class="d-flex align-items-center my-4">
-                            <hr class="flex-grow-1">
-                            <span class="px-3 small text-muted">Selesaikan</span>
-                            <hr class="flex-grow-1">
+                        <div class="kelas-field-hint">
+                            <i class="fas fa-shield-alt"></i>
+                            Guru yang dipilih akan menjadi penanggung jawab rombongan belajar ini.
                         </div>
+                    </div>
+                </section>
 
-                        <!-- Tombol Aksi -->
-                        <div class="d-flex gap-3">
-                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill flex-grow-1">
-                                <i class="fas fa-check-circle me-2"></i>Simpan Data
-                            </button>
-                            <a href="{{ url_for('data_kelas.halaman_daftar_kelas') }}" 
-                               class="btn btn-light border px-4 py-2 rounded-pill flex-grow-1 text-dark">
-                                <i class="fas fa-times me-2"></i>Batal
-                            </a>
-                        </div>
-                    </form>
+                <!-- FOOTER ACTION -->
+                <div class="kelas-form-footer">
+                    <div class="kelas-footer-note">
+                        <i class="fas fa-lock"></i>
+                        Pastikan informasi sudah benar sebelum menyimpan.
+                    </div>
+
+                    <div class="kelas-actions">
+                        <a
+                            href="{{ url_for('data_kelas.halaman_daftar_kelas') }}"
+                            class="kelas-btn kelas-btn-cancel"
+                        >
+                            <i class="fas fa-arrow-left"></i>
+                            Batal
+                        </a>
+
+                        <button type="submit" class="kelas-btn kelas-btn-submit">
+                            <i class="fas {{ 'fa-save' if mode == 'ubah' else 'fa-plus' }}"></i>
+                            {{ 'Simpan Perubahan' if mode == 'ubah' else 'Buat Kelas' }}
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </div>
+
+            </form>
+        </main>
     </div>
 </div>
+
+<script>
+(function () {
+    const root = document.querySelector('[data-page="form-kelas"]');
+    if (!root) return;
+
+    const namaInput = root.querySelector('#nama_kelas');
+    const jenjangInput = root.querySelector('#jenjang');
+    const waliInput = root.querySelector('#wali_kelas_id');
+
+    const previewName = root.querySelector('[data-preview-name]');
+    const previewLevel = root.querySelector('[data-preview-level]');
+    const previewWali = root.querySelector('[data-preview-wali]');
+
+    function updatePreview() {
+        const nama = namaInput?.value.trim();
+        const jenjang = jenjangInput?.value;
+        const wali = waliInput?.selectedOptions?.[0]?.text;
+
+        if (previewName) {
+            previewName.textContent = nama || 'Nama Kelas';
+        }
+
+        if (previewLevel) {
+            previewLevel.textContent = jenjang
+                ? `Kelas ${jenjang}`
+                : 'Jenjang belum dipilih';
+        }
+
+        if (previewWali) {
+            previewWali.textContent =
+                waliInput?.value && wali
+                    ? wali
+                    : 'Belum ditentukan';
+        }
+    }
+
+    namaInput?.addEventListener('input', updatePreview);
+    jenjangInput?.addEventListener('change', updatePreview);
+    waliInput?.addEventListener('change', updatePreview);
+
+    updatePreview();
+})();
+</script>
