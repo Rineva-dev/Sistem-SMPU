@@ -2,7 +2,9 @@
    TEACHER SCHEDULE — EMERALD WORKSPACE
    Premium SaaS Interface
 ========================================================= */
-
+.content-wrapper {
+    padding: 0;
+}
 .tjm-page {
     --tjm-green: #08775b;
     --tjm-green-dark: #064e3b;
@@ -16,6 +18,7 @@
     isolation: isolate;
     width: 100%;
     min-height: 100vh;
+    padding: 25px 30px 35px;
     color: var(--tjm-text);
     font-family: 'Inter', sans-serif;
     overflow: hidden;
