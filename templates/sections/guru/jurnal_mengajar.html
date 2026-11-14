@@ -17,8 +17,12 @@
     <div class="jm-decoration jm-decoration-a"></div>
     <div class="jm-decoration jm-decoration-b"></div>
 
-    <!-- PAGE HEADING -->
+    <!-- PAGE HEADING — ACADEMIC EDITORIAL -->
     <header class="jm-header">
+        <div class="jm-header-orbit jm-header-orbit-one"></div>
+        <div class="jm-header-orbit jm-header-orbit-two"></div>
+        <div class="jm-header-grid"></div>
+
         <div class="jm-header-main">
             <div class="jm-breadcrumb">
                 <span>AKADEMIK</span>
@@ -30,19 +34,57 @@
                 <div class="jm-title-symbol">
                     <i class="fa-solid fa-book-open"></i>
                     <span></span>
+                    <span class="jm-symbol-orbit"></span>
                 </div>
-                <div>
-                    <h1>Jurnal Mengajar</h1>
-                    <p>Dokumentasikan setiap proses pembelajaran dalam satu ruang kerja.</p>
+
+                <div class="jm-title-content">
+                    <div class="jm-title-eyebrow">
+                        <span class="jm-eyebrow-line"></span>
+                        TEACHING DOCUMENTATION
+                    </div>
+
+                    <h1>
+                        Jurnal <span>Mengajar.</span>
+                    </h1>
+
+                    <p>
+                        Ruang dokumentasi profesional untuk merekam setiap
+                        proses dan perjalanan pembelajaran di kelas.
+                    </p>
                 </div>
+            </div>
+
+            <div class="jm-header-bottom">
+                <span>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Dokumentasi akademik guru
+                </span>
+                <span class="jm-header-separator"></span>
+                <span>
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    Teaching journal workspace
+                </span>
             </div>
         </div>
 
-        <button class="jm-btn-primary" type="button" id="jmCreateTop">
-            <i class="fa-solid fa-plus"></i>
-            <span>Buat Jurnal Baru</span>
-            <i class="fa-solid fa-arrow-up-right-from-square jm-btn-arrow"></i>
-        </button>
+        <div class="jm-header-aside" aria-hidden="true">
+            <div class="jm-header-aside-ring jm-ring-one"></div>
+            <div class="jm-header-aside-ring jm-ring-two"></div>
+
+            <div class="jm-header-emblem">
+                <div class="jm-emblem-inner">
+                    <i class="fa-solid fa-feather-pointed"></i>
+                </div>
+                <span class="jm-emblem-dot"></span>
+            </div>
+
+            <div class="jm-header-aside-caption">
+                <span>ACADEMIC RECORD</span>
+                <strong>LEARN. TEACH. DOCUMENT.</strong>
+            </div>
+
+            <div class="jm-header-aside-line"></div>
+        </div>
     </header>
 
     <!-- CONTENT WORKSPACE -->
@@ -650,876 +692,1672 @@
 
 
 <style>
-/* =====================================================
-   JOURNAL WORKSPACE — PREMIUM SAAS
-===================================================== */
+
+/* =========================================================
+   JOURNAL WORKSPACE — EDITORIAL EMERALD
+   Premium Academic SaaS / Non-dashboard
+========================================================= */
+
 .jm-page {
     --green: #087a58;
-    --green-dark: #07543e;
-    --green-light: #eaf6ef;
-    --ink: #1d3328;
-    --muted: #87968e;
-    --line: #e9efeb;
+    --green-dark: #064b38;
+    --green-deep: #07372d;
+    --green-soft: #edf7f0;
+    --gold: #c9a45e;
+    --ink: #1b3429;
+    --muted: #89988f;
+    --line: #e8eee9;
+
     position: relative;
     isolation: isolate;
-    padding: 10px 0 40px;
     color: var(--ink);
     font-family: Inter, "Segoe UI", sans-serif;
 }
-.jm-page * { box-sizing: border-box; }
 
-/* Tiny ambient decoration */
+.jm-page * {
+    box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
+   AMBIENT BACKGROUND
+--------------------------------------------------------- */
+
 .jm-decoration {
     position: absolute;
     z-index: -1;
     pointer-events: none;
     border-radius: 50%;
-    filter: blur(1px);
-}
-.jm-decoration-a {
-    width: 190px;
-    height: 190px;
-    top: 110px;
-    right: 4%;
-    background: radial-gradient(circle, rgba(15,160,105,.045), transparent 70%);
-    animation: jmAmbient 9s ease-in-out infinite alternate;
-}
-.jm-decoration-b {
-    width: 140px;
-    height: 140px;
-    bottom: 100px;
-    left: -45px;
-    background: radial-gradient(circle, rgba(226,184,99,.045), transparent 70%);
-    animation: jmAmbient 11s ease-in-out infinite alternate-reverse;
-}
-@keyframes jmAmbient {
-    from { transform: translate3d(0,0,0) scale(.9); }
-    to { transform: translate3d(14px,-12px,0) scale(1.12); }
+    filter: blur(2px);
 }
 
-/* Header */
-.jm-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 20px;
-    padding: 5px 2px 22px;
-    margin-bottom: 19px;
-    border-bottom: 1px solid var(--line);
-    animation: jmAppear .45s ease both;
+.jm-decoration-a {
+    width: 270px;
+    height: 270px;
+    top: 90px;
+    right: 2%;
+    background: radial-gradient(circle, rgba(15,160,105,.065), transparent 70%);
+    animation: jmAmbient 12s ease-in-out infinite alternate;
 }
+
+.jm-decoration-b {
+    width: 210px;
+    height: 210px;
+    bottom: 80px;
+    left: -75px;
+    background: radial-gradient(circle, rgba(201,164,94,.065), transparent 70%);
+    animation: jmAmbient 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes jmAmbient {
+    from { transform: translate3d(0,0,0) scale(.88); }
+    to { transform: translate3d(18px,-16px,0) scale(1.14); }
+}
+
 @keyframes jmAppear {
-    from { opacity: 0; transform: translateY(9px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(13px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+/* ---------------------------------------------------------
+   EDITORIAL HEADER
+--------------------------------------------------------- */
+
+.jm-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 218px;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 28px 34px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px;
+    color: #fff;
+    background:
+        radial-gradient(ellipse at 78% 0%, rgba(211,184,121,.19), transparent 34%),
+        radial-gradient(ellipse at 0% 100%, rgba(24,155,109,.2), transparent 45%),
+        linear-gradient(118deg, #062f26 0%, #07523d 53%, #08775a 100%);
+    box-shadow:
+        0 15px 38px rgba(5,61,43,.12),
+        0 3px 10px rgba(5,61,43,.05);
+    animation: jmAppear .55s ease both;
+}
+
+.jm-header::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: .13;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255,255,255,.13) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.13) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(100deg, transparent 5%, #000 75%);
+}
+
+.jm-header::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -90%;
+    left: -30%;
+    width: 35%;
+    height: 280%;
+    opacity: .13;
+    transform: rotate(25deg);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.5),
+        transparent
+    );
+    animation: jmHeaderShine 11s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes jmHeaderShine {
+    0%, 65% { left: -35%; }
+    100% { left: 125%; }
+}
+
+.jm-header-main {
+    position: relative;
+    z-index: 2;
+    width: min(720px, 75%);
+}
+
 .jm-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 9px;
-    color: #a0ada5;
+    gap: 10px;
+    margin-bottom: 22px;
+    color: rgba(255,255,255,.53);
     font-size: 9px;
     font-weight: 800;
-    letter-spacing: 1.2px;
-    margin-bottom: 12px;
+    letter-spacing: 1.5px;
 }
-.jm-breadcrumb i { font-size: 7px; color: #c2cdc5; }
-.jm-breadcrumb .active { color: #07835d; }
-.jm-title-row { display: flex; align-items: center; gap: 13px; }
-.jm-title-symbol {
-    width: 47px;
-    height: 47px;
-    position: relative;
-    display: grid;
-    place-items: center;
-    flex: none;
-    border: 1px solid #dceee2;
-    border-radius: 14px;
-    color: #087a58;
-    background: linear-gradient(145deg,#e6f6ec,#f5faf6);
-    font-size: 18px;
-    box-shadow: 0 5px 13px rgba(8,122,88,.06);
+
+.jm-breadcrumb i {
+    color: rgba(255,255,255,.35);
+    font-size: 7px;
 }
-.jm-title-symbol > span {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    right: 5px;
-    top: 5px;
-    border-radius: 50%;
-    background: #e4b65f;
-    box-shadow: 0 0 0 3px rgba(228,182,95,.14);
-    animation: jmBlink 2.5s ease infinite;
+
+.jm-breadcrumb .active {
+    color: #e8ce91;
 }
-@keyframes jmBlink {
-    50% { opacity: .45; transform: scale(.7); }
-}
-.jm-title-row h1 {
-    color: #19382b;
-    font-size: 24px;
-    font-weight: 850;
-    letter-spacing: -.9px;
-    margin: 0 0 5px;
-}
-.jm-title-row p { color: #8a9a91; font-size: 11px; margin: 0; }
-.jm-btn-primary {
-    position: relative;
+
+.jm-title-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 9px;
-    overflow: hidden;
-    border: 0;
-    border-radius: 10px;
-    padding: 12px 16px;
-    background: linear-gradient(110deg,#087a58,#0b966a);
-    color: white;
-    box-shadow: 0 6px 16px rgba(8,122,88,.17);
-    font-size: 10px;
-    font-weight: 800;
-    transition: .25s;
-    white-space: nowrap;
-}
-.jm-btn-primary::after {
-    content: "";
-    position: absolute;
-    top: -60%;
-    left: -60%;
-    width: 35%;
-    height: 220%;
-    transform: rotate(25deg);
-    background: rgba(255,255,255,.22);
-    transition: left .65s ease;
-}
-.jm-btn-primary:hover::after { left: 130%; }
-.jm-btn-primary:hover {
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 23px rgba(8,122,88,.23);
-}
-.jm-btn-arrow { font-size: 8px; opacity: .65; margin-left: 2px; }
-
-/* Main layout */
-.jm-layout {
-    display: grid;
-    grid-template-columns: minmax(255px,.75fr) minmax(0,2fr);
     gap: 17px;
-    align-items: start;
-    animation: jmAppear .55s .07s ease both;
 }
-.jm-schedule, .jm-main {
-    min-width: 0;
-    background: rgba(255,255,255,.94);
-    border: 1px solid #e8efea;
-    border-radius: 16px;
-    box-shadow: 0 4px 17px rgba(25,58,42,.028);
-    transition: border-color .25s, box-shadow .25s;
-}
-.jm-schedule { padding: 19px 16px; }
-.jm-main { padding: 21px; }
-.jm-schedule:hover, .jm-main:hover {
-    border-color: #dcebe1;
-    box-shadow: 0 9px 26px rgba(25,58,42,.045);
-}
-.jm-panel-heading, .jm-main-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-}
-.jm-overline {
-    color: #0a9367;
-    font-size: 8px;
-    font-weight: 850;
-    letter-spacing: 1.4px;
-    margin-bottom: 6px;
-}
-.jm-panel-heading h2, .jm-main-heading h2 {
-    color: #20382c;
-    font-size: 17px;
-    font-weight: 850;
-    letter-spacing: -.45px;
-    margin: 0 0 5px;
-}
-.jm-panel-heading p, .jm-main-heading p {
-    color: #93a198;
-    font-size: 10px;
-    line-height: 1.6;
-    margin: 0;
-}
-.jm-panel-icon {
-    width: 34px;
-    height: 34px;
+
+.jm-title-symbol {
+    position: relative;
     display: grid;
+    width: 62px;
+    height: 62px;
+    flex: 0 0 62px;
     place-items: center;
-    flex: none;
-    border-radius: 10px;
-    background: #eaf6ef;
-    color: #087a58;
-    font-size: 13px;
+    border: 1px solid rgba(255,255,255,.23);
+    border-radius: 18px;
+    color: #f0d69d;
+    background: linear-gradient(145deg, rgba(255,255,255,.17), rgba(255,255,255,.055));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.17),
+        0 8px 22px rgba(0,0,0,.12);
+    font-size: 23px;
+    animation: jmSymbolFloat 5s ease-in-out infinite;
 }
-.jm-schedule-date {
+
+@keyframes jmSymbolFloat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-5px) rotate(-3deg); }
+}
+
+.jm-title-symbol > span:first-of-type {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e6c47f;
+    box-shadow: 0 0 0 4px rgba(230,196,127,.14);
+    animation: jmBlink 2.5s ease infinite;
+}
+
+.jm-symbol-orbit {
+    position: absolute;
+    inset: -6px;
+    border: 1px solid rgba(226,199,142,.23);
+    border-radius: 22px;
+    animation: jmOrbit 12s linear infinite;
+}
+
+@keyframes jmOrbit {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes jmBlink {
+    50% { opacity: .45; transform: scale(.72); }
+}
+
+.jm-title-content {
+    min-width: 0;
+}
+
+.jm-title-eyebrow {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 11px;
-    margin: 17px 0 12px;
-    border-radius: 9px;
+    margin-bottom: 7px;
+    color: #c5dfd1;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: 2px;
+}
+
+.jm-eyebrow-line {
+    width: 20px;
+    height: 1px;
+    background: #d8b875;
+}
+
+.jm-title-row h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(29px, 3vw, 39px);
+    font-weight: 850;
+    letter-spacing: -1.8px;
+    line-height: 1.12;
+}
+
+.jm-title-row h1 span {
+    color: #e8cb8b;
+    font-weight: 650;
+    font-style: italic;
+}
+
+.jm-title-row p {
+    max-width: 510px;
+    margin: 9px 0 0;
+    color: rgba(255,255,255,.68);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.jm-header-bottom {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-top: 23px;
+    color: rgba(255,255,255,.61);
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.jm-header-bottom > span:not(.jm-header-separator) {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.jm-header-bottom i {
+    color: #e5c47f;
+    font-size: 10px;
+}
+
+.jm-header-separator {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.4);
+}
+
+/* Header decorative emblem */
+
+.jm-header-aside {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    width: 34%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.jm-header-aside-ring {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    border: 1px solid rgba(231,207,157,.19);
+    border-radius: 50%;
+}
+
+.jm-ring-one {
+    animation: jmRingRotate 24s linear infinite;
+}
+
+.jm-ring-two {
+    width: 145px;
+    height: 145px;
+    border-style: dashed;
+    border-color: rgba(255,255,255,.15);
+    animation: jmRingRotate 32s linear infinite reverse;
+}
+
+@keyframes jmRingRotate {
+    to { transform: rotate(360deg); }
+}
+
+.jm-header-emblem {
+    position: relative;
+    display: grid;
+    width: 104px;
+    height: 104px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.19);
+    border-radius: 31px;
+    background: rgba(255,255,255,.055);
+    transform: rotate(8deg);
+    box-shadow: 0 15px 45px rgba(0,0,0,.12);
+    animation: jmEmblemFloat 6s ease-in-out infinite;
+}
+
+@keyframes jmEmblemFloat {
+    0%, 100% { transform: translateY(0) rotate(8deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.jm-emblem-inner {
+    display: grid;
+    width: 70px;
+    height: 70px;
+    place-items: center;
+    border: 1px solid rgba(230,203,145,.3);
+    border-radius: 23px;
+    color: #e9ce96;
+    background: linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.035));
+    font-size: 31px;
+}
+
+.jm-emblem-dot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 9px;
+    height: 9px;
+    border: 2px solid #07523d;
+    border-radius: 50%;
+    background: #e5c17b;
+    box-shadow: 0 0 0 5px rgba(229,193,123,.12);
+}
+
+.jm-header-aside-caption {
+    position: absolute;
+    right: 28px;
+    bottom: 23px;
+    display: grid;
+    gap: 4px;
+    text-align: right;
+}
+
+.jm-header-aside-caption span {
+    color: rgba(255,255,255,.45);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.jm-header-aside-caption strong {
+    color: rgba(255,255,255,.78);
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+.jm-header-aside-line {
+    position: absolute;
+    top: 22px;
+    right: 28px;
+    width: 36px;
+    height: 2px;
+    border-radius: 5px;
+    background: #d9b875;
+}
+
+/* ---------------------------------------------------------
+   MAIN LAYOUT
+--------------------------------------------------------- */
+
+.jm-layout {
+    display: grid;
+    grid-template-columns: minmax(260px,.76fr) minmax(0,2fr);
+    gap: 19px;
+    align-items: start;
+    animation: jmAppear .65s .08s ease both;
+}
+
+.jm-schedule,
+.jm-main {
+    min-width: 0;
+    border: 1px solid #e8eee9;
+    border-radius: 17px;
+    background: rgba(255,255,255,.96);
+    box-shadow: 0 5px 22px rgba(25,58,42,.035);
+    transition: border-color .25s, box-shadow .25s;
+}
+
+.jm-schedule:hover,
+.jm-main:hover {
+    border-color: #dce9df;
+    box-shadow: 0 12px 30px rgba(25,58,42,.055);
+}
+
+.jm-schedule {
+    padding: 20px 17px;
+}
+
+.jm-main {
+    padding: 23px;
+}
+
+.jm-panel-heading,
+.jm-main-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 13px;
+}
+
+.jm-overline {
+    margin-bottom: 7px;
+    color: #0a9367;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: 1.45px;
+}
+
+.jm-panel-heading h2,
+.jm-main-heading h2 {
+    margin: 0 0 6px;
+    color: #20382c;
+    font-size: 17px;
+    font-weight: 850;
+    letter-spacing: -.55px;
+}
+
+.jm-panel-heading p,
+.jm-main-heading p {
+    margin: 0;
+    color: #929f97;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.jm-panel-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border: 1px solid #e3eee6;
+    border-radius: 12px;
+    color: #087a58;
+    background: linear-gradient(145deg,#eaf6ef,#f7fbf8);
+    font-size: 14px;
+    transition: .3s ease;
+}
+
+.jm-schedule:hover .jm-panel-icon {
+    transform: translateY(-3px) rotate(-5deg);
+    box-shadow: 0 6px 13px rgba(8,122,88,.1);
+}
+
+/* Schedule date */
+
+.jm-schedule-date {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 18px 0 13px;
+    padding: 10px 12px;
+    border: 1px solid #e5f0e8;
+    border-radius: 10px;
     color: #37775d;
-    background: #f1f8f3;
+    background: linear-gradient(100deg,#f0f8f2,#f9fcfa);
     font-size: 9px;
     font-weight: 800;
 }
+
 .jm-date-indicator {
+    position: relative;
     width: 7px;
     height: 7px;
+    flex: 0 0 7px;
     border-radius: 50%;
     background: #0c9c69;
     box-shadow: 0 0 0 4px #dff2e6;
 }
+
+.jm-date-indicator::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 1px solid rgba(12,156,105,.35);
+    border-radius: 50%;
+    animation: jmPulse 2.4s ease-out infinite;
+}
+
+@keyframes jmPulse {
+    0% { transform: scale(.8); opacity: .8; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* Schedule list */
+
 .jm-schedule-items {
     display: flex;
+    max-height: 565px;
     flex-direction: column;
     gap: 8px;
-    max-height: 565px;
     overflow: auto;
-    padding-right: 3px;
+    padding: 1px 4px 2px 1px;
 }
+
 .jm-schedule-item {
     position: relative;
     display: flex;
     align-items: center;
     gap: 10px;
     overflow: hidden;
-    padding: 10px 8px;
+    padding: 10px 9px;
     border: 1px solid #edf1ee;
     border-radius: 11px;
-    transition: .22s;
+    background: #fff;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+    animation: jmAppear .4s both;
 }
+
+.jm-schedule-item:hover {
+    transform: translateX(3px);
+    border-color: #d5e8db;
+    background: #f9fcfa;
+    box-shadow: 0 5px 13px rgba(21,75,46,.045);
+}
+
 .jm-schedule-item::before {
-    content: "";
     position: absolute;
     top: 50%;
     left: 0;
     width: 3px;
     height: 0;
     border-radius: 0 4px 4px 0;
-    background: #0b966a;
-    transition: .22s;
+    background: linear-gradient(#0a9b6c,#d3b36e);
+    content: "";
+    transition: height .25s, top .25s;
 }
-.jm-schedule-item:hover {
-    background: #f8fbf9;
-    border-color: #dcebe1;
-    transform: translateX(2px);
+
+.jm-schedule-item:hover::before {
+    top: 15%;
+    height: 70%;
 }
-.jm-schedule-item:hover::before { top: 17%; height: 66%; }
+
 .jm-day-mark {
     display: grid;
+    width: 39px;
+    height: 40px;
+    flex: 0 0 39px;
     place-items: center;
-    width: 38px;
-    height: 39px;
-    flex: none;
-    border-radius: 9px;
+    border: 1px solid #e3eee6;
+    border-radius: 10px;
     color: #087a58;
-    background: #eaf6ef;
+    background: linear-gradient(145deg,#eaf6ef,#f7fbf8);
     font-size: 9px;
     font-weight: 850;
-    transition: .2s;
+    transition: .25s;
 }
+
 .jm-schedule-item:hover .jm-day-mark {
-    background: #dff2e6;
-    transform: scale(1.05);
+    transform: scale(1.06);
+    border-color: #cde5d5;
+    background: #e3f3e9;
 }
+
 .jm-schedule-detail {
     display: flex;
-    flex: 1;
     min-width: 0;
+    flex: 1;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
 }
+
 .jm-schedule-detail strong {
     overflow: hidden;
     color: #293e32;
     font-size: 10px;
+    font-weight: 800;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.jm-schedule-detail > span { color: #8e9b93; font-size: 9px; }
-.jm-schedule-detail small { color: #07835d; font-size: 8px; font-weight: 750; }
-.jm-schedule-chevron { color: #c2cec6; font-size: 9px; }
+
+.jm-schedule-detail > span {
+    overflow: hidden;
+    color: #8e9b93;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jm-schedule-detail small {
+    color: #07835d;
+    font-size: 8px;
+    font-weight: 750;
+}
+
+.jm-schedule-detail small i {
+    margin-right: 3px;
+}
+
+.jm-schedule-chevron {
+    color: #c2cec6;
+    font-size: 9px;
+    transition: transform .2s, color .2s;
+}
+
+.jm-schedule-item:hover .jm-schedule-chevron {
+    transform: translateX(3px);
+    color: #0a9367;
+}
+
 .jm-schedule-footer {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    margin-top: 14px;
-    padding-top: 12px;
+    margin-top: 15px;
+    padding-top: 13px;
     border-top: 1px solid #eff3f0;
     color: #99a69e;
     font-size: 9px;
-    line-height: 1.6;
+    line-height: 1.7;
 }
-.jm-footer-icon { color: #75a98a; }
-.jm-empty-schedule { padding: 25px 8px; text-align: center; color: #a0ada5; }
-.jm-empty-schedule i { display: block; font-size: 22px; margin-bottom: 8px; }
-.jm-empty-schedule strong, .jm-empty-schedule span { display: block; font-size: 10px; margin-top: 4px; }
 
-/* Main workspace */
-.jm-main-heading { align-items: center; margin-bottom: 18px; }
+.jm-footer-icon {
+    color: #75a98a;
+}
+
+.jm-empty-schedule {
+    padding: 28px 8px;
+    color: #a0ada5;
+    text-align: center;
+}
+
+.jm-empty-schedule i {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 23px;
+}
+
+.jm-empty-schedule strong,
+.jm-empty-schedule span {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+}
+
+/* ---------------------------------------------------------
+   SUBJECT WORKSPACE HEADING
+--------------------------------------------------------- */
+
+.jm-main-heading {
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.jm-main-heading h2 {
+    font-size: 19px;
+    letter-spacing: -.7px;
+}
+
 .jm-subject-total {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 11px;
-    border: 1px solid #e8f0ea;
+    padding: 9px 12px;
+    border: 1px solid #e4ede6;
     border-radius: 9px;
-    background: #f7faf8;
     color: #698375;
+    background: #f8fbf9;
     font-size: 9px;
     font-weight: 750;
     white-space: nowrap;
 }
-.jm-subject-total i { color: #0a9568; }
 
-/* Toolbar */
+.jm-subject-total i {
+    color: #0a9568;
+    font-size: 11px;
+}
+
+/* ---------------------------------------------------------
+   TOOLBAR
+--------------------------------------------------------- */
+
 .jm-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 11px;
+    margin-bottom: 17px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #edf1ee;
 }
+
 .jm-search {
     display: flex;
-    align-items: center;
-    gap: 9px;
-    flex: 1;
     min-width: 150px;
-    height: 40px;
-    padding: 0 11px;
-    border: 1px solid #e7eee9;
-    border-radius: 9px;
+    height: 42px;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border: 1px solid #e5ece7;
+    border-radius: 10px;
+    color: #91a097;
     background: #fbfcfb;
-    color: #9aa79f;
-    transition: .2s;
+    transition: border-color .2s, box-shadow .2s, background .2s;
 }
+
 .jm-search:focus-within {
-    border-color: #84bda0;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(8,122,88,.06);
+    border-color: #8abda0;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(8,122,88,.07);
 }
-.jm-search > i { font-size: 11px; }
+
+.jm-search > i {
+    font-size: 11px;
+}
+
 .jm-search input {
     min-width: 0;
     flex: 1;
     border: 0;
     outline: 0;
-    background: transparent;
     color: #2d4437;
+    background: transparent;
+    font-family: inherit;
     font-size: 10px;
 }
-.jm-search input::placeholder { color: #a7b2aa; }
+
+.jm-search input::placeholder {
+    color: #a7b2aa;
+}
+
 .jm-search-shortcut {
     display: grid;
+    width: 20px;
+    height: 21px;
     place-items: center;
-    width: 19px;
-    height: 20px;
     border: 1px solid #e7ece8;
     border-radius: 5px;
     color: #a6b1a9;
+    background: white;
     font-size: 11px;
 }
-.jm-toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+.jm-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .jm-filter-wrap {
     position: relative;
     display: flex;
+    height: 42px;
     align-items: center;
-    gap: 7px;
-    height: 40px;
-    padding: 0 10px;
-    border: 1px solid #e7eee9;
-    border-radius: 9px;
+    gap: 8px;
+    padding: 0 11px;
+    border: 1px solid #e5ece7;
+    border-radius: 10px;
     color: #84978b;
+    background: #fff;
+    transition: border-color .2s;
 }
-.jm-filter-wrap > i:first-child { font-size: 10px; }
+
+.jm-filter-wrap:focus-within {
+    border-color: #8abda0;
+}
+
+.jm-filter-wrap > i:first-child {
+    font-size: 10px;
+}
+
 .jm-filter-wrap select {
     appearance: none;
+    padding-right: 14px;
     border: 0;
     outline: 0;
-    background: transparent;
     color: #61766a;
+    background: transparent;
+    font-family: inherit;
     font-size: 9px;
-    padding-right: 12px;
     cursor: pointer;
 }
+
 .jm-filter-wrap .jm-select-arrow {
     position: absolute;
-    right: 9px;
+    right: 10px;
     font-size: 7px;
     pointer-events: none;
 }
+
 .jm-view-switch {
     display: flex;
     gap: 3px;
     padding: 4px;
-    border-radius: 8px;
-    background: #f1f5f2;
-}
-.jm-view-switch button {
-    width: 28px;
-    height: 27px;
-    border: 0;
-    border-radius: 5px;
-    background: transparent;
-    color: #9aa89f;
-    font-size: 10px;
-    transition: .2s;
-}
-.jm-view-switch button.active {
-    color: #087a58;
-    background: white;
-    box-shadow: 0 2px 6px #183d2912;
+    border: 1px solid #edf1ee;
+    border-radius: 9px;
+    background: #f3f6f4;
 }
 
-/* Subject cards */
+.jm-view-switch button {
+    display: grid;
+    width: 29px;
+    height: 28px;
+    place-items: center;
+    border: 0;
+    border-radius: 6px;
+    color: #9aa89f;
+    background: transparent;
+    font-size: 10px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.jm-view-switch button:hover {
+    color: #087a58;
+}
+
+.jm-view-switch button.active {
+    color: #087a58;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(24,61,41,.09);
+}
+
+/* ---------------------------------------------------------
+   SUBJECT CARDS
+--------------------------------------------------------- */
+
 .jm-subject-grid {
     display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr));
-    gap: 12px;
+    gap: 13px;
 }
+
 .jm-subject-card {
     position: relative;
     min-width: 0;
     overflow: hidden;
-    padding: 15px;
-    border: 1px solid #e8efea;
-    border-radius: 13px;
-    background: white;
-    animation: jmCardIn .4s both;
-    transition: transform .23s, border-color .23s, box-shadow .23s;
+    padding: 16px;
+    border: 1px solid #e7eee9;
+    border-radius: 14px;
+    background: linear-gradient(155deg,#fff 0%,#fff 75%,#fbfdfb 100%);
+    box-shadow: 0 2px 8px rgba(23,58,39,.018);
+    animation: jmCardIn .48s both;
+    transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
 }
+
+.jm-subject-card:nth-child(2) { animation-delay: .04s; }
+.jm-subject-card:nth-child(3) { animation-delay: .08s; }
+.jm-subject-card:nth-child(4) { animation-delay: .12s; }
+.jm-subject-card:nth-child(5) { animation-delay: .16s; }
+.jm-subject-card:nth-child(6) { animation-delay: .20s; }
+
 @keyframes jmCardIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
 .jm-card-accent {
     position: absolute;
     top: 0;
-    left: 15px;
-    width: 30px;
-    height: 2px;
-    border-radius: 0 0 4px 4px;
-    background: linear-gradient(90deg,#087a58,#8fd5ae);
-    opacity: .55;
-    transition: width .3s, opacity .3s;
+    left: 16px;
+    width: 35px;
+    height: 3px;
+    border-radius: 0 0 5px 5px;
+    background: linear-gradient(90deg,#087a58,#d8b875);
+    transition: width .3s ease;
 }
+
 .jm-subject-card:hover {
-    transform: translateY(-3px);
-    border-color: #cfe5d7;
-    box-shadow: 0 12px 26px rgba(22,70,44,.065);
+    transform: translateY(-4px);
+    border-color: #cfe4d6;
+    box-shadow:
+        0 14px 30px rgba(22,70,44,.065),
+        0 3px 8px rgba(22,70,44,.025);
 }
-.jm-subject-card:hover .jm-card-accent { width: 65px; opacity: 1; }
+
+.jm-subject-card:hover .jm-card-accent {
+    width: 75px;
+}
+
 .jm-subject-card::after {
-    content: "";
     position: absolute;
-    top: -55px;
-    right: -55px;
-    width: 95px;
-    height: 95px;
+    top: -65px;
+    right: -65px;
+    width: 125px;
+    height: 125px;
     border-radius: 50%;
-    background: radial-gradient(circle,rgba(12,157,104,.09),transparent 70%);
+    background: radial-gradient(circle,rgba(12,157,104,.105),transparent 70%);
+    content: "";
     opacity: 0;
-    transition: .35s;
     pointer-events: none;
+    transition: .4s ease;
 }
-.jm-subject-card:hover::after { opacity: 1; transform: scale(1.5); }
-.jm-card-heading { display: flex; justify-content: space-between; align-items: center; }
+
+.jm-subject-card:hover::after {
+    transform: scale(1.35);
+    opacity: 1;
+}
+
+.jm-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .jm-subject-icon {
     position: relative;
     display: grid;
-    place-items: center;
-    width: 35px;
-    height: 35px;
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
     overflow: hidden;
-    border-radius: 9px;
+    place-items: center;
+    border: 1px solid #e1eee5;
+    border-radius: 11px;
     color: #087a58;
-    background: linear-gradient(145deg,#e5f5eb,#f4faf6);
-    font-size: 13px;
-    transition: .25s;
+    background: linear-gradient(145deg,#e5f5eb,#f6faf7);
+    font-size: 14px;
+    transition: .28s ease;
 }
+
 .jm-subject-card:hover .jm-subject-icon {
     transform: rotate(-5deg) scale(1.07);
-    box-shadow: 0 5px 13px rgba(8,122,88,.12);
+    border-color: #cce5d5;
+    box-shadow: 0 6px 14px rgba(8,122,88,.12);
 }
+
 .jm-icon-glow {
     position: absolute;
     top: -20px;
-    left: -30px;
-    width: 20px;
-    height: 70px;
+    left: -35px;
+    width: 21px;
+    height: 80px;
     transform: rotate(30deg);
-    background: rgba(255,255,255,.65);
-    transition: left .5s;
+    background: rgba(255,255,255,.72);
+    transition: left .55s ease;
 }
-.jm-subject-card:hover .jm-icon-glow { left: 55px; }
+
+.jm-subject-card:hover .jm-icon-glow {
+    left: 65px;
+}
+
 .jm-code {
-    padding: 5px 7px;
-    border-radius: 5px;
-    background: #f4f7f5;
-    color: #9ba99f;
+    padding: 5px 8px;
+    border: 1px solid #edf1ee;
+    border-radius: 6px;
+    color: #93a197;
+    background: #f8faf8;
     font-size: 7px;
     font-weight: 850;
-    letter-spacing: .7px;
+    letter-spacing: .8px;
 }
-.jm-subject-info { padding: 12px 0 13px; }
+
+.jm-subject-info {
+    padding: 13px 0 14px;
+}
+
 .jm-category {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 5px;
+    gap: 7px;
+    margin-bottom: 6px;
     color: #0b9367;
     font-size: 7px;
     font-weight: 850;
     letter-spacing: 1px;
 }
+
 .jm-category span {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #0aab75;
     box-shadow: 0 0 0 3px #e7f6ed;
 }
+
 .jm-subject-info h3 {
-    margin: 0 0 7px;
+    margin: 0 0 8px;
     color: #21392c;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 850;
-    letter-spacing: -.3px;
+    letter-spacing: -.45px;
+    line-height: 1.4;
     overflow-wrap: anywhere;
     transition: color .2s;
 }
-.jm-subject-card:hover .jm-subject-info h3 { color: #087a58; }
-.jm-class { color: #899990; font-size: 9px; }
-.jm-class i { color: #a2b3a8; margin-right: 5px; }
-.jm-card-divider { height: 1px; background: #eff3f0; }
-.jm-card-schedule { padding: 11px 0; min-height: 65px; }
+
+.jm-subject-card:hover .jm-subject-info h3 {
+    color: #087a58;
+}
+
+.jm-class {
+    color: #899990;
+    font-size: 9px;
+}
+
+.jm-class i {
+    margin-right: 5px;
+    color: #a2b3a8;
+}
+
+.jm-card-divider {
+    height: 1px;
+    background: #eff3f0;
+}
+
+/* Card schedule */
+
+.jm-card-schedule {
+    min-height: 70px;
+    padding: 12px 0;
+}
+
 .jm-card-label {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 8px;
-    color: #a0ada5;
+    gap: 7px;
+    margin-bottom: 9px;
+    color: #9ba9a0;
     font-size: 7px;
     font-weight: 850;
-    letter-spacing: .8px;
+    letter-spacing: .85px;
 }
-.jm-card-label i { color: #82a48e; font-size: 9px; }
-.jm-day-list { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.jm-card-label i {
+    color: #82a48e;
+    font-size: 9px;
+}
+
+.jm-day-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
 .jm-day-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 7px;
-    border-radius: 5px;
-    background: #f0f7f2;
+    padding: 6px 8px;
+    border: 1px solid #e8f0ea;
+    border-radius: 6px;
     color: #3e795b;
+    background: #f3f8f4;
     font-size: 8px;
-    transition: .2s;
+    transition: transform .2s, background .2s, border-color .2s;
 }
-.jm-day-pill:hover { transform: translateY(-2px); background: #e3f2e8; }
-.jm-day-pill strong { font-size: 8px; }
-.jm-day-pill span { color: #819b8b; font-size: 7px; }
-.jm-no-schedule { color: #b1bcb4; font-size: 8px; font-style: italic; }
+
+.jm-day-pill:hover {
+    transform: translateY(-2px);
+    border-color: #d5e9dc;
+    background: #e8f5ec;
+}
+
+.jm-day-pill strong {
+    font-size: 8px;
+}
+
+.jm-day-pill span {
+    color: #819b8b;
+    font-size: 7px;
+}
+
+.jm-no-schedule {
+    color: #b1bcb4;
+    font-size: 8px;
+    font-style: italic;
+}
+
+/* Journal metadata */
+
 .jm-journal-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    padding: 10px 0 12px;
+    justify-content: space-between;
+    gap: 9px;
+    padding: 11px 0 13px;
     border-top: 1px solid #eff3f0;
 }
-.jm-journal-count { display: flex; align-items: center; gap: 7px; flex: none; }
+
+.jm-journal-count {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+}
+
 .jm-journal-icon {
-    width: 28px;
-    height: 28px;
     display: grid;
+    width: 30px;
+    height: 30px;
     place-items: center;
-    border-radius: 7px;
-    background: #edf6f0;
+    border: 1px solid #e3eee6;
+    border-radius: 8px;
     color: #54866d;
+    background: #edf6f0;
     font-size: 10px;
 }
-.jm-journal-count strong { display: block; color: #304a39; font-size: 13px; line-height: 1.2; }
-.jm-journal-count span { display: block; color: #9aa79f; font-size: 7px; margin-top: 3px; }
-.jm-last-journal { min-width: 0; text-align: right; }
+
+.jm-journal-count strong {
+    display: block;
+    color: #304a39;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.jm-journal-count span {
+    display: block;
+    margin-top: 3px;
+    color: #9aa79f;
+    font-size: 7px;
+}
+
+.jm-last-journal {
+    min-width: 0;
+    text-align: right;
+}
+
 .jm-last-journal > span {
     display: block;
+    margin-bottom: 4px;
     color: #a2afa7;
     font-size: 6px;
     font-weight: 850;
-    letter-spacing: .6px;
-    margin-bottom: 4px;
+    letter-spacing: .7px;
 }
-.jm-last-journal strong { display: block; color: #5b7867; font-size: 8px; }
-.jm-last-journal strong.jm-not-yet { color: #a4afa8; }
+
+.jm-last-journal strong {
+    display: block;
+    color: #5b7867;
+    font-size: 8px;
+}
+
+.jm-last-journal strong.jm-not-yet {
+    color: #a4afa8;
+}
+
 .jm-last-journal small {
     display: block;
-    max-width: 135px;
+    max-width: 145px;
     overflow: hidden;
+    margin-top: 3px;
     color: #9ba79f;
     font-size: 7px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-top: 3px;
 }
-.jm-card-actions { display: flex; gap: 7px; }
-.jm-btn-history, .jm-btn-create {
+
+/* Card actions */
+
+.jm-card-actions {
     display: flex;
-    justify-content: center;
+    gap: 8px;
+}
+
+.jm-btn-history,
+.jm-btn-create {
+    display: flex;
+    height: 36px;
     align-items: center;
-    gap: 6px;
-    height: 34px;
-    border-radius: 7px;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 8px;
+    font-family: inherit;
     font-size: 8px;
     font-weight: 800;
     text-decoration: none;
-    transition: .2s;
+    cursor: pointer;
+    transition: transform .22s, box-shadow .22s, background .22s, border-color .22s;
 }
+
 .jm-btn-history {
     flex: 1;
-    border: 1px solid #e5ece7;
-    background: white;
+    border: 1px solid #e3ebe5;
     color: #62786b;
+    background: #fff;
 }
+
 .jm-btn-history:hover {
+    transform: translateY(-2px);
     border-color: #b9d9c5;
-    background: #f6fbf7;
     color: #087a58;
+    background: #f6fbf7;
 }
+
 .jm-btn-create {
     flex: 1.3;
-    border: 0;
+    border: 1px solid #087a58;
+    color: #fff;
     background: linear-gradient(110deg,#087a58,#0b966a);
-    color: white;
+    box-shadow: 0 3px 8px rgba(8,122,88,.11);
 }
-.jm-btn-create:hover {
-    background: #07543e;
-    color: white;
-    box-shadow: 0 5px 12px rgba(8,122,88,.17);
-}
-.jm-btn-create i { transition: transform .25s; }
-.jm-btn-create:hover i { transform: rotate(90deg); }
 
-/* List mode */
-.jm-subject-grid.is-list { grid-template-columns: 1fr; }
+.jm-btn-create:hover {
+    transform: translateY(-2px);
+    border-color: #07543e;
+    color: #fff;
+    background: linear-gradient(110deg,#07543e,#087a58);
+    box-shadow: 0 7px 15px rgba(8,122,88,.19);
+}
+
+.jm-btn-create i {
+    transition: transform .25s;
+}
+
+.jm-btn-create:hover i {
+    transform: rotate(90deg);
+}
+
+/* ---------------------------------------------------------
+   LIST MODE
+--------------------------------------------------------- */
+
+.jm-subject-grid.is-list {
+    grid-template-columns: 1fr;
+}
+
 .jm-subject-grid.is-list .jm-subject-card {
     display: grid;
-    grid-template-columns: 38px minmax(130px,1fr) minmax(140px,1.1fr) minmax(130px,.9fr) minmax(145px,auto);
+    grid-template-columns: 42px minmax(130px,1fr) minmax(140px,1.1fr) minmax(130px,.9fr) minmax(145px,auto);
     align-items: center;
-    gap: 12px;
-    padding: 12px;
+    gap: 13px;
+    padding: 13px;
 }
-.jm-subject-grid.is-list .jm-card-heading { display: contents; }
-.jm-subject-grid.is-list .jm-code { display: none; }
-.jm-subject-grid.is-list .jm-subject-info { padding: 0; }
-.jm-subject-grid.is-list .jm-card-divider { display: none; }
-.jm-subject-grid.is-list .jm-card-schedule { padding: 0; }
-.jm-subject-grid.is-list .jm-journal-info { padding: 0; border: 0; }
-.jm-subject-grid.is-list .jm-card-actions { min-width: 145px; }
 
-/* Empty */
-.jm-no-results, .jm-empty-main { text-align: center; padding: 40px 15px; }
-.jm-no-results > div, .jm-empty-illustration {
-    position: relative;
-    width: 55px;
-    height: 55px;
-    display: grid;
-    place-items: center;
-    margin: 0 auto 13px;
-    border-radius: 16px;
-    color: #6caa86;
-    background: #edf7f1;
-    font-size: 19px;
+.jm-subject-grid.is-list .jm-card-heading {
+    display: contents;
 }
+
+.jm-subject-grid.is-list .jm-code {
+    display: none;
+}
+
+.jm-subject-grid.is-list .jm-subject-info {
+    padding: 0;
+}
+
+.jm-subject-grid.is-list .jm-card-divider {
+    display: none;
+}
+
+.jm-subject-grid.is-list .jm-card-schedule {
+    padding: 0;
+}
+
+.jm-subject-grid.is-list .jm-journal-info {
+    padding: 0;
+    border: 0;
+}
+
+.jm-subject-grid.is-list .jm-card-actions {
+    min-width: 145px;
+}
+
+/* ---------------------------------------------------------
+   EMPTY STATES
+--------------------------------------------------------- */
+
+.jm-no-results,
+.jm-empty-main {
+    padding: 45px 15px;
+    text-align: center;
+}
+
+.jm-no-results > div,
+.jm-empty-illustration {
+    position: relative;
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    margin: 0 auto 14px;
+    border: 1px solid #e0eee4;
+    border-radius: 17px;
+    color: #6caa86;
+    background: linear-gradient(145deg,#edf7f1,#f8fbf9);
+    font-size: 20px;
+}
+
 .jm-empty-illustration > span {
     position: absolute;
-    top: -4px;
+    top: -5px;
     right: -5px;
     color: #e4b65f;
-    font-size: 11px;
+    font-size: 12px;
     animation: jmBlink 2s infinite;
 }
-.jm-no-results h3, .jm-empty-main h3 { color: #31483a; font-size: 14px; font-weight: 850; }
-.jm-no-results p, .jm-empty-main p { color: #99a69e; font-size: 10px; }
-.jm-no-results button {
-    border: 0;
-    border-radius: 7px;
-    padding: 9px 13px;
-    background: #eaf6ef;
-    color: #087a58;
-    font-size: 9px;
-    font-weight: 800;
+
+.jm-no-results h3,
+.jm-empty-main h3 {
+    margin: 0 0 7px;
+    color: #31483a;
+    font-size: 15px;
+    font-weight: 850;
 }
 
-/* Modal */
-.jm-modal .modal-content {
-    overflow: hidden;
-    border: 0;
-    border-radius: 17px;
-    box-shadow: 0 25px 80px rgba(10,40,26,.2);
-}
-.jm-modal-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 21px 23px;
-    color: white;
-    background:
-        radial-gradient(circle at 92% 0%,rgba(255,255,255,.12),transparent 28%),
-        linear-gradient(110deg,#064735,#0a805b);
-}
-.jm-modal-symbol {
-    display: grid;
-    place-items: center;
-    width: 41px;
-    height: 41px;
-    flex: none;
-    border-radius: 11px;
-    background: #ffffff20;
-    font-size: 16px;
-}
-.jm-modal-header > div:nth-child(2) { min-width: 0; }
-.jm-modal-header > div:nth-child(2) > span {
-    display: block;
-    color: #b9e8d5;
-    font-size: 7px;
-    font-weight: 850;
-    letter-spacing: 1.4px;
-    margin-bottom: 4px;
-}
-.jm-modal-header h3 { color: white; font-size: 16px; font-weight: 850; margin: 0 0 4px; }
-.jm-modal-header p { color: #d1e7dc; font-size: 9px; margin: 0; }
-.jm-modal-close {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    margin-left: auto;
-    align-self: flex-start;
-    flex: none;
-    border: 0;
-    border-radius: 8px;
-    background: #ffffff20;
-    color: white;
-}
-.jm-modal-body { padding: 21px 23px; max-height: 65vh; }
-.jm-form-section { padding-bottom: 19px; margin-bottom: 18px; border-bottom: 1px solid #edf1ee; }
-.jm-form-section:last-child { padding: 0; margin: 0; border: 0; }
-.jm-form-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.jm-form-heading > span {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: #eaf6ef;
-    color: #087a58;
-    font-size: 9px;
-    font-weight: 850;
-}
-.jm-form-heading strong { display: block; color: #2b4034; font-size: 11px; font-weight: 850; }
-.jm-form-heading small { display: block; color: #9aa69f; font-size: 8px; margin-top: 3px; }
-.jm-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-.jm-field { min-width: 0; margin-bottom: 11px; }
-.jm-field:last-child { margin-bottom: 0; }
-.jm-field label { display: block; color: #52675a; font-size: 9px; font-weight: 750; margin-bottom: 6px; }
-.jm-field label b { color: #e26b56; }
-.jm-field .form-control {
-    min-height: 39px;
-    border: 1px solid #e4ebe6;
-    border-radius: 8px;
-    color: #34483b;
+.jm-no-results p,
+.jm-empty-main p {
+    color: #99a69e;
     font-size: 10px;
-    box-shadow: none;
+    line-height: 1.7;
 }
-.jm-field textarea.form-control { min-height: 75px; resize: vertical; padding-top: 10px; }
-.jm-field .form-control:focus { border-color: #78b99a; box-shadow: 0 0 0 3px #087a5810; }
-.jm-field .form-control[readonly] { background: #f5f8f6; color: #708378; }
-.jm-modal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 23px;
-    border-top: 1px solid #edf1ee;
-    background: #f9fbf9;
-}
-.jm-security-note { color: #91a097; font-size: 8px; }
-.jm-security-note i { color: #6eaa87; margin-right: 4px; }
-.jm-modal-actions { display: flex; gap: 8px; }
-.jm-btn-cancel, .jm-btn-submit {
-    border-radius: 7px;
-    padding: 10px 13px;
+
+.jm-no-results button {
+    padding: 9px 14px;
+    border: 1px solid #dcece2;
+    border-radius: 8px;
+    color: #087a58;
+    background: #eaf6ef;
     font-size: 9px;
     font-weight: 800;
-}
-.jm-btn-cancel { border: 1px solid #e2eae4; background: white; color: #74847a; }
-.jm-btn-submit {
-    border: 0;
-    background: #087a58;
-    color: white;
     transition: .2s;
 }
-.jm-btn-submit:hover { background: #07543e; transform: translateY(-1px); box-shadow: 0 5px 12px #087a5825; }
 
-/* Scrollbar */
-.jm-schedule-items::-webkit-scrollbar { width: 4px; }
-.jm-schedule-items::-webkit-scrollbar-thumb { background: #dce9e0; border-radius: 10px; }
+.jm-no-results button:hover {
+    transform: translateY(-2px);
+    background: #dff1e5;
+}
 
-/* Responsive */
-@media(max-width:1100px) {
-    .jm-layout { grid-template-columns: 1fr; }
-    .jm-schedule-items { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); max-height: none; }
+/* ---------------------------------------------------------
+   SCROLLBAR
+--------------------------------------------------------- */
+
+.jm-schedule-items {
+    scrollbar-width: thin;
+    scrollbar-color: #dce9e0 transparent;
 }
-@media(max-width:760px) {
-    .jm-header { align-items: flex-start; flex-direction: column; }
-    .jm-btn-primary { width: 100%; }
-    .jm-main, .jm-schedule { padding: 15px; }
-    .jm-schedule-items { grid-template-columns: 1fr; }
-    .jm-subject-grid { grid-template-columns: 1fr; }
-    .jm-toolbar { flex-direction: column; align-items: stretch; }
-    .jm-toolbar-right { justify-content: space-between; }
-    .jm-search { width: 100%; }
-    .jm-filter-wrap { flex: 1; }
-    .jm-filter-wrap select { width: 100%; }
-    .jm-subject-grid.is-list .jm-subject-card { display: block; }
-    .jm-subject-grid.is-list .jm-card-heading { display: flex; }
-    .jm-subject-grid.is-list .jm-code { display: block; }
-    .jm-subject-grid.is-list .jm-subject-info { padding: 12px 0 13px; }
-    .jm-subject-grid.is-list .jm-card-schedule { padding: 11px 0; }
-    .jm-subject-grid.is-list .jm-journal-info { padding: 10px 0 12px; border-top: 1px solid #eff3f0; }
-    .jm-subject-grid.is-list .jm-card-actions { min-width: 0; }
-    .jm-modal-header { padding: 17px; }
-    .jm-modal-body { padding: 17px; }
-    .jm-modal-footer { align-items: flex-start; flex-direction: column; padding: 13px 17px; }
-    .jm-modal-actions { width: 100%; }
-    .jm-modal-actions button { flex: 1; }
-    .jm-form-grid { grid-template-columns: 1fr; gap: 0; }
+
+.jm-schedule-items::-webkit-scrollbar {
+    width: 4px;
 }
-@media(max-width:390px) {
-    .jm-title-row h1 { font-size: 21px; }
-    .jm-title-row p { max-width: 230px; line-height: 1.6; }
-    .jm-journal-info { align-items: flex-start; flex-direction: column; }
-    .jm-last-journal { text-align: left; }
+
+.jm-schedule-items::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #dce9e0;
 }
-@media(prefers-reduced-motion:reduce) {
-    .jm-page *, .jm-page *::before, .jm-page *::after,
-    .jm-modal *, .jm-modal *::before, .jm-modal *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-        scroll-behavior: auto !important;
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media(max-width: 1100px) {
+    .jm-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .jm-schedule-items {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        max-height: none;
+    }
+
+    .jm-header-aside {
+        width: 29%;
     }
 }
+
+@media(max-width: 760px) {
+    .jm-header {
+        min-height: 205px;
+        padding: 24px 23px;
+        border-radius: 16px;
+    }
+
+    .jm-header-main {
+        width: 82%;
+    }
+
+    .jm-header-aside {
+        width: 25%;
+        opacity: .65;
+    }
+
+    .jm-header-emblem {
+        width: 75px;
+        height: 75px;
+    }
+
+    .jm-emblem-inner {
+        width: 51px;
+        height: 51px;
+        border-radius: 17px;
+        font-size: 23px;
+    }
+
+    .jm-header-aside-ring {
+        width: 140px;
+        height: 140px;
+    }
+
+    .jm-ring-two {
+        width: 105px;
+        height: 105px;
+    }
+
+    .jm-header-aside-caption {
+        display: none;
+    }
+
+    .jm-header-aside-line {
+        right: 20px;
+    }
+
+    .jm-main,
+    .jm-schedule {
+        padding: 17px;
+    }
+
+    .jm-schedule-items {
+        grid-template-columns: 1fr;
+    }
+
+    .jm-subject-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .jm-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .jm-toolbar-right {
+        justify-content: space-between;
+    }
+
+    .jm-search {
+        width: 100%;
+    }
+
+    .jm-filter-wrap {
+        flex: 1;
+    }
+
+    .jm-filter-wrap select {
+        width: 100%;
+    }
+
+    .jm-subject-grid.is-list .jm-subject-card {
+        display: block;
+    }
+
+    .jm-subject-grid.is-list .jm-card-heading {
+        display: flex;
+    }
+
+    .jm-subject-grid.is-list .jm-code {
+        display: block;
+    }
+
+    .jm-subject-grid.is-list .jm-subject-info {
+        padding: 13px 0 14px;
+    }
+
+    .jm-subject-grid.is-list .jm-card-schedule {
+        padding: 12px 0;
+    }
+
+    .jm-subject-grid.is-list .jm-journal-info {
+        padding: 11px 0 13px;
+        border-top: 1px solid #eff3f0;
+    }
+
+    .jm-subject-grid.is-list .jm-card-actions {
+        min-width: 0;
+    }
+}
+
+@media(max-width: 480px) {
+    .jm-page {
+        padding-top: 5px;
+    }
+
+    .jm-header {
+        min-height: 0;
+        padding: 22px 18px;
+        margin-bottom: 16px;
+    }
+
+    .jm-header-main {
+        width: 100%;
+    }
+
+    .jm-header-aside {
+        top: 5px;
+        right: -18px;
+        width: 105px;
+        height: 120px;
+        opacity: .28;
+    }
+
+    .jm-header-aside-ring {
+        width: 115px;
+        height: 115px;
+    }
+
+    .jm-ring-two {
+        width: 85px;
+        height: 85px;
+    }
+
+    .jm-header-emblem {
+        width: 58px;
+        height: 58px;
+        border-radius: 19px;
+    }
+
+    .jm-emblem-inner {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        font-size: 18px;
+    }
+
+    .jm-header-aside-line {
+        display: none;
+    }
+
+    .jm-breadcrumb {
+        gap: 7px;
+        margin-bottom: 18px;
+        font-size: 8px;
+    }
+
+    .jm-title-row {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .jm-title-symbol {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+        border-radius: 13px;
+        font-size: 17px;
+    }
+
+    .jm-title-row h1 {
+        font-size: 27px;
+        letter-spacing: -1.2px;
+    }
+
+    .jm-title-row p {
+        max-width: 290px;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    .jm-title-eyebrow {
+        font-size: 7px;
+        letter-spacing: 1.4px;
+    }
+
+    .jm-header-bottom {
+        gap: 9px;
+        margin-top: 19px;
+        font-size: 8px;
+    }
+
+    .jm-header-bottom > span:last-child {
+        display: none;
+    }
+
+    .jm-header-separator {
+        display: none;
+    }
+
+    .jm-main-heading {
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .jm-main-heading h2 {
+        font-size: 17px;
+    }
+
+    .jm-subject-total {
+        padding: 7px 8px;
+        font-size: 8px;
+    }
+
+    .jm-main,
+    .jm-schedule {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .jm-journal-info {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .jm-last-journal {
+        text-align: left;
+    }
+
+    .jm-last-journal small {
+        max-width: 100%;
+    }
+
+    .jm-card-actions {
+        gap: 7px;
+    }
+}
+
+@media(max-width: 360px) {
+    .jm-title-row h1 {
+        font-size: 24px;
+    }
+
+    .jm-title-symbol {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .jm-header-bottom {
+        font-size: 7px;
+    }
+
+    .jm-main-heading {
+        flex-direction: column;
+    }
+}
+
+
 
 
 /* =========================================================
@@ -3088,23 +3926,6 @@ let tjmBootstrapAttempts = 0;
             '[Jurnal Studio] Modal #tjmJournalModal atau form #tjmJournalForm tidak ditemukan.'
         );
     }
-
-    /* =====================================================
-       TOMBOL BUAT JURNAL DI BAGIAN ATAS
-    ===================================================== */
-    $('#jmCreateTop')?.addEventListener('click', () => {
-        const firstCard = $$('.jm-subject-card')
-            .find(card => !card.hidden);
-
-        const button = firstCard?.querySelector('.tombol-buat-jurnal');
-
-        if (button) {
-            // Memicu delegated click yang sama dengan tombol kartu.
-            button.click();
-        } else {
-            search?.focus();
-        }
-    });
 
 })();
 </script>
