@@ -141,12 +141,8 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    padding: 20px 30px 22px;
+    padding: 20px 0 22px;
     margin-bottom: 30px;
-    background:
-        radial-gradient(ellipse at 82% 15%, rgba(8, 120, 91, .055), transparent 32%),
-        #fff;
-    border-bottom: 1px solid #e9efec;
 }
 
 /* Breadcrumb */
