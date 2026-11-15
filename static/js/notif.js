@@ -58,6 +58,20 @@ class Notifikasi {
     }
 }
 
-// Inisialisasi otomatis
+// ==========================================
+// INISIALISASI OTOMATIS
+// ==========================================
+
 const notif = new Notifikasi();
-document.addEventListener('DOMContentLoaded', () => notif.bacaFlash());
+
+function jalankanNotifikasi() {
+    notif.bacaFlash();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', jalankanNotifikasi, {
+        once: true
+    });
+} else {
+    jalankanNotifikasi();
+}

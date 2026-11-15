@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notif.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
@@ -237,6 +238,14 @@
 
     </main>
 
+        <div class="notif-container"></div>
+
+    <script>
+        window.pesanFlash = {{ get_flashed_messages(with_categories=true) | tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/notif.js') }}"></script>
+
     <script>
         (() => {
             "use strict";
@@ -247,7 +256,6 @@
             const formLogin = document.getElementById("formLogin");
             const btnLogin = document.getElementById("btnLogin");
 
-            // Tampilkan / sembunyikan kata sandi
             togglePassword.addEventListener("click", () => {
                 const isPassword = passwordInput.type === "password";
 
@@ -261,8 +269,6 @@
                 );
             });
 
-            // Efek tombol saat form dikirim.
-            // Form tetap dikirim normal ke backend Flask.
             formLogin.addEventListener("submit", () => {
                 if (!formLogin.checkValidity()) return;
 
@@ -274,7 +280,6 @@
                 btnLogin.disabled = true;
             });
 
-            // Efek input aktif
             document.querySelectorAll(".input-wrapper input").forEach(input => {
                 const wrapper = input.closest(".input-wrapper");
 
