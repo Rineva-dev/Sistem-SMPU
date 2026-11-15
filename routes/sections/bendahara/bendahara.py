@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify, abort
 from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
 from models import (
     db, User, TahunPelajaran, Siswa, Kelas, RiwayatKelas,
     JenisPembayaran, Ekstrakurikuler, Peminatan,
@@ -48,7 +49,7 @@ def daftar_bulan_semester(
             except (ValueError, TypeError):
                 return []
 
-    akhir = sampai_tanggal if sampai_tanggal is not None else date.today()
+    akhir = sampai_tanggal if sampai_tanggal is not None else tanggal_wita()
     bulan_list = []
 
     while sekarang <= akhir:
@@ -544,7 +545,7 @@ def pastikan_tagihan_tercatat(
         if nominal_baru > 0 and sudah_dibayar >= nominal_baru:
             tagihan.status = 'Sudah Lunas'
             tagihan.tanggal_lunas = (
-                tagihan.tanggal_lunas or date.today()
+                tagihan.tanggal_lunas or tanggal_wita()
             )
 
         elif sudah_dibayar > 0:
@@ -576,6 +577,17 @@ def pastikan_tagihan_tercatat(
 
 
 bendahara_bp = Blueprint('bendahara', __name__, url_prefix='/bendahara')
+
+# =========================================================
+# TIMEZONE SEKOLAH — WITA
+# =========================================================
+WITA = ZoneInfo("Asia/Makassar")
+
+def waktu_wita():
+    return datetime.now(WITA)
+
+def tanggal_wita():
+    return waktu_wita().date()
 
 @bendahara_bp.app_template_filter('label_tp')
 def label_tp_filter(kode):
@@ -659,7 +671,7 @@ def hitung_jumlah_bulan(kode_tahun_dasar, pola_waktu):
     if not semua_semester:
         return 0
     sekarang = semua_semester[0].tanggal_mulai
-    akhir = date.today()
+    akhir = tanggal_wita()
     jumlah = 0
     while sekarang <= akhir:
         jumlah += 1
@@ -708,8 +720,8 @@ def index():
         riwayat_tercatat = RiwayatKelas.query.filter_by(tahun_pelajaran=kode_tahun_aktif).all()
         id_unik_siswa = list({r.siswa_id for r in riwayat_tercatat})
         total_siswa = len(id_unik_siswa)
-        bulan_ini = date.today().month
-        tahun_ini = date.today().year
+        bulan_ini = tanggal_wita().month
+        tahun_ini = tanggal_wita().year
 
         # ✅ AMBIL SEMUA TAGIHAN DARI SEMUA TAHUN AJARAN (bukan dibatasi satu tahun)
         tagihan_semua = TagihanSiswa.query.all()
@@ -832,7 +844,7 @@ def index():
     data_pemasukan = []
     data_pengeluaran = []
 
-    hari_ini = date.today()
+    hari_ini = tanggal_wita()
 
     for i in range(5, -1, -1):
         # Mundur berdasarkan bulan kalender, termasuk pergantian tahun.
@@ -855,7 +867,8 @@ def index():
     return render_template('index.html',
         active_page='dashboard', halaman_aktif='bendahara', user=user,
         user_name=session.get('user_name','Pengguna'), user_role=session.get('jabatan','Bendahara'),
-        today_date=datetime.now().strftime('%d %B %Y'), today_date_long=datetime.now().strftime('%A, %d %B %Y'),
+        today_date=waktu_wita().strftime('%d %B %Y'),
+        today_date_long=waktu_wita().strftime('%A, %d %B %Y'),
         tahun_ajaran=nama_tahun, semester=nama_semester, total_siswa=total_siswa,
         pemasukan_bulan_ini=format_rupiah(pemasukan_bulan_ini),
         pengeluaran_bulan_ini=format_rupiah(pengeluaran_bulan_ini),
@@ -986,7 +999,7 @@ def ubah_tarif(id):
     tarif_lama = JenisPembayaran.query.get_or_404(id)
     angkatan_dasar = get_base_tahun(tarif_lama.tahun_pelajaran)
     
-    tarif_lama.tgl_berlaku_sampai = date.today()
+    tarif_lama.tgl_berlaku_sampai = tanggal_wita()
     db.session.commit()
 
     tarif_baru = JenisPembayaran(
