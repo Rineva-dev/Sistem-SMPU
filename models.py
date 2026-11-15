@@ -510,7 +510,7 @@ class RiwayatPembayaran(db.Model):
     tagihan_id = db.Column(db.Integer, db.ForeignKey('tagihan_siswa.id'), nullable=False)
     jumlah_bayar = db.Column(db.BigInteger, nullable=False)
     metode = db.Column(db.String(50), default='Tunai')
-    tanggal_bayar = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    tanggal_bayar = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     dicatat_oleh = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     keterangan = db.Column(db.Text, nullable=True)
     nomor_bukti = db.Column(db.String(50), unique=True, nullable=True)

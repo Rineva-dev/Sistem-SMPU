@@ -3458,13 +3458,12 @@ let tjmBootstrapAttempts = 0;
        TANGGAL LOKAL
     ===================================================== */
     function localDate() {
-        const now = new Date();
-
-        return [
-            now.getFullYear(),
-            String(now.getMonth() + 1).padStart(2, '0'),
-            String(now.getDate()).padStart(2, '0')
-        ].join('-');
+        return new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Makassar',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(new Date());
     }
 
     /* =====================================================
@@ -3474,6 +3473,7 @@ let tjmBootstrapAttempts = 0;
         const now = new Date();
 
         const value = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Makassar',
             weekday: 'long',
             day: 'numeric',
             month: 'long',

@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, current_app, g, flash
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from models import (
     db, Guru, User, MataPelajaran, PengaturanMapelKelas,
     JadwalPelajaran, Kelas, JurnalMengajar, TahunPelajaran,
@@ -160,7 +159,6 @@ def halaman_jurnal():
 @jurnal_mengajar_bp.route('/simpan', methods=['POST'])
 @guru_wajib
 def simpan_jurnal():
-    from datetime import datetime
 
     try:
         # ==========================================

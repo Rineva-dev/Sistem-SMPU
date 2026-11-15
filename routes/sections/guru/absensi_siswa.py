@@ -192,6 +192,9 @@ def simpan_absensi(jurnal_id):
                 url_for('absensi_siswa.halaman_absensi', jurnal_id=jurnal.id)
             )
 
+        data_absensi = []
+
+        # Validasi seluruh data terlebih dahulu
         for siswa_id in siswa_valid:
             status = (
                 request.form.get(f'status_{siswa_id}') or ''
@@ -200,6 +203,39 @@ def simpan_absensi(jurnal_id):
             keterangan = (
                 request.form.get(f'keterangan_{siswa_id}') or ''
             ).strip()
+
+            if status not in status_valid:
+                raise ValueError(
+                    f'Status absensi siswa ID {siswa_id} tidak valid.'
+                )
+
+            data_absensi.append({
+                'siswa_id': siswa_id,
+                'status': status,
+                'keterangan': keterangan or None
+            })
+
+        # Setelah semua valid, baru simpan
+        for item in data_absensi:
+            siswa_id = item['siswa_id']
+
+            absensi = AbsensiJurnalMengajar.query.filter_by(
+                jurnal_id=jurnal.id,
+                siswa_id=siswa_id
+            ).first()
+
+            if absensi:
+                absensi.status = item['status']
+                absensi.keterangan = item['keterangan']
+            else:
+                db.session.add(
+                    AbsensiJurnalMengajar(
+                        jurnal_id=jurnal.id,
+                        siswa_id=siswa_id,
+                        status=item['status'],
+                        keterangan=item['keterangan']
+                    )
+                )
 
             if status not in status_valid:
                 raise ValueError(

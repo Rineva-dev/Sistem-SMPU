@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 import re
 import secrets
 import os
@@ -29,6 +30,12 @@ payment_public_bp = Blueprint(
     __name__,
     url_prefix="/payment-public"
 )
+
+WITA = ZoneInfo("Asia/Makassar")
+
+def waktu_wita():
+    return datetime.now(WITA)
+
 
 # =========================================================
 # KONFIGURASI BUKTI PEMBAYARAN
@@ -502,7 +509,7 @@ def detail_pembayaran(nisn):
         total_dibayar=total_dibayar,
         total_sisa=total_sisa,
         progres=progres,
-        tahun_sekarang=date.today().year,
+        tahun_sekarang=waktu_wita().year,
     )
 
 
@@ -718,7 +725,7 @@ def proses_pembayaran(nisn):
 
             kode_transaksi = (
                 "SMPU-"
-                + datetime.now().strftime("%Y%m%d%H%M%S")
+                + waktu_wita().strftime("%Y%m%d%H%M%S")
                 + "-"
                 + secrets.token_hex(3).upper()
             )
