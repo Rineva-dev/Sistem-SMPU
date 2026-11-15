@@ -53,9 +53,11 @@ def hitung_status_absensi(jam_masuk_str):
         elif jam_masuk > BATAS_TERLAMBAT:
             # ⏰ TERLAMBAT: Setelah 07:15
             status = "terlambat"
+            hari_ini = waktu_wita().date()
+
             terlambat_menit = (
-                datetime.combine(date.today(), jam_masuk) -
-                datetime.combine(date.today(), BATAS_TERLAMBAT)
+                datetime.combine(hari_ini, jam_masuk) -
+                datetime.combine(hari_ini, BATAS_TERLAMBAT)
             ).seconds // 60
             keterangan = f"Terlambat {terlambat_menit} menit"
         elif jam_masuk > JAM_MASUK_TEPAT:

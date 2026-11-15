@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from models import (
     db,
     User,
@@ -245,7 +246,9 @@ def halaman_jadwal_mengajar():
     # ==========================================
     # HARI DAN WAKTU SEKARANG
     # ==========================================
-    sekarang = datetime.now()
+    WITA = ZoneInfo('Asia/Makassar')
+
+    sekarang = datetime.now(WITA)
 
     nama_hari_sekarang = [
         'Senin', 'Selasa', 'Rabu',

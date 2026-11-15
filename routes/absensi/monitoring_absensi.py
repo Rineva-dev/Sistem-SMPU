@@ -385,7 +385,6 @@ def buat_qr_semua_guru():
     buffered = io.BytesIO()
     qr_img.save(buffered, format="PNG")
     qr_base64 = base64.b64encode(buffered.getvalue()).decode()
-    jam_sekarang = datetime.now().strftime("%H:%M")
     info_tipe = "MASUK" if belum_jam_pulang() else "PULANG"
     return jsonify({
         "status": "sukses",
