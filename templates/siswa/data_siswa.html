@@ -1,315 +1,762 @@
-<!-- Data Siswa -->
-<div class="dashboard-container">
-    <!-- Header Halaman -->
-    <div class="welcome-box">
-        <div>
-            <h2><i class="fas fa-user-graduate"></i> Data Siswa & Peserta Didik</h2>
-            <p class="text-muted">Daftar lengkap siswa di sekolah, per {{ today_date }}</p>
-        </div>
-        <div class="date-box">
-            <i class="fas fa-user-graduate"></i>
-            <span>Total: {{ total_siswa | default('0') }} Orang</span>
-        </div>
-    </div>
 
-    <!-- Kartu Ringkasan Statistik -->
-    <div class="stats-grid">
-        <!-- Total Siswa -->
-        <div class="stat-card">
-            <div class="stat-icon bg-primary">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ total_siswa | default('0') }}</h3>
-                <p>Total Siswa</p>
-                <span class="stat-change neutral">Semua Jenjang</span>
-            </div>
-        </div>
-        <!-- Siswa Aktif -->
-        <div class="stat-card">
-            <div class="stat-icon bg-success">
-                <i class="fas fa-user-check"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ siswa_aktif | default('0') }}</h3>
-                <p>Siswa Aktif</p>
-                <span class="stat-change neutral">Sedang Belajar</span>
-            </div>
-        </div>
-        <!-- Siswa Lulus -->
-        <div class="stat-card">
-            <div class="stat-icon bg-info">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ siswa_lulus | default('0') }}</h3>
-                <p>Siswa Lulus</p>
-                <span class="stat-change neutral">Tamat Belajar</span>
-            </div>
-        </div>
-        <!-- Siswa Pindah/Keluar -->
-        <div class="stat-card">
-            <div class="stat-icon bg-warning">
-                <i class="fas fa-exchange-alt"></i>
-            </div>
-            <div class="stat-info">
-                <h3>{{ siswa_pindah | default('0') }}</h3>
-                <p>Pindah/Keluar</p>
-                <span class="stat-change neutral">Tidak Aktif</span>
-            </div>
-        </div>
-    </div>
+<!-- =====================================================
+     SMPU STUDENT HUB — NEW GENERATION
+===================================================== -->
 
-    <!-- Filter & Tabel Daftar Siswa -->
-    <div class="card tabel-kartu">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <h4><i class="fas fa-list"></i> Daftar Siswa</h4>
-            <div class="d-flex gap-2 align-items-center">
-                <div class="cari-wrapper">
-                    <i class="fas fa-search cari-icon"></i>
-                    <input type="text" class="form-control" placeholder="Cari NIS / Nama / Kelas..." id="cariSiswa">
+<div class="student-hub">
+
+    <!-- TOP HEADER -->
+    <section class="sh-heading">
+        <div class="sh-heading-left">
+            <div class="sh-eyebrow">
+                <span class="sh-eyebrow-dot"></span>
+                STUDENT MANAGEMENT SYSTEM
+            </div>
+
+            <h1>Direktori <span>Siswa.</span></h1>
+
+            <p>
+                Kelola informasi, status, dan data seluruh peserta didik
+                dalam satu ruang kerja terpadu.
+            </p>
+        </div>
+
+        <div class="sh-heading-right">
+            <div class="sh-date">
+                <i class="far fa-calendar-alt"></i>
+                <span>{{ today_date }}</span>
+            </div>
+
+            {% if bisa_kelola %}
+            <a href="{{ url_for('data_siswa.tambah_siswa') }}"
+               class="sh-add-button">
+                <i class="fas fa-plus"></i>
+                <span>Tambah Siswa</span>
+                <i class="fas fa-arrow-right sh-add-arrow"></i>
+            </a>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- OVERVIEW PANEL -->
+    <section class="sh-overview">
+
+        <!-- TOTAL STUDENTS -->
+        <div class="sh-total-panel">
+            <div class="sh-total-top">
+                <span class="sh-section-caption">
+                    TOTAL PESERTA DIDIK
+                </span>
+                <span class="sh-total-icon">
+                    <i class="fas fa-users"></i>
+                </span>
+            </div>
+
+            <div class="sh-total-number">
+                {{ total_siswa | default('0') }}
+            </div>
+
+            <div class="sh-total-bottom">
+                <span class="sh-live-dot"></span>
+                Seluruh jenjang pendidikan
+            </div>
+
+            <div class="sh-total-decoration"></div>
+            <div class="sh-total-decoration second"></div>
+        </div>
+
+
+        <!-- STATISTICS -->
+        <div class="sh-statistics">
+
+            <div class="sh-stat-item">
+                <div class="sh-stat-heading">
+                    <div class="sh-stat-icon active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <span class="sh-stat-tag">01</span>
                 </div>
-                {% if bisa_kelola %}
-                <a href="{{ url_for('data_siswa.tambah_siswa') }}" class="btn btn-primary-tambah">
-                    <i class="fas fa-plus"></i> Tambah Siswa
-                </a>
-                {% endif %}
+
+                <div class="sh-stat-value">
+                    {{ siswa_aktif | default('0') }}
+                </div>
+
+                <div class="sh-stat-label">Siswa Aktif</div>
+
+                <div class="sh-stat-footer">
+                    <span class="sh-stat-indicator active"></span>
+                    Sedang belajar
+                </div>
             </div>
+
+
+            <div class="sh-stat-item">
+                <div class="sh-stat-heading">
+                    <div class="sh-stat-icon graduated">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <span class="sh-stat-tag">02</span>
+                </div>
+
+                <div class="sh-stat-value">
+                    {{ siswa_lulus | default('0') }}
+                </div>
+
+                <div class="sh-stat-label">Siswa Lulus</div>
+
+                <div class="sh-stat-footer">
+                    <span class="sh-stat-indicator graduated"></span>
+                    Tamat belajar
+                </div>
+            </div>
+
+
+            <div class="sh-stat-item">
+                <div class="sh-stat-heading">
+                    <div class="sh-stat-icon transferred">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <span class="sh-stat-tag">03</span>
+                </div>
+
+                <div class="sh-stat-value">
+                    {{ siswa_pindah | default('0') }}
+                </div>
+
+                <div class="sh-stat-label">Pindah / Keluar</div>
+
+                <div class="sh-stat-footer">
+                    <span class="sh-stat-indicator transferred"></span>
+                    Riwayat keluar
+                </div>
+            </div>
+
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table tabel-siswa mb-0">
+    </section>
+
+
+    <!-- DIRECTORY WORKSPACE -->
+    <section class="sh-directory">
+
+        <!-- DIRECTORY HEADER -->
+        <div class="sh-directory-header">
+
+            <div class="sh-directory-title">
+                <div class="sh-directory-icon">
+                    <i class="fas fa-address-book"></i>
+                </div>
+
+                <div>
+                    <h3>Student Directory</h3>
+                    <p>Database lengkap seluruh peserta didik</p>
+                </div>
+            </div>
+
+            <div class="sh-directory-meta">
+                <span class="sh-meta-indicator"></span>
+                Data terintegrasi
+            </div>
+
+        </div>
+
+
+        <!-- TOOLBAR -->
+        <div class="sh-toolbar">
+
+            <div class="sh-search">
+                <i class="fas fa-search"></i>
+
+                <input type="text"
+                       id="cariSiswa"
+                       placeholder="Cari nama, NIS, NISN atau kelas..."
+                       autocomplete="off">
+
+                <kbd>⌕</kbd>
+            </div>
+
+            <div class="sh-filter-group">
+
+                <div class="sh-select-wrap">
+                    <i class="fas fa-filter"></i>
+
+                    <select id="filterStatusSiswa">
+                        <option value="">Semua Status</option>
+                        <option value="aktif">Aktif</option>
+                        <option value="lulus">Lulus</option>
+                        <option value="pindah">Pindah</option>
+                        <option value="berhenti">Berhenti</option>
+                        <option value="nonaktif">Non Aktif</option>
+                    </select>
+
+                    <i class="fas fa-chevron-down sh-select-arrow"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUICK FILTER TABS -->
+        <div class="sh-tabs">
+            <button type="button"
+                    class="sh-tab active"
+                    data-filter="all">
+                Semua Siswa
+                <span>{{ total_siswa | default('0') }}</span>
+            </button>
+
+            <button type="button"
+                    class="sh-tab"
+                    data-filter="aktif">
+                Aktif
+            </button>
+
+            <button type="button"
+                    class="sh-tab"
+                    data-filter="lulus">
+                Lulus
+            </button>
+
+            <button type="button"
+                    class="sh-tab"
+                    data-filter="nonaktif">
+                Non Aktif
+            </button>
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="sh-table-container">
+
+            <div class="sh-table-scroll">
+
+                <table class="sh-table">
+
                     <thead>
                         <tr>
-                            <th width="80" class="text-center">No</th>
+                            <th class="sh-number-col">NO.</th>
+                            <th>IDENTITAS SISWA</th>
                             <th>NIS</th>
                             <th>NISN</th>
-                            <th>Nama Lengkap</th>
-                            <th>Kelas / Tingkat</th>
-                            <th class="text-center">JK</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th>KELAS</th>
+                            <th>JENIS KELAMIN</th>
+                            <th>STATUS</th>
+                            <th class="sh-action-col">AKSI</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% if daftar_dengan_posisi %}
-                            {% for item in daftar_dengan_posisi %}
-                            <tr>
-                                <td class="text-center text-muted small fw-medium">{{ loop.index }}</td>
-                                <td class="text-muted small">{{ item.siswa.nis }}</td>
-                                <td class="text-muted small">{{ item.siswa.nisn or '-' }}</td>
-                                <td>
-                                    <span class="nama-siswa">{{ item.siswa.nama }}</span>
-                                </td>
-                                <td>
-                                    {% if item.kelas != '-' %}
-                                        <span class="badge-kelas">
-                                            {% if item.tingkat and item.tingkat != '-' %}
-                                                {{ item.tingkat }} {{ item.kelas }}
-                                            {% else %}
-                                                {{ item.kelas }}
-                                            {% endif %}
+
+                    <tbody id="shStudentBody">
+
+                    {% if daftar_dengan_posisi %}
+
+                        {% for item in daftar_dengan_posisi %}
+
+                        {% set status_filter = (
+                            'aktif' if item.siswa.status == 'Aktif'
+                            else 'lulus' if item.siswa.status == 'Lulus'
+                            else 'pindah' if item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Pindah'
+                            else 'berhenti' if item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Berhenti'
+                            else 'nonaktif'
+                        ) %}
+
+                        <tr class="sh-student-row"
+                            data-status="{{ status_filter }}">
+
+                            <!-- NUMBER -->
+                            <td class="sh-number-col">
+                                <span class="sh-row-number">
+                                    {{ loop.index }}
+                                </span>
+                            </td>
+
+
+                            <!-- STUDENT IDENTITY -->
+                            <td>
+                                <div class="sh-identity">
+
+                                    <div class="sh-avatar
+                                        {% if item.siswa.jenis_kelamin == 'Perempuan' %}
+                                            female
+                                        {% else %}
+                                            male
+                                        {% endif %}">
+
+                                        {{ item.siswa.nama[:1] | upper }}
+
+                                    </div>
+
+                                    <div class="sh-identity-info">
+                                        <span class="sh-student-name">
+                                            {{ item.siswa.nama }}
                                         </span>
-                                    {% elif item.tingkat != '-' %}
-                                        <span class="text-muted">Tingkat {{ item.tingkat }}</span>
-                                    {% else %}
-                                        <span class="text-muted fst-italic">Belum ada</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if item.siswa.jenis_kelamin == 'Laki-laki' %}
-                                        <span class="jk-icon l">L</span>
-                                    {% elif item.siswa.jenis_kelamin == 'Perempuan' %}
-                                        <span class="jk-icon p">P</span>
-                                    {% else %}
-                                        <span class="text-muted">-</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if item.siswa.status == 'Aktif' %}
-                                        <span class="status-badge aktif">Aktif</span>
-                                    {% elif item.siswa.status == 'Lulus' %}
-                                        <span class="status-badge lulus">Lulus</span>
-                                    {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Pindah' %}
-                                        <span class="status-badge pindah">Pindah</span>
-                                    {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Berhenti' %}
-                                        <span class="status-badge berhenti">Berhenti</span>
-                                    {% else %}
-                                        <span class="status-badge nonaktif">Non Aktif</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <div class="tombol-aksi">
-                                        <a href="{{ url_for('data_siswa.detail_siswa', id=item.siswa.id) }}" class="btn-aksi detail" title="Lihat Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        {% if bisa_kelola %}
-                                        <a href="{{ url_for('data_siswa.ubah_siswa', id=item.siswa.id) }}" class="btn-aksi ubah" title="Ubah Data">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <button type="button" class="btn-aksi status" title="Ubah Status" 
-                                                data-bs-toggle="modal" data-bs-target="#modalStatus{{ item.siswa.id }}">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </button>
-                                        {% endif %}
-                                        {% if bisa_hapus %}
-                                        <form action="{{ url_for('data_siswa.hapus_siswa', id=item.siswa.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                            <button type="submit" class="btn-aksi hapus" title="Hapus Data">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                        {% endif %}
-                                        {% if bisa_buat_akun %}
-                                            {% if item.siswa.akun %}
-                                            <a href="{{ url_for('data_siswa.ubah_password_siswa', id=item.siswa.id) }}" class="btn-aksi kunci" title="Ubah Password">
-                                                <i class="fas fa-key"></i>
-                                            </a>
-                                            {% else %}
-                                            <a href="{{ url_for('data_siswa.buat_akun_siswa', id=item.siswa.id) }}" class="btn-aksi akun" title="Buat Akun">
-                                                <i class="fas fa-user-plus"></i>
-                                            </a>
-                                            {% endif %}
-                                        {% endif %}
+
+                                        <span class="sh-student-caption">
+                                            <i class="fas fa-circle"></i>
+                                            Peserta didik SMPU
+                                        </span>
                                     </div>
-                                </td>
-                            </tr>
 
-                            <!-- MODAL UBAH STATUS — VERSI MODERN MINIMALIS WOW -->
-                            <div class="modal fade modal-ubah-status" id="modalStatus{{ item.siswa.id }}" tabindex="-1" 
-                                aria-labelledby="labelStatus{{ item.siswa.id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <form action="{{ url_for('data_siswa.ubah_status', id=item.siswa.id) }}" method="POST">
-                                            <!-- Header -->
-                                            <div class="modal-header-custom">
-                                                <div class="modal-icon-wrap">
-                                                    <i class="fas fa-exchange-alt"></i>
-                                                </div>
-                                                <div class="modal-title-wrap">
-                                                    <h5 class="modal-title" id="labelStatus{{ item.siswa.id }}">Ubah Status Siswa</h5>
-                                                    <p class="modal-subtitle">Perbarui status keaktifan siswa</p>
-                                                </div>
-                                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                                            </div>
-
-                                            <!-- Body -->
-                                            <div class="modal-body-custom">
-                                                <!-- Info Siswa — Kartu Ringkas -->
-                                                <div class="info-siswa-card">
-                                                    <div class="info-row">
-                                                        <span class="info-label">Nama Lengkap</span>
-                                                        <span class="info-value nama">{{ item.siswa.nama }}</span>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <span class="info-label">NIS</span>
-                                                        <span class="info-value">{{ item.siswa.nis }}</span>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <span class="info-label">Tingkat / Kelas</span>
-                                                        <span class="info-value">
-                                                            {% if item.tingkat and item.kelas and item.kelas != '-' %}
-                                                                {{ item.tingkat }} {{ item.kelas }}
-                                                            {% elif item.tingkat and item.tingkat != '-' %}
-                                                                Tingkat {{ item.tingkat }}
-                                                            {% else %}
-                                                                -
-                                                            {% endif %}
-                                                        </span>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <span class="info-label">Status Saat Ini</span>
-                                                        <span class="status-pill">
-                                                            {% if item.siswa.status == 'Aktif' %}
-                                                                <span class="pill-aktif">Aktif</span>
-                                                            {% elif item.siswa.status == 'Lulus' %}
-                                                                <span class="pill-lulus">Lulus</span>
-                                                            {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Pindah' %}
-                                                                <span class="pill-pindah">Pindah</span>
-                                                            {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Berhenti' %}
-                                                                <span class="pill-berhenti">Berhenti</span>
-                                                            {% else %}
-                                                                <span class="pill-nonaktif">Non Aktif</span>
-                                                            {% endif %}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Pilih Status Baru -->
-                                                <div class="form-section">
-                                                    <label class="form-label-main">Status Baru</label>
-                                                    <select name="status" id="status{{ item.siswa.id }}" class="form-select-custom" required 
-                                                            onchange="tampilkanFormNonAktif({{ item.siswa.id }})">
-                                                        <option value="">-- Pilih Status --</option>
-                                                        <option value="Aktif" {{ 'selected' if item.siswa.status == 'Aktif' else '' }}>Aktif</option>
-                                                        <option value="Non Aktif" {{ 'selected' if item.siswa.status not in ['Aktif', 'Lulus'] else '' }}>Non Aktif</option>
-                                                    </select>
-                                                </div>
-
-                                                <!-- Form Keterangan Non Aktif — Muncul Otomatis -->
-                                                <div id="formNonAktif{{ item.siswa.id }}" class="form-ekstra d-none">
-                                                    <div class="form-section">
-                                                        <label class="form-label-main">Jenis Non Aktif</label>
-                                                        <select name="jenis_non_aktif" id="jenis{{ item.siswa.id }}" class="form-select-custom"
-                                                                onchange="tampilkanSekolahTujuan({{ item.siswa.id }})">
-                                                            <option value="">-- Pilih --</option>
-                                                            <option value="Berhenti" {{ 'selected' if item.siswa.jenis_non_aktif == 'Berhenti' else '' }}>Berhenti Sekolah</option>
-                                                            <option value="Pindah" {{ 'selected' if item.siswa.jenis_non_aktif == 'Pindah' else '' }}>Pindah Sekolah</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-row">
-                                                        <div class="form-col">
-                                                            <label class="form-label-main">Tanggal</label>
-                                                            <input type="date" name="tanggal_non_aktif" class="form-input-custom" 
-                                                                value="{{ item.siswa.tanggal_non_aktif.strftime('%Y-%m-%d') if item.siswa.tanggal_non_aktif else '' }}">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-section">
-                                                        <label class="form-label-main">Alasan</label>
-                                                        <textarea name="alasan_non_aktif" class="form-textarea-custom" rows="2" 
-                                                                placeholder="Tuliskan alasan...">{{ item.siswa.alasan_non_aktif or '' }}</textarea>
-                                                    </div>
-
-                                                    <div class="form-section d-none" id="kolomSekolah{{ item.siswa.id }}">
-                                                        <label class="form-label-main">Sekolah Tujuan</label>
-                                                        <input type="text" name="sekolah_tujuan" class="form-input-custom" 
-                                                            value="{{ item.siswa.sekolah_tujuan or '' }}" placeholder="Contoh: SMP Negeri 1 Praya">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Catatan Info -->
-                                                <div class="info-note">
-                                                    <i class="fas fa-info-circle"></i>
-                                                    <span>Status <strong>Non Aktif</strong> hanya bisa disimpan jika siswa sudah tidak terdaftar di kelas manapun.</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Footer / Tombol -->
-                                            <div class="modal-footer-custom">
-                                                <button type="button" class="btn-batal" data-bs-dismiss="modal">
-                                                    <i class="fas fa-times"></i> Batal
-                                                </button>
-                                                <button type="submit" class="btn-simpan">
-                                                    <i class="fas fa-check"></i> Simpan Perubahan
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
                                 </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="kosong-tabel">
-                                    <i class="fas fa-user-slash fa-2x mb-2"></i>
-                                    <p>Belum ada data siswa yang terdaftar</p>
-                                </td>
-                            </tr>
-                        {% endif %}
+                            </td>
+
+
+                            <!-- NIS -->
+                            <td>
+                                <span class="sh-code">
+                                    {{ item.siswa.nis }}
+                                </span>
+                            </td>
+
+
+                            <!-- NISN -->
+                            <td>
+                                <span class="sh-code muted">
+                                    {{ item.siswa.nisn or '-' }}
+                                </span>
+                            </td>
+
+
+                            <!-- CLASS -->
+                            <td>
+                                {% if item.kelas != '-' %}
+                                    <span class="sh-class">
+                                        <i class="fas fa-layer-group"></i>
+
+                                        {% if item.tingkat and item.tingkat != '-' %}
+                                            {{ item.tingkat }} {{ item.kelas }}
+                                        {% else %}
+                                            {{ item.kelas }}
+                                        {% endif %}
+                                    </span>
+
+                                {% elif item.tingkat != '-' %}
+                                    <span class="sh-no-class">
+                                        Tingkat {{ item.tingkat }}
+                                    </span>
+
+                                {% else %}
+                                    <span class="sh-no-class">
+                                        Belum ada kelas
+                                    </span>
+                                {% endif %}
+                            </td>
+
+
+                            <!-- GENDER -->
+                            <td>
+                                {% if item.siswa.jenis_kelamin == 'Laki-laki' %}
+
+                                    <span class="sh-gender male">
+                                        <i class="fas fa-mars"></i>
+                                        Laki-laki
+                                    </span>
+
+                                {% elif item.siswa.jenis_kelamin == 'Perempuan' %}
+
+                                    <span class="sh-gender female">
+                                        <i class="fas fa-venus"></i>
+                                        Perempuan
+                                    </span>
+
+                                {% else %}
+                                    <span class="sh-code muted">-</span>
+                                {% endif %}
+                            </td>
+
+
+                            <!-- STATUS -->
+                            <td>
+                                {% if item.siswa.status == 'Aktif' %}
+
+                                    <span class="sh-status active">
+                                        <span></span> Aktif
+                                    </span>
+
+                                {% elif item.siswa.status == 'Lulus' %}
+
+                                    <span class="sh-status graduated">
+                                        <span></span> Lulus
+                                    </span>
+
+                                {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Pindah' %}
+
+                                    <span class="sh-status transferred">
+                                        <span></span> Pindah
+                                    </span>
+
+                                {% elif item.siswa.status == 'Non Aktif' and item.siswa.jenis_non_aktif == 'Berhenti' %}
+
+                                    <span class="sh-status stopped">
+                                        <span></span> Berhenti
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="sh-status inactive">
+                                        <span></span> Non Aktif
+                                    </span>
+
+                                {% endif %}
+                            </td>
+
+
+                            <!-- ACTIONS -->
+                            <td>
+                                <div class="sh-actions">
+
+                                    <a href="{{ url_for('data_siswa.detail_siswa', id=item.siswa.id) }}"
+                                       class="sh-action view"
+                                       title="Lihat Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    {% if bisa_kelola %}
+
+                                    <a href="{{ url_for('data_siswa.ubah_siswa', id=item.siswa.id) }}"
+                                       class="sh-action edit"
+                                       title="Ubah Data">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+
+                                    <button type="button"
+                                            class="sh-action status"
+                                            title="Ubah Status"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalStatus{{ item.siswa.id }}">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+
+                                    {% endif %}
+
+                                    {% if bisa_buat_akun %}
+
+                                        {% if item.siswa.akun %}
+
+                                        <a href="{{ url_for('data_siswa.ubah_password_siswa', id=item.siswa.id) }}"
+                                           class="sh-action account"
+                                           title="Ubah Password">
+                                            <i class="fas fa-key"></i>
+                                        </a>
+
+                                        {% else %}
+
+                                        <a href="{{ url_for('data_siswa.buat_akun_siswa', id=item.siswa.id) }}"
+                                           class="sh-action account"
+                                           title="Buat Akun">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                    {% if bisa_hapus %}
+
+                                    <form action="{{ url_for('data_siswa.hapus_siswa', id=item.siswa.id) }}"
+                                          method="POST"
+                                          class="sh-delete-form"
+                                          onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
+
+                                        <button type="submit"
+                                                class="sh-action delete"
+                                                title="Hapus Data">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+
+                                    </form>
+
+                                    {% endif %}
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="8">
+                                <div class="sh-empty">
+                                    <div class="sh-empty-icon">
+                                        <i class="fas fa-user-slash"></i>
+                                    </div>
+                                    <h4>Belum Ada Data Siswa</h4>
+                                    <p>Data peserta didik belum tersedia.</p>
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
                     </tbody>
+
                 </table>
+
+            </div>
+
+
+            <!-- NO SEARCH RESULT -->
+            <div class="sh-no-result" id="shNoResult" hidden>
+                <div class="sh-empty-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h4>Siswa Tidak Ditemukan</h4>
+                <p>Coba gunakan kata kunci atau filter lainnya.</p>
+                <button type="button" id="shResetFilter">
+                    Reset Pencarian
+                </button>
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="sh-table-footer">
+
+            <div class="sh-result-info">
+                Menampilkan
+                <strong id="shVisibleCount">0</strong>
+                dari
+                <strong id="shTotalCount">0</strong>
+                siswa
+            </div>
+
+            <div class="sh-footer-note">
+                <i class="fas fa-shield-alt"></i>
+                Student data management
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         STATUS MODALS — OUTSIDE TABLE
+    ================================================== -->
+
+    {% if daftar_dengan_posisi %}
+        {% for item in daftar_dengan_posisi %}
+
+        <div class="modal fade sh-status-modal"
+             id="modalStatus{{ item.siswa.id }}"
+             tabindex="-1"
+             aria-labelledby="labelStatus{{ item.siswa.id }}"
+             aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content">
+
+                    <form action="{{ url_for('data_siswa.ubah_status', id=item.siswa.id) }}"
+                          method="POST">
+
+                        <!-- MODAL HEADER -->
+                        <div class="sh-modal-header">
+
+                            <div class="sh-modal-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+
+                            <div class="sh-modal-title">
+                                <h5 id="labelStatus{{ item.siswa.id }}">
+                                    Perbarui Status
+                                </h5>
+                                <p>Pengaturan status peserta didik</p>
+                            </div>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Tutup"></button>
+
+                        </div>
+
+
+                        <!-- MODAL BODY -->
+                        <div class="sh-modal-body">
+
+                            <div class="sh-modal-student">
+
+                                <div class="sh-modal-avatar">
+                                    {{ item.siswa.nama[:1] | upper }}
+                                </div>
+
+                                <div>
+                                    <strong>{{ item.siswa.nama }}</strong>
+                                    <span>NIS {{ item.siswa.nis }}</span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="sh-modal-info">
+
+                                <div>
+                                    <span>Tingkat / Kelas</span>
+                                    <strong>
+                                        {% if item.tingkat and item.kelas and item.kelas != '-' %}
+                                            {{ item.tingkat }} {{ item.kelas }}
+                                        {% elif item.tingkat and item.tingkat != '-' %}
+                                            Tingkat {{ item.tingkat }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>Status Sekarang</span>
+                                    <strong>{{ item.siswa.status }}
+                                        {% if item.siswa.jenis_non_aktif %}
+                                            · {{ item.siswa.jenis_non_aktif }}
+                                        {% endif %}
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="sh-form-section">
+
+                                <label for="status{{ item.siswa.id }}">
+                                    Status Baru
+                                </label>
+
+                                <select name="status"
+                                        id="status{{ item.siswa.id }}"
+                                        class="sh-form-control"
+                                        required
+                                        onchange="tampilkanFormNonAktif({{ item.siswa.id }})">
+
+                                    <option value="">Pilih Status</option>
+
+                                    <option value="Aktif"
+                                        {{ 'selected' if item.siswa.status == 'Aktif' else '' }}>
+                                        Aktif
+                                    </option>
+
+                                    <option value="Non Aktif"
+                                        {{ 'selected' if item.siswa.status not in ['Aktif', 'Lulus'] else '' }}>
+                                        Non Aktif
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div id="formNonAktif{{ item.siswa.id }}"
+                                 class="sh-inactive-fields d-none">
+
+                                <div class="sh-form-section">
+
+                                    <label for="jenis{{ item.siswa.id }}">
+                                        Jenis Non Aktif
+                                    </label>
+
+                                    <select name="jenis_non_aktif"
+                                            id="jenis{{ item.siswa.id }}"
+                                            class="sh-form-control"
+                                            onchange="tampilkanSekolahTujuan({{ item.siswa.id }})">
+
+                                        <option value="">Pilih Jenis</option>
+
+                                        <option value="Berhenti"
+                                            {{ 'selected' if item.siswa.jenis_non_aktif == 'Berhenti' else '' }}>
+                                            Berhenti Sekolah
+                                        </option>
+
+                                        <option value="Pindah"
+                                            {{ 'selected' if item.siswa.jenis_non_aktif == 'Pindah' else '' }}>
+                                            Pindah Sekolah
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="sh-form-section">
+
+                                    <label>Tanggal Non Aktif</label>
+
+                                    <input type="date"
+                                           name="tanggal_non_aktif"
+                                           class="sh-form-control"
+                                           value="{{ item.siswa.tanggal_non_aktif.strftime('%Y-%m-%d') if item.siswa.tanggal_non_aktif else '' }}">
+
+                                </div>
+
+
+                                <div class="sh-form-section">
+
+                                    <label>Alasan</label>
+
+                                    <textarea name="alasan_non_aktif"
+                                              class="sh-form-control"
+                                              rows="3"
+                                              placeholder="Tuliskan alasan...">{{ item.siswa.alasan_non_aktif or '' }}</textarea>
+
+                                </div>
+
+
+                                <div class="sh-form-section d-none"
+                                     id="kolomSekolah{{ item.siswa.id }}">
+
+                                    <label>Sekolah Tujuan</label>
+
+                                    <input type="text"
+                                           name="sekolah_tujuan"
+                                           class="sh-form-control"
+                                           value="{{ item.siswa.sekolah_tujuan or '' }}"
+                                           placeholder="Nama sekolah tujuan">
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="sh-modal-notice">
+                                <i class="fas fa-info-circle"></i>
+                                <span>
+                                    Status Non Aktif hanya dapat disimpan
+                                    jika siswa sudah tidak terdaftar di kelas manapun.
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <!-- MODAL FOOTER -->
+                        <div class="sh-modal-footer">
+
+                            <button type="button"
+                                    class="sh-modal-cancel"
+                                    data-bs-dismiss="modal">
+                                Batal
+                            </button>
+
+                            <button type="submit"
+                                    class="sh-modal-submit">
+                                <i class="fas fa-check"></i>
+                                Simpan Perubahan
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
             </div>
         </div>
-    </div>
+
+        {% endfor %}
+    {% endif %}
+
 </div>
