@@ -476,8 +476,8 @@ def tambah_siswa():
         }
     )
 
-@data_siswa_bp.route('/ubah/<int:id>', methods=['GET', 'POST'])
-def ubah_siswa(id):
+@data_siswa_bp.route('/ubah/<string:public_id>', methods=['GET', 'POST'])
+def ubah_siswa(public_id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
 
@@ -485,7 +485,9 @@ def ubah_siswa(id):
         flash("Anda tidak berhak mengubah data siswa", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
     kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
 
     tahun_pilihan = TahunPelajaran.query.filter_by(kode=kode_tahun).first()
@@ -544,7 +546,7 @@ def ubah_siswa(id):
                 flash("Pilih tingkat penerimaan siswa pindahan!", "danger")
                 return redirect(url_for(
                     'data_siswa.ubah_siswa',
-                    id=id,
+                    public_id=public_id,
                     tahun=kode_tahun
                 ))
 
@@ -554,7 +556,7 @@ def ubah_siswa(id):
             flash("Jenis pendaftaran tidak valid!", "danger")
             return redirect(url_for(
                 'data_siswa.ubah_siswa',
-                id=id,
+                public_id=public_id,
                 tahun=kode_tahun
             ))
 
@@ -576,27 +578,27 @@ def ubah_siswa(id):
 
         if tingkat not in ['7', '8', '9']:
             flash("Tingkat siswa harus 7, 8, atau 9!", "danger")
-            return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+            return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
 
         if not nis or not nama or not jenis_kelamin or not jenis_pendaftaran or not tanggal_diterima:
             flash("NIS, Nama, Jenis Kelamin, Jenis Pendaftaran, dan Tanggal Diterima wajib diisi!", "danger")
-            return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+            return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
 
         if nis != siswa.nis and Siswa.query.filter_by(nis=nis).first():
             flash("NIS sudah digunakan!", "danger")
-            return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+            return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
 
         if nisn and nisn != siswa.nisn and Siswa.query.filter_by(nisn=nisn).first():
             flash("NISN sudah digunakan!", "danger")
-            return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+            return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
 
         if email and email != siswa.email:
             if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
                 flash("Format email tidak valid!", "danger")
-                return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+                return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
             if Siswa.query.filter_by(email=email).first():
                 flash("Email sudah digunakan!", "danger")
-                return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+                return redirect(url_for('data_siswa.ubah_siswa', public_id=public_id, tahun=kode_tahun))
 
         siswa.nis = nis
         siswa.nisn = nisn
@@ -714,13 +716,15 @@ def kenaikan_kelas():
         user={'jabatan': session.get('jabatan', '')}
     )
 
-@data_siswa_bp.route('/atur-kelas/<int:id>', methods=['POST'])
-def atur_kelas(id):
+@data_siswa_bp.route('/atur-kelas/<string:public_id>', methods=['POST'])
+def atur_kelas(public_id):
     if not session.get('logged_in') or not bisa_kelola():
         flash("Tidak berhak mengubah kelas!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
     kode_tahun = request.form.get('tahun_pelajaran', '').strip()
     kelas_id_baru = request.form.get('kelas_id', '').strip()
 
@@ -734,7 +738,7 @@ def atur_kelas(id):
         return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
 
     posisi = RiwayatKelas.query.filter_by(
-        siswa_id=id,
+        siswa_id=siswa.id,
         tahun_pelajaran=kode_tahun
     ).first()
 
@@ -758,8 +762,8 @@ def atur_kelas(id):
     return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
 
 
-@data_siswa_bp.route('/hapus/<int:id>', methods=['POST'])
-def hapus_siswa(id):
+@data_siswa_bp.route('/hapus/<string:public_id>', methods=['POST'])
+def hapus_siswa(public_id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
 
@@ -767,7 +771,9 @@ def hapus_siswa(id):
         flash("Anda tidak berhak menghapus data!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
 
     try:
         # ==========================================
@@ -776,7 +782,7 @@ def hapus_siswa(id):
         ada_riwayat_bayar = (
             RiwayatPembayaran.query
             .join(TagihanSiswa, RiwayatPembayaran.tagihan_id == TagihanSiswa.id)
-            .filter(TagihanSiswa.siswa_id == id)
+            .filter(TagihanSiswa.siswa_id == siswa.id)
             .first()
         )
 
@@ -795,7 +801,7 @@ def hapus_siswa(id):
         ada_detail_pengajuan = (
             DetailPengajuanPembayaran.query
             .join(TagihanSiswa, DetailPengajuanPembayaran.tagihan_id == TagihanSiswa.id)
-            .filter(TagihanSiswa.siswa_id == id)
+            .filter(TagihanSiswa.siswa_id == siswa.id)
             .first()
         )
 
@@ -812,7 +818,7 @@ def hapus_siswa(id):
         # ==========================================
         ada_pengajuan = (
             PengajuanPembayaran.query
-            .filter_by(siswa_id=id)
+            .filter_by(siswa_id=siswa.id)
             .first()
         )
 
@@ -827,7 +833,7 @@ def hapus_siswa(id):
         # ==========================================
         # 4. HAPUS RIWAYAT KELAS
         # ==========================================
-        RiwayatKelas.query.filter_by(siswa_id=id).delete(
+        RiwayatKelas.query.filter_by(siswa_id=siswa.id).delete(
             synchronize_session=False
         )
 
@@ -855,7 +861,7 @@ def hapus_siswa(id):
     except Exception as e:
         db.session.rollback()
         current_app.logger.exception(
-            "Gagal menghapus siswa ID %s", id
+            "Gagal menghapus siswa ID %s", siswa.id
         )
         flash(
             "Terjadi kesalahan saat menghapus data siswa. "
@@ -865,19 +871,21 @@ def hapus_siswa(id):
 
     return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-@data_siswa_bp.route('/detail/<int:id>')
-def detail_siswa(id):
+@data_siswa_bp.route('/detail/<string:public_id>')
+def detail_siswa(public_id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
     if not bisa_lihat():
         flash("Anda tidak berhak melihat data ini!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
     
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
 
     # ========== DEBUG: CEK RIWAYAT SISWA ==========
     print("=" * 50)
-    print(f"[DETAIL SISWA] ID: {id} | Nama: {siswa.nama}")  # ← diperbaiki: nama, bukan nama_lengkap
+    print(f"[DETAIL SISWA] ID: {siswa.id} | Public ID: {siswa.public_id} | Nama: {siswa.nama}")
     # ==============================================
 
     # === AMBIL & NORMALISASI KODE TAHUN ===
@@ -909,7 +917,7 @@ def detail_siswa(id):
     riwayat_tahun_ini = None
     if kode_cari:
         riwayat_tahun_ini = RiwayatKelas.query.filter_by(
-            siswa_id=id,
+            siswa_id=siswa.id,
             tahun_pelajaran=kode_cari
         ).first()
 
@@ -924,7 +932,7 @@ def detail_siswa(id):
         kelas_sekarang.jenjang = riwayat_tahun_ini.tingkat
         kelas_tahun_formatted = tahun_dipilih_formatted
     else:
-        riwayat_terakhir = RiwayatKelas.query.filter_by(siswa_id=id)\
+        riwayat_terakhir = RiwayatKelas.query.filter_by(siswa_id=siswa.id)\
             .order_by(RiwayatKelas.tahun_pelajaran.desc())\
             .first()
         if riwayat_terakhir and riwayat_terakhir.kelas:
@@ -933,7 +941,7 @@ def detail_siswa(id):
             kelas_tahun_formatted = format_tahun_pelajaran(riwayat_terakhir.tahun_pelajaran)
     
     # Ambil SEMUA riwayat kelas siswa
-    riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=id)\
+    riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=siswa.id)\
         .order_by(RiwayatKelas.tahun_pelajaran.asc()).all()
 
     # ========== DEBUG ==========
@@ -997,16 +1005,18 @@ def detail_siswa(id):
         }
     )
 
-@data_siswa_bp.route('/buat-akun/<int:id>', methods=['GET', 'POST'])
-def buat_akun_siswa(id):
+@data_siswa_bp.route('/buat-akun/<string:public_id>', methods=['GET', 'POST'])
+def buat_akun_siswa(public_id):
     if not session.get('logged_in') or not bisa_buat_akun():
         flash("Anda tidak memiliki hak akses untuk membuat akun siswa!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
     if siswa.akun:
         flash("Siswa sudah memiliki akun!", "warning")
-        return redirect(url_for('data_siswa.detail_siswa', id=id))
+        return redirect(url_for('data_siswa.detail_siswa', public_id=public_id))
 
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
@@ -1014,11 +1024,11 @@ def buat_akun_siswa(id):
 
         if not username or not password:
             flash("Username dan Password wajib diisi!", "danger")
-            return redirect(url_for('data_siswa.buat_akun_siswa', id=id))
+            return redirect(url_for('data_siswa.buat_akun_siswa', public_id=public_id))
 
         if User.query.filter_by(username=username).first():
             flash("Username sudah digunakan!", "danger")
-            return redirect(url_for('data_siswa.buat_akun_siswa', id=id))
+            return redirect(url_for('data_siswa.buat_akun_siswa', public_id=public_id))
 
         akun_baru = User(
             username=username,
@@ -1030,7 +1040,7 @@ def buat_akun_siswa(id):
         db.session.add(akun_baru)
         db.session.commit()
         flash("Akun berhasil dibuat!", "success")
-        return redirect(url_for('data_siswa.detail_siswa', id=id))
+        return redirect(url_for('data_siswa.detail_siswa', public_id=public_id))
 
     return render_template('index.html',
         siswa=siswa,
@@ -1043,27 +1053,29 @@ def buat_akun_siswa(id):
         }
     )
 
-@data_siswa_bp.route('/ubah-password/<int:id>', methods=['GET', 'POST'])
-def ubah_password_siswa(id):
+@data_siswa_bp.route('/ubah-password/<string:public_id>', methods=['GET', 'POST'])
+def ubah_password_siswa(public_id):
     if not session.get('logged_in') or not bisa_buat_akun():
         flash("Anda tidak memiliki hak akses untuk mengubah password siswa!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
     if not siswa.akun:
         flash("Siswa belum memiliki akun!", "warning")
-        return redirect(url_for('data_siswa.detail_siswa', id=id))
+        return redirect(url_for('data_siswa.detail_siswa', public_id=public_id))
 
     if request.method == 'POST':
         password_baru = request.form.get('password_baru', '').strip()
         if not password_baru:
             flash("Password baru tidak boleh kosong!", "danger")
-            return redirect(url_for('data_siswa.ubah_password_siswa', id=id))
+            return redirect(url_for('data_siswa.ubah_password_siswa', public_id=public_id))
 
         siswa.akun.set_password(password_baru)
         db.session.commit()
         flash("Password berhasil diubah!", "success")
-        return redirect(url_for('data_siswa.detail_siswa', id=id))
+        return redirect(url_for('data_siswa.detail_siswa', public_id=public_id))
 
     return render_template('index.html',
         siswa=siswa,
@@ -1076,13 +1088,15 @@ def ubah_password_siswa(id):
         }
     )
 
-@data_siswa_bp.route('/ubah-status/<int:id>', methods=['GET', 'POST'])
-def ubah_status(id):
+@data_siswa_bp.route('/ubah-status/<string:public_id>', methods=['GET', 'POST'])
+def ubah_status(public_id):
     if not session.get('logged_in') or not bisa_kelola():
         flash("Anda tidak memiliki hak akses untuk mengubah status siswa", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
-    siswa = Siswa.query.get_or_404(id)
+    siswa = Siswa.query.filter_by(
+        public_id=public_id
+    ).first_or_404()
 
     if request.method == 'POST':
         status_baru = request.form.get('status', '').strip()

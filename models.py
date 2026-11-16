@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import String
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
+import uuid
 
 # ✅ Inisialisasi database
 db = SQLAlchemy()
@@ -332,6 +333,14 @@ class Siswa(db.Model):
     
     def __repr__(self):
         return f"<Siswa {self.nama} - Tingkat {self.tingkat}>"
+
+    public_id = db.Column(
+        db.String(36),
+        unique=True,
+        nullable=False,
+        default=lambda: str(uuid.uuid4()),
+        index=True
+    )
 
 # ==========================================
 # ✅ TABEL RIWAYAT KELAS

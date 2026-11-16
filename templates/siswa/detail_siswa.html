@@ -20,7 +20,7 @@
                 <span>Kembali</span>
             </a>
             {% if bisa_kelola %}
-            <a href="{{ url_for('data_siswa.ubah_siswa', id=siswa.id) }}" class="sd-btn sd-btn-primary">
+            <a href="{{ url_for('data_siswa.ubah_siswa', public_id=siswa.public_id) }}" class="sd-btn sd-btn-primary">
                 <i class="fas fa-pen"></i>
                 <span>Ubah Data</span>
             </a>

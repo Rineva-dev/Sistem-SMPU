@@ -2,7 +2,7 @@
 <div class="admission-app" id="admissionApp">
 
     <form method="POST"
-          action="{{ url_for('data_siswa.ubah_siswa', id=siswa.id) if mode == 'ubah' else url_for('data_siswa.tambah_siswa') }}"
+          action="{{ url_for('data_siswa.ubah_siswa', public_id=siswa.public_id) if mode == 'ubah' else url_for('data_siswa.tambah_siswa') }}"
           id="formSiswa"
           novalidate>
 

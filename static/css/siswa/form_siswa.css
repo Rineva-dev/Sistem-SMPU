@@ -1226,8 +1226,8 @@
 
 .btn-exit {
     color: #8a978e;
-    border: 1px solid transparent;
-    background: transparent;
+    border: 1px solid #00000020;
+    background: #00000005;
 }
 
 .btn-exit:hover {

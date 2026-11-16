@@ -453,7 +453,7 @@
                             <td>
                                 <div class="sh-actions">
 
-                                    <a href="{{ url_for('data_siswa.detail_siswa', id=item.siswa.id) }}"
+                                    <a href="{{ url_for('data_siswa.detail_siswa', public_id=item.siswa.public_id) }}"
                                        class="sh-action view"
                                        title="Lihat Detail">
                                         <i class="fas fa-eye"></i>
@@ -461,7 +461,7 @@
 
                                     {% if bisa_kelola %}
 
-                                    <a href="{{ url_for('data_siswa.ubah_siswa', id=item.siswa.id) }}"
+                                    <a href="{{ url_for('data_siswa.ubah_siswa', public_id=item.siswa.public_id) }}"
                                        class="sh-action edit"
                                        title="Ubah Data">
                                         <i class="fas fa-pen"></i>
@@ -481,7 +481,7 @@
 
                                         {% if item.siswa.akun %}
 
-                                        <a href="{{ url_for('data_siswa.ubah_password_siswa', id=item.siswa.id) }}"
+                                        <a href="{{ url_for('data_siswa.ubah_password_siswa', public_id=item.siswa.public_id) }}"
                                            class="sh-action account"
                                            title="Ubah Password">
                                             <i class="fas fa-key"></i>
@@ -489,7 +489,7 @@
 
                                         {% else %}
 
-                                        <a href="{{ url_for('data_siswa.buat_akun_siswa', id=item.siswa.id) }}"
+                                        <a href="{{ url_for('data_siswa.buat_akun_siswa', public_id=item.siswa.public_id) }}"
                                            class="sh-action account"
                                            title="Buat Akun">
                                             <i class="fas fa-user-plus"></i>
@@ -501,7 +501,7 @@
 
                                     {% if bisa_hapus %}
 
-                                    <form action="{{ url_for('data_siswa.hapus_siswa', id=item.siswa.id) }}"
+                                    <form action="{{ url_for('data_siswa.hapus_siswa', public_id=item.siswa.public_id) }}"
                                           method="POST"
                                           class="sh-delete-form"
                                           onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
@@ -600,7 +600,7 @@
 
                 <div class="modal-content">
 
-                    <form action="{{ url_for('data_siswa.ubah_status', id=item.siswa.id) }}"
+                    <form action="{{ url_for('data_siswa.ubah_status', public_id=item.siswa.public_id) }}"
                           method="POST">
 
                         <!-- MODAL HEADER -->
