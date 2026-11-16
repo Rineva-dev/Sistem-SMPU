@@ -258,7 +258,6 @@ def tambah_siswa():
         # Tahun diterima selalu mengikuti tanggal diterima
         tanggal_obj = datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None
         tahun_diterima = tanggal_obj.year if tanggal_obj else None
-        diterima_di_kelas_id = request.form.get('diterima_di_kelas') or None
         sekolah_sd = request.form.get('sekolah_sd', '').strip()
         tahun_lulus_sd = request.form.get('tahun_lulus_sd') or None
         alamat_sekolah_sd = request.form.get('alamat_sekolah_sd', '').strip()
@@ -268,74 +267,39 @@ def tambah_siswa():
 
         print(f"[DEBUG] Jenis: {jenis_pendaftaran} | NIS: {nis} | Nama: {nama}")
 
-        tingkat = None
-        diterima_di_kelas = None
-        kelas_id = None
+        # ==========================================
+        # PENENTUAN TINGKAT PENERIMAAN
+        # ROMBEL TIDAK DITENTUKAN SAAT PENDAFTARAN
+        # ==========================================
 
-        tingkat = request.form.get('tingkat', '').strip()
-        
+        tingkat_form = request.form.get('tingkat', '').strip()
+
         if jenis_pendaftaran == 'baru':
+            # Siswa baru otomatis diterima di tingkat 7
             tingkat = '7'
-            # Cari kelas tingkat 7 secara eksplisit
-            kelas_tingkat_7 = Kelas.query.filter_by(
-                jenjang='7',
-                tahun_pelajaran=dasar_tahun
-            ).first()
-            if kelas_tingkat_7:
-                diterima_di_kelas = kelas_tingkat_7.id
-                kelas_id = kelas_tingkat_7.id
-                print(f"[DEBUG] Kelas Tingkat 7 ditemukan: {kelas_tingkat_7.nama_kelas}")
-            else:
-                flash("Kelas Tingkat 7 belum dibuat untuk Tahun Pelajaran ini!", "danger")
-                return render_template('index.html',
-                    daftar_kelas=daftar_kelas,
-                    active_page='data_siswa',
-                    sub_page='form_tambah',
-                    halaman_aktif=session.get('halaman_aktif', 'utama'),
-                    tahun_dipilih=kode_tahun,
-                    dasar_tahun=dasar_tahun,
-                    mode='tambah',
-                    user={
-                        'jabatan': session.get('jabatan', ''),
-                        'tugas_tambahan': session.get('tugas_tambahan', '')
-                    }
-                )
 
         elif jenis_pendaftaran == 'pindahan':
-            if not diterima_di_kelas_id:
-                flash("Pilih kelas tempat diterima siswa pindahan!", "danger")
-                return render_template('index.html',
-                    daftar_kelas=daftar_kelas,
-                    active_page='data_siswa',
-                    sub_page='form_tambah',
-                    halaman_aktif=session.get('halaman_aktif', 'utama'),
-                    tahun_dipilih=kode_tahun,
-                    dasar_tahun=dasar_tahun,
-                    mode='tambah',
-                    user={
-                        'jabatan': session.get('jabatan', ''),
-                        'tugas_tambahan': session.get('tugas_tambahan', '')
-                    }
-                )
-            kelas_diterima = Kelas.query.get(diterima_di_kelas_id)
-            if not kelas_diterima:
-                flash("Kelas yang dipilih tidak ditemukan!", "danger")
-                return render_template('index.html',
-                    daftar_kelas=daftar_kelas,
-                    active_page='data_siswa',
-                    sub_page='form_tambah',
-                    halaman_aktif=session.get('halaman_aktif', 'utama'),
-                    tahun_dipilih=kode_tahun,
-                    dasar_tahun=dasar_tahun,
-                    mode='tambah',
-                    user={
-                        'jabatan': session.get('jabatan', ''),
-                        'tugas_tambahan': session.get('tugas_tambahan', '')
-                    }
-                )
-            tingkat = kelas_diterima.jenjang
-            diterima_di_kelas = kelas_diterima.id
-            kelas_id = kelas_diterima.id
+            # Siswa pindahan harus menentukan tingkat penerimaan
+            if tingkat_form not in ['7', '8', '9']:
+                flash("Pilih tingkat penerimaan siswa pindahan!", "danger")
+                return redirect(url_for(
+                    'data_siswa.tambah_siswa'
+                ))
+
+            tingkat = tingkat_form
+
+        else:
+            flash("Jenis pendaftaran tidak valid!", "danger")
+            return redirect(url_for(
+                'data_siswa.tambah_siswa'
+            ))
+
+        # Tidak ada penempatan rombel saat pendaftaran
+        kelas_id = None
+
+        # Kolom lama dipertahankan sementara untuk kompatibilitas
+        # tetapi tidak lagi digunakan untuk menyimpan ID rombel
+        diterima_di_kelas = None
 
         # Validasi wajib
         if not nis or not nama or not jenis_kelamin or not jenis_pendaftaran or not tanggal_diterima:
@@ -468,7 +432,7 @@ def tambah_siswa():
                     siswa_id=siswa_baru.id,
                     tahun_pelajaran=kode_tahun,
                     tingkat=tingkat,
-                    kelas_id=kelas_id
+                    kelas_id=None
                 )
                 db.session.add(riwayat_baru)
                 print(f"[DEBUG] Riwayat dibuat: TP={kode_tahun}, Tingkat={tingkat}")
@@ -557,8 +521,6 @@ def ubah_siswa(id):
         tanggal_diterima = request.form.get('tanggal_diterima')
         tanggal_obj = datetime.strptime(tanggal_diterima, '%Y-%m-%d') if tanggal_diterima else None
         tahun_diterima = tanggal_obj.year if tanggal_obj else None
-        diterima_di_kelas_id = request.form.get('diterima_di_kelas') or None
-        kelas_id_baru = request.form.get('kelas_id') or None
         sekolah_sd = request.form.get('sekolah_sd', '').strip()
         tahun_lulus_sd = request.form.get('tahun_lulus_sd') or None
         alamat_sekolah_sd = request.form.get('alamat_sekolah_sd', '').strip()
@@ -566,42 +528,50 @@ def ubah_siswa(id):
         tahun_pindah = request.form.get('tahun_pindah') or None
         alamat_sekolah_pindah = request.form.get('alamat_sekolah_pindah', '').strip()
 
-        tingkat = siswa.tingkat
-        diterima_di_kelas = siswa.diterima_di_kelas
-        kelas_id = siswa.kelas_id
+        # ==========================================
+        # TINGKAT PENERIMAAN
+        # TANPA PENENTUAN ROMBEL
+        # ==========================================
+
+        tingkat_form = request.form.get('tingkat', '').strip()
 
         if jenis_pendaftaran == 'baru':
             tingkat = '7'
-            if kelas_id_baru:
-                kelas_baru = Kelas.query.get(kelas_id_baru)
-                if not kelas_baru or kelas_baru.jenjang != '7' or kelas_baru.tahun_pelajaran != kode_tahun:
-                    flash("❌ Siswa Baru hanya boleh masuk ke Kelas Tingkat 7 di tahun pelajaran aktif!", "danger")
-                    return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
-            if diterima_di_kelas_id:
-                kelas_diterima = Kelas.query.get(diterima_di_kelas_id)
-                if kelas_diterima and (kelas_diterima.jenjang != '7' or kelas_diterima.tahun_pelajaran != kode_tahun):
-                    flash("❌ Kelas yang dipilih tidak sesuai untuk Siswa Baru!", "danger")
-                    return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
-                if kelas_diterima:
-                    diterima_di_kelas = kelas_diterima.id
 
         elif jenis_pendaftaran == 'pindahan':
-            if kelas_id_baru:
-                kelas_baru = Kelas.query.get(kelas_id_baru)
-                if kelas_baru and kelas_baru.tahun_pelajaran == kode_tahun:
-                    tingkat = kelas_baru.jenjang
-                    kelas_id = kelas_baru.id
-                else:
-                    flash("❌ Kelas yang dipilih tidak valid atau bukan untuk tahun ini!", "danger")
-                    return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
-            elif diterima_di_kelas_id:
-                kelas_diterima = Kelas.query.get(diterima_di_kelas_id)
-                if kelas_diterima and kelas_diterima.tahun_pelajaran == kode_tahun:
-                    tingkat = kelas_diterima.jenjang
-                    diterima_di_kelas = kelas_diterima.id
-                else:
-                    flash("❌ Kelas penerima tidak valid atau bukan untuk tahun ini!", "danger")
-                    return redirect(url_for('data_siswa.ubah_siswa', id=id, tahun=kode_tahun))
+            if tingkat_form not in ['7', '8', '9']:
+                flash("Pilih tingkat penerimaan siswa pindahan!", "danger")
+                return redirect(url_for(
+                    'data_siswa.ubah_siswa',
+                    id=id,
+                    tahun=kode_tahun
+                ))
+
+            tingkat = tingkat_form
+
+        else:
+            flash("Jenis pendaftaran tidak valid!", "danger")
+            return redirect(url_for(
+                'data_siswa.ubah_siswa',
+                id=id,
+                tahun=kode_tahun
+            ))
+
+        # Pertahankan penempatan rombel yang sudah ada,
+        # selama masih sesuai dengan tingkat siswa.
+        kelas_id = siswa.kelas_id
+
+        if kelas_id:
+            kelas_terpasang = Kelas.query.get(kelas_id)
+
+            if (
+                not kelas_terpasang
+                or str(kelas_terpasang.jenjang) != str(tingkat)
+            ):
+                kelas_id = None
+
+        # Kolom lama tidak lagi digunakan
+        diterima_di_kelas = None
 
         if tingkat not in ['7', '8', '9']:
             flash("Tingkat siswa harus 7, 8, atau 9!", "danger")

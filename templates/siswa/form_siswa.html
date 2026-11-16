@@ -1,585 +1,1051 @@
-<div class="card form-wrapper">
-    <div class="card-header">
-        <h4>{{ 'Ubah Data Siswa' if mode == 'ubah' else 'Tambah Data Siswa' }}</h4>
-    </div>
-    <div class="card-body">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for kategori, pesan in messages %}
-                    <div class="alert alert-{{ kategori }}">{{ pesan }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
 
-        <form method="POST" action="{{ url_for('data_siswa.tambah_siswa') }}" class="form-layout" id="formSiswa" novalidate>
+<div class="admission-app" id="admissionApp">
 
-            <input type="hidden" id="tahunPelajaranAktif" name="tahun_pelajaran" value="{{ tahun_dipilih }}">
+    <form method="POST"
+          action="{{ url_for('data_siswa.ubah_siswa', id=siswa.id) if mode == 'ubah' else url_for('data_siswa.tambah_siswa') }}"
+          id="formSiswa"
+          novalidate>
 
-            <div class="form-group full">
-                <label>Jenis Pendaftaran <span class="text-danger">*</span></label>
-                <div class="custom-select">
-                    <select name="jenis_pendaftaran" id="jenisPendaftaran" required>
-                        <option value="">-- Pilih Jenis --</option>
-                        <option value="baru" {{ 'selected' if siswa and siswa.jenis_pendaftaran == 'baru' else '' }}>Siswa Baru</option>
-                        <option value="pindahan" {{ 'selected' if siswa and siswa.jenis_pendaftaran == 'pindahan' else '' }}>Siswa Pindahan</option>
-                    </select>
-                </div>
-            </div>
+        <input type="hidden" name="tahun_pelajaran" id="tahunPelajaranAktif" value="{{ tahun_dipilih }}">
+        <input type="hidden" name="tingkat" id="inputTingkatUtama" value="{{ siswa.tingkat if siswa and siswa.tingkat else '7' }}">
+        <input type="hidden" name="tahun_diterima" id="tahunDiterima" value="{{ siswa.tahun_diterima if siswa else '' }}">
 
-            <!-- Baris 1: NIS & NISN -->
-            <div class="form-row">
-                <div class="form-group half">
-                    <label>NIS <span class="text-danger">*</span></label>
-                    <input type="text" name="nis" class="form-input" required value="{{ siswa.nis if siswa else '' }}">
-                </div>
-                <div class="form-group half">
-                    <label>NISN <span class="text-danger">*</span></label>
-                    <input type="text" name="nisn" class="form-input" required value="{{ siswa.nisn if siswa else '' }}">
-                </div>
-            </div>
+        <div class="admission-layout">
 
-            <!-- Baris 2: Nama Lengkap -->
-            <div class="form-group full">
-                <label>Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" name="nama" class="form-input" required value="{{ siswa.nama if siswa else '' }}">
-            </div>
+            <!-- LEFT PANEL -->
+            <aside class="admission-aside">
 
-            <!-- Baris 3: NIK -->
-            <div class="form-group full">
-                <label>NIK <span class="text-danger">*</span></label>
-                <input type="text" name="nik" class="form-input" required value="{{ siswa.nik if siswa else '' }}">
-            </div>
-
-            <!-- Baris 4: Jenis Kelamin & Agama -->
-            <div class="form-row">
-                <div class="form-group half">
-                    <label>Jenis Kelamin <span class="text-danger">*</span></label>
-                    <div class="custom-select">
-                        <select name="jenis_kelamin" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="Laki-laki" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
-                            <option value="Perempuan" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
-                        </select>
+                <div class="admission-brand">
+                    <div class="brand-mark">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <strong>SMPU <span>ACADEMY</span></strong>
+                        <small>STUDENT MANAGEMENT</small>
                     </div>
                 </div>
-                <div class="form-group half">
-                    <label>Agama <span class="text-danger">*</span></label>
-                    <div class="custom-select">
-                        <select name="agama" required>
-                            <option value="">-- Pilih Agama --</option>
-                            <option value="Islam" {{ 'selected' if siswa and siswa.agama == 'Islam' else '' }}>Islam</option>
-                            <option value="Kristen Protestan" {{ 'selected' if siswa and siswa.agama == 'Kristen Protestan' else '' }}>Kristen Protestan</option>
-                            <option value="Kristen Katolik" {{ 'selected' if siswa and siswa.agama == 'Kristen Katolik' else '' }}>Kristen Katolik</option>
-                            <option value="Hindu" {{ 'selected' if siswa and siswa.agama == 'Hindu' else '' }}>Hindu</option>
-                            <option value="Buddha" {{ 'selected' if siswa and siswa.agama == 'Buddha' else '' }}>Buddha</option>
-                            <option value="Khonghucu" {{ 'selected' if siswa and siswa.agama == 'Khonghucu' else '' }}>Khonghucu</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Baris 5: Tempat Lahir & Tanggal Lahir -->
-            <div class="form-row">
-                <div class="form-group half">
-                    <label>Tempat Lahir <span class="text-danger">*</span></label>
-                    <input type="text" name="tempat_lahir" class="form-input" required value="{{ siswa.tempat_lahir if siswa else '' }}">
-                </div>
-                <div class="form-group half">
-                    <label>Tanggal Lahir <span class="text-danger">*</span></label>
-                    <div class="custom-date">
-                        <input type="date" name="tanggal_lahir" required
-                            value="{{ siswa.tanggal_lahir.strftime('%Y-%m-%d') if siswa and siswa.tanggal_lahir else '' }}">
-                    </div>
-                </div>
-            </div>
+                <div class="aside-art">
+                    <div class="art-orbit orbit-one"></div>
+                    <div class="art-orbit orbit-two"></div>
+                    <div class="art-orbit orbit-three"></div>
 
-            <!-- DATA SEKOLAH SD -->
-            <div class="form-section saat-ini">
-                <h5 class="section-title title-1">Sekolah Asal (SD/MI)</h5>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>Sekolah Dasar (SD) Asal</label>
-                        <input type="text" name="sekolah_sd" class="form-input" placeholder="Nama SD sebelumnya" 
-                            value="{{ siswa.sekolah_sd if siswa else '' }}">
-                    </div>
-                    <div class="form-group half">
-                        <label>Tahun Lulus SD</label>
-                        <input type="number" name="tahun_lulus_sd" class="form-input" min="2000" max="2099" 
-                            value="{{ siswa.tahun_lulus_sd if siswa else '' }}">
-                    </div>
-                </div>
-                <div class="form-group full">
-                    <label>Alamat Sekolah Dasar</label>
-                    <textarea name="alamat_sekolah_sd" class="form-input" rows="2" placeholder="Alamat lengkap SD asal">{{ siswa.alamat_sekolah_sd if siswa else '' }}</textarea>
-                </div>
-            </div>
+                    <div class="art-glow"></div>
 
-            <!-- DATA SEKOLAH ASAL PINDAHAN -->
-            <div id="dataPindahan" class="form-section saat-ini">
-                <h5 class="section-title title-1">Data Sekolah Asal Pindahan</h5>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>Sekolah Asal Pindahan</label>
-                        <input type="text" name="sekolah_asal_pindah" class="form-input" placeholder="Nama sekolah sebelumnya" 
-                            value="{{ siswa.sekolah_asal_pindah if siswa else '' }}">
+                    <div class="art-main">
+                        <i class="fas fa-user-graduate"></i>
                     </div>
-                    <div class="form-group half">
-                        <label>Tahun Pindah Masuk</label>
-                        <input type="number" name="tahun_pindah" class="form-input" min="2000" max="2099" 
-                            value="{{ siswa.tahun_pindah if siswa else '' }}">
-                    </div>
-                </div>
-                <div class="form-group full">
-                    <label>Alamat Sekolah Asal Pindahan</label>
-                    <textarea name="alamat_sekolah_pindah" class="form-input" rows="2" placeholder="Alamat lengkap sekolah asal">{{ siswa.alamat_sekolah_pindah if siswa else '' }}</textarea>
-                </div>
-            </div>
 
-            <!-- DATA PENERIMAAN -->
-            <div class="form-section saat-ini">
-                <h5 class="section-title title-1">Data Penerimaan di Sekolah Ini</h5>
-                <div class="form-row">
-                    <div class="form-group full">
-                        <label>Tanggal Diterima <span class="text-danger">*</span></label>
-                        <div class="custom-date">
-                            <input type="date" name="tanggal_diterima" id="tanggalDiterima" class="form-input" required
-                                value="{{ siswa.tanggal_diterima.strftime('%Y-%m-%d') if siswa and siswa.tanggal_diterima else '' }}">
+                    <div class="art-float float-one">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="art-float float-two">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="art-float float-three">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="art-float float-four">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+
+                    <span class="art-particle particle-one"></span>
+                    <span class="art-particle particle-two"></span>
+                    <span class="art-particle particle-three"></span>
+                    <span class="art-particle particle-four"></span>
+                </div>
+
+                <div class="aside-copy">
+                    <span class="aside-kicker">STUDENT ENROLLMENT PORTAL</span>
+                    <h2>Masa Depan Hebat Dimulai dari <em>Pendidikan.</em></h2>
+                    <p>
+                        Kelola informasi siswa dengan lebih mudah,
+                        terstruktur, aman, dan terintegrasi.
+                    </p>
+                </div>
+
+                <div class="aside-progress">
+                    <div class="progress-caption">
+                        <span>PROGRESS PENDAFTARAN</span>
+                        <strong id="progressPercent">33%</strong>
+                    </div>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+
+                    <div class="progress-step-label">
+                        <span id="progressStepLabel">Tahap 1 dari 3</span>
+                        <span id="progressStepName">Identitas</span>
+                    </div>
+                </div>
+
+                <div class="aside-footer">
+                    <span><i class="fas fa-shield-alt"></i> Secure data management</span>
+                    <span>© SMPU</span>
+                </div>
+
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="admission-main">
+
+                <header class="main-topbar">
+                    <div class="breadcrumb">
+                        <span>Data Siswa</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <strong>{{ 'Edit Siswa' if mode == 'ubah' else 'Tambah Siswa' }}</strong>
+                    </div>
+
+                    <div class="topbar-right">
+                        <span class="secure-label">
+                            <i class="fas fa-lock"></i>
+                            Secure Form
+                        </span>
+                        <span class="form-version">V 2.0</span>
+                    </div>
+                </header>
+
+                <div class="main-inner">
+
+                    <div class="page-heading">
+                        <div>
+                            <span class="page-eyebrow">
+                                {{ 'STUDENT PROFILE MANAGEMENT' if mode == 'ubah' else 'NEW STUDENT REGISTRATION' }}
+                            </span>
+
+                            <h1>
+                                {{ 'Perbarui Data Siswa' if mode == 'ubah' else 'Pendaftaran Siswa Baru' }}
+                                <span class="heading-dot">.</span>
+                            </h1>
+
+                            <p>
+                                {{ 'Periksa dan perbarui informasi siswa dengan teliti.' if mode == 'ubah' else 'Lengkapi informasi siswa melalui tiga langkah sederhana.' }}
+                            </p>
                         </div>
-                    </div>
-                
-                    <div class="form-group half" id="kolomKelasTerima" style="display: none;">
-                        <label>Kelas Diterima <span class="text-danger">*</span></label>
-                        <div class="custom-select">
-                            <select name="diterima_di_kelas" id="diterimaDiKelas">
-                                <option value="">-- Pilih Kelas --</option>
-                                {% for kelas in daftar_kelas %}
-                                <option value="{{ kelas.id }}" 
-                                    data-kode="{{ kelas.nama_kelas }}"
-                                    data-tingkat="{{ kelas.jenjang }}"
-                                    data-tahun="{{ kelas.tahun_pelajaran }}"
-                                    {{ 'selected' if siswa and siswa.diterima_di_kelas == kelas.id else '' }}>
-                                    {{ kelas.nama_kelas }}
-                                </option>
-                                {% endfor %}
-                            </select>
+
+                        <div class="heading-decoration">
+                            <i class="fas fa-sparkles"></i>
                         </div>
                     </div>
 
-                    <div id="infoKelasOtomatis" style="display: none;">
-                        <input type="hidden" name="diterima_di_kelas" id="nilaiKelasOtomatis" value="{{ siswa.diterima_di_kelas if siswa else '' }}">
-                    </div>
-                </div>
-                <input type="hidden" name="tahun_diterima" id="tahunDiterima" value="{{ siswa.tahun_diterima if siswa else '' }}">
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>Tingkat / Jenjang <span class="text-danger">*</span></label>
+                    <!-- FLASH -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for kategori, pesan in messages %}
+                                <div class="admission-alert alert-{{ kategori }}">
+                                    <i class="fas {{ 'fa-check-circle' if kategori == 'success' else 'fa-exclamation-circle' }}"></i>
+                                    <span>{{ pesan }}</span>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
-                        <!-- ✅ SATU input utama yang SELALU ada -->
-                        <input type="hidden" name="tingkat" id="inputTingkatUtama" value="7">
+                    <!-- WIZARD NAVIGATION -->
+                    <nav class="wizard-nav" aria-label="Tahapan formulir">
 
-                        <div id="tampilanTingkatBaru">
-                            <input type="text" class="form-input" readonly
-                                style="background-color: #f8f9fa; cursor: not-allowed;"
-                                value="Tingkat 7">
-                            <!-- ❌ HAPUS baris <input type="hidden" name="tingkat" value="7"> yang ada di sini -->
-                        </div>
+                        <button type="button" class="wizard-step active" data-step-target="0">
+                            <span class="wizard-number">01</span>
+                            <span class="wizard-text">
+                                <strong>Identitas</strong>
+                                <small>Data pribadi</small>
+                            </span>
+                        </button>
 
-                        <div id="pilihTingkatPindahan" style="display: none;">
-                            <div class="custom-select">
-                            <select id="nilaiTingkat">
-                                <!-- ❌ HAPUS name="tingkat" dari select ini -->
-                                <option value="">-- Pilih Tingkat --</option>
-                                <option value="7">Tingkat 7</option>
-                                <option value="8">Tingkat 8</option>
-                                <option value="9">Tingkat 9</option>
-                            </select>
+                        <span class="wizard-connector"></span>
+
+                        <button type="button" class="wizard-step" data-step-target="1">
+                            <span class="wizard-number">02</span>
+                            <span class="wizard-text">
+                                <strong>Akademik</strong>
+                                <small>Data sekolah</small>
+                            </span>
+                        </button>
+
+                        <span class="wizard-connector"></span>
+
+                        <button type="button" class="wizard-step" data-step-target="2">
+                            <span class="wizard-number">03</span>
+                            <span class="wizard-text">
+                                <strong>Keluarga</strong>
+                                <small>Kontak & wali</small>
+                            </span>
+                        </button>
+
+                    </nav>
+
+                    <!-- STEP 1 -->
+                    <section class="wizard-panel active" data-step="0">
+
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-index">STEP 01 / PERSONAL INFORMATION</span>
+                                <h2>Identitas Siswa</h2>
+                                <p>Mulai dengan informasi dasar dan identitas resmi siswa.</p>
+                            </div>
+                            <div class="panel-heading-icon">
+                                <i class="fas fa-id-card"></i>
                             </div>
                         </div>
 
-                        <small class="form-note">
-                            * Siswa Baru otomatis Tingkat 7. Pindahan silakan pilih di atas.
-                        </small>
-                    </div>
+                        <!-- REGISTRATION TYPE -->
+                        <div class="registration-choice">
+                            <div class="field-heading">
+                                <label>Jenis Pendaftaran <span class="required">*</span></label>
+                                <small>Pilih jalur masuk siswa.</small>
+                            </div>
 
-                    <div class="form-group half">
-                        <label>Kelas / Rombongan Belajar Saat Ini</label>
-                        <div class="custom-select">
-                            <select name="kelas_id" id="kelasSaatIni">
-                                <option value="">-- Belum Masuk Rombongan --</option>
-                                {% for kelas in daftar_kelas %}
-                                <option value="{{ kelas.id }}" 
-                                        data-tingkat="{{ kelas.jenjang }}"
-                                        data-tahun="{{ kelas.tahun_pelajaran }}"
-                                        {{ 'selected' if siswa and siswa.kelas_id == kelas.id else '' }}>
-                                    {{ kelas.nama_kelas }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                            <div class="registration-options">
+
+                                <label class="registration-card">
+                                    <input type="radio" name="jenis_pendaftaran" value="baru"
+                                        {{ 'checked' if siswa and siswa.jenis_pendaftaran == 'baru' else '' }}>
+
+                                    <span class="registration-card-icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </span>
+
+                                    <span class="registration-card-copy">
+                                        <strong>Siswa Baru</strong>
+                                        <small>Pendaftaran awal tingkat 7</small>
+                                    </span>
+
+                                    <span class="registration-check">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </label>
+
+                                <label class="registration-card">
+                                    <input type="radio" name="jenis_pendaftaran" value="pindahan"
+                                        {{ 'checked' if siswa and siswa.jenis_pendaftaran == 'pindahan' else '' }}>
+
+                                    <span class="registration-card-icon transfer-icon">
+                                        <i class="fas fa-right-left"></i>
+                                    </span>
+
+                                    <span class="registration-card-copy">
+                                        <strong>Siswa Pindahan</strong>
+                                        <small>Melanjutkan dari sekolah lain</small>
+                                    </span>
+
+                                    <span class="registration-check">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </label>
+
+                            </div>
+                            <small class="field-error" data-error-for="jenis_pendaftaran"></small>
                         </div>
-                        <small id="infoKelasKosong" class="form-note text-danger d-none">⚠️ Belum ada rombongan belajar untuk tingkat ini</small>
-                        <small class="form-note">* Daftar kelas menyesuaikan tingkat yang dipilih</small>
-                    </div>
-                </div>
-                
-                <div class="form-group full">
-                    <label>Status Siswa</label>
-                    <div class="custom-select">
-                        <select name="status">
-                            <option value="Aktif" {{ 'selected' if not siswa or siswa.status == 'Aktif' else '' }}>Aktif</option>
-                            <option value="Lulus" {{ 'selected' if siswa and siswa.status == 'Lulus' else '' }}>Lulus</option>
-                            <option value="Pindah" {{ 'selected' if siswa and siswa.status == 'Pindah' else '' }}>Pindah</option>
-                            <option value="Keluar" {{ 'selected' if siswa and siswa.status == 'Keluar' else '' }}>Keluar</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
 
-            <!-- KONTAK & ORANG TUA -->
-            <div class="form-section saat-ini">
-                <h5 class="section-title title-1">Kontak & Alamat</h5>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>No. HP Siswa</label>
-                        <input type="text" name="no_hp" class="form-input" placeholder="08xxxxxxxxx" 
-                               value="{{ siswa.no_hp if siswa else '' }}"
-                               pattern="[0-9]{8,13}"
-                               title="Hanya angka, 8–13 digit"
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    </div>
-                    <div class="form-group half">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-input" placeholder="contoh@email.com" 
-                               value="{{ siswa.email if siswa else '' }}">
-                    </div>
-                </div>
-                <div class="form-group full">
-                    <label>Alamat Lengkap</label>
-                    <textarea name="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap tempat tinggal">{{ siswa.alamat if siswa else '' }}</textarea>
-                </div>
-            </div>
+                        <div class="form-divider">
+                            <span>INFORMASI IDENTITAS</span>
+                        </div>
 
-            <div class="form-section saat-ini">
-                <h5 class="section-title title-1">Data Orang Tua / Wali</h5>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>Nama Ayah</label>
-                        <input type="text" name="nama_ayah" class="form-input" value="{{ siswa.nama_ayah if siswa else '' }}">
-                    </div>
-                    <div class="form-group half">
-                        <label>Nama Ibu</label>
-                        <input type="text" name="nama_ibu" class="form-input" value="{{ siswa.nama_ibu if siswa else '' }}">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label>Pekerjaan Ayah</label>
-                        <input type="text" name="pekerjaan_ayah" class="form-input" value="{{ siswa.pekerjaan_ayah if siswa else '' }}">
-                    </div>
-                    <div class="form-group half">
-                        <label>Pekerjaan Ibu</label>
-                        <input type="text" name="pekerjaan_ibu" class="form-input" value="{{ siswa.pekerjaan_ibu if siswa else '' }}">
-                    </div>
-                </div>
-                <div class="form-group full">
-                    <label>No. HP Orang Tua / Wali</label>
-                    <input type="text" name="no_hp_ortu" class="form-input" placeholder="08xxxxxxxxx" 
-                           value="{{ siswa.no_hp_ortu if siswa else '' }}"
-                           pattern="[0-9]{8,13}"
-                           title="Hanya angka, 8–13 digit"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                </div>
-            </div>
+                        <div class="modern-grid">
 
-            <div class="form-actions">
-                <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="btn btn-cancel">Kembali</a>
-                <button type="submit" class="btn btn-save">Simpan Data</button>
-            </div>
+                            <div class="modern-field">
+                                <label>NIS <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-hashtag"></i>
+                                    <input type="text" name="nis" required
+                                           value="{{ siswa.nis if siswa else '' }}"
+                                           placeholder="Nomor Induk Siswa">
+                                </div>
+                            </div>
 
-        </form>
-    </div>
+                            <div class="modern-field">
+                                <label>NISN <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-fingerprint"></i>
+                                    <input type="text" name="nisn" required
+                                           value="{{ siswa.nisn if siswa else '' }}"
+                                           placeholder="Nomor Induk Siswa Nasional">
+                                </div>
+                            </div>
+
+                            <div class="modern-field full-field">
+                                <label>Nama Lengkap <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="nama" required
+                                           value="{{ siswa.nama if siswa else '' }}"
+                                           placeholder="Nama lengkap sesuai dokumen resmi">
+                                </div>
+                            </div>
+
+                            <div class="modern-field full-field">
+                                <label>NIK <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-address-card"></i>
+                                    <input type="text" name="nik" required
+                                           value="{{ siswa.nik if siswa else '' }}"
+                                           placeholder="Nomor Induk Kependudukan">
+                                </div>
+                            </div>
+
+                            <div class="modern-field">
+                                <label>Jenis Kelamin <span class="required">*</span></label>
+                                <div class="select-shell">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <select name="jenis_kelamin" required>
+                                        <option value="">Pilih jenis kelamin</option>
+                                        <option value="Laki-laki" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Laki-laki' else '' }}>Laki-laki</option>
+                                        <option value="Perempuan" {{ 'selected' if siswa and siswa.jenis_kelamin == 'Perempuan' else '' }}>Perempuan</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="modern-field">
+                                <label>Agama <span class="required">*</span></label>
+                                <div class="select-shell">
+                                    <i class="fas fa-pray"></i>
+                                    <select name="agama" required>
+                                        <option value="">Pilih agama</option>
+                                        {% for agama in ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Buddha', 'Khonghucu'] %}
+                                            <option value="{{ agama }}" {{ 'selected' if siswa and siswa.agama == agama else '' }}>{{ agama }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="modern-field">
+                                <label>Tempat Lahir <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" name="tempat_lahir" required
+                                           value="{{ siswa.tempat_lahir if siswa else '' }}"
+                                           placeholder="Kota / Kabupaten">
+                                </div>
+                            </div>
+
+                            <div class="modern-field">
+                                <label>Tanggal Lahir <span class="required">*</span></label>
+                                <div class="input-shell">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="date" name="tanggal_lahir" required
+                                           value="{{ siswa.tanggal_lahir.strftime('%Y-%m-%d') if siswa and siswa.tanggal_lahir else '' }}">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="panel-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Pastikan NIS, NISN, dan NIK sesuai dokumen resmi siswa.</span>
+                        </div>
+
+                    </section>
+
+                    <!-- STEP 2 -->
+                    <section class="wizard-panel" data-step="1" hidden>
+
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-index">STEP 02 / ACADEMIC INFORMATION</span>
+                                <h2>Informasi Akademik</h2>
+                                <p>Catat riwayat sekolah dan penempatan siswa di SMPU.</p>
+                            </div>
+                            <div class="panel-heading-icon">
+                                <i class="fas fa-school"></i>
+                            </div>
+                        </div>
+
+                        <!-- SD -->
+                        <div class="subsection">
+                            <div class="subsection-heading">
+                                <div class="subsection-icon"><i class="fas fa-book-open"></i></div>
+                                <div>
+                                    <strong>Riwayat Pendidikan Dasar</strong>
+                                    <small>Informasi sekolah SD/MI sebelumnya.</small>
+                                </div>
+                            </div>
+
+                            <div class="modern-grid">
+                                <div class="modern-field">
+                                    <label>Nama Sekolah SD/MI</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-school"></i>
+                                        <input type="text" name="sekolah_sd"
+                                               value="{{ siswa.sekolah_sd if siswa else '' }}"
+                                               placeholder="Nama SD / MI asal">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Tahun Lulus SD</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <input type="number" name="tahun_lulus_sd"
+                                               min="2000" max="2099"
+                                               value="{{ siswa.tahun_lulus_sd if siswa else '' }}"
+                                               placeholder="Contoh: 2026">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field full-field">
+                                    <label>Alamat Sekolah SD/MI</label>
+                                    <div class="input-shell textarea-shell">
+                                        <i class="fas fa-location-dot"></i>
+                                        <textarea name="alamat_sekolah_sd" rows="2"
+                                                  placeholder="Alamat sekolah dasar asal">{{ siswa.alamat_sekolah_sd if siswa else '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TRANSFER -->
+                        <div class="transfer-panel" id="dataPindahan" hidden>
+                            <div class="subsection-heading">
+                                <div class="subsection-icon transfer-sub-icon">
+                                    <i class="fas fa-right-left"></i>
+                                </div>
+                                <div>
+                                    <strong>Riwayat Sekolah Pindahan</strong>
+                                    <small>Informasi sekolah asal sebelum masuk SMPU.</small>
+                                </div>
+                                <span class="conditional-badge">KHUSUS PINDAHAN</span>
+                            </div>
+
+                            <div class="modern-grid">
+                                <div class="modern-field">
+                                    <label>Sekolah Asal <span class="required">*</span></label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-building"></i>
+                                        <input type="text" name="sekolah_asal_pindah"
+                                               value="{{ siswa.sekolah_asal_pindah if siswa else '' }}"
+                                               placeholder="Nama sekolah sebelumnya">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Tahun Pindah Masuk <span class="required">*</span></label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-calendar"></i>
+                                        <input type="number" name="tahun_pindah"
+                                               min="2000" max="2099"
+                                               value="{{ siswa.tahun_pindah if siswa else '' }}"
+                                               placeholder="Contoh: 2026">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field full-field">
+                                    <label>Alamat Sekolah Asal</label>
+                                    <div class="input-shell textarea-shell">
+                                        <i class="fas fa-map-location-dot"></i>
+                                        <textarea name="alamat_sekolah_pindah" rows="2"
+                                                  placeholder="Alamat sekolah asal pindahan">{{ siswa.alamat_sekolah_pindah if siswa else '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ADMISSION -->
+                        <div class="subsection">
+                            <div class="subsection-heading">
+                                <div class="subsection-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <div>
+                                    <strong>Informasi Penerimaan SMPU</strong>
+                                    <small>Tentukan tanggal penerimaan dan tingkat pendidikan siswa.</small>
+                                </div>
+                            </div>
+
+                            <div class="modern-grid">
+
+                                <div class="modern-field">
+                                    <label>Tanggal Diterima <span class="required">*</span></label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <input type="date" name="tanggal_diterima" id="tanggalDiterima" required
+                                               value="{{ siswa.tanggal_diterima.strftime('%Y-%m-%d') if siswa and siswa.tanggal_diterima else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Tingkat / Jenjang <span class="required">*</span></label>
+
+                                    <div class="select-shell" id="tingkatBaruWrap">
+                                        <i class="fas fa-layer-group"></i>
+                                        <input type="text" value="Tingkat 7 — Otomatis" readonly>
+                                    </div>
+
+                                    <div class="select-shell" id="tingkatPindahanWrap" hidden>
+                                        <i class="fas fa-layer-group"></i>
+                                        <select id="nilaiTingkat">
+                                            <option value="">Pilih tingkat</option>
+                                            {% for tingkat in [7, 8, 9] %}
+                                                <option value="{{ tingkat }}"
+                                                    {{ 'selected' if siswa and siswa.tingkat|string == tingkat|string else '' }}>
+                                                    Tingkat {{ tingkat }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <i class="fas fa-chevron-down select-arrow"></i>
+                                    </div>
+
+                                    <small class="field-hint" id="tingkatHint">
+                                        Siswa baru otomatis ditempatkan di tingkat 7.
+                                    </small>
+                                </div>
+
+                                
+                                <div class="modern-field full-field">
+                                    <label>Status Siswa</label>
+                                    <div class="select-shell">
+                                        <i class="fas fa-user-check"></i>
+                                        <select name="status">
+                                            <option value="Aktif" {{ 'selected' if not siswa or siswa.status == 'Aktif' else '' }}>Aktif</option>
+                                            <option value="Lulus" {{ 'selected' if siswa and siswa.status == 'Lulus' else '' }}>Lulus</option>
+                                            <option value="Pindah" {{ 'selected' if siswa and siswa.status == 'Pindah' else '' }}>Pindah</option>
+                                            <option value="Keluar" {{ 'selected' if siswa and siswa.status == 'Keluar' else '' }}>Keluar</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down select-arrow"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- STEP 3 -->
+                    <section class="wizard-panel" data-step="2" hidden>
+
+                        <div class="panel-heading">
+                            <div>
+                                <span class="panel-index">STEP 03 / CONTACT INFORMATION</span>
+                                <h2>Kontak & Keluarga</h2>
+                                <p>Lengkapi informasi komunikasi dan orang tua atau wali siswa.</p>
+                            </div>
+                            <div class="panel-heading-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <div class="subsection-heading">
+                                <div class="subsection-icon"><i class="fas fa-address-book"></i></div>
+                                <div>
+                                    <strong>Informasi Kontak Siswa</strong>
+                                    <small>Nomor telepon, email dan alamat tempat tinggal.</small>
+                                </div>
+                            </div>
+
+                            <div class="modern-grid">
+                                <div class="modern-field">
+                                    <label>No. HP Siswa</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-phone"></i>
+                                        <input type="text" name="no_hp" class="phone-input"
+                                               inputmode="numeric" maxlength="13"
+                                               value="{{ siswa.no_hp if siswa else '' }}"
+                                               placeholder="08xxxxxxxxxx">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Email</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" name="email"
+                                               value="{{ siswa.email if siswa else '' }}"
+                                               placeholder="nama@email.com">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field full-field">
+                                    <label>Alamat Lengkap</label>
+                                    <div class="input-shell textarea-shell">
+                                        <i class="fas fa-house"></i>
+                                        <textarea name="alamat" rows="3"
+                                                  placeholder="Alamat lengkap tempat tinggal siswa">{{ siswa.alamat if siswa else '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <div class="subsection-heading">
+                                <div class="subsection-icon"><i class="fas fa-people-roof"></i></div>
+                                <div>
+                                    <strong>Data Orang Tua / Wali</strong>
+                                    <small>Informasi keluarga dan kontak yang dapat dihubungi.</small>
+                                </div>
+                            </div>
+
+                            <div class="modern-grid">
+                                <div class="modern-field">
+                                    <label>Nama Ayah</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" name="nama_ayah"
+                                               value="{{ siswa.nama_ayah if siswa else '' }}"
+                                               placeholder="Nama lengkap ayah">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Nama Ibu</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" name="nama_ibu"
+                                               value="{{ siswa.nama_ibu if siswa else '' }}"
+                                               placeholder="Nama lengkap ibu">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Pekerjaan Ayah</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-briefcase"></i>
+                                        <input type="text" name="pekerjaan_ayah"
+                                               value="{{ siswa.pekerjaan_ayah if siswa else '' }}"
+                                               placeholder="Pekerjaan ayah">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <label>Pekerjaan Ibu</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-briefcase"></i>
+                                        <input type="text" name="pekerjaan_ibu"
+                                               value="{{ siswa.pekerjaan_ibu if siswa else '' }}"
+                                               placeholder="Pekerjaan ibu">
+                                    </div>
+                                </div>
+
+                                <div class="modern-field full-field">
+                                    <label>No. HP Orang Tua / Wali</label>
+                                    <div class="input-shell">
+                                        <i class="fas fa-phone-volume"></i>
+                                        <input type="text" name="no_hp_ortu" class="phone-input"
+                                               inputmode="numeric" maxlength="13"
+                                               value="{{ siswa.no_hp_ortu if siswa else '' }}"
+                                               placeholder="08xxxxxxxxxx">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="completion-card">
+                            <div class="completion-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <strong>Hampir selesai!</strong>
+                                <p>Periksa kembali seluruh informasi sebelum menyimpan data siswa.</p>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- FOOTER ACTIONS -->
+                    <footer class="wizard-footer">
+                        <button type="button" class="btn-back" id="btnPrev" hidden>
+                            <i class="fas fa-arrow-left"></i>
+                            Sebelumnya
+                        </button>
+
+                        <div class="footer-spacer"></div>
+
+                        <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="btn-exit">
+                            Batal
+                        </a>
+
+                        <button type="button" class="btn-next" id="btnNext">
+                            Lanjutkan
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+
+                        <button type="submit" class="btn-submit" id="btnSimpan" hidden>
+                            <i class="fas fa-check-circle"></i>
+                            {{ 'Simpan Perubahan' if mode == 'ubah' else 'Simpan Data Siswa' }}
+                        </button>
+                    </footer>
+
+                    <div class="main-bottom-note">
+                        <i class="fas fa-lock"></i>
+                        Informasi siswa dikelola secara internal oleh sistem administrasi SMPU.
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </form>
 </div>
 
-<!-- ========================================== -->
-<!-- ✅ JAVASCRIPT YANG SUDAH DIPERBAIKI -->
-<!-- ========================================== -->
+
 <script>
-const jenisPendaftaran = document.getElementById('jenisPendaftaran');
-const tampilanTingkatBaru = document.getElementById('tampilanTingkatBaru');
-const pilihTingkatPindahan = document.getElementById('pilihTingkatPindahan');
-const nilaiTingkat = document.getElementById('nilaiTingkat');
-const kolomKelasTerima = document.getElementById('kolomKelasTerima');
-const infoKelasOtomatis = document.getElementById('infoKelasOtomatis');
-const dataPindahan = document.getElementById('dataPindahan');
-const kelasSaatIni = document.getElementById('kelasSaatIni');
-const infoKelasKosong = document.getElementById('infoKelasKosong');
-const diterimaDiKelas = document.getElementById('diterimaDiKelas');
-const formSiswa = document.getElementById('formSiswa');
 
-function ambilDasarTahun(kode_tp) {
-    if (!kode_tp) return "";
-    let hasil = kode_tp.trim();
-    if (hasil.includes('-')) hasil = hasil.split('-')[0];
-    if (hasil.includes(' ')) hasil = hasil.split(' ')[0];
-    return hasil.trim();
-}
+(() => {
+    function initAdmissionForm() {
+        const app = document.getElementById('admissionApp');
 
-let tahunDipilih = "";
-let semuaDataKelas = [];
+        if (!app || app.dataset.ready === 'true') return;
 
-// ==============================================
-// FUNGSI CUSTOM DROPDOWN ASLI
-// ==============================================
-window.initCustomSelect = function(wrappers) {
-  if (!Array.isArray(wrappers) && !(wrappers instanceof NodeList)) {
-    wrappers = [wrappers];
-  }
-  wrappers.forEach(selectWrapper => {
-    delete selectWrapper.dataset.diproses;
-    selectWrapper.querySelectorAll('.custom-select__trigger, .custom-select__options').forEach(el => el.remove());
-    
-    if (selectWrapper.dataset.diproses === 'true') return;
-    selectWrapper.dataset.diproses = 'true';
-    const originalSelect = selectWrapper.querySelector('select');
-    if (!originalSelect) return;
-    originalSelect.style.cssText = `opacity:0;position:absolute;pointer-events:none;width:1px;height:1px;border:none;margin:0;padding:0;`;
-    originalSelect.tabIndex = -1;
+        const form = app.querySelector('#formSiswa');
+        if (!form) return;
 
-    const trigger = document.createElement('div');
-    const selectedText = document.createElement('span');
-    const arrow = document.createElement('span');
-    const optionsList = document.createElement('div');
-    trigger.className = 'custom-select__trigger';
-    trigger.tabIndex = 0;
-    selectedText.className = 'custom-select__selected';
-    arrow.className = 'custom-select__arrow';
-    optionsList.className = 'custom-select__options';
-    trigger.appendChild(selectedText);
-    trigger.appendChild(arrow);
-    selectWrapper.appendChild(trigger);
-    selectWrapper.appendChild(optionsList);
+        app.dataset.ready = 'true';
 
-    const populateOptions = () => {
-      optionsList.innerHTML = '';
-      Array.from(originalSelect.options).forEach((option) => {
-        const optionEl = document.createElement('div');
-        optionEl.className = 'custom-select__option';
-        optionEl.dataset.value = option.value;
-        optionEl.textContent = option.textContent.trim();
-        if (option.selected) {
-          optionEl.classList.add('selected');
-          selectedText.textContent = option.textContent.trim();
+        const $ = id => app.querySelector('#' + id);
+
+        const panels = [...app.querySelectorAll('.wizard-panel')];
+        const steps = [...app.querySelectorAll('.wizard-step')];
+        const connectors = [...app.querySelectorAll('.wizard-connector')];
+
+        const btnNext = $('btnNext');
+        const btnPrev = $('btnPrev');
+        const btnSubmit = $('btnSimpan');
+
+        const jenisInputs = [
+            ...form.querySelectorAll('[name="jenis_pendaftaran"]')
+        ];
+
+        const dataPindahan = $('dataPindahan');
+        const tingkatBaruWrap = $('tingkatBaruWrap');
+        const tingkatPindahanWrap = $('tingkatPindahanWrap');
+        const tingkatSelect = $('nilaiTingkat');
+        const tingkatInput = $('inputTingkatUtama');
+
+        let currentStep = 0;
+
+        function getJenis() {
+            return jenisInputs.find(input => input.checked)?.value || '';
         }
-        optionEl.addEventListener('click', (e) => {
-          e.stopPropagation();
-          originalSelect.value = option.value;
-          originalSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          window.closeAllSelects();
-          trigger.focus();
+
+        function setStep(index) {
+            currentStep = Math.max(
+                0,
+                Math.min(index, panels.length - 1)
+            );
+
+            panels.forEach((panel, i) => {
+                const active = i === currentStep;
+                panel.hidden = !active;
+                panel.classList.toggle('active', active);
+            });
+
+            steps.forEach((step, i) => {
+                step.classList.toggle('active', i === currentStep);
+                step.classList.toggle('completed', i < currentStep);
+
+                step.setAttribute(
+                    'aria-current',
+                    i === currentStep ? 'step' : 'false'
+                );
+            });
+
+            connectors.forEach((connector, i) => {
+                connector.classList.toggle(
+                    'completed',
+                    i < currentStep
+                );
+            });
+
+            const percent = Math.round(
+                ((currentStep + 1) / panels.length) * 100
+            );
+
+            $('progressPercent').textContent = percent + '%';
+            $('progressFill').style.width = percent + '%';
+
+            $('progressStepLabel').textContent =
+                `Tahap ${currentStep + 1} dari ${panels.length}`;
+
+            const labels = ['Identitas', 'Akademik', 'Keluarga'];
+
+            $('progressStepName').textContent = labels[currentStep];
+
+            btnPrev.hidden = currentStep === 0;
+            btnNext.hidden = currentStep === panels.length - 1;
+            btnSubmit.hidden = currentStep !== panels.length - 1;
+
+            const main = app.querySelector('.admission-main');
+
+            if (main) {
+                main.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function clearErrors(panel) {
+            panel.querySelectorAll('.field-invalid').forEach(el => {
+                el.classList.remove('field-invalid');
+            });
+
+            panel.querySelectorAll('.field-error').forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        function validatePanel(index) {
+            const panel = panels[index];
+            if (!panel) return true;
+
+            clearErrors(panel);
+
+            let firstInvalid = null;
+
+            if (index === 0 && !getJenis()) {
+                const error = app.querySelector(
+                    '[data-error-for="jenis_pendaftaran"]'
+                );
+
+                if (error) {
+                    error.textContent =
+                        'Pilih jenis pendaftaran terlebih dahulu.';
+                }
+
+                app.querySelector('.registration-options')
+                    ?.classList.add('field-invalid');
+
+                return false;
+            }
+
+            const requiredFields = [
+                ...panel.querySelectorAll('[required]')
+            ].filter(field => {
+                if (field.disabled) return false;
+
+                if (
+                    field.name === 'sekolah_asal_pindah' ||
+                    field.name === 'tahun_pindah'
+                ) {
+                    return getJenis() === 'pindahan';
+                }
+
+                return true;
+            });
+
+            for (const field of requiredFields) {
+                const value = String(field.value || '').trim();
+
+                if (!value) {
+                    field.classList.add('field-invalid');
+                    firstInvalid ||= field;
+                }
+            }
+
+            if (index === 0) {
+                const nisn = form.querySelector('[name="nisn"]');
+                const nik = form.querySelector('[name="nik"]');
+
+                if (nisn?.value && !/^\d+$/.test(nisn.value.trim())) {
+                    nisn.classList.add('field-invalid');
+                    firstInvalid ||= nisn;
+                }
+
+                if (nik?.value && !/^\d+$/.test(nik.value.trim())) {
+                    nik.classList.add('field-invalid');
+                    firstInvalid ||= nik;
+                }
+            }
+
+            if (index === 1) {
+                if (!tingkatInput.value) {
+                    tingkatSelect?.classList.add('field-invalid');
+                    firstInvalid ||= tingkatSelect;
+                }
+            }
+
+            if (index === 2) {
+                const email = form.querySelector('[name="email"]');
+
+                if (email?.value && !email.checkValidity()) {
+                    email.classList.add('field-invalid');
+                    firstInvalid ||= email;
+                }
+            }
+
+            if (firstInvalid) {
+                firstInvalid.focus();
+
+                firstInvalid.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                return false;
+            }
+
+            return true;
+        }
+
+        // Jenis pendaftaran dan tingkat.
+        function updateAdmissionType() {
+            const type = getJenis();
+
+            const transfer = type === 'pindahan';
+            const fresh = type === 'baru';
+
+            dataPindahan.hidden = !transfer;
+
+            tingkatBaruWrap.hidden = !fresh;
+            tingkatPindahanWrap.hidden = !transfer;
+
+            const schoolInput = form.querySelector(
+                '[name="sekolah_asal_pindah"]'
+            );
+
+            const yearInput = form.querySelector(
+                '[name="tahun_pindah"]'
+            );
+
+            if (schoolInput) schoolInput.required = false;
+            if (yearInput) yearInput.required = false;
+
+            if (fresh) {
+                tingkatInput.value = '7';
+
+                $('tingkatHint').textContent =
+                    'Siswa baru otomatis masuk tingkat 7.';
+            } else if (transfer) {
+                const level = tingkatSelect?.value || '';
+
+                tingkatInput.value = level;
+
+                $('tingkatHint').textContent =
+                    'Pilih tingkat sesuai jenjang siswa sebelum pindah.';
+            } else {
+                tingkatInput.value = '';
+
+                $('tingkatHint').textContent =
+                    'Pilih jenis pendaftaran terlebih dahulu.';
+            }
+        }
+
+        // Pilihan tingkat siswa pindahan.
+        tingkatSelect?.addEventListener('change', () => {
+            tingkatInput.value = tingkatSelect.value;
+
+            tingkatSelect.classList.remove('field-invalid');
         });
-        optionsList.appendChild(optionEl);
-      });
-    };
 
-    trigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      window.closeAllSelects(selectWrapper);
-      selectWrapper.classList.toggle('open');
-      selectWrapper.classList.add('focused');
-    });
-    trigger.addEventListener('focus', () => selectWrapper.classList.add('focused'));
-    trigger.addEventListener('blur', () => setTimeout(() => {
-      if (!selectWrapper.classList.contains('open')) selectWrapper.classList.remove('focused');
-    }, 150));
-    trigger.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectWrapper.classList.toggle('open'); }
-      if (e.key === 'Escape') { window.closeAllSelects(); trigger.focus(); }
-    });
-    originalSelect.addEventListener('change', () => {
-      const currentValue = originalSelect.value;
-      let ditemukan = false;
-      optionsList.querySelectorAll('.custom-select__option').forEach(opt => {
-        const cocok = opt.dataset.value === currentValue;
-        opt.classList.toggle('selected', cocok);
-        if (cocok) { selectedText.textContent = opt.textContent.trim(); ditemukan = true; }
-      });
-      if (!ditemukan) selectedText.textContent = '';
-    });
-    populateOptions();
-  });
-};
+        // Pilihan jenis pendaftaran.
+        jenisInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                updateAdmissionType();
 
-window.closeAllSelects = (except = null) => {
-  document.querySelectorAll('.custom-select').forEach(sel => {
-    if (sel !== except) sel.classList.remove('open', 'focused');
-  });
-};
+                app.querySelector(
+                    '.registration-options'
+                )?.classList.remove('field-invalid');
 
-// ==============================================
-// SIMPAN DATA LENGKAP DENGAN ATRIBUTNYA
-// ==============================================
-function simpanSemuaKelasAsli() {
-  semuaDataKelas = [];
-  const diproses = new Set();
-  [diterimaDiKelas, kelasSaatIni].forEach(select => {
-    if (!select) return;
-    Array.from(select.options).forEach(opt => {
-      if (opt.value && !diproses.has(opt.value)) {
-        diproses.add(opt.value);
-        semuaDataKelas.push({
-          id: opt.value.trim(),
-          nama: opt.textContent.trim(),
-          tingkat: String(opt.dataset.tingkat || '').trim(),
-          tahun: String(opt.dataset.tahun || '').trim()
+                const error = app.querySelector(
+                    '[data-error-for="jenis_pendaftaran"]'
+                );
+
+                if (error) error.textContent = '';
+            });
         });
-      }
-    });
-  });
-  console.log("✅ Data kelas tersimpan:", semuaDataKelas);
-}
 
-// ==============================================
-// FILTER DIPERBAIKI: ATRIBUT TERBAWA & PASTI BERJALAN
-// ==============================================
-function terapkanFilterKelas(selectElement, tingkatDipilih) {
-    if (!selectElement) return;
-    tingkatDipilih = String(tingkatDipilih || '').trim();
-    const tahunValid = tahunDipilih.trim();
-    let adaKelasCocok = false;
+        // Tahun diterima mengikuti tanggal penerimaan.
+        $('tanggalDiterima')?.addEventListener('change', function () {
+            $('tahunDiterima').value = this.value
+                ? this.value.substring(0, 4)
+                : '';
+        });
 
-    selectElement.innerHTML = '<option value="">-- Belum Masuk Rombongan --</option>';
-    semuaDataKelas.forEach(kelas => {
-        const cocokTingkat = (tingkatDipilih === '') || (kelas.tingkat === tingkatDipilih);
-        const cocokTahun = (String(kelas.tahun || '').trim() === tahunValid);
+        // Format nomor telepon.
+        form.querySelectorAll('.phone-input').forEach(input => {
+            input.addEventListener('input', () => {
+                input.value = input.value
+                    .replace(/\D/g, '')
+                    .slice(0, 13);
+            });
+        });
 
-        console.log(`Cek filter: ${kelas.nama} | Tingkat ${kelas.tingkat} vs ${tingkatDipilih} = ${cocokTingkat} | Tahun = ${cocokTahun}`);
+        // Hapus tanda error saat field diperbaiki.
+        form.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('input', () => {
+                field.classList.remove('field-invalid');
+            });
 
-        if (cocokTingkat && cocokTahun) {
-            const opsi = document.createElement('option');
-            opsi.value = kelas.id;
-            opsi.textContent = kelas.nama;
-            opsi.dataset.tingkat = kelas.tingkat;
-            opsi.dataset.tahun = kelas.tahun;
-            selectElement.appendChild(opsi);
-            adaKelasCocok = true;
-        }
-    });
+            field.addEventListener('change', () => {
+                field.classList.remove('field-invalid');
+            });
+        });
 
-    infoKelasKosong.classList.toggle('d-none', adaKelasCocok);
-    const wrapper = selectElement.closest('.custom-select');
-    if (wrapper) {
-        wrapper.dataset.diproses = '';
-        window.initCustomSelect(wrapper);
-    }
-}
+        // Tombol lanjut.
+        btnNext.addEventListener('click', () => {
+            if (!validatePanel(currentStep)) return;
 
-// ==============================================
-// ATUR JENIS: SISWA BARU LANGSUNG KE TINGKAT 7
-// ==============================================
-function aturBerdasarkanJenis() {
-    const jenis = jenisPendaftaran.value;
-    const inputTingkatUtama = document.getElementById('inputTingkatUtama');
-    
-    kolomKelasTerima.style.display = 'none';
-    infoKelasOtomatis.style.display = 'none';
-    dataPindahan.style.display = 'none';
-    infoKelasKosong.classList.add('d-none');
+            setStep(currentStep + 1);
+        });
 
-    if (jenis === 'baru') {
-        tampilanTingkatBaru.style.display = 'block';
-        pilihTingkatPindahan.style.display = 'none';
-        dataPindahan.style.display = 'none';
-        
-        // ✅ Pasti isi 7
-        inputTingkatUtama.value = '7';
-        
-        setTimeout(() => {
-            terapkanFilterKelas(kelasSaatIni, '7');
-        }, 30);
-    } 
-    else if (jenis === 'pindahan') {
-        tampilanTingkatBaru.style.display = 'none';
-        pilihTingkatPindahan.style.display = 'block';
-        dataPindahan.style.display = 'flex';
-        
-        // Ambil dari select, jika belum pilih biarkan kosong
-        const nilai = nilaiTingkat.value;
-        inputTingkatUtama.value = nilai;
-        
-        if (nilai) {
-            terapkanFilterKelas(diterimaDiKelas, nilai);
-            terapkanFilterKelas(kelasSaatIni, nilai);
-        } else {
-            terapkanFilterKelas(diterimaDiKelas, '');
-            terapkanFilterKelas(kelasSaatIni, '');
-        }
-    }
-}
+        // Tombol kembali.
+        btnPrev.addEventListener('click', () => {
+            setStep(currentStep - 1);
+        });
 
-nilaiTingkat?.addEventListener('change', function(){
-    const inputTingkatUtama = document.getElementById('inputTingkatUtama');
-    inputTingkatUtama.value = this.value; // ✅ kirim ke input utama
-    terapkanFilterKelas(diterimaDiKelas, this.value);
-    terapkanFilterKelas(kelasSaatIni, this.value);
-});
+        // Navigasi step.
+        steps.forEach((step, index) => {
+            step.addEventListener('click', () => {
+                if (index <= currentStep) {
+                    setStep(index);
+                } else if (
+                    index === currentStep + 1 &&
+                    validatePanel(currentStep)
+                ) {
+                    setStep(index);
+                }
+            });
+        });
 
-formSiswa.addEventListener('submit', e => {
-    console.log('👉 Form diklik submit');
-    
-    // Cek validasi manual
-    if (jenisPendaftaran.value === 'pindahan' && !nilaiTingkat.value) {
-        alert('Pilih tingkat dulu!');
-        e.preventDefault();
-        return;
+        // Validasi akhir sebelum submit.
+        form.addEventListener('submit', event => {
+            for (let i = 0; i < panels.length; i++) {
+                if (!validatePanel(i)) {
+                    event.preventDefault();
+                    setStep(i);
+                    return;
+                }
+            }
+
+            if (!tingkatInput.value) {
+                event.preventDefault();
+                setStep(1);
+
+                alert('Tingkat siswa belum ditentukan.');
+                return;
+            }
+
+            const tanggal = $('tanggalDiterima')?.value;
+
+            if (tanggal) {
+                $('tahunDiterima').value = tanggal.substring(0, 4);
+            }
+
+            btnSubmit.disabled = true;
+
+            btnSubmit.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        });
+
+        // Inisialisasi awal.
+        updateAdmissionType();
+
+        setStep(0);
     }
 
-    // Cek semua kolom wajib
-    const wajib = formSiswa.querySelectorAll('[required]');
-    let adaKosong = false;
-    wajib.forEach(input => {
-        if (!input.value.trim()) {
-            console.log('❌ Kolom kosong:', input.name || input.id);
-            adaKosong = true;
-        }
-    });
-    
-    if (adaKosong) {
-        alert('Ada kolom wajib yang belum diisi — lihat Console (F12) untuk detail');
-        e.preventDefault();
-        return;
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            initAdmissionForm,
+            { once: true }
+        );
+    } else {
+        initAdmissionForm();
     }
 
-    console.log('✅ Form lolos cek, siap dikirim');
-    // JANGAN panggil e.preventDefault() di sini!
-});
+    // Dukungan SPA.
+    document.addEventListener(
+        'spa:page-loaded',
+        initAdmissionForm
+    );
+})();
 
-// ==============================================
-// URUTAN JALAN DIPASTIKAN BENAR
-// ==============================================
-document.addEventListener('DOMContentLoaded', function() {
-    const inputTahun = document.getElementById('tahunPelajaranAktif');
-    const tahunMentah = inputTahun ? inputTahun.value : "";
-
-    tahunDipilih = ambilDasarTahun(tahunMentah);
-    console.log("📅 Tahun mentah:", tahunMentah);
-    console.log("✅ Tahun yang dipakai filter:", tahunDipilih);
-
-    window.initCustomSelect(document.querySelectorAll('.custom-select'));
-    document.addEventListener('click', window.closeAllSelects);
-
-    simpanSemuaKelasAsli();
-    setTimeout(() => {
-        aturBerdasarkanJenis();
-
-        const tingkatSembunyi = document.getElementById('nilaiTingkatSembunyi');
-        if (jenisPendaftaran.value === 'pindahan' && tingkatSembunyi?.value) {
-            setTimeout(() => {
-            nilaiTingkat.value = tingkatSembunyi.value;
-            terapkanFilterKelas(diterimaDiKelas, tingkatSembunyi.value);
-            terapkanFilterKelas(kelasSaatIni, tingkatSembunyi.value);
-            }, 80);
-        }
-    }, 50);
-});
-
-jenisPendaftaran.addEventListener('change', aturBerdasarkanJenis);
 </script>
