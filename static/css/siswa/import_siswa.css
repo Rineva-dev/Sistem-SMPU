@@ -1591,10 +1591,6 @@
 
 @media (max-width: 850px) {
 
-    .siswa-import-page {
-        padding: 20px 18px 30px;
-    }
-
     .si-main-grid {
         grid-template-columns: 1fr;
     }
@@ -1616,10 +1612,6 @@
 }
 
 @media (max-width: 600px) {
-
-    .siswa-import-page {
-        padding: 16px 12px 25px;
-    }
 
     .si-page-header {
         align-items: flex-start;

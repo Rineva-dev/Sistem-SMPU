@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, session, redirect, url_for, reques
 from datetime import datetime
 import re
 from sqlalchemy import or_
-from models import db, Siswa, Kelas, User, TahunPelajaran, RiwayatKelas
+from models import db, Siswa, Kelas, User, TahunPelajaran, RiwayatKelas, RiwayatPembayaran, TagihanSiswa, PengajuanPembayaran, DetailPengajuanPembayaran
+from flask import current_app
 
 # Buat Blueprint
 data_siswa_bp = Blueprint('data_siswa', __name__, url_prefix='/siswa')
@@ -756,6 +757,7 @@ def atur_kelas(id):
     flash(f"✅ Siswa dipindahkan ke {kelas_baru.nama_kelas} TP {kode_tahun}", "success")
     return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
 
+
 @data_siswa_bp.route('/hapus/<int:id>', methods=['POST'])
 def hapus_siswa(id):
     if not session.get('logged_in'):
@@ -766,12 +768,101 @@ def hapus_siswa(id):
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
     siswa = Siswa.query.get_or_404(id)
-    RiwayatKelas.query.filter_by(siswa_id=id).delete()
-    if siswa.akun:
-        db.session.delete(siswa.akun)
-    db.session.delete(siswa)
-    db.session.commit()
-    flash("Data siswa dan riwayatnya berhasil dihapus!", "success")
+
+    try:
+        # ==========================================
+        # 1. PERIKSA RIWAYAT PEMBAYARAN
+        # ==========================================
+        ada_riwayat_bayar = (
+            RiwayatPembayaran.query
+            .join(TagihanSiswa, RiwayatPembayaran.tagihan_id == TagihanSiswa.id)
+            .filter(TagihanSiswa.siswa_id == id)
+            .first()
+        )
+
+        if ada_riwayat_bayar:
+            flash(
+                "Siswa tidak dapat dihapus karena sudah memiliki "
+                "riwayat pembayaran. Pertahankan data keuangan "
+                "dan ubah status siswa menjadi nonaktif jika diperlukan.",
+                "warning"
+            )
+            return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+
+        # ==========================================
+        # 2. PERIKSA DETAIL PENGAJUAN PEMBAYARAN
+        # ==========================================
+        ada_detail_pengajuan = (
+            DetailPengajuanPembayaran.query
+            .join(TagihanSiswa, DetailPengajuanPembayaran.tagihan_id == TagihanSiswa.id)
+            .filter(TagihanSiswa.siswa_id == id)
+            .first()
+        )
+
+        if ada_detail_pengajuan:
+            flash(
+                "Siswa tidak dapat dihapus karena tagihannya "
+                "masih terhubung dengan pengajuan pembayaran.",
+                "warning"
+            )
+            return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+
+        # ==========================================
+        # 3. PERIKSA PENGAJUAN PEMBAYARAN SISWA
+        # ==========================================
+        ada_pengajuan = (
+            PengajuanPembayaran.query
+            .filter_by(siswa_id=id)
+            .first()
+        )
+
+        if ada_pengajuan:
+            flash(
+                "Siswa tidak dapat dihapus karena masih memiliki "
+                "riwayat pengajuan pembayaran.",
+                "warning"
+            )
+            return redirect(url_for('data_siswa.halaman_daftar_siswa'))
+
+        # ==========================================
+        # 4. HAPUS RIWAYAT KELAS
+        # ==========================================
+        RiwayatKelas.query.filter_by(siswa_id=id).delete(
+            synchronize_session=False
+        )
+
+        # ==========================================
+        # 5. HAPUS AKUN JIKA ADA
+        # ==========================================
+        if siswa.akun:
+            db.session.delete(siswa.akun)
+
+        # ==========================================
+        # 6. HAPUS SISWA
+        # Tagihan tanpa relasi keuangan akan ikut
+        # terhapus melalui cascade delete-orphan.
+        # ==========================================
+        db.session.delete(siswa)
+
+        db.session.commit()
+
+        flash(
+            "Data siswa, riwayat kelas, dan tagihan yang aman "
+            "dihapus berhasil dihapus!",
+            "success"
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(
+            "Gagal menghapus siswa ID %s", id
+        )
+        flash(
+            "Terjadi kesalahan saat menghapus data siswa. "
+            "Silakan periksa log server.",
+            "danger"
+        )
+
     return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
 @data_siswa_bp.route('/detail/<int:id>')
