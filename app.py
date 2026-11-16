@@ -384,6 +384,7 @@ from routes.umum import umum_bp
 from routes.kalender_pendidikan import kalender_bp
 from routes.sections.waka_kurikulum.dashboard_wakakur import bp as dashboard_wakakur_bp
 from routes.siswa.data_siswa import data_siswa_bp
+from routes.siswa.import_siswa import import_siswa_bp
 from routes.kelas.kelas import kelas_bp
 from routes.ekstrakurikuler.ekstrakurikuler import data_ekskul_bp
 from routes.ekstrakurikuler.peminatan import data_peminatan_bp
@@ -422,6 +423,7 @@ app.register_blueprint(umum_bp)
 app.register_blueprint(kalender_bp)
 app.register_blueprint(dashboard_wakakur_bp)
 app.register_blueprint(data_siswa_bp)
+app.register_blueprint(import_siswa_bp)
 app.register_blueprint(naik_kelas_bp)
 app.register_blueprint(kelas_bp)
 app.register_blueprint(mapel_bp)

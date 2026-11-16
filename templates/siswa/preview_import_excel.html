@@ -1,0 +1,442 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/import_siswa.css') }}">
+<div class="siswa-import-page si-preview-page" id="siPreviewPage">
+
+    <!-- HEADER -->
+    <div class="si-page-header">
+
+        <div class="si-heading-left">
+
+            <a href="{{ url_for('import_siswa.halaman_import_excel') }}"
+               class="si-back-button">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </a>
+
+            <div class="si-heading-text">
+
+                <div class="si-breadcrumb">
+                    <span>Data Siswa</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>Import Excel</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>Preview</span>
+                </div>
+
+                <h1>Periksa Data Import</h1>
+
+                <p>
+                    Periksa hasil validasi sebelum menyimpan data siswa.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="si-header-badge">
+            <span class="si-badge-dot"></span>
+            Import Validation
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+    <div class="si-preview-summary">
+
+        <div class="si-summary-card si-summary-total">
+
+            <div class="si-summary-icon">
+                <i class="fa-solid fa-file-excel"></i>
+            </div>
+
+            <div>
+                <span>Total Baris Data</span>
+                <strong>{{ total_baris }}</strong>
+                <small>Baris terbaca dari Excel</small>
+            </div>
+
+        </div>
+
+
+        <div class="si-summary-card si-summary-valid">
+
+            <div class="si-summary-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Data Valid</span>
+                <strong>{{ total_valid }}</strong>
+                <small>Siap diimport</small>
+            </div>
+
+        </div>
+
+
+        <div class="si-summary-card si-summary-error">
+
+            <div class="si-summary-icon">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+
+            <div>
+                <span>Data Bermasalah</span>
+                <strong>{{ total_error }}</strong>
+                <small>Tidak akan disimpan</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VALIDATION STATUS -->
+    <div class="si-validation-banner
+                {% if total_error == 0 and total_valid > 0 %}
+                    si-validation-success
+                {% elif total_valid > 0 %}
+                    si-validation-warning
+                {% else %}
+                    si-validation-danger
+                {% endif %}">
+
+        <div class="si-validation-icon">
+
+            {% if total_error == 0 and total_valid > 0 %}
+                <i class="fa-solid fa-circle-check"></i>
+            {% elif total_valid > 0 %}
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            {% else %}
+                <i class="fa-solid fa-circle-xmark"></i>
+            {% endif %}
+
+        </div>
+
+        <div class="si-validation-text">
+
+            {% if total_error == 0 and total_valid > 0 %}
+
+                <strong>Semua data berhasil melewati validasi.</strong>
+
+                <p>
+                    Data siap disimpan ke dalam database.
+                    Periksa kembali sebelum melakukan konfirmasi.
+                </p>
+
+            {% elif total_valid > 0 %}
+
+                <strong>Validasi selesai dengan beberapa catatan.</strong>
+
+                <p>
+                    {{ total_valid }} data valid dapat disimpan.
+                    {{ total_error }} baris bermasalah tidak akan ikut diimport.
+                </p>
+
+            {% else %}
+
+                <strong>Tidak ada data yang siap diimport.</strong>
+
+                <p>
+                    Perbaiki data Excel dan lakukan upload ulang.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- VALID DATA -->
+    <div class="si-preview-panel">
+
+        <div class="si-panel-heading">
+
+            <div class="si-panel-title">
+
+                <div class="si-panel-icon si-panel-icon-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <h3>Data Siap Diimport</h3>
+                    <p>Data yang telah lolos pemeriksaan.</p>
+                </div>
+
+            </div>
+
+            <span class="si-count-badge si-count-green">
+                {{ total_valid }} Data Valid
+            </span>
+
+        </div>
+
+
+        {% if valid_rows %}
+
+        <div class="si-table-toolbar">
+
+            <div class="si-table-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="search"
+                       id="siValidSearch"
+                       placeholder="Cari NIS atau nama siswa...">
+
+            </div>
+
+            <span id="siValidCount">
+                Menampilkan {{ total_valid }} data
+            </span>
+
+        </div>
+
+
+        <div class="si-table-wrapper">
+
+            <table class="si-preview-table" id="siValidTable">
+
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>NIS</th>
+                        <th>NISN</th>
+                        <th>Nama Siswa</th>
+                        <th>Jenis Kelamin</th>
+                        <th>Pendaftaran</th>
+                        <th>Tingkat</th>
+                        <th>Tanggal Diterima</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for siswa in valid_rows %}
+
+                    <tr data-search="{{ siswa.nis }} {{ siswa.nisn or '' }} {{ siswa.nama }}">
+
+                        <td>
+                            <span class="si-row-number">
+                                {{ loop.index }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>{{ siswa.nis }}</strong>
+                        </td>
+
+                        <td>
+                            {{ siswa.nisn or '-' }}
+                        </td>
+
+                        <td>
+                            <div class="si-student-name">
+                                <div class="si-student-avatar">
+                                    {{ siswa.nama[:1]|upper }}
+                                </div>
+
+                                <strong>{{ siswa.nama }}</strong>
+                            </div>
+                        </td>
+
+                        <td>{{ siswa.jenis_kelamin }}</td>
+
+                        <td>
+                            <span class="si-type-pill">
+                                {% if siswa.jenis_pendaftaran == 'baru' %}
+                                    Siswa Baru
+                                {% else %}
+                                    Pindahan
+                                {% endif %}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="si-grade-pill">
+                                Kelas {{ siswa.tingkat }}
+                            </span>
+                        </td>
+
+                        <td>{{ siswa.tanggal_diterima }}</td>
+
+                        <td>
+                            <span class="si-status-active">
+                                {{ siswa.status }}
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="si-empty-state">
+
+            <div>
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+
+            <strong>Belum ada data valid</strong>
+
+            <p>Silakan perbaiki file Excel dan upload kembali.</p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ERROR DATA -->
+    {% if error_rows %}
+
+    <div class="si-preview-panel si-error-panel">
+
+        <div class="si-panel-heading">
+
+            <div class="si-panel-title">
+
+                <div class="si-panel-icon si-panel-icon-red">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div>
+                    <h3>Data Bermasalah</h3>
+                    <p>Baris berikut perlu diperbaiki pada file Excel.</p>
+                </div>
+
+            </div>
+
+            <span class="si-count-badge si-count-red">
+                {{ total_error }} Baris Bermasalah
+            </span>
+
+        </div>
+
+
+        <div class="si-error-list">
+
+            {% for item in error_rows %}
+
+            <div class="si-error-item">
+
+                <div class="si-error-row-number">
+                    Baris {{ item.baris }}
+                </div>
+
+                <div class="si-error-student">
+
+                    <strong>{{ item.nama }}</strong>
+
+                    <span>NIS: {{ item.nis }}</span>
+
+                </div>
+
+                <div class="si-error-messages">
+
+                    {% for error in item.errors %}
+
+                    <div>
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        {{ error }}
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- INFORMATION -->
+    <div class="si-preview-information">
+
+        <i class="fa-solid fa-shield-halved"></i>
+
+        <div>
+            <strong>Data belum disimpan ke database.</strong>
+
+            <p>
+                Sistem hanya akan menyimpan {{ total_valid }} data valid
+                setelah kamu menekan tombol konfirmasi.
+                Baris yang bermasalah akan dilewati.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- ACTION -->
+    <div class="si-preview-actions">
+
+        <form method="POST"
+              action="{{ url_for('import_siswa.batal_import') }}">
+
+            {% if csrf_token is defined %}
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+            {% endif %}
+
+            <button type="submit"
+                    class="si-secondary-button"
+                    onclick="return confirm('Batalkan proses import ini?')">
+
+                <i class="fa-solid fa-xmark"></i>
+                Batalkan Import
+
+            </button>
+
+        </form>
+
+
+        <form method="POST"
+              action="{{ url_for('import_siswa.konfirmasi_import') }}"
+              id="siConfirmForm">
+
+            {% if csrf_token is defined %}
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+            {% endif %}
+
+            <input type="hidden"
+                   name="token"
+                   value="{{ token }}">
+
+            <button type="submit"
+                    class="si-primary-button"
+                    {% if total_valid == 0 %}disabled{% endif %}>
+
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                <span>
+                    Konfirmasi & Import {{ total_valid }} Siswa
+                </span>
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+</div>

@@ -314,9 +314,9 @@
             "spa:page-loaded",
             function () {
 
-                // Tunggu sampai konten SPA selesai dimasukkan.
                 requestAnimationFrame(() => {
                     initStudentHub();
+                    initStudentAddDropdown();
                 });
 
             }
@@ -324,21 +324,83 @@
 
     }
 
+
+    /* ======================================================
+    ADD STUDENT DROPDOWN — SPA SAFE
+    ====================================================== */
+
+    function initStudentAddDropdown() {
+
+        const root = document.querySelector(".student-hub");
+
+        if (!root) return;
+
+        const dropdown = root.querySelector(".sh-add-dropdown");
+        const button = root.querySelector("#shAddDropdownBtn");
+
+        if (!dropdown || !button) return;
+
+        if (button.dataset.dropdownInitialized === "true") return;
+
+        button.dataset.dropdownInitialized = "true";
+
+        button.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            const isOpen = dropdown.classList.toggle("open");
+
+            button.setAttribute("aria-expanded", String(isOpen));
+
+        });
+
+        document.addEventListener("click", function (event) {
+
+            if (!dropdown.contains(event.target)) {
+
+                dropdown.classList.remove("open");
+
+                button.setAttribute("aria-expanded", "false");
+
+            }
+
+        });
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key === "Escape") {
+
+                dropdown.classList.remove("open");
+
+                button.setAttribute("aria-expanded", "false");
+
+            }
+
+        });
+
+    }
+
+
     /* ======================================================
        INITIAL PAGE LOAD
     ====================================================== */
+
+    function initStudentPage() {
+        initStudentHub();
+        initStudentAddDropdown();
+    }
 
     if (document.readyState === "loading") {
 
         document.addEventListener(
             "DOMContentLoaded",
-            initStudentHub,
+            initStudentPage,
             { once: true }
         );
 
     } else {
 
-        initStudentHub();
+        initStudentPage();
 
     }
 

@@ -1,0 +1,492 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/import_siswa.css') }}">
+<div class="siswa-import-page" id="siswaImportPage">
+
+    <!-- HEADER -->
+    <div class="si-page-header">
+
+        <div class="si-heading-left">
+
+            <a href="{{ url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun) }}"
+               class="si-back-button"
+               title="Kembali ke Data Siswa">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </a>
+
+            <div class="si-heading-text">
+
+                <div class="si-breadcrumb">
+                    <span>Data Siswa</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>Import Excel</span>
+                </div>
+
+                <h1>Import Data Siswa</h1>
+
+                <p>
+                    Tambahkan banyak data siswa sekaligus dengan mudah
+                    menggunakan file Excel.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="si-header-badge">
+            <span class="si-badge-dot"></span>
+            <span>Bulk Data Import</span>
+        </div>
+
+    </div>
+
+
+    <!-- HERO -->
+    <div class="si-hero-card">
+
+        <div class="si-hero-content">
+
+            <div class="si-hero-eyebrow">
+                <i class="fa-solid fa-file-excel"></i>
+                SMART STUDENT IMPORT
+            </div>
+
+            <h2>
+                Kelola data siswa
+                <span>lebih cepat.</span>
+            </h2>
+
+            <p>
+                Tidak perlu memasukkan siswa satu per satu.
+                Siapkan data melalui template Excel resmi,
+                periksa seluruh data, lalu import dengan aman.
+            </p>
+
+            <div class="si-hero-features">
+
+                <div>
+                    <i class="fa-solid fa-circle-check"></i>
+                    Validasi otomatis
+                </div>
+
+                <div>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Aman sebelum disimpan
+                </div>
+
+                <div>
+                    <i class="fa-solid fa-bolt"></i>
+                    Import sekaligus
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="si-hero-visual">
+
+            <div class="si-visual-orbit si-orbit-one"></div>
+            <div class="si-visual-orbit si-orbit-two"></div>
+
+            <div class="si-visual-sheet">
+
+                <div class="si-sheet-top">
+                    <div class="si-sheet-icon">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+
+                    <div>
+                        <strong>Data Siswa.xlsx</strong>
+                        <small>Excel Spreadsheet</small>
+                    </div>
+                </div>
+
+                <div class="si-sheet-grid">
+
+                    <div class="si-grid-head">NIS</div>
+                    <div class="si-grid-head">NAMA</div>
+                    <div class="si-grid-head">TINGKAT</div>
+
+                    <div>00124</div>
+                    <div>Ahmad</div>
+                    <div>7</div>
+
+                    <div>00125</div>
+                    <div>Siti</div>
+                    <div>7</div>
+
+                    <div>00126</div>
+                    <div>Rizki</div>
+                    <div>8</div>
+
+                </div>
+
+                <div class="si-sheet-status">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Siap diperiksa
+                </div>
+
+            </div>
+
+            <div class="si-floating-icon si-float-check">
+                <i class="fa-solid fa-check"></i>
+            </div>
+
+            <div class="si-floating-icon si-float-upload">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTENT GRID -->
+    <div class="si-main-grid">
+
+        <!-- LEFT CONTENT -->
+        <div class="si-main-column">
+
+            <!-- STEP -->
+            <div class="si-section-heading">
+
+                <div>
+                    <span class="si-section-label">LANGKAH PERTAMA</span>
+                    <h3>Siapkan file Excel</h3>
+                    <p>Ikuti langkah berikut sebelum mengunggah data.</p>
+                </div>
+
+                <div class="si-step-indicator">
+                    <span>01</span>
+                    <div></div>
+                    <span>02</span>
+                    <div></div>
+                    <span>03</span>
+                </div>
+
+            </div>
+
+
+            <!-- DOWNLOAD TEMPLATE -->
+            <div class="si-template-card">
+
+                <div class="si-template-icon">
+                    <i class="fa-solid fa-file-excel"></i>
+                </div>
+
+                <div class="si-template-info">
+
+                    <span class="si-template-label">
+                        OFFICIAL EXCEL TEMPLATE
+                    </span>
+
+                    <h4>Template Import Data Siswa</h4>
+
+                    <p>
+                        Gunakan template resmi agar struktur kolom
+                        sesuai dengan sistem.
+                    </p>
+
+                    <div class="si-template-meta">
+                        <span>
+                            <i class="fa-solid fa-file"></i>
+                            Format .XLSX
+                        </span>
+
+                        <span>
+                            <i class="fa-solid fa-table-columns"></i>
+                            26 Kolom
+                        </span>
+
+                        <span>
+                            <i class="fa-solid fa-users"></i>
+                            Maks. 1.000 Baris
+                        </span>
+                    </div>
+
+                </div>
+
+                <a href="{{ url_for('import_siswa.download_template') }}"
+                   class="si-download-button">
+
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download Template</span>
+
+                </a>
+
+            </div>
+
+
+            <!-- UPLOAD -->
+            <div class="si-upload-section">
+
+                <div class="si-section-heading si-upload-heading">
+
+                    <div>
+                        <span class="si-section-label">LANGKAH KEDUA</span>
+                        <h3>Unggah file Excel</h3>
+                        <p>Pilih file yang sudah kamu isi menggunakan template.</p>
+                    </div>
+
+                </div>
+
+
+                <form id="siUploadForm"
+                      action="{{ url_for('import_siswa.preview_import') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+
+                    {% if csrf_token is defined %}
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+                    {% endif %}
+
+                    <input type="file"
+                           name="file_excel"
+                           id="siExcelFile"
+                           accept=".xlsx"
+                           hidden
+                           required>
+
+
+                    <div class="si-dropzone"
+                         id="siDropzone"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Pilih atau jatuhkan file Excel">
+
+                        <div class="si-dropzone-content"
+                             id="siDropzoneEmpty">
+
+                            <div class="si-upload-icon">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+
+                            <h4>
+                                Tarik dan letakkan file Excel di sini
+                            </h4>
+
+                            <p>
+                                atau
+                                <button type="button"
+                                        class="si-browse-button"
+                                        id="siBrowseButton">
+                                    pilih file dari perangkat
+                                </button>
+                            </p>
+
+                            <div class="si-upload-limit">
+                                <span>.XLSX</span>
+                                <span>Maksimal 10 MB</span>
+                            </div>
+
+                        </div>
+
+
+                        <!-- FILE SELECTED -->
+                        <div class="si-selected-file"
+                             id="siSelectedFile"
+                             hidden>
+
+                            <div class="si-selected-icon">
+                                <i class="fa-solid fa-file-excel"></i>
+                            </div>
+
+                            <div class="si-selected-info">
+
+                                <strong id="siFileName">
+                                    Nama file.xlsx
+                                </strong>
+
+                                <span id="siFileSize">
+                                    0 KB
+                                </span>
+
+                            </div>
+
+                            <button type="button"
+                                    class="si-remove-file"
+                                    id="siRemoveFile"
+                                    aria-label="Hapus file">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="si-upload-note">
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        <span>
+                            Pastikan file menggunakan template resmi.
+                            Data belum akan disimpan pada tahap ini.
+                        </span>
+                    </div>
+
+
+                    <div class="si-upload-actions">
+
+                        <a href="{{ url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun) }}"
+                           class="si-secondary-button">
+
+                            Batal
+
+                        </a>
+
+                        <button type="submit"
+                                class="si-primary-button"
+                                id="siPreviewButton"
+                                disabled>
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Periksa & Preview Data</span>
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="si-side-column">
+
+            <!-- INSTRUCTION -->
+            <div class="si-info-card">
+
+                <div class="si-info-card-header">
+
+                    <div class="si-info-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+
+                    <div>
+                        <h4>Petunjuk Pengisian</h4>
+                        <span>PENTING UNTUK DIPERHATIKAN</span>
+                    </div>
+
+                </div>
+
+
+                <div class="si-instruction-list">
+
+                    <div class="si-instruction-item">
+                        <span class="si-instruction-number">01</span>
+                        <div>
+                            <strong>Jangan ubah nama kolom</strong>
+                            <p>Gunakan header yang tersedia pada template.</p>
+                        </div>
+                    </div>
+
+                    <div class="si-instruction-item">
+                        <span class="si-instruction-number">02</span>
+                        <div>
+                            <strong>Lengkapi data wajib</strong>
+                            <p>NIS, nama, jenis kelamin, jenis pendaftaran, dan tanggal diterima.</p>
+                        </div>
+                    </div>
+
+                    <div class="si-instruction-item">
+                        <span class="si-instruction-number">03</span>
+                        <div>
+                            <strong>Perhatikan jenis siswa</strong>
+                            <p>Siswa baru otomatis tingkat 7. Siswa pindahan pilih tingkat 7, 8, atau 9.</p>
+                        </div>
+                    </div>
+
+                    <div class="si-instruction-item">
+                        <span class="si-instruction-number">04</span>
+                        <div>
+                            <strong>Periksa tanggal</strong>
+                            <p>Gunakan format YYYY-MM-DD atau DD/MM/YYYY.</p>
+                        </div>
+                    </div>
+
+                    <div class="si-instruction-item">
+                        <span class="si-instruction-number">05</span>
+                        <div>
+                            <strong>Periksa data ganda</strong>
+                            <p>NIS, NISN, dan email tidak boleh duplikat.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY -->
+            <div class="si-security-card">
+
+                <div class="si-security-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <h4>Import Aman & Terkontrol</h4>
+
+                <p>
+                    Sistem akan memeriksa data terlebih dahulu.
+                    Tidak ada siswa yang disimpan sebelum kamu
+                    menyetujui hasil preview.
+                </p>
+
+                <div class="si-security-footer">
+                    <i class="fa-solid fa-lock"></i>
+                    Validasi sebelum penyimpanan
+                </div>
+
+            </div>
+
+
+            <!-- IMPORTANT NOTE -->
+            <div class="si-warning-card">
+
+                <div class="si-warning-title">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Perlu Diketahui
+                </div>
+
+                <ul>
+                    <li>Penempatan kelas dilakukan setelah import.</li>
+                    <li>Import tidak membuat akun login siswa.</li>
+                    <li>Import tidak membuat tagihan otomatis.</li>
+                    <li>Baris yang bermasalah tidak ikut disimpan.</li>
+                </ul>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <!-- BOTTOM NOTE -->
+    <div class="si-bottom-note">
+
+        <div class="si-bottom-note-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+
+        <div>
+            <strong>SMP Unggulan Hamzanwadi</strong>
+            <span>Student Data Management System</span>
+        </div>
+
+        <div class="si-bottom-note-right">
+            DATA IMPORT WORKSPACE
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/siswa/import_siswa.js') }}"></script>

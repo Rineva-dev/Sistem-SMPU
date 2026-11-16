@@ -27,14 +27,62 @@
                 <span>{{ today_date }}</span>
             </div>
 
+            
             {% if bisa_kelola %}
-            <a href="{{ url_for('data_siswa.tambah_siswa') }}"
-               class="sh-add-button">
-                <i class="fas fa-plus"></i>
-                <span>Tambah Siswa</span>
-                <i class="fas fa-arrow-right sh-add-arrow"></i>
-            </a>
+            <div class="sh-add-dropdown">
+
+                <button type="button"
+                        class="sh-add-button"
+                        id="shAddDropdownBtn"
+                        aria-expanded="false">
+
+                    <i class="fas fa-plus"></i>
+                    <span>Tambah Siswa</span>
+                    <i class="fas fa-chevron-down sh-add-arrow"></i>
+
+                </button>
+
+                <div class="sh-add-menu" id="shAddDropdownMenu">
+
+                    <a href="{{ url_for('data_siswa.tambah_siswa') }}"
+                    class="sh-add-menu-item">
+
+                        <span class="sh-add-menu-icon form">
+                            <i class="fas fa-user-plus"></i>
+                        </span>
+
+                        <span class="sh-add-menu-text">
+                            <strong>Tambah Lewat Form</strong>
+                            <small>Input data siswa satu per satu</small>
+                        </span>
+
+                        <i class="fas fa-arrow-right sh-menu-arrow"></i>
+
+                    </a>
+
+                    <div class="sh-add-menu-divider"></div>
+
+                    <a href="{{ url_for('import_siswa.halaman_import_excel') }}"
+                    class="sh-add-menu-item">
+
+                        <span class="sh-add-menu-icon excel">
+                            <i class="fas fa-file-excel"></i>
+                        </span>
+
+                        <span class="sh-add-menu-text">
+                            <strong>Import dari Excel</strong>
+                            <small>Tambahkan banyak siswa sekaligus</small>
+                        </span>
+
+                        <i class="fas fa-arrow-right sh-menu-arrow"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
             {% endif %}
+
         </div>
     </section>
 

@@ -149,8 +149,8 @@
     border-radius: 11px;
     background: linear-gradient(120deg,#047857,#059669);
     color: white;
-    font-size: .8rem;
-    font-weight: 750;
+    font-size: .8rem !important;
+    font-weight: 750 !important;
     text-decoration: none;
     box-shadow: 0 6px 16px rgba(5,150,105,.18);
     transition: .3s ease;
@@ -1499,3 +1499,142 @@ textarea.sh-form-control {
     }
 }
 
+
+/* ==========================================================
+   STUDENT HUB — PREMIUM ADD DROPDOWN
+========================================================== */
+
+.sh-add-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 30;
+}
+
+.sh-add-dropdown .sh-add-button {
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.sh-add-dropdown .sh-add-arrow {
+    transition: transform .25s ease;
+}
+
+.sh-add-dropdown.open .sh-add-arrow {
+    transform: rotate(180deg);
+}
+
+.sh-add-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 290px;
+    padding: 9px;
+    background: #fff;
+    border: 1px solid #e8eee9;
+    border-radius: 16px;
+    box-shadow: 0 18px 45px rgba(15, 45, 32, .16);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(.98);
+    transform-origin: top right;
+    transition: all .22s ease;
+}
+
+.sh-add-dropdown.open .sh-add-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.sh-add-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: #173b2d;
+    text-decoration: none;
+    border-radius: 11px;
+    transition: background .2s ease, transform .2s ease;
+}
+
+.sh-add-menu-item:hover {
+    background: #f2f8f4;
+    color: #08734d;
+    transform: translateX(3px);
+}
+
+.sh-add-menu-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.sh-add-menu-icon.form {
+    color: #08734d;
+    background: #e7f5ed;
+}
+
+.sh-add-menu-icon.excel {
+    color: #16834f;
+    background: #e6f6ec;
+}
+
+.sh-add-menu-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.sh-add-menu-text strong {
+    font-size: 13px;
+    font-weight: 750;
+    color: #183d2e;
+}
+
+.sh-add-menu-text small {
+    font-size: 11px;
+    color: #84958b;
+}
+
+.sh-menu-arrow {
+    font-size: 11px;
+    color: #9aaca1;
+    transition: transform .2s ease;
+}
+
+.sh-add-menu-item:hover .sh-menu-arrow {
+    transform: translateX(3px);
+    color: #08734d;
+}
+
+.sh-add-menu-divider {
+    height: 1px;
+    background: #edf1ee;
+    margin: 4px 8px;
+}
+
+@media (max-width: 576px) {
+    .sh-add-dropdown {
+        width: 100%;
+    }
+
+    .sh-add-dropdown > .sh-add-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sh-add-menu {
+        width: 100%;
+        right: 0;
+    }
+}

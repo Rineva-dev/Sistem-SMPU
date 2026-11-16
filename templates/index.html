@@ -94,6 +94,14 @@
     {% include "siswa/data_siswa.html" %}
 {% endif %}
 
+{% if active_page == "data_siswa" and sub_page == "import_excel" %}
+    {% include "siswa/import_excel.html" %}
+{% endif %}
+
+{% if active_page == "data_siswa" and sub_page == "preview_import_excel" %}
+    {% include "siswa/preview_import_excel.html" %}
+{% endif %}
+
 {% if active_page == "data_siswa" and sub_page == "form_tambah" %}
     {% include "siswa/form_siswa.html" %}
 {% endif %}
