@@ -538,7 +538,7 @@
                 </li>
 
                 <li class="menu-item">
-                  <a href="/siswa"
+                  <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}"
                      class="menu-link {% if active_page == 'data_siswa' %}active{% endif %}">
                     <i class="fas fa-user-graduate"></i>
                     <span>Data Siswa</span>
@@ -691,7 +691,7 @@
               </li>
 
               <li class="menu-item">
-                <a href="/siswa"
+                <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}"
                    class="menu-link {% if active_page == 'data_siswa' %}active{% endif %}">
                   <i class="fas fa-user-graduate"></i>
                   <span>Data Siswa</span>
