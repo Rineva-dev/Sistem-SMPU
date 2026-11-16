@@ -716,27 +716,48 @@ def kenaikan_kelas():
         user={'jabatan': session.get('jabatan', '')}
     )
 
+
 @data_siswa_bp.route('/atur-kelas/<string:public_id>', methods=['POST'])
 def atur_kelas(public_id):
     if not session.get('logged_in') or not bisa_kelola():
         flash("Tidak berhak mengubah kelas!", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
+    # Cari siswa menggunakan public_id untuk URL
     siswa = Siswa.query.filter_by(
         public_id=public_id
     ).first_or_404()
+
     kode_tahun = request.form.get('tahun_pelajaran', '').strip()
     kelas_id_baru = request.form.get('kelas_id', '').strip()
 
     if not kode_tahun or not kelas_id_baru:
         flash("Pilih tahun pelajaran dan kelas terlebih dahulu!", "danger")
-        return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
+        return redirect(url_for(
+            'data_siswa.halaman_daftar_siswa',
+            tahun=kode_tahun
+        ))
 
-    kelas_baru = Kelas.query.get(kelas_id_baru)
+    # Validasi ID kelas
+    try:
+        kelas_id_baru = int(kelas_id_baru)
+    except (TypeError, ValueError):
+        flash("ID kelas tidak valid!", "danger")
+        return redirect(url_for(
+            'data_siswa.halaman_daftar_siswa',
+            tahun=kode_tahun
+        ))
+
+    kelas_baru = db.session.get(Kelas, kelas_id_baru)
+
     if not kelas_baru or kelas_baru.tahun_pelajaran != kode_tahun:
         flash("Kelas tidak sesuai dengan tahun pelajaran yang dipilih!", "danger")
-        return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
+        return redirect(url_for(
+            'data_siswa.halaman_daftar_siswa',
+            tahun=kode_tahun
+        ))
 
+    # Cari riwayat menggunakan ID INTEGER siswa
     posisi = RiwayatKelas.query.filter_by(
         siswa_id=siswa.id,
         tahun_pelajaran=kode_tahun
@@ -747,19 +768,34 @@ def atur_kelas(public_id):
         posisi.tingkat = kelas_baru.jenjang
     else:
         posisi = RiwayatKelas(
-            siswa_id=id,
+            siswa_id=siswa.id,  # ✅ ID INTEGER SISWA
             tahun_pelajaran=kode_tahun,
             tingkat=kelas_baru.jenjang,
             kelas_id=kelas_baru.id
         )
         db.session.add(posisi)
 
+    # Perbarui posisi siswa saat ini
     siswa.tingkat = kelas_baru.jenjang
     siswa.kelas_id = kelas_baru.id
 
-    db.session.commit()
-    flash(f"✅ Siswa dipindahkan ke {kelas_baru.nama_kelas} TP {kode_tahun}", "success")
-    return redirect(url_for('data_siswa.halaman_daftar_siswa', tahun=kode_tahun))
+    try:
+        db.session.commit()
+        flash(
+            f"✅ Siswa berhasil ditempatkan di {kelas_baru.nama_kelas} TP {kode_tahun}",
+            "success"
+        )
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception(
+            "Gagal mengatur kelas siswa ID %s", siswa.id
+        )
+        flash("Gagal menyimpan penempatan kelas. Periksa log server.", "danger")
+
+    return redirect(url_for(
+        'data_siswa.halaman_daftar_siswa',
+        tahun=kode_tahun
+    ))
 
 
 @data_siswa_bp.route('/hapus/<string:public_id>', methods=['POST'])
