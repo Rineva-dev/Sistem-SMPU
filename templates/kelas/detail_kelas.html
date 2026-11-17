@@ -226,8 +226,8 @@
                             </td>
                             <td><span class="cr-student-status">{{ siswa.status }}</span></td>
                             <td>
-                                <a href="{{ url_for('data_siswa.detail_siswa', id=siswa.id) }}"
-                                   class="cr-detail-button" title="Lihat detail siswa">
+                                <a href="{{ url_for('data_siswa.detail_siswa', public_id=siswa.public_id) }}"
+                                    class="cr-detail-button" title="Lihat detail siswa">
                                     <i class="fas fa-arrow-up-right-from-square"></i>
                                 </a>
                             </td>
