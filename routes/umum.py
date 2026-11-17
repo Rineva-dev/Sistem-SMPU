@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g
-from models import db, TahunPelajaran, User, RiwayatKelas
-from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g, current_app
+from models import db, TahunPelajaran, User, RiwayatKelas, LogSiklusAkademik
+from datetime import datetime, date
 
 umum_bp = Blueprint('umum', __name__, url_prefix='/')
 
@@ -20,6 +20,35 @@ def bisa_kelola_tahun_pelajaran(user, halaman_aktif='utama'):
         user.jabatan in ["Admin", "Kepala Sekolah", "Tata Usaha", "TU", "Waka Kurikulum"]
         or ("Admin Sistem" in daftar_tugas and halaman_aktif == "admin_sistem")
         or ("Waka Kurikulum" in daftar_tugas and halaman_aktif == "waka_kurikulum")
+    )
+
+def bisa_menyetujui_siklus(user, halaman_aktif='utama'):
+    if not user:
+        return False
+
+    # Kepala Sekolah selalu berhak memberikan persetujuan
+    if user.jabatan == "Kepala Sekolah":
+        return True
+
+    # Waka Kurikulum berdasarkan jabatan
+    if user.jabatan == "Waka Kurikulum":
+        return True
+
+    # Waka Kurikulum berdasarkan tugas tambahan
+    daftar_tugas = []
+
+    if hasattr(user, 'tugas_tambahan') and user.tugas_tambahan:
+        if isinstance(user.tugas_tambahan, str):
+            daftar_tugas = [
+                t.strip()
+                for t in user.tugas_tambahan.split(',')
+            ]
+        else:
+            daftar_tugas = user.tugas_tambahan
+
+    return (
+        "Waka Kurikulum" in daftar_tugas
+        and halaman_aktif == "waka_kurikulum"
     )
 
 def validasi_data_tahun_pelajaran(form):
@@ -63,6 +92,26 @@ def validasi_data_tahun_pelajaran(form):
         "tanggal_mulai": tanggal_mulai,
         "tanggal_selesai": tanggal_selesai
     }
+
+def sinkronisasi_status_siklus():
+    hari_ini = date.today()
+
+    daftar_tahun = TahunPelajaran.query.all()
+
+    for tp in daftar_tahun:
+        if hari_ini < tp.tanggal_mulai:
+            status = "persiapan"
+
+        elif tp.tanggal_mulai <= hari_ini <= tp.tanggal_selesai:
+            status = "berlangsung"
+
+        else:
+            status = "selesai"
+
+        if tp.status_siklus != status:
+            tp.status_siklus = status
+
+    db.session.commit()
 
 @umum_bp.before_app_request
 def load_tahun_aktif():
@@ -175,6 +224,24 @@ def kelola_tahun_pelajaran():
                 if not tp:
                     raise ValueError("Tahun pelajaran tidak ditemukan.")
 
+                tp = db.session.get(TahunPelajaran, int(id_tp))
+
+                if not tp:
+                    raise ValueError("Tahun pelajaran tidak ditemukan.")
+
+                # ==========================================
+                # KUNCI PERIODE YANG SUDAH SELESAI
+                # ==========================================
+                if tp.status_siklus == "selesai":
+                    flash(
+                        "Tahun pelajaran sudah selesai. "
+                        "Data periode ini tidak dapat diedit lagi.",
+                        "danger"
+                    )
+                    return redirect(url_for("umum.kelola_tahun_pelajaran"))
+
+                data = validasi_data_tahun_pelajaran(request.form)
+
                 data = validasi_data_tahun_pelajaran(request.form)
 
                 # Identitas periode tidak boleh diubah jika sudah
@@ -255,7 +322,24 @@ def kelola_tahun_pelajaran():
 
         return redirect(url_for("umum.kelola_tahun_pelajaran"))
 
-    daftar_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.desc()).all()
+    daftar_tahun = TahunPelajaran.query.order_by(
+        TahunPelajaran.kode.desc()
+    ).all()
+
+    # Riwayat perubahan siklus akademik
+    riwayat_siklus = (
+        db.session.query(
+            LogSiklusAkademik,
+            TahunPelajaran.kode
+        )
+        .join(
+            TahunPelajaran,
+            LogSiklusAkademik.tahun_pelajaran_id == TahunPelajaran.id
+        )
+        .order_by(LogSiklusAkademik.dibuat_pada.desc())
+        .limit(30)
+        .all()
+    )
 
     return render_template(
         "index.html",
@@ -263,7 +347,8 @@ def kelola_tahun_pelajaran():
         sub_page="daftar",
         user=user,
         halaman_aktif=halaman_aktif,
-        daftar_tahun=daftar_tahun
+        daftar_tahun=daftar_tahun,
+        riwayat_siklus=riwayat_siklus
     )
 
 # ==========================================
@@ -303,3 +388,84 @@ def ganti_tahun():
     flash(f"Tahun pelajaran berhasil diubah ke {tp.kode}.", "success")
 
     return redirect(request.referrer or url_for('dashboard.index'))
+
+
+@umum_bp.route('/tahun-pelajaran/ubah-status-siklus', methods=['POST'])
+def ubah_status_siklus():
+    if not session.get('logged_in'):
+        return redirect(url_for('login.halaman_login'))
+
+    user_id = session.get('user_id')
+    user = db.session.get(User, user_id) if user_id else None
+
+    halaman_aktif = session.get('halaman_aktif', 'utama')
+    tujuan = request.referrer or url_for('umum.kelola_tahun_pelajaran')
+
+    if not user:
+        flash("Sesi pengguna tidak valid.", "danger")
+        return redirect(tujuan)
+
+    # Hak akses khusus perubahan siklus akademik
+    if not bisa_kelola_tahun_pelajaran(user, halaman_aktif):
+        flash("Anda tidak memiliki hak untuk mengubah siklus akademik.", "danger")
+        return redirect(tujuan)
+
+    # Siklus hanya boleh diproses pada tahun pelajaran operasional
+    tp_id = request.form.get("id_tahun_pelajaran", "").strip()
+
+    if not tp_id.isdigit():
+        flash("Tahun pelajaran tidak valid.", "danger")
+        return redirect(tujuan)
+
+    tp = db.session.get(TahunPelajaran, int(tp_id))
+
+    if not tp:
+        flash("Tahun pelajaran tidak ditemukan.", "danger")
+        return redirect(tujuan)
+
+    if not tp.aktif:
+        flash(
+            "Siklus akademik hanya dapat diproses pada tahun pelajaran yang aktif.",
+            "warning"
+        )
+        return redirect(tujuan)
+
+    id_tp = request.form.get("id_tahun_pelajaran", "").strip()
+    status_baru = request.form.get("status_siklus", "").strip()
+    # ==========================================
+    # PENGAMANAN PERSETUJUAN AKHIR SIKLUS
+    # ==========================================
+    if status_baru == "selesai":
+        if not bisa_menyetujui_siklus(user, halaman_aktif):
+            flash(
+                "Hanya Kepala Sekolah atau Waka Kurikulum "
+                "yang berwenang menyelesaikan siklus akademik.",
+                "danger"
+            )
+            return redirect(tujuan)
+
+    catatan = request.form.get("catatan", "").strip()
+
+    if not id_tp.isdigit():
+        flash("Tahun pelajaran tidak valid.", "danger")
+        return redirect(tujuan)
+
+    try:
+        TahunPelajaran.ubah_status_siklus(
+            id=tp.id,
+            status_baru=status_baru,
+            user_id=user.id,
+            catatan=catatan or None
+        )
+
+        flash("Status siklus akademik berhasil diperbarui.", "success")
+
+    except ValueError as e:
+        flash(str(e), "warning")
+
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception("Gagal mengubah status siklus akademik.")
+        flash("Terjadi kesalahan saat mengubah status siklus akademik.", "danger")
+
+    return redirect(tujuan)

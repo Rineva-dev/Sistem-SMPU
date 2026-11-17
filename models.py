@@ -170,12 +170,32 @@ class TahunPelajaran(db.Model):
     tanggal_mulai = db.Column(db.Date, nullable=False)
     tanggal_selesai = db.Column(db.Date, nullable=False)
 
+    @property
+    def status_periode(self):
+        hari_ini = datetime.now(
+            ZoneInfo("Asia/Makassar")
+        ).date()
+
+        if hari_ini < self.tanggal_mulai:
+            return "persiapan"
+
+        if hari_ini > self.tanggal_selesai:
+            return "selesai"
+
+        return "berlangsung"
+
     @staticmethod
     def set_aktif(id):
         tp = db.session.get(TahunPelajaran, id)
 
         if not tp:
             raise ValueError("Tahun pelajaran tidak ditemukan.")
+
+        if tp.status_periode == "selesai":
+            raise ValueError(
+                "Tahun pelajaran yang siklus akademiknya sudah selesai "
+                "tidak dapat diaktifkan kembali."
+            )
 
         try:
             TahunPelajaran.query.filter(
@@ -194,8 +214,82 @@ class TahunPelajaran(db.Model):
             db.session.rollback()
             raise
 
+    
+    @staticmethod
+    def ubah_status_siklus(id, status_baru, user_id=None, catatan=None):
+        alur_status = {
+            "persiapan": "berlangsung",
+            "berlangsung": "pengisian_nilai",
+            "pengisian_nilai": "pemeriksaan_rapor",
+            "pemeriksaan_rapor": "menunggu_persetujuan",
+            "menunggu_persetujuan": "selesai",
+        }
+
+        tp = db.session.get(TahunPelajaran, id)
+
+        if not tp:
+            raise ValueError("Tahun pelajaran tidak ditemukan.")
+
+        status_lama = tp.status_siklus
+
+        if status_lama == "selesai":
+            raise ValueError(
+                "Siklus akademik sudah selesai dan tidak dapat diubah kembali."
+            )
+
+        if alur_status.get(status_lama) != status_baru:
+            raise ValueError(
+                f"Perubahan status dari {status_lama} ke {status_baru} tidak diizinkan."
+            )
+
+        try:
+            tp.status_siklus = status_baru
+
+            log = LogSiklusAkademik(
+                tahun_pelajaran_id=tp.id,
+                user_id=str(user_id) if user_id is not None else None,
+                status_sebelum=status_lama,
+                status_sesudah=status_baru,
+                catatan=catatan
+            )
+
+            db.session.add(log)
+            db.session.commit()
+
+            return tp
+
+        except Exception:
+            db.session.rollback()
+            raise
+
+
     def __repr__(self):
         return f"<TahunPelajaran {self.kode}>"
+
+
+class LogSiklusAkademik(db.Model):
+    __tablename__ = "log_siklus_akademik"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    tahun_pelajaran_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tahun_pelajaran.id"),
+        nullable=False
+    )
+
+    user_id = db.Column(db.String(50), nullable=True)
+
+    status_sebelum = db.Column(db.String(30), nullable=True)
+    status_sesudah = db.Column(db.String(30), nullable=False)
+
+    catatan = db.Column(db.Text, nullable=True)
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
 
 
 class KalenderPendidikan(db.Model):

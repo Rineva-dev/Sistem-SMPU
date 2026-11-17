@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, session, redirect, url_for, reques
 from datetime import datetime
 import re
 from sqlalchemy import or_
-from models import db, Siswa, Kelas, User, TahunPelajaran, RiwayatKelas, RiwayatPembayaran, TagihanSiswa, PengajuanPembayaran, DetailPengajuanPembayaran
+from models import (
+    db, Siswa, Kelas, User, TahunPelajaran,
+    RiwayatKelas, RiwayatSemester,
+    RiwayatPembayaran, TagihanSiswa,
+    PengajuanPembayaran, DetailPengajuanPembayaran
+)
 from flask import current_app
 
 # Buat Blueprint
@@ -89,6 +94,97 @@ def format_tahun_pelajaran(kode_tp):
         elif angka == '2':
             return f"{tahun}-Genap"
     return kode_tp  # fallback jika format lain
+
+def simpan_keaktifan_riwayat(siswa, tanggal_non_aktif, jenis):
+    """
+    Mencatat status Pindah/Berhenti pada semester sesuai tanggal.
+    Tidak mengubah status_akhir dan tidak menimpa riwayat semester sebelumnya.
+    """
+
+    # Cari periode akademik berdasarkan tanggal kejadian
+    periode = TahunPelajaran.query.filter(
+        TahunPelajaran.tanggal_mulai <= tanggal_non_aktif,
+        TahunPelajaran.tanggal_selesai >= tanggal_non_aktif
+    ).all()
+
+    if len(periode) != 1:
+        raise ValueError(
+            "Tanggal nonaktif tidak berada dalam tepat satu periode "
+            "tahun pelajaran. Periksa kalender tahun pelajaran."
+        )
+
+    tp = periode[0]
+    dasar_tahun = tp.kode.rsplit("-", 1)[0]
+    semester = tp.semester
+
+    # Pastikan siswa memang memiliki riwayat kelas pada periode tersebut
+    kode_periode = tp.kode
+
+    riwayat_kelas = RiwayatKelas.query.filter_by(
+        siswa_id=siswa.id,
+        tahun_pelajaran=kode_periode
+    ).first()
+
+    if not riwayat_kelas:
+        raise ValueError(
+            "Riwayat kelas siswa pada periode tersebut tidak ditemukan."
+        )
+
+    riwayat = RiwayatSemester.query.filter_by(
+        siswa_id=siswa.id,
+        tahun_pelajaran=dasar_tahun,
+        semester=semester
+    ).first()
+
+    if riwayat:
+        # Hanya ubah keaktifan semester tempat kejadian berlangsung
+        riwayat.keaktifan = jenis
+
+    else:
+        kelas = db.session.get(Kelas, riwayat_kelas.kelas_id) \
+            if riwayat_kelas.kelas_id else None
+
+        riwayat = RiwayatSemester(
+            siswa_id=siswa.id,
+            tahun_pelajaran=dasar_tahun,
+            semester=semester,
+            status_awal="Lanjutan",
+            status_akhir=None,
+            keaktifan=jenis,
+            tingkat_saat_itu=riwayat_kelas.tingkat,
+            kelas_nama=kelas.nama_kelas if kelas else None
+        )
+
+        db.session.add(riwayat)
+
+    # Jika kejadian terjadi di semester 2, pastikan semester 1
+    # tercatat Aktif apabila siswa memang memiliki riwayat kelas di sana.
+    if semester == 2:
+        riwayat_ganjil = RiwayatSemester.query.filter_by(
+            siswa_id=siswa.id,
+            tahun_pelajaran=dasar_tahun,
+            semester=1
+        ).first()
+
+        kelas_ganjil = RiwayatKelas.query.filter_by(
+            siswa_id=siswa.id,
+            tahun_pelajaran=f"{dasar_tahun}-1"
+        ).first()
+
+        if not riwayat_ganjil and kelas_ganjil:
+            kelas = db.session.get(Kelas, kelas_ganjil.kelas_id) \
+                if kelas_ganjil.kelas_id else None
+
+            db.session.add(RiwayatSemester(
+                siswa_id=siswa.id,
+                tahun_pelajaran=dasar_tahun,
+                semester=1,
+                status_awal="Lanjutan",
+                status_akhir=None,
+                keaktifan="Aktif",
+                tingkat_saat_itu=kelas_ganjil.tingkat,
+                kelas_nama=kelas.nama_kelas if kelas else None
+            ))
 
 # ======================================
 # RUTE: Halaman Daftar Siswa ✅ SUDAH DIPERBAIKI TOTAL
@@ -998,35 +1094,88 @@ def detail_siswa(public_id):
         print(f"   -> TP: {r.tahun_pelajaran} | Kelas: {r.kelas.nama_kelas if r.kelas else 'TIDAK ADA/NULL'} | Tingkat: {r.tingkat}")
     # ===========================
 
+    
+    
     riwayat_semester = []
+
     for rw in riwayat_kelas:
-        if siswa.jenis_pendaftaran == 'baru' and rw.tahun_pelajaran == f"{siswa.tahun_diterima}/{siswa.tahun_diterima+1}-1":
-            status_awal = "Siswa Baru"
-        elif siswa.jenis_pendaftaran == 'pindahan' and rw.tahun_pelajaran == kode_cari:
-            status_awal = "Siswa Pindahan"
+        # Normalisasi kode tahun dan semester.
+        bagian = rw.tahun_pelajaran.rsplit('-', 1)
+
+        if len(bagian) == 2 and bagian[1] in ['1', '2']:
+            dasar_tahun = bagian[0]
+            nomor_semester = int(bagian[1])
         else:
-            status_awal = "Lanjutan"
-        
-        if rw.tingkat == "9":
-            status_akhir = "Lulus"
-        elif rw.tahun_pelajaran == kode_cari:
-            status_akhir = ""
+            dasar_tahun = rw.tahun_pelajaran
+            nomor_semester = None
+
+        # Jika RiwayatKelas belum menyimpan kode semester,
+        # gunakan semester aktif yang sesuai dengan konteks data.
+        if nomor_semester is None and kode_cari:
+            bagian_pilihan = kode_cari.rsplit('-', 1)
+
+            if len(bagian_pilihan) == 2 and bagian_pilihan[1] in ['1', '2']:
+                if bagian_pilihan[0] == dasar_tahun:
+                    nomor_semester = int(bagian_pilihan[1])
+
+        riwayat_db = None
+
+        if nomor_semester:
+            riwayat_db = RiwayatSemester.query.filter_by(
+                siswa_id=siswa.id,
+                tahun_pelajaran=dasar_tahun,
+                semester=nomor_semester
+            ).first()
+
+        print(
+            f"[CEK RIWAYAT] Siswa={siswa.id} | "
+            f"TP={rw.tahun_pelajaran} | "
+            f"Dasar={dasar_tahun} | "
+            f"Semester={nomor_semester} | "
+            f"Ditemukan={riwayat_db is not None}"
+        )
+
+        # Status awal semester
+        status_awal = (
+            riwayat_db.status_awal
+            if riwayat_db and riwayat_db.status_awal
+            else "Lanjutan"
+        )
+
+        # Status akhir semester
+        status_akhir = (
+            riwayat_db.status_akhir
+            if riwayat_db and riwayat_db.status_akhir
+            else ""
+        )
+
+        # Keaktifan:
+        # Jika ada catatan database, gunakan nilai tersebut.
+        # Jika belum ada catatan, siswa dianggap Aktif karena
+        # memiliki RiwayatKelas pada semester ini.
+        if riwayat_db and riwayat_db.keaktifan:
+            keaktifan = riwayat_db.keaktifan
         else:
-            status_akhir = "Naik"
-        
-        if siswa.status == "Aktif":
             keaktifan = "Aktif"
-        elif siswa.status == "Lulus":
-            keaktifan = "Lulus"
-        else:
-            keaktifan = siswa.jenis_non_aktif or "Tidak Aktif"
-        
+
+        tingkat_saat_itu = (
+            riwayat_db.tingkat_saat_itu
+            if riwayat_db and riwayat_db.tingkat_saat_itu
+            else rw.tingkat
+        )
+
+        kelas_nama = (
+            riwayat_db.kelas_nama
+            if riwayat_db and riwayat_db.kelas_nama
+            else (rw.kelas.nama_kelas if rw.kelas else None)
+        )
+
         riwayat_semester.append({
             "tahun_pelajaran": rw.tahun_pelajaran,
             "status_awal": status_awal,
             "status_akhir": status_akhir,
-            "tingkat_saat_itu": rw.tingkat,
-            "kelas_nama": rw.kelas.nama_kelas if rw.kelas else None,
+            "tingkat_saat_itu": tingkat_saat_itu,
+            "kelas_nama": kelas_nama,
             "keaktifan": keaktifan
         })
 
@@ -1171,9 +1320,17 @@ def ubah_status(public_id):
                 flash("Nama sekolah tujuan wajib diisi!", "danger")
                 return redirect(url_for('data_siswa.halaman_daftar_siswa'))
 
+            tanggal_obj = datetime.strptime(tanggal, '%Y-%m-%d').date()
+
+            simpan_keaktifan_riwayat(
+                siswa=siswa,
+                tanggal_non_aktif=tanggal_obj,
+                jenis=jenis
+            )
+
             siswa.status = 'Non Aktif'
             siswa.jenis_non_aktif = jenis
-            siswa.tanggal_non_aktif = datetime.strptime(tanggal, '%Y-%m-%d')
+            siswa.tanggal_non_aktif = tanggal_obj
             siswa.alasan_non_aktif = alasan
             siswa.sekolah_tujuan = sekolah_tujuan if jenis == 'Pindah' else None
             flash("✅ Status berhasil diubah menjadi Non Aktif", "success")

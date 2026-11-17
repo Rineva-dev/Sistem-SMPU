@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
-from models import db, Kelas, Guru, TahunPelajaran, User, Siswa, RiwayatKelas, MataPelajaran, PengaturanMapelKelas, JadwalPelajaran
+from models import db, Kelas, Guru, TahunPelajaran, User, Siswa, RiwayatKelas, RiwayatSemester, MataPelajaran, PengaturanMapelKelas, JadwalPelajaran
 from functools import wraps
 
 kelas_bp = Blueprint('data_kelas', __name__, url_prefix='/kelas')
@@ -78,6 +78,51 @@ def get_base_tahun(kode_tp):
     if ' ' in kode_tp:
         kode_tp = kode_tp.split(' ')[0]
     return kode_tp.strip()
+
+def simpan_status_riwayat_semester(
+    siswa,
+    kelas,
+    dasar_tahun,
+    nomor_semester,
+    status_akhir,
+    tingkat
+):
+    """
+    Simpan hasil proses akademik pada riwayat semester asal.
+    Tidak mengubah riwayat semester lainnya.
+    """
+
+    riwayat = RiwayatSemester.query.filter_by(
+        siswa_id=siswa.id,
+        tahun_pelajaran=dasar_tahun,
+        semester=nomor_semester
+    ).first()
+
+    if riwayat:
+        # Perbarui hanya hasil akhir semester yang sedang diproses.
+        riwayat.status_akhir = status_akhir
+
+        # Lengkapi data historis jika sebelumnya kosong.
+        if not riwayat.tingkat_saat_itu:
+            riwayat.tingkat_saat_itu = str(tingkat)
+
+        if not riwayat.kelas_nama and kelas:
+            riwayat.kelas_nama = kelas.nama_kelas
+
+    else:
+        # Buat catatan jika belum tersedia.
+        riwayat = RiwayatSemester(
+            siswa_id=siswa.id,
+            tahun_pelajaran=dasar_tahun,
+            semester=nomor_semester,
+            status_awal="Aktif",
+            status_akhir=status_akhir,
+            keaktifan="Aktif",
+            tingkat_saat_itu=str(tingkat),
+            kelas_nama=kelas.nama_kelas if kelas else None
+        )
+
+        db.session.add(riwayat)
 
 # --------------------------
 # Fungsi Bantu: Kelola Otomatis Tugas Wali Kelas
@@ -375,11 +420,16 @@ def daftar_siswa_di_kelas(id):
             sudah_di_genap = RiwayatKelas.query.filter_by(
                 siswa_id=siswa.id, tahun_pelajaran=kode_genap_cek
             ).first()
-            sudah_naik = RiwayatKelas.query.filter(
+            riwayat_tahun_ini = RiwayatKelas.query.filter(
                 RiwayatKelas.siswa_id == siswa.id,
-                RiwayatKelas.tahun_pelajaran.like(f"{dasar_tahun}%"),
-                RiwayatKelas.tingkat > tingkat_kelas
-            ).first()
+                RiwayatKelas.tahun_pelajaran.like(f"{dasar_tahun}%")
+            ).all()
+
+            sudah_naik = any(
+                str(r.tingkat).isdigit()
+                and int(r.tingkat) > int(tingkat_kelas)
+                for r in riwayat_tahun_ini
+            )
             if not sudah_di_genap and not sudah_naik:
                 siswa_lanjutkan.append(siswa)
 
@@ -698,117 +748,147 @@ def kelola_siswa_di_kelas(kelas_id):
     ))
 
 
-
 @kelas_bp.route('/<int:kelas_id>/lanjutkan-genap', methods=['POST'])
 @bisa_kelola_kelas
 def lanjutkan_semester_genap(kelas_id):
     kelas = Kelas.query.get_or_404(kelas_id)
 
-    kode_genap = request.form.get('kode_genap')
-    siswa_dipilih = request.form.getlist('siswa_id')
+    kode_genap = (request.form.get('kode_genap') or '').strip()
+    siswa_dipilih_raw = request.form.getlist('siswa_id')
 
-    print(f"[DEBUG] kode_genap: {kode_genap}")
-    print(f"[DEBUG] siswa dipilih: {siswa_dipilih}")
-
-    if not kode_genap or not siswa_dipilih:
-        flash(
-            "Pilih siswa yang akan dilanjutkan ke Genap!",
-            "warning"
-        )
+    if not kode_genap or not siswa_dipilih_raw:
+        flash("Pilih siswa yang akan dilanjutkan ke Semester Genap!", "warning")
         return redirect(url_for(
             'data_kelas.daftar_siswa_di_kelas',
             id=kelas_id
         ))
 
-    dasar_tahun = get_base_tahun(kode_genap)
-    kode_genap_benar = f"{dasar_tahun}-2"
-    kode_ganjil_sama = f"{dasar_tahun}-1"
-
-    dibuat = 0
-    diperbarui = 0
-
     try:
-        for sid_raw in siswa_dipilih:
+        # ==========================================
+        # VALIDASI KODE PERIODE
+        # ==========================================
+        dasar_tahun = get_base_tahun(kode_genap)
+        kode_ganjil = f"{dasar_tahun}-1"
+        kode_genap_benar = f"{dasar_tahun}-2"
 
-            # Konversi ID dari form menjadi INTEGER
-            try:
-                sid = int(sid_raw)
-            except (TypeError, ValueError):
+        if kode_genap != kode_genap_benar:
+            raise ValueError("Kode Semester Genap tidak valid.")
+
+        if kelas.tahun_pelajaran != dasar_tahun:
+            raise ValueError("Kelas tidak sesuai dengan tahun pelajaran.")
+
+        # Pastikan kedua periode terdaftar
+        periode_ganjil = TahunPelajaran.query.filter_by(
+            kode=kode_ganjil
+        ).first()
+
+        periode_genap = TahunPelajaran.query.filter_by(
+            kode=kode_genap_benar
+        ).first()
+
+        if not periode_ganjil or not periode_genap:
+            raise ValueError(
+                "Periode Ganjil atau Genap belum terdaftar "
+                "di pengaturan Tahun Pelajaran."
+            )
+
+        # ==========================================
+        # VALIDASI ID SISWA
+        # ==========================================
+        try:
+            siswa_ids = {int(sid) for sid in siswa_dipilih_raw}
+        except (TypeError, ValueError):
+            raise ValueError("Terdapat ID siswa yang tidak valid.")
+
+        dibuat = 0
+        dilewati = 0
+
+        for siswa_id in siswa_ids:
+
+            siswa = db.session.get(Siswa, siswa_id)
+
+            if not siswa or siswa.status != 'Aktif':
+                dilewati += 1
                 continue
 
-            # Pastikan siswa benar-benar ada
-            siswa = db.session.get(Siswa, sid)
+            # Siswa wajib benar-benar tercatat di kelas
+            # pada Semester Ganjil yang sedang diproses.
+            riwayat_ganjil = RiwayatKelas.query.filter_by(
+                siswa_id=siswa_id,
+                tahun_pelajaran=kode_ganjil,
+                kelas_id=kelas.id
+            ).first()
 
-            if not siswa:
+            if not riwayat_ganjil:
+                dilewati += 1
                 continue
 
+            # Tingkat harus konsisten dengan kelas asal.
+            if str(riwayat_ganjil.tingkat) != str(kelas.jenjang):
+                dilewati += 1
+                continue
+
+            # Jangan menimpa riwayat Genap yang sudah ada.
             riwayat_genap = RiwayatKelas.query.filter_by(
-                siswa_id=sid,
+                siswa_id=siswa_id,
                 tahun_pelajaran=kode_genap_benar
             ).first()
 
             if riwayat_genap:
-                if riwayat_genap.kelas_id != kelas.id:
-                    riwayat_genap.kelas_id = kelas.id
-                    diperbarui += 1
+                dilewati += 1
+                continue
 
-            else:
-                riwayat_ganjil = RiwayatKelas.query.filter_by(
-                    siswa_id=sid,
-                    tahun_pelajaran=kode_ganjil_sama,
-                    kelas_id=kelas.id
-                ).first()
+            # Buat riwayat keanggotaan Semester Genap.
+            db.session.add(RiwayatKelas(
+                siswa_id=siswa_id,
+                tahun_pelajaran=kode_genap_benar,
+                tingkat=riwayat_ganjil.tingkat,
+                kelas_id=kelas.id
+            ))
 
-                print(
-                    f"[DEBUG] sid={sid} "
-                    f"riwayat_ganjil ditemukan: {riwayat_ganjil}"
-                )
+            # Catat bahwa siswa melanjutkan dari Semester Ganjil.
+            simpan_status_riwayat_semester(
+                siswa=siswa,
+                kelas=kelas,
+                dasar_tahun=dasar_tahun,
+                nomor_semester=1,
+                status_akhir="Lanjut",
+                tingkat=riwayat_ganjil.tingkat
+            )
 
-                if riwayat_ganjil:
-                    db.session.add(RiwayatKelas(
-                        siswa_id=sid,
-                        tahun_pelajaran=kode_genap_benar,
-                        tingkat=riwayat_ganjil.tingkat,
-                        kelas_id=kelas.id
-                    ))
-                    dibuat += 1
+            dibuat += 1
 
         db.session.commit()
 
-        print(
-            f"[DEBUG] dibuat={dibuat}, "
-            f"diperbarui={diperbarui}"
-        )
-
         pesan = (
-            f"Selesai! {dibuat} siswa baru ditambahkan ke Genap"
+            f"{dibuat} siswa berhasil dilanjutkan ke Semester Genap."
         )
 
-        if diperbarui > 0:
-            pesan += (
-                f", {diperbarui} siswa sudah ada "
-                "dan diperbarui kelasnya"
-            )
+        if dilewati:
+            pesan += f" {dilewati} siswa dilewati karena tidak memenuhi syarat atau sudah memiliki riwayat Genap."
 
-        flash(pesan + ". Riwayat Ganjil tetap aman!", "success")
+        flash(pesan, "success" if dibuat else "warning")
+
+    except ValueError as e:
+        db.session.rollback()
+        flash(str(e), "danger")
 
     except Exception:
         db.session.rollback()
         current_app.logger.exception(
-            "Gagal melanjutkan siswa ke semester Genap, kelas ID %s",
+            "Gagal melanjutkan siswa ke Semester Genap, kelas ID %s",
             kelas_id
         )
         flash(
-            "Gagal melanjutkan siswa ke Genap. Periksa log server.",
+            "Gagal melanjutkan siswa ke Semester Genap. Periksa log server.",
             "danger"
         )
 
     return redirect(url_for(
         'data_kelas.daftar_siswa_di_kelas',
         id=kelas.id,
-        tahun=kode_genap_benar
+        tahun=kode_genap_benar if 'kode_genap_benar' in locals() else None
     ))
-
 
 
 @kelas_bp.route('/<int:kelas_id>/naik-kelas', methods=['POST'])
@@ -820,9 +900,10 @@ def naik_kelas(kelas_id):
         request.form.get('kode_sekarang')
         or request.args.get('tahun')
         or session.get('tahun_pelajaran')
-    )
+        or ''
+    ).strip()
 
-    siswa_dipilih = request.form.getlist('siswa_id')
+    siswa_dipilih_raw = request.form.getlist('siswa_id')
 
     if not kode_sekarang:
         flash("Tahun pelajaran tidak ditemukan!", "danger")
@@ -831,122 +912,204 @@ def naik_kelas(kelas_id):
             id=kelas_id
         ))
 
-    if not siswa_dipilih:
-        flash("Pilih siswa yang akan naik kelas!", "warning")
+    if not siswa_dipilih_raw:
+        flash("Pilih siswa yang akan diproses!", "warning")
         return redirect(url_for(
             'data_kelas.daftar_siswa_di_kelas',
             id=kelas_id,
             tahun=kode_sekarang
         ))
-
-    dasar_tahun = get_base_tahun(kode_sekarang)
-    tingkat_sekarang = str(kelas.jenjang)
-
-    # Tentukan status akhir
-    semester = (
-        1 if (
-            "-1" in kode_sekarang
-            or "Ganjil" in kode_sekarang
-        ) else 2
-    )
-
-    if tingkat_sekarang == "9" and semester == 2:
-        status_akhir = "Lulus"
-    else:
-        status_akhir = "Naik"
-
-    tingkat_baru = str(int(tingkat_sekarang) + 1)
-
-    tahun_parts = dasar_tahun.split('/')
-
-    if len(tahun_parts) != 2:
-        flash("Format tahun pelajaran tidak valid!", "danger")
-        return redirect(url_for(
-            'data_kelas.daftar_siswa_di_kelas',
-            id=kelas_id,
-            tahun=kode_sekarang
-        ))
-
-    tahun_berikutnya = (
-        tahun_parts[0] + '/' +
-        str(int(tahun_parts[1]) + 1)
-    )
-
-    kode_tahun_baru_ganjil = f"{tahun_berikutnya}-1"
-
-    jumlah_berhasil = 0
-    sudah_lulus = 0
 
     try:
-        for sid_raw in siswa_dipilih:
+        # ==========================================
+        # VALIDASI PERIODE ASAL
+        # ==========================================
+        dasar_tahun = get_base_tahun(kode_sekarang)
 
-            # Konversi ID dari form menjadi INTEGER
-            try:
-                sid = int(sid_raw)
-            except (TypeError, ValueError):
-                continue
+        if kode_sekarang not in (
+            f"{dasar_tahun}-1",
+            f"{dasar_tahun}-2"
+        ):
+            raise ValueError("Kode semester tidak valid.")
 
-            siswa = db.session.get(Siswa, sid)
+        if kode_sekarang != f"{dasar_tahun}-2":
+            raise ValueError(
+                "Proses naik kelas hanya dapat dilakukan "
+                "pada Semester Genap."
+            )
+
+        if kelas.tahun_pelajaran != dasar_tahun:
+            raise ValueError(
+                "Kelas tidak sesuai dengan tahun pelajaran yang dipilih."
+            )
+
+        periode_asal = TahunPelajaran.query.filter_by(
+            kode=kode_sekarang
+        ).first()
+
+        if not periode_asal:
+            raise ValueError("Periode Semester Genap tidak ditemukan.")
+
+        # ==========================================
+        # VALIDASI JENJANG
+        # ==========================================
+        try:
+            tingkat_sekarang = int(kelas.jenjang)
+        except (TypeError, ValueError):
+            raise ValueError("Jenjang kelas tidak valid.")
+
+        if tingkat_sekarang not in (7, 8, 9):
+            raise ValueError("Jenjang kelas tidak dapat diproses.")
+
+        tingkat_baru = str(tingkat_sekarang + 1)
+
+        # Tahun pelajaran berikutnya
+        tahun_parts = dasar_tahun.split('/')
+
+        if len(tahun_parts) != 2:
+            raise ValueError("Format tahun pelajaran tidak valid.")
+
+        tahun_berikutnya = (
+            f"{tahun_parts[0]}/{int(tahun_parts[1]) + 1}"
+        )
+
+        kode_tahun_baru = f"{tahun_berikutnya}-1"
+
+        # Untuk kelas 7 dan 8, periode tujuan wajib tersedia.
+        if tingkat_sekarang < 9:
+            periode_tujuan = TahunPelajaran.query.filter_by(
+                kode=kode_tahun_baru
+            ).first()
+
+            if not periode_tujuan:
+                raise ValueError(
+                    f"Periode {kode_tahun_baru} belum dibuat. "
+                    "Buat periode Tahun Pelajaran berikutnya terlebih dahulu."
+                )
+
+        # ==========================================
+        # VALIDASI SISWA TERPILIH
+        # ==========================================
+        try:
+            siswa_ids = {int(sid) for sid in siswa_dipilih_raw}
+        except (TypeError, ValueError):
+            raise ValueError("Terdapat ID siswa yang tidak valid.")
+
+        jumlah_naik = 0
+        jumlah_lulus = 0
+        dilewati = 0
+
+        for siswa_id in siswa_ids:
+
+            siswa = db.session.get(Siswa, siswa_id)
 
             if not siswa or siswa.status != 'Aktif':
+                dilewati += 1
                 continue
 
-            # Pastikan siswa memang tercatat di kelas
+            # Pastikan siswa memang anggota kelas ini
+            # pada Semester Genap yang dipilih.
             riwayat_lama = RiwayatKelas.query.filter_by(
-                siswa_id=sid,
+                siswa_id=siswa_id,
                 tahun_pelajaran=kode_sekarang,
                 kelas_id=kelas.id
             ).first()
 
             if not riwayat_lama:
+                dilewati += 1
                 continue
 
-            if status_akhir == "Naik":
+            if str(riwayat_lama.tingkat) != str(tingkat_sekarang):
+                dilewati += 1
+                continue
 
-                riwayat_baru = RiwayatKelas.query.filter_by(
-                    siswa_id=sid,
-                    tahun_pelajaran=kode_tahun_baru_ganjil
-                ).first()
-
-                if not riwayat_baru:
-                    db.session.add(RiwayatKelas(
-                        siswa_id=sid,
-                        tahun_pelajaran=kode_tahun_baru_ganjil,
-                        tingkat=tingkat_baru,
-                        kelas_id=None
-                    ))
-                else:
-                    riwayat_baru.tingkat = tingkat_baru
-
-                siswa.tingkat = tingkat_baru
-                jumlah_berhasil += 1
-
-            else:
+            # ======================================
+            # KELAS 9: LULUS
+            # Tidak membuat riwayat Tingkat 10.
+            # ======================================
+            if tingkat_sekarang == 9:
                 siswa.status = "Lulus"
-                sudah_lulus += 1
+
+                # Catat hasil akhir Semester Genap.
+                simpan_status_riwayat_semester(
+                    siswa=siswa,
+                    kelas=kelas,
+                    dasar_tahun=dasar_tahun,
+                    nomor_semester=2,
+                    status_akhir="Lulus",
+                    tingkat=riwayat_lama.tingkat
+                )
+
+                jumlah_lulus += 1
+                continue
+
+            # ======================================
+            # KELAS 7 / 8: NAIK KELAS
+            # ======================================
+            riwayat_baru = RiwayatKelas.query.filter_by(
+                siswa_id=siswa_id,
+                tahun_pelajaran=kode_tahun_baru
+            ).first()
+
+            # Jangan menimpa riwayat tahun berikutnya.
+            if riwayat_baru:
+                dilewati += 1
+                continue
+
+            # Buat riwayat pada tahun pelajaran berikutnya.
+            db.session.add(RiwayatKelas(
+                siswa_id=siswa_id,
+                tahun_pelajaran=kode_tahun_baru,
+                tingkat=tingkat_baru,
+                kelas_id=None
+            ))
+
+            # Catat hasil akhir Semester Genap tahun sebelumnya.
+            simpan_status_riwayat_semester(
+                siswa=siswa,
+                kelas=kelas,
+                dasar_tahun=dasar_tahun,
+                nomor_semester=2,
+                status_akhir="Naik Kelas",
+                tingkat=riwayat_lama.tingkat
+            )
+
+            siswa.tingkat = tingkat_baru
+            jumlah_naik += 1
 
         db.session.commit()
 
-        pesan = ""
+        # ==========================================
+        # HASIL PROSES
+        # ==========================================
+        bagian_pesan = []
 
-        if jumlah_berhasil > 0:
-            pesan += (
-                f"Naik ke Tingkat {tingkat_baru}: "
-                f"{jumlah_berhasil} siswa"
+        if jumlah_naik:
+            bagian_pesan.append(
+                f"{jumlah_naik} siswa naik ke Tingkat {tingkat_baru}"
             )
 
-        if sudah_lulus > 0:
-            if pesan:
-                pesan += " | "
-
-            pesan += (
-                f"{sudah_lulus} siswa dinyatakan LULUS"
+        if jumlah_lulus:
+            bagian_pesan.append(
+                f"{jumlah_lulus} siswa dinyatakan LULUS"
             )
 
-        if not pesan:
+        if bagian_pesan:
+            pesan = "Berhasil: " + " | ".join(bagian_pesan) + "."
+        else:
             pesan = "Tidak ada siswa yang memenuhi syarat untuk diproses."
 
-        flash(pesan, "success" if jumlah_berhasil or sudah_lulus else "warning")
+        if dilewati:
+            pesan += f" {dilewati} siswa dilewati karena tidak memenuhi syarat atau sudah memiliki riwayat tujuan."
+
+        flash(
+            pesan,
+            "success" if jumlah_naik or jumlah_lulus else "warning"
+        )
+
+    except ValueError as e:
+        db.session.rollback()
+        flash(str(e), "danger")
 
     except Exception:
         db.session.rollback()
@@ -961,9 +1124,8 @@ def naik_kelas(kelas_id):
 
     return redirect(url_for(
         'data_kelas.halaman_daftar_kelas',
-        tahun=kode_tahun_baru_ganjil
+        tahun=kode_tahun_baru if 'kode_tahun_baru' in locals() else kode_sekarang
     ))
-
 
 @kelas_bp.route('/<int:kelas_id>/simpan-pengaturan-mapel', methods=['POST'])
 @bisa_kelola_kelas
