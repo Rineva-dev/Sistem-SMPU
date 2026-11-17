@@ -159,16 +159,40 @@ class TahunPelajaran(db.Model):
     tahun_selesai = db.Column(db.Integer, nullable=False)
     semester = db.Column(db.Integer, nullable=False)
     aktif = db.Column(db.Boolean, default=False)
+
+    status_siklus = db.Column(
+        db.String(30),
+        nullable=False,
+        default="persiapan",
+        server_default="persiapan"
+    )
+    
     tanggal_mulai = db.Column(db.Date, nullable=False)
     tanggal_selesai = db.Column(db.Date, nullable=False)
 
     @staticmethod
     def set_aktif(id):
-        TahunPelajaran.query.update({"aktif": False})
-        tp = TahunPelajaran.query.get(id)
-        if tp:
+        tp = db.session.get(TahunPelajaran, id)
+
+        if not tp:
+            raise ValueError("Tahun pelajaran tidak ditemukan.")
+
+        try:
+            TahunPelajaran.query.filter(
+                TahunPelajaran.id != tp.id
+            ).update(
+                {"aktif": False},
+                synchronize_session=False
+            )
+
             tp.aktif = True
-        db.session.commit()
+            db.session.commit()
+
+            return tp
+
+        except Exception:
+            db.session.rollback()
+            raise
 
     def __repr__(self):
         return f"<TahunPelajaran {self.kode}>"

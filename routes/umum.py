@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g
-from models import db, TahunPelajaran, User
+from models import db, TahunPelajaran, User, RiwayatKelas
 from datetime import datetime
 
 umum_bp = Blueprint('umum', __name__, url_prefix='/')
@@ -22,13 +22,80 @@ def bisa_kelola_tahun_pelajaran(user, halaman_aktif='utama'):
         or ("Waka Kurikulum" in daftar_tugas and halaman_aktif == "waka_kurikulum")
     )
 
+def validasi_data_tahun_pelajaran(form):
+    try:
+        tahun_mulai = int(form.get("tahun_mulai", ""))
+        tahun_selesai = int(form.get("tahun_selesai", ""))
+        semester = int(form.get("semester", ""))
+
+        tanggal_mulai = datetime.strptime(
+            form.get("tanggal_mulai", ""), "%Y-%m-%d"
+        ).date()
+
+        tanggal_selesai = datetime.strptime(
+            form.get("tanggal_selesai", ""), "%Y-%m-%d"
+        ).date()
+
+    except (ValueError, TypeError):
+        raise ValueError("Data tahun pelajaran atau tanggal tidak valid.")
+
+    if tahun_selesai != tahun_mulai + 1:
+        raise ValueError("Tahun selesai harus satu tahun setelah tahun mulai.")
+
+    if semester not in (1, 2):
+        raise ValueError("Semester hanya boleh 1 (Ganjil) atau 2 (Genap).")
+
+    if tanggal_mulai > tanggal_selesai:
+        raise ValueError("Tanggal mulai tidak boleh melewati tanggal selesai.")
+
+    kode = f"{tahun_mulai}/{tahun_selesai}-{semester}"
+    nama = (
+        f"Tahun Pelajaran {tahun_mulai}/{tahun_selesai} "
+        f"- Semester {semester}"
+    )
+
+    return {
+        "kode": kode,
+        "nama": nama,
+        "tahun_mulai": tahun_mulai,
+        "tahun_selesai": tahun_selesai,
+        "semester": semester,
+        "tanggal_mulai": tanggal_mulai,
+        "tanggal_selesai": tanggal_selesai
+    }
+
 @umum_bp.before_app_request
 def load_tahun_aktif():
-    """Muat tahun pelajaran yang dipilih ke semua halaman"""
-    g.tahun_pelajaran = session.get('tahun_pelajaran')
-    if not g.tahun_pelajaran:
-        aktif = TahunPelajaran.query.filter_by(aktif=True).first()
-        g.tahun_pelajaran = aktif.kode if aktif else ""
+    """
+    Memisahkan tahun pelajaran operasional dan tahun pilihan pengguna.
+    """
+
+    # 1. Tahun pelajaran operasional sekolah dari database
+    tahun_operasional = TahunPelajaran.query.filter_by(
+        aktif=True
+    ).first()
+
+    g.tahun_pelajaran_aktif = (
+        tahun_operasional.kode if tahun_operasional else ""
+    )
+
+    # 2. Tahun pelajaran pilihan pengguna untuk melihat data
+    tahun_pilihan = session.get('tahun_pelajaran')
+
+    # Pastikan tahun pilihan masih terdaftar
+    if tahun_pilihan:
+        tersedia = TahunPelajaran.query.filter_by(
+            kode=tahun_pilihan
+        ).first()
+
+        if not tersedia:
+            tahun_pilihan = None
+            session.pop('tahun_pelajaran', None)
+
+    # 3. Jika belum memilih, gunakan tahun operasional
+    g.tahun_pelajaran = (
+        tahun_pilihan or g.tahun_pelajaran_aktif
+    )
 
 # ==========================================
 # HALAMAN KELOLA TAHUN PELAJARAN
@@ -52,62 +119,139 @@ def kelola_tahun_pelajaran():
 
     # --- PROSES FORM POST ---
     if request.method == "POST":
+
+        # ==========================================
+        # TAMBAH TAHUN PELAJARAN
+        # ==========================================
         if "tambah" in request.form:
-            tahun_mulai = int(request.form.get("tahun_mulai"))
-            tahun_selesai = int(request.form.get("tahun_selesai"))
-            semester = int(request.form.get("semester"))
-            tanggal_mulai_str = request.form.get("tanggal_mulai")
-            tanggal_selesai_str = request.form.get("tanggal_selesai")
+            try:
+                data = validasi_data_tahun_pelajaran(request.form)
 
-            tanggal_mulai = datetime.strptime(tanggal_mulai_str, "%Y-%m-%d").date()
-            tanggal_selesai = datetime.strptime(tanggal_selesai_str, "%Y-%m-%d").date()
+                duplikat = TahunPelajaran.query.filter_by(
+                    kode=data["kode"]
+                ).first()
 
-            kode = f"{tahun_mulai}/{tahun_selesai}-{semester}"
-            nama = f"Tahun Pelajaran {tahun_mulai}/{tahun_selesai} - Semester {semester}"
+                if duplikat:
+                    raise ValueError(
+                        f"Tahun pelajaran {data['kode']} sudah tersedia."
+                    )
 
-            baru = TahunPelajaran(
-                kode=kode,
-                nama=nama,
-                tahun_mulai=tahun_mulai,
-                tahun_selesai=tahun_selesai,
-                semester=semester,
-                tanggal_mulai=tanggal_mulai,
-                tanggal_selesai=tanggal_selesai
-            )
-            db.session.add(baru)
-            db.session.commit()
-            flash("Data tahun pelajaran berhasil ditambahkan!", "success")
+                baru = TahunPelajaran(
+                    kode=data["kode"],
+                    nama=data["nama"],
+                    tahun_mulai=data["tahun_mulai"],
+                    tahun_selesai=data["tahun_selesai"],
+                    semester=data["semester"],
+                    tanggal_mulai=data["tanggal_mulai"],
+                    tanggal_selesai=data["tanggal_selesai"],
+                    aktif=False
+                )
 
+                db.session.add(baru)
+                db.session.commit()
+
+                flash("Tahun pelajaran berhasil ditambahkan!", "success")
+
+            except ValueError as e:
+                db.session.rollback()
+                flash(str(e), "danger")
+
+            except Exception:
+                db.session.rollback()
+                flash("Gagal menambahkan tahun pelajaran.", "danger")
+
+        # ==========================================
+        # EDIT TAHUN PELAJARAN
+        # ==========================================
         elif "perbarui" in request.form:
-            id = request.form.get("id")
-            tahun_mulai = int(request.form.get("tahun_mulai"))
-            tahun_selesai = int(request.form.get("tahun_selesai"))
-            semester = int(request.form.get("semester"))
-            tanggal_mulai_str = request.form.get("tanggal_mulai")
-            tanggal_selesai_str = request.form.get("tanggal_selesai")
+            try:
+                id_tp = request.form.get("id")
 
-            tanggal_mulai = datetime.strptime(tanggal_mulai_str, "%Y-%m-%d").date()
-            tanggal_selesai = datetime.strptime(tanggal_selesai_str, "%Y-%m-%d").date()
+                if not id_tp or not id_tp.isdigit():
+                    raise ValueError("ID tahun pelajaran tidak valid.")
 
-            tp = TahunPelajaran.query.get_or_404(id)
-            kode_baru = f"{tahun_mulai}/{tahun_selesai}-{semester}"
-            nama_baru = f"Tahun Pelajaran {tahun_mulai}/{tahun_selesai} - Semester {semester}"
+                tp = db.session.get(TahunPelajaran, int(id_tp))
 
-            tp.kode = kode_baru
-            tp.nama = nama_baru
-            tp.tahun_mulai = tahun_mulai
-            tp.tahun_selesai = tahun_selesai
-            tp.semester = semester
-            tp.tanggal_mulai = tanggal_mulai
-            tp.tanggal_selesai = tanggal_selesai
+                if not tp:
+                    raise ValueError("Tahun pelajaran tidak ditemukan.")
 
-            db.session.commit()
-            flash("Perubahan berhasil disimpan!", "success")
+                data = validasi_data_tahun_pelajaran(request.form)
 
+                # Identitas periode tidak boleh diubah jika sudah
+                # memiliki riwayat siswa.
+                sudah_digunakan = RiwayatKelas.query.filter_by(
+                    tahun_pelajaran=tp.kode
+                ).first()
+
+                identitas_berubah = (
+                    tp.kode != data["kode"]
+                    or tp.tahun_mulai != data["tahun_mulai"]
+                    or tp.tahun_selesai != data["tahun_selesai"]
+                    or tp.semester != data["semester"]
+                )
+
+                if sudah_digunakan and identitas_berubah:
+                    raise ValueError(
+                        "Identitas periode tidak dapat diubah karena "
+                        "sudah memiliki riwayat siswa."
+                    )
+
+                duplikat = TahunPelajaran.query.filter(
+                    TahunPelajaran.kode == data["kode"],
+                    TahunPelajaran.id != tp.id
+                ).first()
+
+                if duplikat:
+                    raise ValueError(
+                        f"Tahun pelajaran {data['kode']} sudah tersedia."
+                    )
+
+                tp.kode = data["kode"]
+                tp.nama = data["nama"]
+                tp.tahun_mulai = data["tahun_mulai"]
+                tp.tahun_selesai = data["tahun_selesai"]
+                tp.semester = data["semester"]
+                tp.tanggal_mulai = data["tanggal_mulai"]
+                tp.tanggal_selesai = data["tanggal_selesai"]
+
+                db.session.commit()
+
+                flash("Perubahan tahun pelajaran berhasil disimpan!", "success")
+
+            except ValueError as e:
+                db.session.rollback()
+                flash(str(e), "danger")
+
+            except Exception:
+                db.session.rollback()
+                flash("Gagal memperbarui tahun pelajaran.", "danger")
+
+        # ==========================================
+        # AKTIFKAN TAHUN PELAJARAN
+        # ==========================================
         elif "jadikan_aktif" in request.form:
-            id = request.form.get("id")
-            TahunPelajaran.set_aktif(id)
-            flash("Berhasil diaktifkan!", "success")
+            id_tp = request.form.get("id")
+
+            try:
+                if not id_tp or not id_tp.isdigit():
+                    raise ValueError("ID tahun pelajaran tidak valid.")
+
+                TahunPelajaran.set_aktif(int(id_tp))
+
+                flash(
+                    "Tahun pelajaran berhasil diaktifkan!",
+                    "success"
+                )
+
+            except ValueError as e:
+                flash(str(e), "danger")
+
+            except Exception:
+                db.session.rollback()
+                flash(
+                    "Terjadi kesalahan saat mengaktifkan tahun pelajaran.",
+                    "danger"
+                )
 
         return redirect(url_for("umum.kelola_tahun_pelajaran"))
 
@@ -138,12 +282,24 @@ def ganti_tahun():
         flash("Tidak memiliki hak untuk mengubah tahun pelajaran!", "danger")
         return redirect(request.referrer or url_for('dashboard.index'))
 
-    tahun_baru = request.form.get('tahun_pelajaran')
-    if tahun_baru:
-        session['tahun_pelajaran'] = tahun_baru
-        g.tahun_pelajaran = tahun_baru
-        flash(f'Tahun pelajaran berhasil diubah ke {tahun_baru}', 'success')
-    else:
-        flash('Pilihan tahun pelajaran tidak valid', 'warning')
+    tahun_baru = request.form.get('tahun_pelajaran', '').strip()
+
+    if not tahun_baru:
+        flash("Silakan pilih tahun pelajaran.", "warning")
+        return redirect(request.referrer or url_for('dashboard.index'))
+
+    # Pastikan periode benar-benar terdaftar
+    tp = TahunPelajaran.query.filter_by(kode=tahun_baru).first()
+
+    if not tp:
+        flash("Tahun pelajaran tidak ditemukan.", "danger")
+        return redirect(request.referrer or url_for('dashboard.index'))
+
+    # Hanya mengubah periode tampilan pengguna,
+    # bukan mengubah periode operasional sekolah.
+    session['tahun_pelajaran'] = tp.kode
+    g.tahun_pelajaran = tp.kode
+
+    flash(f"Tahun pelajaran berhasil diubah ke {tp.kode}.", "success")
 
     return redirect(request.referrer or url_for('dashboard.index'))

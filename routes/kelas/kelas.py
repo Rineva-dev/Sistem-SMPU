@@ -483,7 +483,6 @@ def daftar_siswa_di_kelas(id):
         daftar_tugas=daftar_tugas
     )
 
-
 # --------------------------
 # Proses Kelola Siswa di Kelas
 # --------------------------
