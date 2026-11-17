@@ -383,9 +383,33 @@ def daftar_siswa_di_kelas(id):
             if not sudah_di_genap and not sudah_naik:
                 siswa_lanjutkan.append(siswa)
 
-    semua_siswa_aktif = Siswa.query.filter_by(status='Aktif').all()
-    id_siswa_sudah = {s.id for s in daftar_siswa}
-    siswa_belum_masuk = [s for s in semua_siswa_aktif if s.id not in id_siswa_sudah]
+    # ==========================================
+    # SISWA YANG BELUM MASUK KELAS
+    # HANYA SISWA YANG SUDAH MEMILIKI RIWAYAT
+    # PADA SEMESTER YANG DIPILIH
+    # ==========================================
+
+    siswa_belum_masuk = []
+
+    if kode_tahun_dipilih:
+
+        riwayat_belum_masuk = RiwayatKelas.query.filter(
+            RiwayatKelas.tahun_pelajaran == kode_tahun_dipilih,
+            RiwayatKelas.kelas_id.is_(None),
+            RiwayatKelas.tingkat == str(kelas.jenjang)
+        ).all()
+
+        for rw in riwayat_belum_masuk:
+
+            siswa = db.session.get(Siswa, rw.siswa_id)
+
+            if not siswa:
+                continue
+
+            if siswa.status != 'Aktif':
+                continue
+
+            siswa_belum_masuk.append(siswa)
 
     daftar_mapel = MataPelajaran.query.order_by(MataPelajaran.kode).all()
     daftar_guru = Guru.query.join(User).filter(
@@ -459,9 +483,6 @@ def daftar_siswa_di_kelas(id):
         daftar_tugas=daftar_tugas
     )
 
-# --------------------------
-# Proses Kelola Siswa di Kelas
-# --------------------------
 
 # --------------------------
 # Proses Kelola Siswa di Kelas
@@ -469,13 +490,17 @@ def daftar_siswa_di_kelas(id):
 @kelas_bp.route('/<int:kelas_id>/kelola-siswa', methods=['POST'])
 @bisa_kelola_kelas
 def kelola_siswa_di_kelas(kelas_id):
+
     kelas = db.session.get(Kelas, kelas_id)
 
     if not kelas:
         flash("Kelas tidak ditemukan!", "danger")
         return redirect(url_for('data_kelas.halaman_daftar_kelas'))
 
-    # Prioritas: form → URL → session → tahun aktif
+    # =====================================
+    # MENENTUKAN SEMESTER
+    # Prioritas: Form -> URL -> Session -> Tahun Aktif
+    # =====================================
     kode_semester = (
         request.form.get('tahun_pelajaran')
         or request.args.get('tahun')
@@ -483,7 +508,10 @@ def kelola_siswa_di_kelas(kelas_id):
     )
 
     if not kode_semester:
-        tahun_aktif = TahunPelajaran.query.filter_by(aktif=True).first()
+        tahun_aktif = TahunPelajaran.query.filter_by(
+            aktif=True
+        ).first()
+
         kode_semester = tahun_aktif.kode if tahun_aktif else None
 
     if not kode_semester:
@@ -493,15 +521,34 @@ def kelola_siswa_di_kelas(kelas_id):
             id=kelas_id
         ))
 
-    # Data dari form selalu berupa STRING.
-    # Konversi menjadi INTEGER sebelum query database.
+    # =====================================
+    # PASTIKAN KELAS SESUAI TAHUN AJARAN
+    # =====================================
+    dasar_tahun = get_base_tahun(kode_semester)
+
+    if kelas.tahun_pelajaran != dasar_tahun:
+        flash(
+            "Kelas tidak sesuai dengan tahun pelajaran yang dipilih!",
+            "danger"
+        )
+        return redirect(url_for(
+            'data_kelas.daftar_siswa_di_kelas',
+            id=kelas_id,
+            tahun=kode_semester
+        ))
+
+    # =====================================
+    # AMBIL DATA ID SISWA DARI FORM
+    # =====================================
     siswa_tambah_raw = request.form.getlist('tambah_id')
     siswa_keluar_raw = request.form.getlist('keluarkan_id')
 
     try:
+
         siswa_tambah = set()
         siswa_keluar = set()
 
+        # Konversi ID menjadi integer
         for sid in siswa_tambah_raw:
             try:
                 siswa_tambah.add(int(sid))
@@ -514,53 +561,80 @@ def kelola_siswa_di_kelas(kelas_id):
             except (TypeError, ValueError):
                 raise ValueError(f"ID siswa tidak valid: {sid}")
 
-        # Jika ID yang sama masuk daftar tambah dan keluarkan,
-        # proses keluarkan tidak dilakukan.
+        # Jika ID yang sama ada di kedua daftar,
+        # prioritaskan penambahan.
         siswa_keluar -= siswa_tambah
 
         jumlah_ditambahkan = 0
         jumlah_dikeluarkan = 0
+        jumlah_dilewati = 0
 
         # =====================================
         # TAMBAHKAN SISWA KE KELAS
+        #
+        # SYARAT:
+        # 1. Siswa harus ada.
+        # 2. Status siswa harus Aktif.
+        # 3. Tingkat harus sesuai jenjang kelas.
+        # 4. Riwayat semester yang dipilih wajib ada.
+        # 5. Tidak boleh terdaftar di kelas lain.
+        #
+        # TIDAK MEMBUAT RIWAYAT BARU.
         # =====================================
         for siswa_id in siswa_tambah:
 
-            # Gunakan ID INTEGER untuk mengambil siswa
             siswa = db.session.get(Siswa, siswa_id)
 
             if not siswa:
+                jumlah_dilewati += 1
                 continue
 
             if siswa.status != 'Aktif':
+                jumlah_dilewati += 1
                 continue
 
             if str(siswa.tingkat) != str(kelas.jenjang):
+                jumlah_dilewati += 1
                 continue
 
-            # Gunakan siswa.id, bukan string dari form
+            # Cari riwayat pada semester yang dipilih
             riwayat = RiwayatKelas.query.filter_by(
                 siswa_id=siswa.id,
                 tahun_pelajaran=kode_semester
             ).first()
 
-            if riwayat:
-                riwayat.kelas_id = kelas.id
-                riwayat.tingkat = kelas.jenjang
-            else:
-                riwayat = RiwayatKelas(
-                    siswa_id=siswa.id,
-                    tahun_pelajaran=kode_semester,
-                    tingkat=kelas.jenjang,
-                    kelas_id=kelas.id
-                )
-                db.session.add(riwayat)
+            # Jika belum memiliki riwayat semester ini,
+            # jangan izinkan masuk kelas.
+            if not riwayat:
+                jumlah_dilewati += 1
+                continue
+
+            # Jika sudah berada di kelas yang sama,
+            # tidak perlu diproses lagi.
+            if riwayat.kelas_id == kelas.id:
+                jumlah_dilewati += 1
+                continue
+
+            # Jika masih tercatat di kelas lain,
+            # jangan pindahkan secara otomatis.
+            if riwayat.kelas_id is not None:
+                jumlah_dilewati += 1
+                continue
+
+            # Masukkan ke kelas.
+            # Riwayat semester lama tidak disentuh.
+            riwayat.kelas_id = kelas.id
+            riwayat.tingkat = kelas.jenjang
 
             jumlah_ditambahkan += 1
 
         # =====================================
         # KELUARKAN SISWA DARI KELAS
-        # Hanya semester yang dipilih
+        #
+        # Hanya mengosongkan kelas pada semester
+        # yang sedang dipilih.
+        #
+        # Riwayat tetap dipertahankan.
         # =====================================
         for siswa_id in siswa_keluar:
 
@@ -570,41 +644,60 @@ def kelola_siswa_di_kelas(kelas_id):
                 kelas_id=kelas.id
             ).first()
 
-            if riwayat:
-                # Riwayat tetap dipertahankan.
-                # Hanya kelas pada semester ini yang dikosongkan.
-                riwayat.kelas_id = None
-                jumlah_dikeluarkan += 1
+            if not riwayat:
+                continue
 
+            riwayat.kelas_id = None
+            jumlah_dikeluarkan += 1
+
+        # =====================================
+        # SIMPAN PERUBAHAN
+        # =====================================
         db.session.commit()
 
-        flash(
+        pesan = (
             f"Berhasil menyimpan perubahan! "
             f"{jumlah_ditambahkan} siswa ditambahkan dan "
             f"{jumlah_dikeluarkan} siswa dikeluarkan "
-            f"dari kelas untuk semester {kode_semester}.",
-            "success"
+            f"dari kelas."
         )
 
+        if jumlah_dilewati:
+            pesan += (
+                f" {jumlah_dilewati} siswa dilewati karena "
+                f"tidak memenuhi persyaratan."
+            )
+
+        flash(pesan, "success")
+
     except ValueError as e:
+
         db.session.rollback()
         flash(str(e), "danger")
 
     except Exception:
+
         db.session.rollback()
+
         current_app.logger.exception(
-            "Gagal mengelola siswa kelas ID %s", kelas_id
+            "Gagal mengelola siswa kelas ID %s",
+            kelas_id
         )
+
         flash(
             "Gagal menyimpan perubahan siswa. Periksa log server.",
             "danger"
         )
 
+    # =====================================
+    # KEMBALI KE DETAIL KELAS
+    # =====================================
     return redirect(url_for(
         'data_kelas.daftar_siswa_di_kelas',
         id=kelas_id,
         tahun=kode_semester
     ))
+
 
 
 @kelas_bp.route('/<int:kelas_id>/lanjutkan-genap', methods=['POST'])
@@ -796,7 +889,7 @@ def naik_kelas(kelas_id):
 
             siswa = db.session.get(Siswa, sid)
 
-            if not siswa or str(siswa.tingkat) != tingkat_sekarang:
+            if not siswa or siswa.status != 'Aktif':
                 continue
 
             # Pastikan siswa memang tercatat di kelas
@@ -906,9 +999,6 @@ def simpan_pengaturan_mapel(kelas_id):
     flash("<i class='fas fa-book-open'></i> Pengaturan mata pelajaran tersimpan! Mapel dengan JP > 0 sudah aktif.", "success")
     return redirect(url_for('data_kelas.daftar_siswa_di_kelas', id=kelas_id, tahun=kode_tahun))
 
-# --------------------------
-# Halaman Atur Jadwal Kelas
-# --------------------------
 
 # --------------------------
 # Halaman Atur Jadwal Kelas

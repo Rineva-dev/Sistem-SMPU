@@ -120,50 +120,62 @@ def halaman_daftar_siswa():
     lulus = 0
     pindah = 0
 
+    
     if kode_tahun:
-        # Ambil semua riwayat yang sudah tercatat di TP ini
-        riwayat_tercatat = RiwayatKelas.query.filter_by(tahun_pelajaran=kode_tahun).all()
-        siswa_tercatat = {r.siswa_id: r for r in riwayat_tercatat}
+        # Ambil hanya riwayat yang benar-benar tercatat
+        # pada tahun pelajaran yang sedang dipilih.
+        riwayat_tercatat = (
+            RiwayatKelas.query
+            .filter_by(tahun_pelajaran=kode_tahun)
+            .all()
+        )
 
-        # ✅ Hitung total siswa UNIK di tahun ini saja
+        siswa_tercatat = {
+            r.siswa_id: r
+            for r in riwayat_tercatat
+        }
+
         id_siswa_di_tahun_ini = list(siswa_tercatat.keys())
+
+        # Statistik hanya berdasarkan siswa yang memiliki riwayat
+        # pada tahun pelajaran terpilih.
         total = len(id_siswa_di_tahun_ini)
 
-        # Hitung status siswa yang ada di tahun ini
         if id_siswa_di_tahun_ini:
-            aktif = Siswa.query.filter(Siswa.id.in_(id_siswa_di_tahun_ini), Siswa.status == 'Aktif').count()
-            lulus = Siswa.query.filter(Siswa.id.in_(id_siswa_di_tahun_ini), Siswa.status == 'Lulus').count()
-            pindah = Siswa.query.filter(Siswa.id.in_(id_siswa_di_tahun_ini), Siswa.status == 'Pindah').count()
+            aktif = Siswa.query.filter(
+                Siswa.id.in_(id_siswa_di_tahun_ini),
+                Siswa.status == 'Aktif'
+            ).count()
 
-        # Ambil semua siswa yang masih Aktif
-        semua_siswa_aktif = Siswa.query.filter_by(status='Aktif').all()
+            lulus = Siswa.query.filter(
+                Siswa.id.in_(id_siswa_di_tahun_ini),
+                Siswa.status == 'Lulus'
+            ).count()
 
-        for siswa in semua_siswa_aktif:
-            # ✅ Aturan: Siswa hanya muncul jika tahun masuknya <= TP yang dipilih
-            if siswa.tahun_diterima and siswa.tahun_diterima > int(kode_tahun.split('/')[0]):
+            pindah = Siswa.query.filter(
+                Siswa.id.in_(id_siswa_di_tahun_ini),
+                Siswa.status == 'Pindah'
+            ).count()
+
+        # Tampilkan hanya siswa yang memiliki riwayat
+        # pada tahun pelajaran yang dipilih.
+        daftar_dengan_posisi = []
+
+        for riwayat in riwayat_tercatat:
+            siswa = riwayat.siswa
+
+            if not siswa or siswa.status != 'Aktif':
                 continue
 
-            # Jika sudah ada riwayat di TP ini → pakai data tersebut
-            if siswa.id in siswa_tercatat:
-                r = siswa_tercatat[siswa.id]
-                daftar_dengan_posisi.append({
-                    'siswa': siswa,
-                    'tingkat': r.tingkat,
-                    'kelas': r.kelas.nama_kelas if r.kelas else '-'
-                })
-            else:
-                # Jika belum ada, cari riwayat TERAKHIR dari TP sebelumnya
-                riwayat_terakhir = RiwayatKelas.query.filter_by(siswa_id=siswa.id)\
-                    .order_by(RiwayatKelas.tahun_pelajaran.desc())\
-                    .first()
+            daftar_dengan_posisi.append({
+                'siswa': siswa,
+                'tingkat': riwayat.tingkat,
+                'kelas': (
+                    riwayat.kelas.nama_kelas
+                    if riwayat.kelas else '-'
+                )
+            })
 
-                if riwayat_terakhir:
-                    # Tampilkan data dari riwayat terakhir (tanpa simpan otomatis)
-                    daftar_dengan_posisi.append({
-                        'siswa': siswa,
-                        'tingkat': riwayat_terakhir.tingkat,
-                        'kelas': riwayat_terakhir.kelas.nama_kelas if riwayat_terakhir.kelas else '-'
-                    })
     else:
         # Jika belum pilih tahun, tampilkan semua siswa aktif
         total = Siswa.query.filter_by(status='Aktif').count()
@@ -1212,42 +1224,8 @@ def perbaiki_data_lama():
 
 @data_siswa_bp.route('/isi-riwayat-lama')
 def isi_riwayat_lama():
-    semua_siswa = Siswa.query.all()
-    semua_tahun = TahunPelajaran.query.order_by(TahunPelajaran.kode.asc()).all()
-    
-    for siswa in semua_siswa:
-        if not siswa.tahun_diterima:
-            continue
-        for tp in semua_tahun:
-            tahun_awal_tp = int(tp.kode.split('/')[0])
-            if tahun_awal_tp < siswa.tahun_diterima:
-                continue
-            sudah_ada = RiwayatKelas.query.filter_by(
-                siswa_id=siswa.id,
-                tahun_pelajaran=tp.kode
-            ).first()
-            if sudah_ada:
-                continue
-            # Ambil tingkat terakhir atau tingkat awal
-            riwayat_sebelumnya = RiwayatKelas.query.filter(
-                RiwayatKelas.siswa_id==siswa.id,
-                RiwayatKelas.tahun_pelajaran < tp.kode
-            ).order_by(RiwayatKelas.tahun_pelajaran.desc()).first()
-            
-            tingkat = riwayat_sebelumnya.tingkat if riwayat_sebelumnya else siswa.tingkat
-            # Naikkan tingkat jika sudah ada sebelumnya
-            if riwayat_sebelumnya:
-                if tingkat == '7': tingkat = '8'
-                elif tingkat == '8': tingkat = '9'
-                elif tingkat == '9': continue  # sudah lulus
-            
-            RiwayatKelas.query.filter_by(siswa_id=siswa.id, tingkat=tingkat).first()
-            baris = RiwayatKelas(
-                siswa_id=siswa.id,
-                tahun_pelajaran=tp.kode,
-                tingkat=tingkat,
-                kelas_id=siswa.kelas_id
-            )
-            db.session.add(baris)
-    db.session.commit()
-    return "Selesai mengisi riwayat lama"
+    return (
+        "Fitur pengisian riwayat otomatis telah dinonaktifkan. "
+        "Riwayat siswa hanya dibuat melalui proses pendaftaran, "
+        "lanjut semester, dan kenaikan kelas."
+    ), 410
