@@ -551,35 +551,46 @@
                     <div class="cr-selection-toolbar">
                         <div>
                             <strong>Daftar siswa kelas {{ kelas.nama_kelas }}</strong>
-                            <span>{{ daftar_siswa|length }} siswa terdaftar</span>
+                            <span>{{ siswa_belum_naik|length }} siswa belum dinaikkan</span>
                         </div>
                         <label class="cr-select-all">
-                            <input type="checkbox" id="pilihSemuaNaik" {% if daftar_siswa %}checked{% endif %}>
+                            <input type="checkbox" id="pilihSemuaNaik" {% if siswa_belum_naik %}checked{% endif %}>
                             <span class="cr-custom-check"></span>
                             Pilih semua
                         </label>
                     </div>
 
                     <div class="cr-process-list" id="crNaikList">
-                        {% if daftar_siswa %}
-                            {% for siswa in daftar_siswa %}
+                        {% if siswa_belum_naik %}
+                            {% for siswa in siswa_belum_naik %}
                             <label class="cr-process-student">
-                                <input class="naik-check" type="checkbox" name="siswa_id"
-                                       value="{{ siswa.id }}" checked>
+                                <input class="naik-check"
+                                    type="checkbox"
+                                    name="siswa_id"
+                                    value="{{ siswa.id }}"
+                                    checked>
+
                                 <span class="cr-custom-check"></span>
-                                <span class="cr-process-avatar gold-avatar">{{ siswa.nama[:1]|upper }}</span>
+
+                                <span class="cr-process-avatar gold-avatar">
+                                    {{ siswa.nama[:1]|upper }}
+                                </span>
+
                                 <span class="cr-process-name">
                                     <strong>{{ siswa.nama }}</strong>
                                     <small>{{ siswa.nis }}</small>
                                 </span>
-                                <span class="cr-process-check-icon"><i class="fas fa-check"></i></span>
+
+                                <span class="cr-process-check-icon">
+                                    <i class="fas fa-check"></i>
+                                </span>
                             </label>
                             {% endfor %}
                         {% else %}
                             <div class="cr-process-empty">
-                                <i class="fas fa-users"></i>
-                                <strong>Belum ada siswa di kelas ini</strong>
-                                <span>Belum ada siswa yang dapat diproses.</span>
+                                <i class="fas fa-circle-check"></i>
+                                <strong>Semua siswa sudah dinaikkan kelas.</strong>
+                                <span>Tidak ada siswa tersisa untuk diproses pada periode ini.</span>
                             </div>
                         {% endif %}
                     </div>
@@ -589,7 +600,9 @@
                     <span class="cr-footer-note"><i class="fas fa-box-archive"></i> Data lama tetap menjadi arsip.</span>
                     <div class="cr-footer-actions">
                         <button type="button" class="cr-btn-ghost" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="cr-btn-primary gold-primary" {% if not daftar_siswa %}disabled{% endif %}>
+                        <button type="submit"
+                                class="cr-btn-primary gold-primary"
+                                {% if not siswa_belum_naik %}disabled{% endif %}>
                             <i class="fas fa-arrow-up"></i> Proses Kenaikan
                         </button>
                     </div>

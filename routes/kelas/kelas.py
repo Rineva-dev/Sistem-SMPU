@@ -428,6 +428,51 @@ def daftar_siswa_di_kelas(id):
                 siswa_lanjutkan.append(siswa)
 
     # ==========================================
+    # SISWA YANG BELUM DINAIKKAN KELAS
+    # KHUSUS MODAL NAIK KELAS
+    # ==========================================
+
+    siswa_belum_naik = list(daftar_siswa)
+
+    # Kenaikan kelas dilakukan setelah semester Genap
+    if kode_tahun_dipilih and kode_tahun_dipilih.endswith('-2'):
+
+        bagian_tahun = dasar_tahun.split('/')
+
+        if len(bagian_tahun) == 2:
+            tahun_mulai = int(bagian_tahun[0])
+            tahun_selesai = int(bagian_tahun[1])
+
+            kode_tahun_tujuan = (
+                f"{tahun_mulai + 1}/{tahun_selesai + 1}-1"
+            )
+
+            tingkat = int(kelas.jenjang)
+
+            # Kelas 7 dan 8: cek apakah sudah punya riwayat
+            # pada tahun pelajaran tujuan.
+            if tingkat < 9:
+
+                daftar_id_siswa = [
+                    siswa.id for siswa in daftar_siswa
+                ]
+
+                if daftar_id_siswa:
+                    sudah_naik_ids = {
+                        row[0]
+                        for row in db.session.query(
+                            RiwayatKelas.siswa_id
+                        ).filter(
+                            RiwayatKelas.tahun_pelajaran == kode_tahun_tujuan,
+                            RiwayatKelas.siswa_id.in_(daftar_id_siswa)
+                        ).all()
+                    }
+
+                    siswa_belum_naik = [
+                        siswa for siswa in daftar_siswa
+                        if siswa.id not in sudah_naik_ids
+                    ]
+    # ==========================================
     # SISWA YANG BELUM MASUK KELAS
     # HANYA SISWA YANG SUDAH MEMILIKI RIWAYAT
     # PADA SEMESTER YANG DIPILIH
@@ -517,6 +562,7 @@ def daftar_siswa_di_kelas(id):
         daftar_siswa=daftar_siswa,
         siswa_lanjutkan=siswa_lanjutkan,
         siswa_belum_masuk=siswa_belum_masuk,
+        siswa_belum_naik=siswa_belum_naik,
         daftar_mapel=daftar_mapel,
         daftar_guru=daftar_guru,
         tahun_dipilih=kode_tahun_dipilih,
