@@ -79,6 +79,7 @@ def get_base_tahun(kode_tp):
         kode_tp = kode_tp.split(' ')[0]
     return kode_tp.strip()
 
+
 def simpan_status_riwayat_semester(
     siswa,
     kelas,
@@ -88,8 +89,9 @@ def simpan_status_riwayat_semester(
     tingkat
 ):
     """
-    Simpan hasil proses akademik pada riwayat semester asal.
-    Tidak mengubah riwayat semester lainnya.
+    Memperbarui hasil akhir pada riwayat semester asal.
+    Tidak membuat riwayat baru secara otomatis karena
+    status_awal harus berasal dari data akademik sebenarnya.
     """
 
     riwayat = RiwayatSemester.query.filter_by(
@@ -98,31 +100,23 @@ def simpan_status_riwayat_semester(
         semester=nomor_semester
     ).first()
 
-    if riwayat:
-        # Perbarui hanya hasil akhir semester yang sedang diproses.
-        riwayat.status_akhir = status_akhir
-
-        # Lengkapi data historis jika sebelumnya kosong.
-        if not riwayat.tingkat_saat_itu:
-            riwayat.tingkat_saat_itu = str(tingkat)
-
-        if not riwayat.kelas_nama and kelas:
-            riwayat.kelas_nama = kelas.nama_kelas
-
-    else:
-        # Buat catatan jika belum tersedia.
-        riwayat = RiwayatSemester(
-            siswa_id=siswa.id,
-            tahun_pelajaran=dasar_tahun,
-            semester=nomor_semester,
-            status_awal="Aktif",
-            status_akhir=status_akhir,
-            keaktifan="Aktif",
-            tingkat_saat_itu=str(tingkat),
-            kelas_nama=kelas.nama_kelas if kelas else None
+    if not riwayat:
+        raise ValueError(
+            f"Riwayat Semester {nomor_semester} tahun "
+            f"{dasar_tahun} untuk siswa {siswa.nama_lengkap} "
+            "belum tersedia. Proses dibatalkan agar riwayat "
+            "akademik tidak dibuat dengan status awal yang keliru."
         )
 
-        db.session.add(riwayat)
+    # Perbarui hanya hasil akhir semester yang diproses.
+    riwayat.status_akhir = status_akhir
+
+    # Lengkapi data historis hanya jika masih kosong.
+    if not riwayat.tingkat_saat_itu:
+        riwayat.tingkat_saat_itu = str(tingkat)
+
+    if not riwayat.kelas_nama and kelas:
+        riwayat.kelas_nama = kelas.nama_kelas
 
 # --------------------------
 # Fungsi Bantu: Kelola Otomatis Tugas Wali Kelas
