@@ -4,7 +4,7 @@
     <!-- HEADER -->
     <header class="sd-header">
         <div class="sd-header-main">
-            <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="sd-back">
+            <a href="{% if halaman_aktif == 'wali_kelas' %}{{ url_for('siswa_wali.data_siswa') }}{% else %}{{ url_for('data_siswa.halaman_daftar_siswa') }}{% endif %}" class="sd-back">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>
@@ -15,7 +15,7 @@
         </div>
 
         <div class="sd-header-actions">
-            <a href="{{ url_for('data_siswa.halaman_daftar_siswa') }}" class="sd-btn sd-btn-light">
+            <a href="{% if halaman_aktif == 'wali_kelas' %}{{ url_for('siswa_wali.data_siswa') }}{% else %}{{ url_for('data_siswa.halaman_daftar_siswa') }}{% endif %}" class="sd-btn sd-btn-light">
                 <i class="fas fa-arrow-left"></i>
                 <span>Kembali</span>
             </a>
@@ -77,7 +77,7 @@
                         <i class="fas fa-school"></i>
                         {{ kelas_sekarang.jenjang if kelas_sekarang.jenjang else '' }}
                         {{ kelas_sekarang.nama_kelas }}
-                        <small>{{ tahun_dipilih_formatted or kelas_sekarang.tahun_pelajaran_formatted }}</small>
+                        <small>{{ kelas_sekarang_tahun_formatted or kelas_sekarang.tahun_pelajaran_formatted }}</small>
                     </span>
                     {% else %}
                     <span class="sd-class-tag sd-class-empty">

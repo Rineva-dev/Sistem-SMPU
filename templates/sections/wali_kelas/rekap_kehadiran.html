@@ -1,0 +1,716 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="wk-attendance">
+
+    <div class="wk-att-hero">
+        <div class="wk-att-hero-content">
+            <div class="wk-att-eyebrow">
+                <i class="fas fa-chart-line"></i>
+                STUDENT ATTENDANCE ANALYTICS
+            </div>
+            <h1>Rekap Kehadiran</h1>
+            <p>Pantau kehadiran siswa dalam kegiatan pembelajaran secara terstruktur.</p>
+            <div class="wk-att-hero-meta">
+                <span><i class="fas fa-calendar-alt"></i>
+                    {{ tahun_pelajaran.nama }}
+                </span>
+                {% if kelas_terpilih %}
+                <span><i class="fas fa-users"></i>
+                    {{ kelas_terpilih.nama_kelas }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="wk-att-hero-icon">
+            <i class="fas fa-chart-pie"></i>
+        </div>
+    </div>
+
+    {% if daftar_kelas %}
+
+    <form method="GET" class="wk-att-filter">
+        <div class="wk-att-filter-heading">
+            <div>
+                <h3><i class="fas fa-sliders"></i> Filter Rekap</h3>
+                <p>Tentukan kelas dan periode kehadiran yang ingin dilihat.</p>
+            </div>
+        </div>
+
+        <div class="wk-att-filter-grid">
+            <div class="wk-att-field">
+                <label for="kelas_id">Kelas</label>
+                <select name="kelas_id" id="kelas_id">
+                    {% for kelas in daftar_kelas %}
+                    <option value="{{ kelas.id }}"
+                        {% if kelas_terpilih and kelas.id == kelas_terpilih.id %}selected{% endif %}>
+                        {{ kelas.nama_kelas }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="wk-att-field">
+                <label for="mulai">Tanggal Mulai</label>
+                <input type="date" name="mulai" id="mulai"
+                       value="{{ tanggal_mulai }}">
+            </div>
+
+            <div class="wk-att-field">
+                <label for="sampai">Tanggal Selesai</label>
+                <input type="date" name="sampai" id="sampai"
+                       value="{{ tanggal_selesai }}">
+            </div>
+
+            <div class="wk-att-filter-action">
+                <button type="submit">
+                    <i class="fas fa-search"></i>
+                    Tampilkan
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="wk-att-section-heading">
+        <div>
+            <span class="wk-att-section-label">ATTENDANCE OVERVIEW</span>
+            <h2>Ringkasan Kehadiran</h2>
+            <p>Akumulasi kehadiran seluruh siswa pada periode terpilih.</p>
+        </div>
+        <span class="wk-att-period">
+            <i class="far fa-calendar"></i>
+            {{ tanggal_mulai }} — {{ tanggal_selesai }}
+        </span>
+    </div>
+
+    <div class="wk-att-stats">
+        <div class="wk-att-stat stat-total">
+            <div class="wk-att-stat-top">
+                <span>Total Kehadiran</span>
+                <div class="wk-att-stat-icon"><i class="fas fa-clipboard-check"></i></div>
+            </div>
+            <strong>{{ statistik.total }}</strong>
+            <small>Data absensi tercatat</small>
+        </div>
+
+        <div class="wk-att-stat stat-hadir">
+            <div class="wk-att-stat-top">
+                <span>Hadir</span>
+                <div class="wk-att-stat-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <strong>{{ statistik.hadir }}</strong>
+            <small>
+                {% if statistik.total %}
+                    {{ "%.1f"|format(statistik.hadir / statistik.total * 100) }}% dari seluruh data
+                {% else %}
+                    Belum ada data
+                {% endif %}
+            </small>
+        </div>
+
+        <div class="wk-att-stat stat-sakit">
+            <div class="wk-att-stat-top">
+                <span>Sakit</span>
+                <div class="wk-att-stat-icon"><i class="fas fa-heart-pulse"></i></div>
+            </div>
+            <strong>{{ statistik.sakit }}</strong>
+            <small>Jumlah status sakit</small>
+        </div>
+
+        <div class="wk-att-stat stat-izin">
+            <div class="wk-att-stat-top">
+                <span>Izin</span>
+                <div class="wk-att-stat-icon"><i class="fas fa-envelope-open-text"></i></div>
+            </div>
+            <strong>{{ statistik.izin }}</strong>
+            <small>Jumlah status izin</small>
+        </div>
+
+        <div class="wk-att-stat stat-alpha">
+            <div class="wk-att-stat-top">
+                <span>Alpha</span>
+                <div class="wk-att-stat-icon"><i class="fas fa-user-xmark"></i></div>
+            </div>
+            <strong>{{ statistik.alpha }}</strong>
+            <small>Jumlah tanpa keterangan</small>
+        </div>
+    </div>
+
+    <div class="wk-att-content-card">
+        <div class="wk-att-card-header">
+            <div>
+                <span class="wk-att-section-label">STUDENT PERFORMANCE</span>
+                <h2>Rekap Per Siswa</h2>
+                <p>Persentase dihitung dari jumlah pertemuan yang memiliki catatan absensi siswa.</p>
+            </div>
+            <div class="wk-att-student-count">
+                <i class="fas fa-users"></i>
+                {{ daftar_siswa|length }} Siswa
+            </div>
+        </div>
+
+        <div class="wk-att-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="wkSearchStudent"
+                   placeholder="Cari nama siswa...">
+        </div>
+
+        <div class="wk-att-table-wrap">
+            <table class="wk-att-table" id="wkAttendanceTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Nama Siswa</th>
+                        <th>Hadir</th>
+                        <th>Sakit</th>
+                        <th>Izin</th>
+                        <th>Alpha</th>
+                        <th>Total</th>
+                        <th>Kehadiran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in daftar_siswa %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <div class="wk-att-student-name">
+                                <div class="wk-att-avatar">
+                                    {{ item.siswa.nama[:1]|upper }}
+                                </div>
+                                <strong>{{ item.siswa.nama }}</strong>
+                            </div>
+                        </td>
+                        <td><span class="wk-att-number green">{{ item.hadir }}</span></td>
+                        <td><span class="wk-att-number amber">{{ item.sakit }}</span></td>
+                        <td><span class="wk-att-number blue">{{ item.izin }}</span></td>
+                        <td><span class="wk-att-number red">{{ item.alpha }}</span></td>
+                        <td><strong>{{ item.total }}</strong></td>
+                        <td>
+                            <div class="wk-att-percent">
+                                <div class="wk-att-progress">
+                                    <span style="width: {{ item.persentase }}%"></span>
+                                </div>
+                                <strong>{{ item.persentase }}%</strong>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="wk-att-empty">
+                                <i class="fas fa-user-graduate"></i>
+                                <strong>Belum ada data siswa</strong>
+                                <span>Belum ditemukan siswa pada kelas dan tahun pelajaran ini.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="wk-att-content-card">
+        <div class="wk-att-card-header">
+            <div>
+                <span class="wk-att-section-label">LEARNING ACTIVITIES</span>
+                <h2>Riwayat Kehadiran</h2>
+                <p>Detail catatan kehadiran siswa dalam setiap pertemuan pembelajaran.</p>
+            </div>
+            <div class="wk-att-student-count">
+                <i class="fas fa-list-check"></i>
+                {{ riwayat|length }} Catatan
+            </div>
+        </div>
+
+        <div class="wk-att-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="wkSearchHistory"
+                   placeholder="Cari nama siswa atau mata pelajaran...">
+        </div>
+
+        <div class="wk-att-history-list" id="wkHistoryList">
+            {% for item in riwayat %}
+            <div class="wk-att-history-item">
+                <div class="wk-att-history-date">
+                    <strong>{{ item.tanggal.strftime('%d') }}</strong>
+                    <span>{{ item.tanggal.strftime('%b %Y') }}</span>
+                </div>
+
+                <div class="wk-att-history-info">
+                    <strong>{{ item.siswa.nama }}</strong>
+                    <span>{{ item.mata_pelajaran }} · {{ item.guru }}</span>
+                    <small>
+                        {% if item.jam_mulai %}{{ item.jam_mulai }}{% endif %}
+                        {% if item.jam_selesai %} – {{ item.jam_selesai }}{% endif %}
+                    </small>
+                    {% if item.keterangan %}
+                    <small class="wk-att-note">{{ item.keterangan }}</small>
+                    {% endif %}
+                </div>
+
+                <span class="wk-att-status status-{{ item.status }}">
+                    {% if item.status == 'hadir' %}
+                        <i class="fas fa-check"></i> Hadir
+                    {% elif item.status == 'sakit' %}
+                        <i class="fas fa-heart-pulse"></i> Sakit
+                    {% elif item.status == 'izin' %}
+                        <i class="fas fa-envelope"></i> Izin
+                    {% else %}
+                        <i class="fas fa-user-xmark"></i> Alpha
+                    {% endif %}
+                </span>
+            </div>
+            {% else %}
+            <div class="wk-att-empty">
+                <i class="fas fa-calendar-xmark"></i>
+                <strong>Belum ada riwayat kehadiran</strong>
+                <span>Belum ada jurnal pembelajaran dengan catatan absensi pada periode ini.</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="wk-att-content-card">
+        <div class="wk-att-empty">
+            <i class="fas fa-chalkboard-user"></i>
+            <strong>Belum ada kelas binaan</strong>
+            <span>Anda belum ditugaskan sebagai wali kelas pada tahun pelajaran aktif.</span>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+.wk-attendance {
+    --wk-green: #087653;
+    --wk-dark: #064e3b;
+    --wk-muted: #718096;
+    --wk-border: #e8eee9;
+    color: #20352d;
+    padding: 22px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+.wk-att-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 34px 38px;
+    border-radius: 23px;
+    color: white;
+    background: linear-gradient(115deg, #064e3b, #087653 65%, #11966c);
+    box-shadow: 0 14px 35px rgba(6, 78, 59, .16);
+}
+.wk-att-hero:after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+    right: 90px;
+    top: -170px;
+    box-shadow: 0 0 0 35px rgba(255,255,255,.035),
+                0 0 0 70px rgba(255,255,255,.025);
+}
+.wk-att-eyebrow, .wk-att-section-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+.wk-att-eyebrow { color: #a7f3d0; }
+.wk-att-hero h1 {
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 800;
+    margin: 12px 0 8px;
+}
+.wk-att-hero p {
+    color: rgba(255,255,255,.78);
+    font-size: 13px;
+    margin: 0;
+}
+.wk-att-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+.wk-att-hero-meta span {
+    padding: 7px 12px;
+    border-radius: 30px;
+    background: rgba(255,255,255,.12);
+    font-size: 11px;
+    font-weight: 700;
+}
+.wk-att-hero-meta i { margin-right: 5px; }
+.wk-att-hero-icon {
+    position: relative;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    border-radius: 26px;
+    display: grid;
+    place-items: center;
+    font-size: 42px;
+    color: #d1fae5;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.16);
+}
+.wk-att-filter, .wk-att-content-card {
+    background: #fff;
+    border: 1px solid var(--wk-border);
+    border-radius: 19px;
+    padding: 23px;
+    margin-top: 22px;
+    box-shadow: 0 5px 20px rgba(15, 50, 35, .035);
+}
+.wk-att-filter-heading h3 {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 5px;
+}
+.wk-att-filter-heading h3 i { color: var(--wk-green); margin-right: 7px; }
+.wk-att-filter-heading p, .wk-att-card-header p,
+.wk-att-section-heading p {
+    color: var(--wk-muted);
+    font-size: 12px;
+    margin: 0;
+}
+.wk-att-filter-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr auto;
+    gap: 13px;
+    align-items: end;
+    margin-top: 19px;
+}
+.wk-att-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 750;
+    margin-bottom: 7px;
+}
+.wk-att-field input, .wk-att-field select {
+    width: 100%;
+    height: 43px;
+    border: 1px solid #e1e9e3;
+    border-radius: 10px;
+    padding: 0 12px;
+    background: #fbfdfb;
+    color: #30463a;
+    font-size: 12px;
+    outline: none;
+}
+.wk-att-field input:focus, .wk-att-field select:focus {
+    border-color: #0c956b;
+    box-shadow: 0 0 0 3px rgba(12,149,107,.09);
+}
+.wk-att-filter-action button {
+    height: 43px;
+    padding: 0 19px;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    background: linear-gradient(120deg, #087653, #09966b);
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+}
+.wk-att-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 15px;
+    margin: 30px 2px 15px;
+}
+.wk-att-section-label { color: #0b956b; }
+.wk-att-section-heading h2, .wk-att-card-header h2 {
+    font-size: 19px;
+    font-weight: 800;
+    margin: 5px 0;
+}
+.wk-att-period, .wk-att-student-count {
+    color: #527264;
+    background: #eff8f2;
+    border: 1px solid #e0efe5;
+    border-radius: 9px;
+    padding: 8px 11px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.wk-att-stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 13px;
+}
+.wk-att-stat {
+    padding: 18px;
+    background: #fff;
+    border: 1px solid var(--wk-border);
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(15,50,35,.035);
+}
+.wk-att-stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    color: #718078;
+    font-size: 11px;
+    font-weight: 700;
+}
+.wk-att-stat-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #f0f5f2;
+    color: #527264;
+}
+.wk-att-stat > strong {
+    display: block;
+    font-size: 29px;
+    font-weight: 850;
+    line-height: 1.4;
+    margin-top: 10px;
+    color: #203b2f;
+}
+.wk-att-stat small { font-size: 10px; color: #89968f; }
+.stat-hadir .wk-att-stat-icon, .green { color: #07845b; }
+.stat-sakit .wk-att-stat-icon, .amber { color: #d18b19; }
+.stat-izin .wk-att-stat-icon, .blue { color: #3578c6; }
+.stat-alpha .wk-att-stat-icon, .red { color: #d34b55; }
+.stat-hadir { border-top: 3px solid #16a36d; }
+.stat-sakit { border-top: 3px solid #e6ad42; }
+.stat-izin { border-top: 3px solid #5c9fe4; }
+.stat-alpha { border-top: 3px solid #e36a70; }
+.wk-att-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+.wk-att-search {
+    position: relative;
+    max-width: 360px;
+    margin-bottom: 15px;
+}
+.wk-att-search i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #92a39a;
+    font-size: 12px;
+}
+.wk-att-search input {
+    width: 100%;
+    height: 40px;
+    padding: 0 13px 0 36px;
+    border: 1px solid #e5ece7;
+    border-radius: 10px;
+    font-size: 12px;
+    outline: none;
+}
+.wk-att-table-wrap { overflow-x: auto; }
+.wk-att-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 780px;
+}
+.wk-att-table th {
+    padding: 13px 12px;
+    text-align: left;
+    background: #f6faf7;
+    color: #718078;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    white-space: nowrap;
+}
+.wk-att-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 12px;
+}
+.wk-att-student-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 180px;
+}
+.wk-att-student-name strong { font-size: 12px; }
+.wk-att-avatar {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #e8f5ed;
+    color: #087653;
+    font-weight: 800;
+}
+.wk-att-number {
+    display: inline-flex;
+    min-width: 25px;
+    justify-content: center;
+    font-weight: 800;
+}
+.wk-att-percent {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 110px;
+}
+.wk-att-percent strong { font-size: 11px; white-space: nowrap; }
+.wk-att-progress {
+    height: 6px;
+    width: 65px;
+    border-radius: 20px;
+    background: #edf2ee;
+    overflow: hidden;
+}
+.wk-att-progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0b8c62, #43bd83);
+}
+.wk-att-history-list {
+    display: flex;
+    flex-direction: column;
+}
+.wk-att-history-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 2px;
+    border-bottom: 1px solid #edf1ee;
+}
+.wk-att-history-date {
+    flex: 0 0 55px;
+    height: 55px;
+    border-radius: 12px;
+    background: #eff8f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #087653;
+}
+.wk-att-history-date strong { font-size: 20px; line-height: 1.1; }
+.wk-att-history-date span { font-size: 9px; font-weight: 700; }
+.wk-att-history-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.wk-att-history-info strong { font-size: 12px; }
+.wk-att-history-info span, .wk-att-history-info small {
+    color: #829087;
+    font-size: 10px;
+}
+.wk-att-history-info .wk-att-note { color: #a16c25; }
+.wk-att-status {
+    flex: 0 0 auto;
+    border-radius: 30px;
+    padding: 7px 11px;
+    font-size: 10px;
+    font-weight: 800;
+}
+.status-hadir { color: #087653; background: #e8f7ef; }
+.status-sakit { color: #a86c10; background: #fff5df; }
+.status-izin { color: #2868a9; background: #eaf3ff; }
+.status-alpha { color: #bd3e4b; background: #fff0f0; }
+.wk-att-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 42px 15px;
+    gap: 8px;
+}
+.wk-att-empty > i { font-size: 30px; color: #9bb8a6; margin-bottom: 5px; }
+.wk-att-empty strong { font-size: 14px; }
+.wk-att-empty span { color: #89968f; font-size: 11px; }
+
+@media(max-width: 1050px) {
+    .wk-att-stats { grid-template-columns: repeat(3, 1fr); }
+    .wk-att-filter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 650px) {
+    .wk-attendance { padding: 12px; }
+    .wk-att-hero { padding: 25px 21px; border-radius: 17px; }
+    .wk-att-hero-icon { width: 58px; height: 58px; font-size: 25px; border-radius: 16px; }
+    .wk-att-hero p { max-width: 250px; line-height: 1.6; }
+    .wk-att-filter, .wk-att-content-card { padding: 16px; border-radius: 15px; }
+    .wk-att-filter-grid { grid-template-columns: 1fr; }
+    .wk-att-filter-action button { width: 100%; }
+    .wk-att-stats { grid-template-columns: repeat(2, 1fr); gap: 9px; }
+    .wk-att-stat { padding: 13px; }
+    .wk-att-stat > strong { font-size: 24px; }
+    .wk-att-stat-top { font-size: 10px; }
+    .wk-att-stat-icon { width: 29px; height: 29px; }
+    .wk-att-section-heading, .wk-att-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .wk-att-section-heading h2, .wk-att-card-header h2 { font-size: 17px; }
+    .wk-att-period { white-space: normal; }
+    .wk-att-search { max-width: none; }
+    .wk-att-history-item { gap: 10px; }
+    .wk-att-history-date { flex-basis: 45px; height: 49px; }
+    .wk-att-status { padding: 6px 8px; font-size: 9px; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchStudent = document.getElementById('wkSearchStudent');
+    const studentRows = document.querySelectorAll('#wkAttendanceTable tbody tr');
+
+    if (searchStudent) {
+        searchStudent.addEventListener('input', function () {
+            const keyword = this.value.toLowerCase().trim();
+
+            studentRows.forEach(row => {
+                const name = row.querySelector('.wk-att-student-name');
+                if (!name) return;
+
+                row.style.display = name.textContent.toLowerCase().includes(keyword)
+                    ? ''
+                    : 'none';
+            });
+        });
+    }
+
+    const searchHistory = document.getElementById('wkSearchHistory');
+    const historyItems = document.querySelectorAll('.wk-att-history-item');
+
+    if (searchHistory) {
+        searchHistory.addEventListener('input', function () {
+            const keyword = this.value.toLowerCase().trim();
+
+            historyItems.forEach(item => {
+                item.style.display = item.textContent.toLowerCase().includes(keyword)
+                    ? ''
+                    : 'none';
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,591 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="wk-dashboard">
+
+    <!-- HEADER -->
+    <section class="wk-hero">
+        <div class="wk-hero-content">
+            <div class="wk-eyebrow">
+                <span class="wk-eyebrow-dot"></span>
+                WALI KELAS WORKSPACE
+            </div>
+
+            <h1>Dashboard Wali Kelas</h1>
+
+            <p>
+                Selamat datang,
+                <strong>
+                    {{ guru.nama if guru else user.username }}
+                </strong>.
+                Kelola kelas dan pantau perkembangan siswa melalui satu tempat.
+            </p>
+
+            <div class="wk-hero-meta">
+                <span>
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ tahun_pelajaran.kode if tahun_pelajaran else 'Tahun pelajaran belum tersedia' }}
+                </span>
+                <span>
+                    <i class="fas fa-user-tie"></i>
+                    {{ guru.nama if guru else 'Data guru belum tersedia' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="wk-hero-decoration">
+            <div class="wk-decoration-circle wk-circle-one"></div>
+            <div class="wk-decoration-circle wk-circle-two"></div>
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+    </section>
+
+    {% if pesan %}
+        <div class="wk-alert">
+            <i class="fas fa-info-circle"></i>
+            <div>{{ pesan }}</div>
+        </div>
+    {% else %}
+
+        <!-- STATISTIK -->
+        <section class="wk-stats">
+            <article class="wk-stat-card">
+                <div class="wk-stat-icon purple">
+                    <i class="fas fa-chalkboard"></i>
+                </div>
+                <div class="wk-stat-info">
+                    <span>Total Kelas</span>
+                    <strong>{{ total_kelas }}</strong>
+                    <small>Kelas yang diampu</small>
+                </div>
+            </article>
+
+            <article class="wk-stat-card">
+                <div class="wk-stat-icon green">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="wk-stat-info">
+                    <span>Total Siswa</span>
+                    <strong>{{ total_siswa }}</strong>
+                    <small>Siswa pada periode aktif</small>
+                </div>
+            </article>
+
+            <article class="wk-stat-card">
+                <div class="wk-stat-icon orange">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="wk-stat-info">
+                    <span>Tahun Pelajaran</span>
+                    <strong class="wk-stat-year">
+                        {{ tahun_pelajaran.kode if tahun_pelajaran else '-' }}
+                    </strong>
+                    <small>Periode yang sedang aktif</small>
+                </div>
+            </article>
+        </section>
+
+        <!-- DAFTAR KELAS -->
+        <section class="wk-section">
+            <div class="wk-section-heading">
+                <div>
+                    <span class="wk-section-label">MANAJEMEN KELAS</span>
+                    <h2>Kelas yang Saya Ampu</h2>
+                    <p>Pilih kelas untuk mengelola dan melihat data siswa.</p>
+                </div>
+
+                <div class="wk-class-count">
+                    {{ total_kelas }} Kelas
+                </div>
+            </div>
+
+            {% if daftar_kelas %}
+                <div class="wk-class-grid">
+                    {% for kelas in daftar_kelas %}
+                        <article class="wk-class-card">
+                            <div class="wk-class-top">
+                                <div class="wk-class-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span class="wk-class-status">
+                                    <span></span> Aktif
+                                </span>
+                            </div>
+
+                            <div class="wk-class-info">
+                                <span class="wk-class-grade">
+                                    KELAS {{ kelas.jenjang }}
+                                </span>
+                                <h3>{{ kelas.nama_kelas }}</h3>
+                                <p>
+                                    <i class="fas fa-user-graduate"></i>
+                                    {{ kelas.jumlah_siswa_periode }} siswa terdaftar
+                                </p>
+                            </div>
+
+                            <div class="wk-class-footer">
+                                <span>Kelola kelas</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="wk-empty">
+                    <div class="wk-empty-icon">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <h3>Belum Ada Kelas yang Diampu</h3>
+                    <p>
+                        Belum ditemukan kelas yang ditugaskan kepada Anda
+                        pada tahun pelajaran aktif.
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.wk-dashboard {
+    --wk-primary: #087a5b;
+    --wk-dark: #064b39;
+    --wk-muted: #718096;
+    --wk-border: #e8edf2;
+    padding: 24px;
+    color: #172b3a;
+}
+
+/* HERO */
+.wk-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 230px;
+    padding: 36px 42px;
+    border-radius: 22px;
+    color: #fff;
+    background: linear-gradient(115deg, #063f31, #087a5b 65%, #11966e);
+    box-shadow: 0 12px 35px rgba(4, 90, 65, .16);
+}
+
+.wk-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+}
+
+.wk-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 16px;
+    color: #b8f4dc;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+
+.wk-eyebrow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #5ce5a9;
+    box-shadow: 0 0 12px #5ce5a9;
+}
+
+.wk-hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: -.8px;
+}
+
+.wk-hero p {
+    margin: 0;
+    color: #d4eee5;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.wk-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 24px;
+}
+
+.wk-hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e0f6ed;
+    font-size: 12px;
+}
+
+.wk-hero-decoration {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 310px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.wk-hero-decoration > i {
+    position: relative;
+    z-index: 2;
+    color: rgba(255,255,255,.16);
+    font-size: 115px;
+}
+
+.wk-decoration-circle {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+}
+
+.wk-circle-one {
+    width: 240px;
+    height: 240px;
+}
+
+.wk-circle-two {
+    width: 175px;
+    height: 175px;
+}
+
+/* ALERT */
+.wk-alert {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-top: 24px;
+    padding: 18px 20px;
+    border: 1px solid #f4dfad;
+    border-radius: 14px;
+    background: #fffaf0;
+    color: #795b17;
+    font-size: 14px;
+}
+
+/* STATISTICS */
+.wk-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 25px;
+}
+
+.wk-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 23px;
+    border: 1px solid var(--wk-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(20,40,60,.035);
+    transition: transform .25s, box-shadow .25s;
+}
+
+.wk-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(20,40,60,.08);
+}
+
+.wk-stat-icon {
+    flex-shrink: 0;
+    width: 53px;
+    height: 53px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    font-size: 21px;
+}
+
+.wk-stat-icon.purple {
+    background: #f0ebff;
+    color: #7956d8;
+}
+
+.wk-stat-icon.green {
+    background: #e4f7ee;
+    color: #139866;
+}
+
+.wk-stat-icon.orange {
+    background: #fff1e3;
+    color: #e78b32;
+}
+
+.wk-stat-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wk-stat-info > span {
+    color: var(--wk-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.wk-stat-info strong {
+    color: #1c3444;
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.wk-stat-info strong.wk-stat-year {
+    font-size: 19px;
+}
+
+.wk-stat-info small {
+    color: #98a4b1;
+    font-size: 11px;
+}
+
+/* SECTION */
+.wk-section {
+    margin-top: 38px;
+}
+
+.wk-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.wk-section-label {
+    color: var(--wk-primary);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.wk-section-heading h2 {
+    margin: 7px 0 5px;
+    color: #1b3444;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.wk-section-heading p {
+    margin: 0;
+    color: var(--wk-muted);
+    font-size: 13px;
+}
+
+.wk-class-count {
+    padding: 9px 15px;
+    border: 1px solid #dcefe7;
+    border-radius: 10px;
+    background: #f0faf5;
+    color: var(--wk-primary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* CLASS CARD */
+.wk-class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.wk-class-card {
+    overflow: hidden;
+    border: 1px solid var(--wk-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(20,40,60,.035);
+    transition: transform .25s, box-shadow .25s;
+}
+
+.wk-class-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(20,40,60,.08);
+}
+
+.wk-class-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 21px 0;
+}
+
+.wk-class-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: #e8f7ef;
+    color: #07815c;
+    font-size: 18px;
+}
+
+.wk-class-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #159568;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.wk-class-status span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22bd82;
+}
+
+.wk-class-info {
+    padding: 21px;
+}
+
+.wk-class-grade {
+    color: #8996a4;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.wk-class-info h3 {
+    margin: 7px 0 12px;
+    color: #1b3444;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.wk-class-info p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #758394;
+    font-size: 12px;
+}
+
+.wk-class-info p i {
+    color: #0b9569;
+}
+
+.wk-class-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 21px;
+    border-top: 1px solid #edf1f4;
+    color: #087a5b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* EMPTY */
+.wk-empty {
+    padding: 55px 20px;
+    border: 1px dashed #d9e3e8;
+    border-radius: 17px;
+    background: #fff;
+    text-align: center;
+}
+
+.wk-empty-icon {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 17px;
+    border-radius: 20px;
+    background: #edf7f2;
+    color: #0b8a62;
+    font-size: 25px;
+}
+
+.wk-empty h3 {
+    margin: 0 0 8px;
+    color: #243c4b;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.wk-empty p {
+    max-width: 430px;
+    margin: auto;
+    color: #84919e;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .wk-class-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .wk-dashboard {
+        padding: 15px;
+    }
+
+    .wk-hero {
+        min-height: 215px;
+        padding: 27px 23px;
+        border-radius: 17px;
+    }
+
+    .wk-hero-decoration {
+        right: -100px;
+        opacity: .6;
+    }
+
+    .wk-hero-meta {
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .wk-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .wk-stat-card {
+        padding: 17px;
+    }
+
+    .wk-section-heading {
+        align-items: flex-start;
+    }
+
+    .wk-class-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .wk-section-heading {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

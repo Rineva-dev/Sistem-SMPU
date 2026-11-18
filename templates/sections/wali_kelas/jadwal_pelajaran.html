@@ -1,0 +1,634 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+.jw-page {
+    --jw-green: #047857;
+    --jw-dark: #064e3b;
+    --jw-soft: #ecfdf5;
+    --jw-border: #e5eee9;
+    color: #1e293b;
+    padding: 24px;
+}
+
+.jw-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 30px;
+    border-radius: 22px;
+    background: linear-gradient(120deg, #064e3b, #047857 65%, #059669);
+    color: white;
+    margin-bottom: 24px;
+}
+
+.jw-hero::after {
+    content: "";
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    right: -60px;
+    top: -100px;
+    border: 35px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.jw-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.jw-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+    color: #a7f3d0;
+    margin-bottom: 10px;
+}
+
+.jw-hero h2 {
+    font-size: 27px;
+    font-weight: 800;
+    margin: 0 0 8px;
+}
+
+.jw-hero p {
+    color: #d1fae5;
+    margin: 0;
+    font-size: 13px;
+}
+
+.jw-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.jw-meta-pill {
+    padding: 8px 13px;
+    border-radius: 30px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.16);
+    font-size: 12px;
+    color: white;
+}
+
+.jw-filter {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 18px;
+    border: 1px solid var(--jw-border);
+    border-radius: 17px;
+    background: white;
+    margin-bottom: 22px;
+}
+
+.jw-filter label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.jw-filter select {
+    min-width: 230px;
+    padding: 11px 13px;
+    border: 1px solid #dce7e1;
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+    color: #334155;
+    font-size: 13px;
+}
+
+.jw-filter select:focus {
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5,150,105,.1);
+}
+
+.jw-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.jw-stat {
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid var(--jw-border);
+    background: white;
+}
+
+.jw-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.jw-stat-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--jw-soft);
+    color: var(--jw-green);
+    font-size: 16px;
+}
+
+.jw-stat-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.jw-stat-value {
+    font-size: 25px;
+    font-weight: 850;
+    color: #0f172a;
+    margin-top: 12px;
+}
+
+.jw-stat-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.jw-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 25px 0 15px;
+}
+
+.jw-section-heading h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.jw-section-heading span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.jw-day {
+    border: 1px solid var(--jw-border);
+    border-radius: 17px;
+    background: white;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.jw-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 18px;
+    background: #f8fcf9;
+    border-bottom: 1px solid var(--jw-border);
+}
+
+.jw-day-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    color: #14532d;
+    font-size: 14px;
+}
+
+.jw-day-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #dcfce7;
+    color: #047857;
+}
+
+.jw-day-count {
+    font-size: 11px;
+    color: #64748b;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.jw-lessons {
+    padding: 5px 18px;
+}
+
+.jw-lesson {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 17px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.jw-lesson:last-child {
+    border-bottom: none;
+}
+
+.jw-time {
+    font-size: 12px;
+    font-weight: 800;
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    padding: 9px 10px;
+    border-radius: 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.jw-subject {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.jw-teacher {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.jw-teacher i {
+    margin-right: 5px;
+    color: #059669;
+}
+
+.jw-class-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 6px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.jw-empty {
+    text-align: center;
+    padding: 35px 20px;
+    color: #94a3b8;
+}
+
+.jw-empty i {
+    font-size: 30px;
+    color: #a7f3d0;
+    margin-bottom: 12px;
+}
+
+.jw-empty h4 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+.jw-empty p {
+    font-size: 12px;
+    margin: 0;
+}
+
+.jw-alert {
+    padding: 17px;
+    border-radius: 13px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    font-size: 13px;
+}
+
+@media(max-width: 768px) {
+    .jw-page {
+        padding: 14px;
+    }
+
+    .jw-hero {
+        padding: 23px 20px;
+    }
+
+    .jw-hero h2 {
+        font-size: 22px;
+    }
+
+    .jw-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .jw-stat {
+        padding: 14px;
+    }
+
+    .jw-stat-value {
+        font-size: 22px;
+    }
+
+    .jw-filter {
+        align-items: stretch;
+    }
+
+    .jw-filter > div,
+    .jw-filter select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .jw-lesson {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .jw-time {
+        width: fit-content;
+    }
+
+    .jw-class-tag {
+        width: fit-content;
+    }
+}
+
+@media(max-width: 420px) {
+    .jw-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .jw-stat-label {
+        font-size: 10px;
+    }
+}
+</style>
+
+<div class="jw-page">
+
+    <!-- HERO -->
+    <section class="jw-hero">
+        <div class="jw-hero-content">
+            <div class="jw-eyebrow">
+                WALI KELAS WORKSPACE
+            </div>
+
+            <h2>Jadwal Pelajaran</h2>
+
+            <p>
+                Pantau jadwal kegiatan pembelajaran kelas yang Anda ampu.
+            </p>
+
+            <div class="jw-hero-meta">
+                <div class="jw-meta-pill">
+                    <i class="fas fa-user-tie me-1"></i>
+                    {{ guru.nama }}
+                </div>
+
+                <div class="jw-meta-pill">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    {% if tahun_pelajaran %}
+                        {{ tahun_pelajaran.nama }}
+                    {% else %}
+                        Tahun pelajaran belum tersedia
+                    {% endif %}
+                </div>
+
+                {% if kelas_terpilih %}
+                <div class="jw-meta-pill">
+                    <i class="fas fa-school me-1"></i>
+                    {{ kelas_terpilih.nama_kelas }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    {% if pesan %}
+
+        <div class="jw-alert">
+            <i class="fas fa-info-circle me-2"></i>
+            {{ pesan }}
+        </div>
+
+    {% else %}
+
+        <!-- FILTER KELAS -->
+        <section class="jw-filter">
+            <div>
+                <label for="jwKelas">Pilih Kelas</label>
+
+                <select id="jwKelas">
+                    <option value="">Semua kelas yang diampu</option>
+
+                    {% for kelas in daftar_kelas %}
+                    <option
+                        value="{{ kelas.id }}"
+                        {% if kelas_terpilih and kelas_terpilih.id == kelas.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ kelas.nama_kelas }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label>Tahun Pelajaran</label>
+                <div style="font-size:13px;font-weight:800;color:#047857;padding:11px 0;">
+                    {{ tahun_pelajaran.nama }}
+                </div>
+            </div>
+        </section>
+
+        <!-- STATISTIK -->
+        <section class="jw-summary">
+
+            <div class="jw-stat">
+                <div class="jw-stat-top">
+                    <span class="jw-stat-label">Total Jadwal</span>
+                    <span class="jw-stat-icon">
+                        <i class="fas fa-book-open"></i>
+                    </span>
+                </div>
+                <div class="jw-stat-value">{{ jumlah_jadwal }}</div>
+                <div class="jw-stat-desc">Jadwal pembelajaran</div>
+            </div>
+
+            <div class="jw-stat">
+                <div class="jw-stat-top">
+                    <span class="jw-stat-label">Hari Pembelajaran</span>
+                    <span class="jw-stat-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </span>
+                </div>
+                <div class="jw-stat-value">
+                    {{ jadwal_per_hari.values() | selectattr('__len__') | list | length }}
+                </div>
+                <div class="jw-stat-desc">Hari dengan jadwal</div>
+            </div>
+
+            <div class="jw-stat">
+                <div class="jw-stat-top">
+                    <span class="jw-stat-label">Kelas Diampu</span>
+                    <span class="jw-stat-icon">
+                        <i class="fas fa-school"></i>
+                    </span>
+                </div>
+                <div class="jw-stat-value">
+                    {{ 1 if kelas_terpilih else daftar_kelas|length }}
+                </div>
+                <div class="jw-stat-desc">Kelas dalam tanggung jawab</div>
+            </div>
+
+        </section>
+
+        <!-- JADWAL PER HARI -->
+        <div class="jw-section-heading">
+            <h3>
+                <i class="fas fa-calendar-alt me-2" style="color:#059669;"></i>
+                Rincian Jadwal Mingguan
+            </h3>
+
+            <span>{{ jumlah_jadwal }} jadwal ditemukan</span>
+        </div>
+
+        {% set ada_jadwal = namespace(value=false) %}
+
+        {% for hari, daftar in jadwal_per_hari.items() %}
+
+            {% if daftar %}
+                {% set ada_jadwal.value = true %}
+
+                <section class="jw-day">
+
+                    <div class="jw-day-header">
+                        <div class="jw-day-name">
+                            <span class="jw-day-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </span>
+                            {{ hari }}
+                        </div>
+
+                        <span class="jw-day-count">
+                            {{ daftar|length }} Mata Pelajaran
+                        </span>
+                    </div>
+
+                    <div class="jw-lessons">
+
+                        {% for jadwal in daftar %}
+
+                        <div class="jw-lesson">
+
+                            <div class="jw-time">
+                                {{ jadwal.jam_mulai or '-' }}
+                                -
+                                {{ jadwal.jam_selesai or '-' }}
+                            </div>
+
+                            <div>
+                                <div class="jw-subject">
+                                    {% if jadwal.jenis_khusus == 'imtaq' %}
+                                        Imtaq
+                                    {% elif jadwal.jenis_khusus == 'upacara' %}
+                                        Upacara Bendera
+                                    {% elif jadwal.mapel %}
+                                        {{ jadwal.mapel.nama_pelajaran }}
+                                    {% else %}
+                                        Mata pelajaran belum ditentukan
+                                    {% endif %}
+                                </div>
+
+                                <div class="jw-teacher">
+                                    <i class="fas fa-user-tie"></i>
+                                    {% if jadwal.jenis_khusus in ['imtaq', 'upacara'] %}
+                                        <span class="text-muted">Kegiatan khusus</span>
+                                    {% elif jadwal.guru %}
+                                        {{ jadwal.guru.nama }}
+                                    {% else %}
+                                        Guru belum ditentukan
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if not kelas_terpilih %}
+                            <div class="jw-class-tag">
+                                {{ jadwal.kelas.nama_kelas if jadwal.kelas else '-' }}
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+                </section>
+
+            {% endif %}
+
+        {% endfor %}
+
+        {% if not ada_jadwal.value %}
+            <section class="jw-day">
+                <div class="jw-empty">
+                    <i class="fas fa-calendar-times"></i>
+                    <h4>Belum Ada Jadwal Pelajaran</h4>
+                    <p>
+                        Belum ditemukan jadwal pelajaran untuk kelas yang dipilih
+                        pada tahun pelajaran aktif.
+                    </p>
+                </div>
+            </section>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+<script>
+(function () {
+    function initJadwalWali() {
+        const select = document.getElementById('jwKelas');
+
+        if (!select || select.dataset.initialized === 'true') return;
+
+        select.dataset.initialized = 'true';
+
+        select.addEventListener('change', function () {
+            const kelasId = this.value;
+            const url = new URL(window.location.href);
+
+            if (kelasId) {
+                url.searchParams.set('kelas_id', kelasId);
+            } else {
+                url.searchParams.delete('kelas_id');
+            }
+
+            window.location.href = url.pathname + url.search;
+        });
+    }
+
+    initJadwalWali();
+})();
+</script>
+
+{% endblock %}

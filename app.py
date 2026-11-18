@@ -407,6 +407,13 @@ from routes.sections.guru.jurnal_mengajar import jurnal_mengajar_bp
 
 from routes.payment.payment_public import payment_public_bp
 
+# --- HALAMAN WALI KELAS --- #
+from routes.sections.wali_kelas.dashboard_wali import bp as dashboard_wali_bp
+from routes.sections.wali_kelas.siswa_wali import siswa_wali_bp
+from routes.sections.wali_kelas.rekap_kehadiran import rekap_kehadiran_bp
+from routes.sections.wali_kelas.jadwal_wali import jadwal_wali_bp
+from routes.sections.wali_kelas.catatan_perkembangan import catatan_perkembangan_bp
+
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
 app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
@@ -441,6 +448,13 @@ app.register_blueprint(profil_bp)
 app.register_blueprint(jurnal_mengajar_bp)
 app.register_blueprint(absensi_siswa_bp)
 app.register_blueprint(payment_public_bp)
+
+# --- BLUE PRINT WALI KELAS --- #
+app.register_blueprint(dashboard_wali_bp, url_prefix='/wali-kelas')
+app.register_blueprint(siswa_wali_bp)
+app.register_blueprint(rekap_kehadiran_bp)
+app.register_blueprint(jadwal_wali_bp)
+app.register_blueprint(catatan_perkembangan_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
 from routes.profil import profil_bp as absensi_profil_bp

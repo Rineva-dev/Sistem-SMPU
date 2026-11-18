@@ -659,6 +659,59 @@
           {% endif %}
 
 
+          <!-- ==========================================
+              WALI KELAS
+              ========================================== -->
+          {% if halaman_aktif == 'wali_kelas' %}
+
+          <div class="menu-section">
+              <h5 class="menu-title">Manajemen Wali Kelas</h5>
+
+              <ul>
+                  <li class="menu-item">
+                      <a href="{{ url_for('dashboard_wali.index') }}"
+                        class="menu-link {% if active_page == 'dashboard_wali' %}active{% endif %}">
+                          <i class="fas fa-gauge-high"></i>
+                          <span>Dashboard</span>
+                      </a>
+                  </li>
+
+                  <li class="menu-item">
+                      <a href="{{ url_for('siswa_wali.data_siswa') }}"
+                        class="menu-link {% if active_page == 'data_siswa_wali' %}active{% endif %}">
+                          <i class="fas fa-user-graduate"></i>
+                          <span>Data Siswa</span>
+                      </a>
+                  </li>
+
+                  <li class="menu-item">
+                      <a href="{{ url_for('rekap_kehadiran.index') }}"
+                        class="menu-link {% if active_page == 'rekap_kehadiran_wali' %}active{% endif %}">
+                          <i class="fas fa-chart-column"></i>
+                          <span>Rekap Kehadiran</span>
+                      </a>
+                  </li>
+
+                  <li class="menu-item">
+                      <a href="{{ url_for('jadwal_wali.index') }}"
+                        class="menu-link {% if active_page == 'jadwal_wali' %}active{% endif %}">
+                          <i class="fas fa-calendar-alt"></i>
+                          <span>Jadwal Pelajaran</span>
+                      </a>
+                  </li>
+
+                  <li class="menu-item">
+                      <a href="{{ url_for('catatan_perkembangan.index') }}"
+                        class="menu-link {% if active_page == 'catatan_perkembangan_wali' %}active{% endif %}">
+                          <i class="fas fa-clipboard-list"></i>
+                          <span>Catatan Perkembangan</span>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+
+          {% endif %}
+
           <!-- ADMIN SISTEM -->
           {% if halaman_aktif == 'admin_sistem' %}
 

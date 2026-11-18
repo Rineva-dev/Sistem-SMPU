@@ -110,7 +110,7 @@
     {% include "siswa/form_siswa.html" %}
 {% endif %}
 
-{% if active_page == "data_siswa" and sub_page == "detail" %}
+{% if active_page in ["data_siswa", "data_siswa_wali"] and sub_page == "detail" %}
     {% include "siswa/detail_siswa.html" %}
 {% endif %}
 
@@ -237,11 +237,15 @@
         {% endif %}
     {% endif %}
 
-    {% if active_page == "data_siswa" %}
+    {% if active_page in ["data_siswa", "data_siswa_wali"] %}
+        {% if active_page == "data_siswa" %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/data_siswa.css') }}">
+        {% endif %}
+
         {% if sub_page in ['form_tambah', 'form_ubah'] %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/form_siswa.css') }}">
         {% endif %}
+
         {% if sub_page == "detail" %}
         <link rel="stylesheet" href="{{ url_for('static', filename='css/siswa/detail_siswa.css') }}">
         {% endif %}
@@ -284,6 +288,10 @@
 
     {% if active_page == "data_siswa" %}
         <script src="{{ url_for('static', filename='js/siswa/data_siswa.js') }}"></script>
+    {% endif %}
+
+    {% if active_page in ["data_siswa", "data_siswa_wali"] and sub_page == "detail" %}
+        <script src="{{ url_for('static', filename='js/siswa/detail_siswa.js') }}"></script>
     {% endif %}
 
     {% if active_page == "data_kelas" and sub_page == "jadwal" %}

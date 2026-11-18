@@ -39,6 +39,8 @@ def index(page='dashboard'):
     # ==============================================
     # ⚠️ TIDAK ADA PENGECEKAN BENDAHARA DI SINI → INI YANG BIKIN LOOP!
     # ==============================================
+    if halaman_aktif == 'wali_kelas':
+        return redirect(url_for('dashboard_wali.index'))
     
     if halaman_aktif == 'waka_kurikulum':
         return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
@@ -277,5 +279,7 @@ def pindah_halaman(nama_halaman):
         return redirect(url_for('dashboard_wakakur.halaman_dashboard_wakakur'))
     elif nama_halaman == 'admin_sistem':
         return redirect(url_for('dashboard_admin.index'))
+    elif nama_halaman == 'wali_kelas':
+        return redirect(url_for('dashboard_wali.index'))
     else:
         return redirect(url_for('dashboard.index'))

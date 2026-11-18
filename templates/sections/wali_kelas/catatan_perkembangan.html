@@ -1,0 +1,595 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="cp-page">
+
+    <!-- HEADER -->
+    <section class="cp-hero">
+        <div class="cp-hero-content">
+            <div class="cp-eyebrow">
+                <span class="cp-eyebrow-dot"></span>
+                WALI KELAS WORKSPACE
+            </div>
+
+            <h1>Catatan Perkembangan Siswa</h1>
+            <p>
+                Pantau perkembangan akademik, karakter, kedisiplinan,
+                dan kehidupan sosial siswa secara terstruktur.
+            </p>
+
+            <div class="cp-hero-meta">
+                <span><i class="fa-solid fa-calendar-days"></i>
+                    {{ tahun_pelajaran.kode if tahun_pelajaran else 'Tahun pelajaran belum tersedia' }}
+                </span>
+                <span><i class="fa-solid fa-user-tie"></i>
+                    {{ guru.nama }}
+                </span>
+            </div>
+        </div>
+
+        <div class="cp-hero-decoration">
+            <div class="cp-decoration-circle cp-circle-one"></div>
+            <div class="cp-decoration-circle cp-circle-two"></div>
+            <div class="cp-decoration-icon">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+        </div>
+    </section>
+
+
+    {% if pesan %}
+    <div class="cp-alert">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>{{ pesan }}</span>
+    </div>
+    {% else %}
+
+    <!-- STATISTIK -->
+    <section class="cp-stats">
+
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-blue">
+                <i class="fa-solid fa-note-sticky"></i>
+            </div>
+            <div>
+                <span class="cp-stat-label">Total Catatan</span>
+                <strong>{{ daftar_catatan|length }}</strong>
+                <small>Catatan perkembangan</small>
+            </div>
+        </div>
+
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-orange">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+                <span class="cp-stat-label">Belum Ditindaklanjuti</span>
+                <strong>
+                    {{ daftar_catatan|selectattr('status_tindak_lanjut', 'equalto', 'belum_ditindaklanjuti')|list|length }}
+                </strong>
+                <small>Memerlukan perhatian</small>
+            </div>
+        </div>
+
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-purple">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
+            <div>
+                <span class="cp-stat-label">Dalam Proses</span>
+                <strong>
+                    {{ daftar_catatan|selectattr('status_tindak_lanjut', 'equalto', 'sedang_ditindaklanjuti')|list|length }}
+                </strong>
+                <small>Sedang ditangani</small>
+            </div>
+        </div>
+
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-green">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <span class="cp-stat-label">Selesai</span>
+                <strong>
+                    {{ daftar_catatan|selectattr('status_tindak_lanjut', 'equalto', 'selesai')|list|length }}
+                </strong>
+                <small>Sudah ditindaklanjuti</small>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- TOOLBAR -->
+    <section class="cp-workspace">
+
+        <div class="cp-workspace-header">
+            <div>
+                <div class="cp-section-label">STUDENT MONITORING</div>
+                <h2>Riwayat Perkembangan</h2>
+                <p>Kelola dan dokumentasikan perkembangan setiap siswa.</p>
+            </div>
+
+            <button type="button" class="cp-primary-btn"
+                    onclick="cpBukaTambah()">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah Catatan</span>
+            </button>
+        </div>
+
+
+        <!-- FILTER -->
+        <form method="GET"
+              action="{{ url_for('catatan_perkembangan.index') }}"
+              class="cp-filter">
+
+            <div class="cp-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text"
+                       name="q"
+                       value="{{ pencarian or '' }}"
+                       placeholder="Cari nama siswa atau catatan...">
+            </div>
+
+            <select name="kelas_id" class="cp-select">
+                <option value="">Semua Kelas</option>
+                {% for kelas in daftar_kelas %}
+                <option value="{{ kelas.id }}"
+                    {% if request.args.get('kelas_id', type=int) == kelas.id %}selected{% endif %}>
+                    {{ kelas.nama_kelas }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="kategori" class="cp-select">
+                <option value="">Semua Kategori</option>
+                {% for item in kategori_catatan %}
+                <option value="{{ item }}"
+                    {% if kategori_terpilih == item %}selected{% endif %}>
+                    {{ item }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="status" class="cp-select">
+                <option value="">Semua Status</option>
+                <option value="belum_ditindaklanjuti"
+                    {% if status_terpilih == 'belum_ditindaklanjuti' %}selected{% endif %}>
+                    Belum ditindaklanjuti
+                </option>
+                <option value="sedang_ditindaklanjuti"
+                    {% if status_terpilih == 'sedang_ditindaklanjuti' %}selected{% endif %}>
+                    Sedang ditindaklanjuti
+                </option>
+                <option value="selesai"
+                    {% if status_terpilih == 'selesai' %}selected{% endif %}>
+                    Selesai
+                </option>
+            </select>
+
+            <button type="submit" class="cp-filter-btn">
+                <i class="fa-solid fa-filter"></i>
+                Filter
+            </button>
+
+            <a href="{{ url_for('catatan_perkembangan.index') }}"
+               class="cp-reset-btn" title="Reset filter">
+                <i class="fa-solid fa-rotate-left"></i>
+            </a>
+
+        </form>
+
+
+        <!-- TABLE -->
+        <div class="cp-table-wrapper">
+
+            <div class="cp-table-heading">
+                <div>
+                    <h3>Daftar Catatan</h3>
+                    <span>{{ daftar_catatan|length }} catatan ditemukan</span>
+                </div>
+                <span class="cp-live-indicator">
+                    <span></span> Data Tahun Aktif
+                </span>
+            </div>
+
+            <div class="cp-table-scroll">
+                <table class="cp-table">
+                    <thead>
+                        <tr>
+                            <th>SISWA</th>
+                            <th>TANGGAL</th>
+                            <th>KATEGORI</th>
+                            <th>CATATAN</th>
+                            <th>TINDAK LANJUT</th>
+                            <th>STATUS</th>
+                            <th class="cp-action-heading">AKSI</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for catatan in daftar_catatan %}
+
+                        <tr>
+                            <td>
+                                <div class="cp-student-cell">
+                                    <div class="cp-avatar">
+                                        {{ catatan.siswa.nama[:1]|upper if catatan.siswa else '?' }}
+                                    </div>
+                                    <div>
+                                        <strong>
+                                            {{ catatan.siswa.nama if catatan.siswa else 'Siswa tidak ditemukan' }}
+                                        </strong>
+                                        <small>
+                                            {{ catatan.kelas.nama_kelas if catatan.kelas else '-' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="cp-date">
+                                    {{ catatan.tanggal.strftime('%d/%m/%Y') if catatan.tanggal else '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="cp-category">
+                                    {{ catatan.kategori }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="cp-note-cell">
+                                    <strong>{{ catatan.judul }}</strong>
+                                    <small>
+                                        {{ catatan.deskripsi|truncate(85, True, '...') }}
+                                    </small>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="cp-followup">
+                                    {{ catatan.tindak_lanjut|truncate(55, True, '...') if catatan.tindak_lanjut else 'Belum ada' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if catatan.status_tindak_lanjut == 'selesai' %}
+                                    <span class="cp-status cp-status-done">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        Selesai
+                                    </span>
+                                {% elif catatan.status_tindak_lanjut == 'sedang_ditindaklanjuti' %}
+                                    <span class="cp-status cp-status-progress">
+                                        <i class="fa-solid fa-spinner"></i>
+                                        Dalam Proses
+                                    </span>
+                                {% else %}
+                                    <span class="cp-status cp-status-pending">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Belum Ditindaklanjuti
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="cp-actions">
+                                    <button type="button"
+                                            class="cp-action-btn cp-view-btn"
+                                            title="Lihat detail"
+                                            onclick="cpLihatDetail(this)"
+                                            data-id="{{ catatan.id }}"
+                                            data-nama="{{ catatan.siswa.nama|e if catatan.siswa else '-' }}"
+                                            data-kelas="{{ catatan.kelas.nama_kelas|e if catatan.kelas else '-' }}"
+                                            data-tanggal="{{ catatan.tanggal.strftime('%Y-%m-%d') if catatan.tanggal else '' }}"
+                                            data-kategori="{{ catatan.kategori|e }}"
+                                            data-judul="{{ catatan.judul|e }}"
+                                            data-deskripsi="{{ catatan.deskripsi|e }}"
+                                            data-tindak-lanjut="{{ (catatan.tindak_lanjut or '')|e }}"
+                                            data-status="{{ catatan.status_tindak_lanjut }}">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+
+                                    {% if catatan.guru_id == guru.id %}
+                                    <button type="button"
+                                            class="cp-action-btn cp-edit-btn"
+                                            title="Edit"
+                                            onclick="cpBukaEdit(this)"
+                                            data-id="{{ catatan.id }}"
+                                            data-siswa="{{ catatan.siswa_id }}"
+                                            data-kelas="{{ catatan.kelas_id }}"
+                                            data-tanggal="{{ catatan.tanggal.strftime('%Y-%m-%d') if catatan.tanggal else '' }}"
+                                            data-kategori="{{ catatan.kategori|e }}"
+                                            data-judul="{{ catatan.judul|e }}"
+                                            data-deskripsi="{{ catatan.deskripsi|e }}"
+                                            data-tindak-lanjut="{{ (catatan.tindak_lanjut or '')|e }}"
+                                            data-status="{{ catatan.status_tindak_lanjut }}">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="cp-action-btn cp-delete-btn"
+                                            title="Hapus"
+                                            onclick="cpKonfirmasiHapus('{{ catatan.id }}', '{{ catatan.kelas_id }}')">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="7">
+                                <div class="cp-empty">
+                                    <div class="cp-empty-icon">
+                                        <i class="fa-solid fa-clipboard-list"></i>
+                                    </div>
+                                    <h3>Belum Ada Catatan</h3>
+                                    <p>
+                                        Belum ada catatan perkembangan siswa
+                                        untuk filter yang dipilih.
+                                    </p>
+                                    <button type="button"
+                                            class="cp-primary-btn"
+                                            onclick="cpBukaTambah()">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Buat Catatan Pertama
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </section>
+    {% endif %}
+
+</div>
+
+
+<!-- =====================================================
+     MODAL TAMBAH / EDIT CATATAN
+===================================================== -->
+
+<div class="cp-modal" id="cpModalForm">
+    <div class="cp-modal-backdrop" onclick="cpTutupForm()"></div>
+
+    <div class="cp-modal-dialog">
+
+        <div class="cp-modal-header">
+            <div>
+                <span class="cp-section-label">STUDENT DEVELOPMENT</span>
+                <h2 id="cpFormTitle">Tambah Catatan</h2>
+                <p>Dokumentasikan perkembangan siswa secara objektif.</p>
+            </div>
+
+            <button type="button" class="cp-modal-close"
+                    onclick="cpTutupForm()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form id="cpForm"
+              method="POST"
+              action="{{ url_for('catatan_perkembangan.tambah') }}">
+
+            <div class="cp-modal-body">
+
+                <div class="cp-form-grid">
+
+                    <div class="cp-form-group cp-full">
+                        <label>Siswa <span>*</span></label>
+                        <select name="siswa_id" id="cpSiswa" required>
+                            <option value="">Pilih siswa</option>
+                            {% for siswa in daftar_siswa %}
+                            <option value="{{ siswa.id }}"
+                                    data-kelas="{{ siswa.posisi_di_tahun(tahun_pelajaran.kode).kelas_id if tahun_pelajaran and siswa.posisi_di_tahun(tahun_pelajaran.kode) else '' }}">
+                                {{ siswa.nama }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="cp-form-group">
+                        <label>Kelas <span>*</span></label>
+                        <select name="kelas_id" id="cpKelas" required>
+                            <option value="">Pilih kelas</option>
+                            {% for kelas in daftar_kelas %}
+                            <option value="{{ kelas.id }}">
+                                {{ kelas.nama_kelas }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="cp-form-group">
+                        <label>Tanggal Catatan <span>*</span></label>
+                        <input type="date"
+                               name="tanggal"
+                               id="cpTanggal"
+                               value="{{ '' }}"
+                               required>
+                    </div>
+
+                    <div class="cp-form-group cp-full">
+                        <label>Kategori Perkembangan <span>*</span></label>
+                        <select name="kategori" id="cpKategori" required>
+                            <option value="">Pilih kategori</option>
+                            {% for item in kategori_catatan %}
+                            <option value="{{ item }}">{{ item }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="cp-form-group cp-full">
+                        <label>Judul Catatan <span>*</span></label>
+                        <input type="text"
+                               name="judul"
+                               id="cpJudul"
+                               maxlength="150"
+                               placeholder="Contoh: Menunjukkan peningkatan kedisiplinan"
+                               required>
+                    </div>
+
+                    <div class="cp-form-group cp-full">
+                        <label>Deskripsi Perkembangan <span>*</span></label>
+                        <textarea name="deskripsi"
+                                  id="cpDeskripsi"
+                                  rows="4"
+                                  placeholder="Jelaskan kejadian, perilaku, atau perkembangan siswa secara objektif..."
+                                  required></textarea>
+                    </div>
+
+                    <div class="cp-form-group cp-full">
+                        <label>Rencana Tindak Lanjut</label>
+                        <textarea name="tindak_lanjut"
+                                  id="cpTindakLanjut"
+                                  rows="3"
+                                  placeholder="Tuliskan langkah pembinaan atau pendampingan yang direncanakan..."></textarea>
+                    </div>
+
+                    <div class="cp-form-group cp-full" id="cpStatusGroup" hidden>
+                        <label>Status Tindak Lanjut</label>
+                        <select name="status_tindak_lanjut"
+                                id="cpStatus">
+                            <option value="belum_ditindaklanjuti">Belum Ditindaklanjuti</option>
+                            <option value="sedang_ditindaklanjuti">Sedang Ditindaklanjuti</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="cp-form-info">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Catatan ini merupakan dokumentasi pembinaan siswa oleh Wali Kelas.
+                </div>
+
+            </div>
+
+            <div class="cp-modal-footer">
+                <button type="button" class="cp-secondary-btn"
+                        onclick="cpTutupForm()">
+                    Batal
+                </button>
+
+                <button type="submit" class="cp-primary-btn">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Simpan Catatan
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL DETAIL
+===================================================== -->
+
+<div class="cp-modal" id="cpModalDetail">
+    <div class="cp-modal-backdrop" onclick="cpTutupDetail()"></div>
+
+    <div class="cp-modal-dialog cp-detail-dialog">
+
+        <div class="cp-modal-header">
+            <div>
+                <span class="cp-section-label">STUDENT RECORD</span>
+                <h2>Detail Perkembangan</h2>
+                <p>Informasi lengkap catatan perkembangan siswa.</p>
+            </div>
+
+            <button type="button" class="cp-modal-close"
+                    onclick="cpTutupDetail()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="cp-modal-body">
+
+            <div class="cp-detail-student">
+                <div class="cp-detail-avatar">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <strong id="cpDetailNama">-</strong>
+                    <span id="cpDetailKelas">-</span>
+                </div>
+            </div>
+
+            <div class="cp-detail-grid">
+
+                <div class="cp-detail-item">
+                    <span>Tanggal</span>
+                    <strong id="cpDetailTanggal">-</strong>
+                </div>
+
+                <div class="cp-detail-item">
+                    <span>Kategori</span>
+                    <strong id="cpDetailKategori">-</strong>
+                </div>
+
+            </div>
+
+            <div class="cp-detail-section">
+                <label>Judul Catatan</label>
+                <h3 id="cpDetailJudul">-</h3>
+            </div>
+
+            <div class="cp-detail-section">
+                <label>Deskripsi Perkembangan</label>
+                <p id="cpDetailDeskripsi">-</p>
+            </div>
+
+            <div class="cp-detail-section">
+                <label>Rencana Tindak Lanjut</label>
+                <p id="cpDetailTindakLanjut">Belum ada tindak lanjut.</p>
+            </div>
+
+            <div class="cp-detail-section">
+                <label>Status</label>
+                <strong id="cpDetailStatus">-</strong>
+            </div>
+
+        </div>
+
+        <div class="cp-modal-footer">
+            <button type="button" class="cp-secondary-btn"
+                    onclick="cpTutupDetail()">
+                Tutup
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =====================================================
+     FORM HAPUS
+===================================================== -->
+
+<form id="cpFormHapus" method="POST" style="display:none;">
+</form>
+
+
+<!-- ASSET HALAMAN -->
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/wali_kelas/catatan_perkembangan.css') }}">
+
+<script src="{{ url_for('static', filename='js/wali_kelas/catatan_perkembangan.js') }}"></script>
+
+{% endblock %}

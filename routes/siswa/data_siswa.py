@@ -3,10 +3,10 @@ from datetime import datetime
 import re
 from sqlalchemy import or_
 from models import (
-    db, Siswa, Kelas, User, TahunPelajaran,
+    db, Siswa, Kelas, User, TahunPelajaran, Guru,
     RiwayatKelas, RiwayatSemester,
     RiwayatPembayaran, TagihanSiswa,
-    PengajuanPembayaran, DetailPengajuanPembayaran
+    PengajuanPembayaran, DetailPengajuanPembayaran, TahunPelajaran,
 )
 from flask import current_app
 
@@ -589,6 +589,15 @@ def ubah_siswa(public_id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
 
+    # Wali Kelas hanya memiliki akses melihat data siswa
+    if session.get('halaman_aktif') == 'wali_kelas':
+        flash("Wali Kelas hanya dapat melihat detail data siswa.", "danger")
+        return redirect(url_for(
+            'data_siswa.detail_siswa',
+            public_id=public_id
+        ))
+
+    # Hak akses pengguna lainnya tetap menggunakan aturan lama
     if not bisa_kelola():
         flash("Anda tidak berhak mengubah data siswa", "danger")
         return redirect(url_for('data_siswa.halaman_daftar_siswa'))
@@ -1019,18 +1028,94 @@ def hapus_siswa(public_id):
 def detail_siswa(public_id):
     if not session.get('logged_in'):
         return redirect(url_for('login.halaman_login'))
-    if not bisa_lihat():
-        flash("Anda tidak berhak melihat data ini!", "danger")
-        return redirect(url_for('data_siswa.halaman_daftar_siswa'))
-    
+
     siswa = Siswa.query.filter_by(
         public_id=public_id
     ).first_or_404()
 
-    # ========== DEBUG: CEK RIWAYAT SISWA ==========
+    akses_wali_kelas = (
+        session.get('halaman_aktif') == 'wali_kelas'
+    )
+
+    if akses_wali_kelas:
+        # Identifikasi guru yang sedang login
+        user_db = db.session.get(
+            User,
+            session.get('user_id')
+        )
+
+        if not user_db or not user_db.guru_id:
+            flash("Akun tidak terhubung dengan data guru.", "danger")
+            return redirect(url_for('dashboard_wali.index'))
+
+        guru = db.session.get(Guru, user_db.guru_id)
+
+        if not guru:
+            flash("Data guru tidak ditemukan.", "danger")
+            return redirect(url_for('dashboard_wali.index'))
+
+        # Tahun pelajaran aktif
+        tahun_aktif = (
+            TahunPelajaran.query
+            .filter_by(aktif=True)
+            .order_by(TahunPelajaran.id.desc())
+            .first()
+        )
+
+        if not tahun_aktif:
+            flash("Tahun pelajaran aktif belum tersedia.", "danger")
+            return redirect(url_for('dashboard_wali.index'))
+
+        kode_tp = tahun_aktif.kode
+        tahun_dasar = kode_tp.split('-')[0].strip()
+
+        # Ambil kelas yang diampu guru pada tahun aktif
+        daftar_kelas_wali = (
+            Kelas.query
+            .filter(
+                Kelas.wali_kelas_id == guru.id,
+                Kelas.tahun_pelajaran == tahun_dasar
+            )
+            .all()
+        )
+
+        kelas_ids_wali = [
+            kelas.id for kelas in daftar_kelas_wali
+        ]
+
+        if not kelas_ids_wali:
+            flash("Anda tidak memiliki kelas binaan.", "danger")
+            return redirect(url_for('siswa_wali.data_siswa'))
+
+        # Pastikan siswa berada di kelas binaan guru
+        riwayat_wali = (
+            RiwayatKelas.query
+            .filter(
+                RiwayatKelas.siswa_id == siswa.id,
+                RiwayatKelas.tahun_pelajaran == kode_tp,
+                RiwayatKelas.kelas_id.in_(kelas_ids_wali)
+            )
+            .first()
+        )
+
+        if not riwayat_wali:
+            flash("Anda tidak memiliki akses ke data siswa ini!", "danger")
+            return redirect(url_for('siswa_wali.data_siswa'))
+
+    else:
+        # Hak akses pengguna lain tetap menggunakan aturan lama
+        if not bisa_lihat():
+            flash("Anda tidak berhak melihat data ini!", "danger")
+            return redirect(
+                url_for('data_siswa.halaman_daftar_siswa')
+            )
+
+    # DEBUG
     print("=" * 50)
-    print(f"[DETAIL SISWA] ID: {siswa.id} | Public ID: {siswa.public_id} | Nama: {siswa.nama}")
-    # ==============================================
+    print(
+        f"[DETAIL SISWA] ID: {siswa.id} | "
+        f"Public ID: {siswa.public_id} | Nama: {siswa.nama}"
+    )
 
     # === AMBIL & NORMALISASI KODE TAHUN ===
     kode_tahun = request.args.get('tahun') or session.get('tahun_pelajaran')
@@ -1215,11 +1300,17 @@ def detail_siswa(public_id):
         tahun_dipilih_formatted=tahun_dipilih_formatted,
         kelas_sekarang_tahun_formatted=kelas_tahun_formatted,
         tahun_dipilih=kode_cari,
-        active_page='data_siswa',
+        active_page=(
+            'data_siswa_wali'
+            if akses_wali_kelas
+            else 'data_siswa'
+        ),
         sub_page='detail',
         halaman_aktif=session.get('halaman_aktif', 'utama'),
         bisa_buat_akun=bisa_buat_akun(),
-        bisa_kelola=bisa_kelola(),
+        bisa_kelola=(
+            False if akses_wali_kelas else bisa_kelola()
+        ),
         user={
             'jabatan': session.get('jabatan', ''),
             'tugas_tambahan': session.get('tugas_tambahan', '')

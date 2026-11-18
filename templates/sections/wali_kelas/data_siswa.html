@@ -1,0 +1,576 @@
+
+{% extends "layout.html" %}
+
+{% block extra_css %}
+<style>
+.wks-page {
+    --wks-green: #08785b;
+    --wks-dark: #064e3b;
+    --wks-soft: #eaf7f1;
+    --wks-border: #e5eee9;
+    color: #183b30;
+    padding-bottom: 30px;
+}
+
+.wks-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 27px 30px;
+    border-radius: 22px;
+    color: white;
+    background: linear-gradient(120deg, #064e3b, #08785b 65%, #11966f);
+    box-shadow: 0 12px 30px rgba(6, 78, 59, .15);
+    margin-bottom: 24px;
+}
+
+.wks-hero::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -55px;
+    top: -110px;
+    border: 35px solid rgba(255,255,255,.08);
+    border-radius: 50%;
+}
+
+.wks-hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.wks-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    opacity: .75;
+    margin-bottom: 8px;
+}
+
+.wks-hero h2 {
+    font-size: clamp(23px, 3vw, 30px);
+    font-weight: 800;
+    margin: 0 0 7px;
+}
+
+.wks-hero p {
+    margin: 0;
+    color: rgba(255,255,255,.8);
+    font-size: 13px;
+}
+
+.wks-year {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 17px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.1);
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.wks-stat {
+    height: 100%;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid var(--wks-border);
+    border-radius: 18px;
+    box-shadow: 0 5px 18px rgba(15, 70, 48, .04);
+}
+
+.wks-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.wks-stat-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: var(--wks-green);
+    background: var(--wks-soft);
+    font-size: 18px;
+}
+
+.wks-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #84958d;
+}
+
+.wks-stat-value {
+    font-size: 27px;
+    font-weight: 800;
+    color: #173f31;
+    line-height: 1.2;
+}
+
+.wks-panel {
+    background: white;
+    border: 1px solid var(--wks-border);
+    border-radius: 19px;
+    box-shadow: 0 5px 20px rgba(15, 70, 48, .04);
+    overflow: hidden;
+}
+
+.wks-panel-header {
+    padding: 21px 23px;
+    border-bottom: 1px solid #edf2ef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.wks-panel-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #173f31;
+    margin: 0;
+}
+
+.wks-panel-subtitle {
+    font-size: 12px;
+    color: #91a098;
+    margin-top: 5px;
+}
+
+.wks-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.wks-select,
+.wks-search {
+    min-height: 42px;
+    border: 1px solid #dfeae4;
+    border-radius: 11px;
+    background: #fbfdfc;
+    padding: 0 13px;
+    color: #29483b;
+    font-size: 13px;
+    outline: none;
+}
+
+.wks-select:focus,
+.wks-search:focus {
+    border-color: #0b9870;
+    box-shadow: 0 0 0 3px rgba(11,152,112,.09);
+}
+
+.wks-search-wrap {
+    position: relative;
+}
+
+.wks-search-wrap i {
+    position: absolute;
+    left: 13px;
+    top: 14px;
+    color: #94a59c;
+    font-size: 13px;
+}
+
+.wks-search {
+    width: 235px;
+    padding-left: 35px;
+}
+
+.wks-table-wrap {
+    overflow-x: auto;
+}
+
+.wks-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.wks-table thead th {
+    background: #f8fbf9;
+    color: #82938a;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    border-bottom: 1px solid #edf2ef;
+    white-space: nowrap;
+}
+
+.wks-table tbody td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f4f1;
+    font-size: 13px;
+    color: #385548;
+    vertical-align: middle;
+}
+
+.wks-table tbody tr:hover {
+    background: #fbfefc;
+}
+
+.wks-number {
+    color: #9aaba2 !important;
+    font-weight: 700;
+    width: 55px;
+}
+
+.wks-student {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 210px;
+}
+
+.wks-avatar {
+    width: 37px;
+    height: 37px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #e8f5ee;
+    color: #08785b;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.wks-student-name {
+    font-weight: 750;
+    color: #244638;
+}
+
+.wks-student-meta {
+    color: #9aa9a1;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.wks-nis {
+    font-family: monospace;
+    font-size: 12px;
+    color: #657c70;
+}
+
+.wks-class-badge {
+    display: inline-flex;
+    padding: 6px 10px;
+    background: #eaf7f1;
+    color: #08785b;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.wks-empty {
+    text-align: center;
+    padding: 55px 20px;
+}
+
+.wks-empty-icon {
+    width: 65px;
+    height: 65px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 15px;
+    border-radius: 20px;
+    background: #edf7f1;
+    color: #0a8965;
+    font-size: 25px;
+}
+
+.wks-empty h4 {
+    color: #294b3c;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.wks-empty p {
+    color: #91a198;
+    font-size: 13px;
+    margin: 0;
+}
+
+.wks-footer {
+    padding: 15px 22px;
+    color: #94a49b;
+    font-size: 11px;
+    background: #fcfdfc;
+}
+
+@media(max-width: 768px) {
+    .wks-hero {
+        padding: 23px 20px;
+        border-radius: 17px;
+    }
+
+    .wks-panel-header {
+        align-items: stretch;
+        padding: 18px;
+    }
+
+    .wks-toolbar {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .wks-select,
+    .wks-search,
+    .wks-search-wrap {
+        width: 100%;
+    }
+
+    .wks-stat {
+        padding: 16px;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-fluid wks-page">
+
+    <!-- HERO -->
+    <div class="wks-hero">
+        <div class="wks-hero-content">
+            <div class="wks-eyebrow">WALI KELAS WORKSPACE</div>
+            <h2>Data Siswa</h2>
+            <p>Kelola dan pantau data siswa dari kelas yang menjadi tanggung jawab Anda.</p>
+
+            <div class="wks-year">
+                <i class="fas fa-calendar-alt"></i>
+                Tahun Pelajaran:
+                {{ tahun_pelajaran.kode if tahun_pelajaran else '-' }}
+            </div>
+        </div>
+    </div>
+
+    {% if pesan %}
+        <div class="wks-panel mb-4">
+            <div class="wks-empty">
+                <div class="wks-empty-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h4>Informasi</h4>
+                <p>{{ pesan }}</p>
+            </div>
+        </div>
+    {% else %}
+
+        <!-- STATISTIK -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-4">
+                <div class="wks-stat">
+                    <div class="wks-stat-top">
+                        <span class="wks-stat-label">Total Siswa</span>
+                        <div class="wks-stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                    </div>
+                    <div class="wks-stat-value" id="wksTotalSiswa">
+                        {{ daftar_siswa|length }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-4">
+                <div class="wks-stat">
+                    <div class="wks-stat-top">
+                        <span class="wks-stat-label">Kelas Diampu</span>
+                        <div class="wks-stat-icon">
+                            <i class="fas fa-chalkboard"></i>
+                        </div>
+                    </div>
+                    <div class="wks-stat-value">
+                        {{ daftar_kelas|length }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="wks-stat">
+                    <div class="wks-stat-top">
+                        <span class="wks-stat-label">Wali Kelas</span>
+                        <div class="wks-stat-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                    </div>
+                    <div class="wks-stat-value" style="font-size:19px">
+                        {{ guru.nama if guru else user.username }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABEL SISWA -->
+        <div class="wks-panel">
+
+            <div class="wks-panel-header">
+                <div>
+                    <h3 class="wks-panel-title">Daftar Siswa</h3>
+                    <div class="wks-panel-subtitle">
+                        Data siswa sesuai riwayat kelas pada tahun pelajaran aktif.
+                    </div>
+                </div>
+
+                <div class="wks-toolbar">
+
+                    <form method="GET" action="{{ url_for('siswa_wali.data_siswa') }}">
+                        <select name="kelas_id"
+                                class="wks-select"
+                                onchange="this.form.submit()">
+
+                            <option value="">Semua Kelas</option>
+
+                            {% for kelas in daftar_kelas %}
+                                <option value="{{ kelas.id }}"
+                                    {% if kelas_terpilih and kelas_terpilih.id == kelas.id %}
+                                        selected
+                                    {% endif %}>
+                                    {{ kelas.nama_kelas }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </form>
+
+                    <div class="wks-search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text"
+                               class="wks-search"
+                               id="wksSearch"
+                               placeholder="Cari nama, NIS, NISN...">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="wks-table-wrap">
+                <table class="wks-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Nama Siswa</th>
+                            <th>NIS</th>
+                            <th>NISN</th>
+                            <th>Kelas</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="wksTableBody">
+
+                        {% for siswa in daftar_siswa %}
+                        <tr class="wks-student-row">
+
+                            <td class="wks-number">{{ loop.index }}</td>
+
+                            <td>
+                                <div class="wks-student">
+                                    <div class="wks-avatar">
+                                        {{ (siswa.nama or '?')[:1]|upper }}
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <a href="{{ url_for('data_siswa.detail_siswa', public_id=siswa.public_id) }}"
+                                            class="wks-student-name"
+                                            style="text-decoration:none; color:#08785b; cursor:pointer;">
+                                                {{ siswa.nama }}
+                                            </a>
+
+                                            <div class="wks-student-meta">
+                                                Data siswa
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="wks-nis">
+                                {{ siswa.nis or '-' }}
+                            </td>
+
+                            <td class="wks-nis">
+                                {{ siswa.nisn or '-' }}
+                            </td>
+
+                            <td>
+                                {% set ns = namespace(nama_kelas='-') %}
+                                {% for rk in siswa.riwayat_kelas %}
+                                    {% if rk.tahun_pelajaran == tahun_pelajaran.kode %}
+                                        {% for kelas in daftar_kelas %}
+                                            {% if rk.kelas_id == kelas.id %}
+                                                {% set ns.nama_kelas = kelas.nama_kelas %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="wks-class-badge">
+                                    {{ ns.nama_kelas }}
+                                </span>
+                            </td>
+
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="wks-empty">
+                                    <div class="wks-empty-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <h4>Belum Ada Data Siswa</h4>
+                                    <p>Belum ada siswa pada kelas dan periode yang dipilih.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="wks-footer">
+                Menampilkan <strong id="wksVisibleCount">{{ daftar_siswa|length }}</strong>
+                siswa
+            </div>
+
+        </div>
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const search = document.getElementById('wksSearch');
+    const rows = document.querySelectorAll('.wks-student-row');
+    const count = document.getElementById('wksVisibleCount');
+
+    if (!search) return;
+
+    search.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase().trim();
+        let visible = 0;
+
+        rows.forEach(function (row) {
+            const match = row.textContent.toLowerCase().includes(keyword);
+            row.style.display = match ? '' : 'none';
+
+            if (match) visible++;
+        });
+
+        if (count) count.textContent = visible;
+    });
+});
+</script>
+{% endblock %}

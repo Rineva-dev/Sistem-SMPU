@@ -481,6 +481,124 @@ class RiwayatKelas(db.Model):
     def __repr__(self):
         return f"<RiwayatKelas {self.siswa_id} - {self.tahun_pelajaran} - Tingkat {self.tingkat}>"
     
+
+# ==========================================
+# CATATAN PERKEMBANGAN SISWA - WALI KELAS
+# ==========================================
+class CatatanPerkembanganSiswa(db.Model):
+    __tablename__ = 'catatan_perkembangan_siswa'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    siswa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    kelas_id = db.Column(
+        db.Integer,
+        db.ForeignKey('kelas.id'),
+        nullable=False,
+        index=True
+    )
+
+    guru_id = db.Column(
+        db.String(6),
+        db.ForeignKey('guru.id'),
+        nullable=False,
+        index=True
+    )
+
+    tahun_pelajaran = db.Column(
+        db.String(20),
+        nullable=False,
+        index=True
+    )
+
+    tanggal = db.Column(
+        db.Date,
+        nullable=False,
+        default=date.today,
+        index=True
+    )
+
+    kategori = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    judul = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    deskripsi = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    tindak_lanjut = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    status_tindak_lanjut = db.Column(
+        db.String(30),
+        nullable=False,
+        default='belum_ditindaklanjuti'
+    )
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    # Relasi ke siswa
+    siswa = db.relationship(
+        'Siswa',
+        backref=db.backref(
+            'catatan_perkembangan',
+            lazy=True
+        )
+    )
+
+    # Relasi ke kelas
+    kelas = db.relationship(
+        'Kelas',
+        backref=db.backref(
+            'catatan_perkembangan',
+            lazy=True
+        )
+    )
+
+    # Relasi ke guru pencatat
+    guru = db.relationship(
+        'Guru',
+        backref=db.backref(
+            'catatan_perkembangan_dibuat',
+            lazy=True
+        )
+    )
+
+    def __repr__(self):
+        return (
+            f"<CatatanPerkembanganSiswa "
+            f"Siswa:{self.siswa_id} "
+            f"Kategori:{self.kategori} "
+            f"Tahun:{self.tahun_pelajaran}>"
+        )
+
+
 # ==========================================
 # ✅ TABEL MATA PELAJARAN
 # ==========================================
