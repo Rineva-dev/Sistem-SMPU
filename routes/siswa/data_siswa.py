@@ -1058,32 +1058,56 @@ def detail_siswa(public_id):
     
     tahun_dipilih_formatted = format_tahun_pelajaran(kode_cari) if kode_cari else None
 
+    # ==========================================
+    # KONDISI SISWA SAAT INI
+    # TIDAK TERPENGARUH FILTER TAHUN AJARAN
+    # ==========================================
+
+    tahun_aktif = TahunPelajaran.query.filter_by(
+        aktif=True
+    ).first()
+
+    kode_tahun_aktif = tahun_aktif.kode if tahun_aktif else None
+
+    # Ambil riwayat kelas siswa pada tahun pelajaran aktif
     riwayat_tahun_ini = None
-    if kode_cari:
+
+    if kode_tahun_aktif:
         riwayat_tahun_ini = RiwayatKelas.query.filter_by(
             siswa_id=siswa.id,
-            tahun_pelajaran=kode_cari
+            tahun_pelajaran=kode_tahun_aktif
         ).first()
 
-    # ========== DEBUG ==========
-    print(f"[DETAIL SISWA] riwayat_tahun_ini ditemukan: {riwayat_tahun_ini is not None}")
-    # ===========================
-
+    # Tentukan kelas saat ini
     kelas_sekarang = None
     kelas_tahun_formatted = None
-    if riwayat_tahun_ini and riwayat_tahun_ini.kelas:
-        kelas_sekarang = riwayat_tahun_ini.kelas
-        kelas_sekarang.jenjang = riwayat_tahun_ini.tingkat
-        kelas_tahun_formatted = tahun_dipilih_formatted
+
+    if riwayat_tahun_ini:
+        if riwayat_tahun_ini.kelas:
+            kelas_sekarang = riwayat_tahun_ini.kelas
+
+        kelas_tahun_formatted = format_tahun_pelajaran(
+            kode_tahun_aktif
+        )
+
     else:
-        riwayat_terakhir = RiwayatKelas.query.filter_by(siswa_id=siswa.id)\
-            .order_by(RiwayatKelas.tahun_pelajaran.desc())\
+        # Jika belum memiliki riwayat pada TP aktif,
+        # gunakan posisi kelas terakhir yang tercatat.
+        riwayat_terakhir = (
+            RiwayatKelas.query
+            .filter_by(siswa_id=siswa.id)
+            .order_by(RiwayatKelas.tahun_pelajaran.desc())
             .first()
-        if riwayat_terakhir and riwayat_terakhir.kelas:
-            kelas_sekarang = riwayat_terakhir.kelas
-            kelas_sekarang.jenjang = riwayat_terakhir.tingkat
-            kelas_tahun_formatted = format_tahun_pelajaran(riwayat_terakhir.tahun_pelajaran)
-    
+        )
+
+        if riwayat_terakhir:
+            if riwayat_terakhir.kelas:
+                kelas_sekarang = riwayat_terakhir.kelas
+
+            kelas_tahun_formatted = format_tahun_pelajaran(
+                riwayat_terakhir.tahun_pelajaran
+            )
+                
     # Ambil SEMUA riwayat kelas siswa
     riwayat_kelas = RiwayatKelas.query.filter_by(siswa_id=siswa.id)\
         .order_by(RiwayatKelas.tahun_pelajaran.asc()).all()
