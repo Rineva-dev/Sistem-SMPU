@@ -964,16 +964,28 @@ def naik_kelas(kelas_id):
         tingkat_baru = str(tingkat_sekarang + 1)
 
         # Tahun pelajaran berikutnya
+        
+        # Tahun pelajaran berikutnya
         tahun_parts = dasar_tahun.split('/')
 
         if len(tahun_parts) != 2:
             raise ValueError("Format tahun pelajaran tidak valid.")
 
+        try:
+            tahun_mulai = int(tahun_parts[0])
+            tahun_selesai = int(tahun_parts[1])
+        except ValueError:
+            raise ValueError("Format tahun pelajaran tidak valid.")
+
+        if tahun_selesai != tahun_mulai + 1:
+            raise ValueError("Rentang tahun pelajaran tidak valid.")
+
         tahun_berikutnya = (
-            f"{tahun_parts[0]}/{int(tahun_parts[1]) + 1}"
+            f"{tahun_mulai + 1}/{tahun_selesai + 1}"
         )
 
         kode_tahun_baru = f"{tahun_berikutnya}-1"
+
 
         # Untuk kelas 7 dan 8, periode tujuan wajib tersedia.
         if tingkat_sekarang < 9:
