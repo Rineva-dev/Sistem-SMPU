@@ -920,6 +920,12 @@ def naik_kelas(kelas_id):
         # ==========================================
         dasar_tahun = get_base_tahun(kode_sekarang)
 
+        current_app.logger.warning(
+            "DEBUG NAIK KELAS | kode_sekarang=%s | dasar_tahun=%s",
+            kode_sekarang,
+            dasar_tahun
+        )
+
         if kode_sekarang not in (
             f"{dasar_tahun}-1",
             f"{dasar_tahun}-2"
