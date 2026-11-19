@@ -600,6 +600,162 @@ class CatatanPerkembanganSiswa(db.Model):
 
 
 # ==========================================
+# RIWAYAT PEMBINAAN SISWA - WALI KELAS
+# ==========================================
+class RiwayatPembinaanSiswa(db.Model):
+    __tablename__ = 'riwayat_pembinaan_siswa'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    siswa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    kelas_id = db.Column(
+        db.Integer,
+        db.ForeignKey('kelas.id'),
+        nullable=False,
+        index=True
+    )
+
+    guru_id = db.Column(
+        db.String(6),
+        db.ForeignKey('guru.id'),
+        nullable=False,
+        index=True
+    )
+
+    tahun_pelajaran = db.Column(
+        db.String(20),
+        nullable=False,
+        index=True
+    )
+
+    tanggal_kejadian = db.Column(
+        db.Date,
+        nullable=False,
+        default=date.today,
+        index=True
+    )
+
+    kategori = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    tingkat_pembinaan = db.Column(
+        db.String(30),
+        nullable=False,
+        default='pembinaan_awal'
+    )
+
+    judul = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    kronologi = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    tindakan_pembinaan = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    hasil_pembinaan = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    perlu_pemantauan = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+
+    tanggal_pemantauan = db.Column(
+        db.Date,
+        nullable=True
+    )
+
+    status = db.Column(
+        db.String(30),
+        nullable=False,
+        default='dalam_pemantauan',
+        index=True
+    )
+
+    komunikasi_orang_tua = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
+    catatan_orang_tua = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    # Relasi siswa
+    siswa = db.relationship(
+        'Siswa',
+        backref=db.backref(
+            'riwayat_pembinaan',
+            lazy=True
+        )
+    )
+
+    # Relasi kelas
+    kelas = db.relationship(
+        'Kelas',
+        backref=db.backref(
+            'riwayat_pembinaan',
+            lazy=True
+        )
+    )
+
+    # Relasi guru pembina
+    guru = db.relationship(
+        'Guru',
+        backref=db.backref(
+            'riwayat_pembinaan_dibuat',
+            lazy=True
+        )
+    )
+
+    def __repr__(self):
+        return (
+            f"<RiwayatPembinaanSiswa "
+            f"Siswa:{self.siswa_id} "
+            f"Kategori:{self.kategori} "
+            f"Tahun:{self.tahun_pelajaran}>"
+        )
+
+
+
+# ==========================================
 # ✅ TABEL MATA PELAJARAN
 # ==========================================
 class MataPelajaran(db.Model):
@@ -1534,6 +1690,16 @@ class AbsensiJurnalMengajar(db.Model):
         nullable=True
     )
 
+    nilai_partisipasi = db.Column(
+        db.Numeric(5, 2),
+        nullable=True
+    )
+
+    catatan_partisipasi = db.Column(
+        db.Text,
+        nullable=True
+    )
+
     dibuat_pada = db.Column(
         db.DateTime,
         nullable=False,
@@ -1613,6 +1779,213 @@ class RiwayatSemester(db.Model):
     def __repr__(self):
         return f"<RiwayatSemester Siswa:{self.siswa_id} {self.tahun_pelajaran}-{self.semester}>"
     
+
+# ==========================================
+# SISTEM PENILAIAN AKADEMIK
+# ==========================================
+
+class Penilaian(db.Model):
+    __tablename__ = 'penilaian'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    jurnal_id = db.Column(
+        db.Integer,
+        db.ForeignKey('jurnal_mengajar.id'),
+        nullable=True,
+        unique=True,
+        index=True
+    )
+
+    jurnal = db.relationship(
+        'JurnalMengajar',
+        backref=db.backref('penilaian_terkait', uselist=False)
+    )
+
+    bentuk_tugas = db.Column(
+        db.String(20),
+        nullable=True
+    )
+
+    pengaturan_mapel_kelas_id = db.Column(
+        db.Integer,
+        db.ForeignKey('pengaturan_mapel_kelas.id'),
+        nullable=False,
+        index=True
+    )
+
+    guru_id = db.Column(
+        db.String(6),
+        db.ForeignKey('guru.id'),
+        nullable=False,
+        index=True
+    )
+
+    tahun_pelajaran = db.Column(
+        db.String(30),
+        nullable=False,
+        index=True
+    )
+
+    # tugas, formatif, sumatif, pts, pas, praktik, proyek, dll.
+    jenis = db.Column(
+        db.String(30),
+        nullable=False
+    )
+
+    judul = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    deskripsi = db.Column(db.Text, nullable=True)
+
+    tanggal = db.Column(
+        db.Date,
+        nullable=False,
+        default=date.today
+    )
+
+    nilai_maksimal = db.Column(
+        db.Numeric(7, 2),
+        nullable=False,
+        default=100
+    )
+
+    # Bobot penilaian terhadap nilai akhir (persentase)
+    bobot = db.Column(
+        db.Numeric(5, 2),
+        nullable=False,
+        default=0
+    )
+
+    # draft / aktif / ditutup
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default='draft',
+        index=True
+    )
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    pengaturan_mapel_kelas = db.relationship(
+        'PengaturanMapelKelas',
+        backref=db.backref('daftar_penilaian', lazy=True)
+    )
+
+    guru = db.relationship(
+        'Guru',
+        backref=db.backref('penilaian_dibuat', lazy=True)
+    )
+
+    daftar_nilai = db.relationship(
+        'NilaiSiswa',
+        back_populates='penilaian',
+        cascade='all, delete-orphan',
+        lazy='selectin'
+    )
+
+    __table_args__ = (
+        db.CheckConstraint(
+            'nilai_maksimal > 0',
+            name='ck_penilaian_nilai_maksimal'
+        ),
+        db.CheckConstraint(
+            'bobot >= 0 AND bobot <= 100',
+            name='ck_penilaian_bobot'
+        ),
+        db.CheckConstraint(
+            "status IN ('draft', 'aktif', 'ditutup')",
+            name='ck_penilaian_status'
+        ),
+    )
+
+    def __repr__(self):
+        return f"<Penilaian {self.judul} - {self.tahun_pelajaran}>"
+
+
+class NilaiSiswa(db.Model):
+    __tablename__ = 'nilai_siswa'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+
+    penilaian_id = db.Column(
+        db.Integer,
+        db.ForeignKey('penilaian.id'),
+        nullable=False,
+        index=True
+    )
+
+    siswa_id = db.Column(
+        db.Integer,
+        db.ForeignKey('siswa.id'),
+        nullable=False,
+        index=True
+    )
+
+    nilai = db.Column(
+        db.Numeric(7, 2),
+        nullable=True
+    )
+
+    keterangan = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    dibuat_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    diperbarui_pada = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    penilaian = db.relationship(
+        'Penilaian',
+        back_populates='daftar_nilai'
+    )
+
+    siswa = db.relationship(
+        'Siswa',
+        backref=db.backref(
+            'daftar_nilai_akademik',
+            lazy=True
+        )
+    )
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            'penilaian_id',
+            'siswa_id',
+            name='uq_nilai_penilaian_siswa'
+        ),
+    )
+
+    def __repr__(self):
+        return f"<NilaiSiswa {self.siswa_id} - Penilaian {self.penilaian_id}>"
+
 
 class PengajuanPembayaran(db.Model):
     __tablename__ = 'pengajuan_pembayaran'

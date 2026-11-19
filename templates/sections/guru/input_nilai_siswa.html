@@ -1,0 +1,222 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/input_nilai.css') }}">
+
+<div class="nilai-page">
+
+    <section class="nilai-hero">
+        <div class="nilai-hero-content">
+            <div class="nilai-eyebrow">
+                <span class="nilai-eyebrow-dot"></span>
+                STUDENT GRADING WORKSPACE
+            </div>
+
+            <h1>Input Nilai Siswa</h1>
+
+            <p>
+                Masukkan dan perbarui nilai siswa untuk komponen
+                penilaian yang dipilih.
+            </p>
+
+            <div class="nilai-hero-meta">
+                <span>
+                    <i class="fas fa-book"></i>
+                    {{ penugasan.mata_pelajaran.nama_pelajaran }}
+                </span>
+                <span>
+                    <i class="fas fa-users"></i>
+                    {{ penugasan.kelas.nama_kelas }}
+                </span>
+                <span>
+                    <i class="fas fa-calendar"></i>
+                    {{ tahun_aktif.nama }}
+                </span>
+            </div>
+        </div>
+
+        <div class="nilai-hero-icon">
+            <i class="fas fa-marker"></i>
+        </div>
+    </section>
+
+    <a href="{{ url_for(
+        'input_nilai_guru.detail_penugasan',
+        penugasan_id=penugasan.id
+    ) }}" class="nilai-back-link">
+        <i class="fas fa-arrow-left"></i>
+        Kembali ke Daftar Penilaian
+    </a>
+
+    <section class="nilai-section">
+
+        <div class="nilai-section-header">
+            <div>
+                <span class="nilai-section-eyebrow">
+                    ASSESSMENT DETAILS
+                </span>
+                <h2>{{ penilaian.judul }}</h2>
+                <p>
+                    {{ penilaian.jenis|replace('_', ' ')|upper }}
+                    · {{ penilaian.tanggal.strftime('%d-%m-%Y') }}
+                </p>
+            </div>
+
+            <span class="assignment-status">
+                <span></span>
+                {{ penilaian.status|capitalize }}
+            </span>
+        </div>
+
+        <div class="nilai-stats">
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <span>Total Siswa</span>
+                    <strong>{{ daftar_siswa|length }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon purple">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <span>Nilai Maksimal</span>
+                    <strong>{{ penilaian.nilai_maksimal }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <span>Sudah Dinilai</span>
+                    <strong>
+                        {{ nilai_map.values()|selectattr('nilai', 'ne', none)|list|length }}
+                    </strong>
+                </div>
+            </div>
+
+        </div>
+
+        {% if daftar_siswa %}
+
+        <form method="POST">
+
+            <div class="nilai-table-wrapper">
+
+                <table class="nilai-table">
+
+                    <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>IDENTITAS SISWA</th>
+                            <th>NIS</th>
+                            <th>NILAI</th>
+                            <th>KETERANGAN</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for siswa in daftar_siswa %}
+
+                        {% set record = nilai_map.get(siswa.id) %}
+
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td>
+                                <strong>{{ siswa.nama }}</strong>
+                            </td>
+
+                            <td>{{ siswa.nis }}</td>
+
+                            <td>
+                                <input
+                                    type="number"
+                                    class="nilai-score-input"
+                                    name="nilai_{{ siswa.id }}"
+                                    min="0"
+                                    max="{{ penilaian.nilai_maksimal }}"
+                                    step="0.01"
+                                    value="{{ record.nilai if record and record.nilai is not none else '' }}"
+                                    placeholder="Belum dinilai"
+                                    {% if penilaian.status == 'ditutup' %}disabled{% endif %}>
+                            </td>
+
+                            <td>
+                                {% if record and record.nilai is not none %}
+                                    <span class="nilai-filled-status">
+                                        <i class="fas fa-check-circle"></i>
+                                        Sudah dinilai
+                                    </span>
+                                {% else %}
+                                    <span class="nilai-pending-status">
+                                        Belum dinilai
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% if penilaian.status != 'ditutup' %}
+
+            <div class="nilai-form-actions">
+                <a href="{{ url_for(
+                    'input_nilai_guru.detail_penugasan',
+                    penugasan_id=penugasan.id
+                ) }}">
+                    Batal
+                </a>
+
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Simpan Semua Nilai
+                </button>
+            </div>
+
+            {% else %}
+
+            <p class="nilai-closed-notice">
+                <i class="fas fa-lock"></i>
+                Penilaian sudah ditutup. Nilai hanya dapat dilihat.
+            </p>
+
+            {% endif %}
+
+        </form>
+
+        {% else %}
+
+        <div class="nilai-empty">
+            <i class="fas fa-users-slash"></i>
+            <h3>Belum Ada Siswa</h3>
+            <p>
+                Tidak ditemukan siswa pada kelas ini untuk
+                semester {{ tahun_aktif.nama }}.
+            </p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

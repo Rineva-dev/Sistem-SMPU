@@ -1,0 +1,157 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/input_nilai.css') }}">
+
+<div class="nilai-page">
+
+    <section class="nilai-hero">
+        <div class="nilai-hero-content">
+            <div class="nilai-eyebrow">
+                <span class="nilai-eyebrow-dot"></span>
+                ASSESSMENT MANAGEMENT
+            </div>
+
+            <h1>Tambah Penilaian</h1>
+
+            <p>
+                Buat komponen penilaian untuk siswa pada kelas
+                dan mata pelajaran yang Anda ampu.
+            </p>
+
+            <div class="nilai-hero-meta">
+                <span>
+                    <i class="fas fa-book"></i>
+                    {{ penugasan.mata_pelajaran.nama_pelajaran }}
+                </span>
+                <span>
+                    <i class="fas fa-users"></i>
+                    {{ penugasan.kelas.nama_kelas }}
+                </span>
+                <span>
+                    <i class="fas fa-calendar"></i>
+                    {{ tahun_aktif.nama }}
+                </span>
+            </div>
+        </div>
+
+        <div class="nilai-hero-icon">
+            <i class="fas fa-file-circle-plus"></i>
+        </div>
+    </section>
+
+    <a href="{{ url_for(
+        'input_nilai_guru.detail_penugasan',
+        penugasan_id=penugasan.id
+    ) }}" class="nilai-back-link">
+        <i class="fas fa-arrow-left"></i>
+        Kembali ke Detail Penugasan
+    </a>
+
+    <section class="nilai-section">
+
+        <div class="nilai-section-header">
+            <div>
+                <span class="nilai-section-eyebrow">
+                    NEW ASSESSMENT
+                </span>
+                <h2>Informasi Komponen Penilaian</h2>
+                <p>Lengkapi informasi di bawah ini.</p>
+            </div>
+        </div>
+
+        <form method="POST">
+
+            <div class="nilai-form-grid">
+
+                <div class="nilai-form-group">
+                    <label>Jenis Penilaian</label>
+                    <select name="jenis" required>
+                        <option value="">Pilih jenis penilaian</option>
+                        {% for kode, nama in jenis_valid.items() %}
+                        <option value="{{ kode }}"
+                            {% if request.form.get('jenis') == kode %}selected{% endif %}>
+                            {{ nama }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="nilai-form-group">
+                    <label>Judul Penilaian</label>
+                    <input
+                        type="text"
+                        name="judul"
+                        maxlength="150"
+                        value="{{ request.form.get('judul', '') }}"
+                        placeholder="Contoh: Tugas Bab 1"
+                        required>
+                </div>
+
+                <div class="nilai-form-group">
+                    <label>Tanggal Penilaian</label>
+                    <input
+                        type="date"
+                        name="tanggal"
+                        value="{{ request.form.get('tanggal', tanggal_default) }}"
+                        required>
+                </div>
+
+                <div class="nilai-form-group">
+                    <label>Nilai Maksimal</label>
+                    <input
+                        type="number"
+                        name="nilai_maksimal"
+                        min="0.01"
+                        step="0.01"
+                        value="{{ request.form.get('nilai_maksimal', '100') }}"
+                        required>
+                </div>
+
+                <div class="nilai-form-group">
+                    <label>Bobot Penilaian (%)</label>
+                    <input
+                        type="number"
+                        name="bobot"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        value="{{ request.form.get('bobot', '0') }}"
+                        required>
+                    <small>Bobot komponen terhadap nilai akhir.</small>
+                </div>
+
+                <div class="nilai-form-group nilai-form-full">
+                    <label>Deskripsi / Keterangan</label>
+                    <textarea
+                        name="deskripsi"
+                        rows="4"
+                        placeholder="Tuliskan keterangan penilaian (opsional)">{{ request.form.get('deskripsi', '') }}</textarea>
+                </div>
+
+            </div>
+
+            <div class="nilai-form-actions">
+                <a href="{{ url_for(
+                    'input_nilai_guru.detail_penugasan',
+                    penugasan_id=penugasan.id
+                ) }}">
+                    Batal
+                </a>
+
+                <button type="submit">
+                    <i class="fas fa-save"></i>
+                    Simpan Komponen
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+{% endblock %}

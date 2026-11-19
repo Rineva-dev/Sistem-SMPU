@@ -264,7 +264,9 @@
                             <th class="as-col-student">IDENTITAS SISWA</th>
                             <th class="as-col-gender">L/P</th>
                             <th class="as-col-status">STATUS KEHADIRAN</th>
-                            <th class="as-col-note">KETERANGAN</th>
+                            <th class="as-col-note">KETERANGAN ABSENSI</th>
+                            <th class="as-col-participation">NILAI PARTISIPASI</th>
+                            <th class="as-col-participation-note">CATATAN PARTISIPASI</th>
                         </tr>
                     </thead>
 
@@ -349,20 +351,49 @@
                                 </div>
                             </td>
 
+                            <!-- KETERANGAN ABSENSI -->
                             <td>
                                 <input type="text"
-                                       class="as-note-input"
-                                       name="keterangan_{{ siswa.id }}"
-                                       value="{{ siswa.keterangan }}"
-                                       placeholder="Tambahkan keterangan..."
-                                       maxlength="255">
+                                    class="as-note-input"
+                                    name="keterangan_{{ siswa.id }}"
+                                    value="{{ siswa.keterangan }}"
+                                    placeholder="Keterangan absensi..."
+                                    maxlength="255">
+                            </td>
+
+                            <!-- NILAI PARTISIPASI -->
+                            <td>
+                                <div class="as-participation-wrap">
+                                    <input type="number"
+                                        class="as-participation-input"
+                                        name="partisipasi_{{ siswa.id }}"
+                                        value="{{ siswa.nilai_partisipasi if siswa.nilai_partisipasi is not none else '' }}"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        placeholder="0–100"
+                                        {% if siswa.status_absensi != 'hadir' %}disabled{% endif %}>
+
+                                    <span class="as-participation-suffix">/ 100</span>
+                                </div>
+                            </td>
+
+                            <!-- CATATAN PARTISIPASI -->
+                            <td>
+                                <input type="text"
+                                    class="as-participation-note"
+                                    name="catatan_partisipasi_{{ siswa.id }}"
+                                    value="{{ siswa.catatan_partisipasi or '' }}"
+                                    placeholder="Catatan keaktifan..."
+                                    maxlength="500"
+                                    {% if siswa.status_absensi != 'hadir' %}disabled{% endif %}>
                             </td>
 
                         </tr>
 
                         {% else %}
                         <tr>
-                            <td colspan="5">
+                            <td colspan="7">
                                 <div class="as-empty">
                                     <div class="as-empty-icon">
                                         <i class="fa-solid fa-users-slash"></i>

@@ -649,6 +649,137 @@
                         </div>
                     </section>
 
+                    <!-- 04 PENUGASAN PERTEMUAN -->
+                    <section class="tjm-studio-section tjm-task-section">
+
+                        <div class="tjm-studio-section-heading">
+                            <div class="tjm-studio-section-number">04</div>
+                            <div>
+                                <span>ASSESSMENT & ASSIGNMENT</span>
+                                <h3>Penugasan pertemuan</h3>
+                            </div>
+                        </div>
+
+                        <div class="tjm-task-intro">
+                            <div class="tjm-task-intro-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div>
+                                <strong>Apakah ada tugas pada pertemuan ini?</strong>
+                                <p>
+                                    Tugas yang dibuat di sini akan otomatis terhubung
+                                    dengan jurnal dan muncul di halaman Input Nilai.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="tjm-task-choice">
+                            <label class="tjm-task-option">
+                                <input type="radio"
+                                    name="ada_tugas"
+                                    value="tidak"
+                                    checked>
+                                <span class="tjm-task-option-content">
+                                    <span class="tjm-task-option-icon">
+                                        <i class="fas fa-minus-circle"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Tidak ada tugas</strong>
+                                        <small>Pertemuan ini tidak memiliki penugasan.</small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="tjm-task-option">
+                                <input type="radio"
+                                    name="ada_tugas"
+                                    value="ya">
+                                <span class="tjm-task-option-content">
+                                    <span class="tjm-task-option-icon">
+                                        <i class="fas fa-clipboard-list"></i>
+                                    </span>
+                                    <span>
+                                        <strong>Ya, ada tugas</strong>
+                                        <small>Buat tugas untuk pertemuan ini.</small>
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="tjm-task-fields" id="tjmTaskFields" hidden>
+
+                            <div class="tjm-task-fields-heading">
+                                <span class="tjm-task-fields-dot"></span>
+                                DETAIL PENUGASAN
+                            </div>
+
+                            <div class="tjm-studio-field">
+                                <div class="tjm-studio-label-row">
+                                    <label for="tjmTaskJudul">
+                                        Judul tugas
+                                        <span class="tjm-studio-required">*</span>
+                                    </label>
+                                    <span>WAJIB DIISI</span>
+                                </div>
+
+                                <div class="tjm-studio-input-icon">
+                                    <i class="fas fa-file-signature"></i>
+                                    <input type="text"
+                                        id="tjmTaskJudul"
+                                        name="tugas_judul"
+                                        maxlength="255"
+                                        placeholder="Contoh: Latihan Persamaan Linear"
+                                        disabled>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-field">
+                                <div class="tjm-studio-label-row">
+                                    <label for="tjmTaskBentuk">
+                                        Bentuk pengerjaan
+                                        <span class="tjm-studio-required">*</span>
+                                    </label>
+                                    <span>WAJIB DIPILIH</span>
+                                </div>
+
+                                <div class="tjm-studio-input-icon">
+                                    <i class="fas fa-users"></i>
+                                    <select id="tjmTaskBentuk"
+                                            name="tugas_bentuk"
+                                            disabled>
+                                        <option value="">Pilih bentuk tugas</option>
+                                        <option value="individu">Individu</option>
+                                        <option value="kelompok">Kelompok</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="tjm-studio-field tjm-studio-field-last">
+                                <div class="tjm-studio-label-row">
+                                    <label for="tjmTaskDeskripsi">
+                                        Deskripsi / petunjuk tugas
+                                    </label>
+                                    <span>OPSIONAL</span>
+                                </div>
+
+                                <textarea id="tjmTaskDeskripsi"
+                                        name="tugas_deskripsi"
+                                        rows="3"
+                                        maxlength="3000"
+                                        placeholder="Tuliskan instruksi, ketentuan, atau hal yang harus dikerjakan peserta didik..."
+                                        disabled></textarea>
+                            </div>
+
+                            <div class="tjm-task-note">
+                                <i class="fas fa-circle-info"></i>
+                                <span>
+                                    Nilai tugas nantinya diinput untuk setiap siswa secara
+                                    individual, termasuk jika bentuk tugasnya kelompok.
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
                     <div class="tjm-studio-privacy-note">
                         <i class="fas fa-lock"></i>
                         <span>
@@ -3413,7 +3544,307 @@
     }
 }
 
+
+/* =========================================================
+   JOURNAL STUDIO — TASK / ASSIGNMENT SECTION
+========================================================= */
+
+#tjmJournalModal .tjm-task-section {
+    padding-top: 5px;
+}
+
+#tjmJournalModal .tjm-task-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #dceee4;
+    border-radius: 14px;
+    background: linear-gradient(125deg, #f1faf5, #f8fbf9);
+}
+
+#tjmJournalModal .tjm-task-intro-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    border-radius: 12px;
+    color: #08775b;
+    background: #dff3e8;
+    font-size: 17px;
+}
+
+#tjmJournalModal .tjm-task-intro strong {
+    display: block;
+    margin: 1px 0 5px;
+    color: #234536;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-task-intro p {
+    margin: 0;
+    color: #718278;
+    font-size: 10px;
+    line-height: 1.65;
+}
+
+/* TASK CHOICES */
+
+#tjmJournalModal .tjm-task-choice {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+}
+
+#tjmJournalModal .tjm-task-option {
+    position: relative;
+    display: block;
+    margin: 0;
+    cursor: pointer;
+}
+
+#tjmJournalModal .tjm-task-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#tjmJournalModal .tjm-task-option-content {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 76px;
+    padding: 13px;
+    border: 1px solid #e5ece7;
+    border-radius: 13px;
+    background: #fff;
+    transition: .2s ease;
+}
+
+#tjmJournalModal .tjm-task-option:hover .tjm-task-option-content {
+    border-color: #a9d5bf;
+    background: #f9fcfa;
+    transform: translateY(-1px);
+}
+
+#tjmJournalModal .tjm-task-option-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border-radius: 11px;
+    color: #819087;
+    background: #f0f4f1;
+    font-size: 15px;
+    transition: .2s ease;
+}
+
+#tjmJournalModal .tjm-task-option-content strong {
+    display: block;
+    color: #34483d;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+#tjmJournalModal .tjm-task-option-content small {
+    display: block;
+    margin-top: 4px;
+    color: #89968e;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+/* SELECTED STATE */
+
+#tjmJournalModal .tjm-task-option input:checked + .tjm-task-option-content {
+    border-color: #15936d;
+    background: linear-gradient(135deg, #f0faf4, #f8fcf9);
+    box-shadow: 0 0 0 2px rgba(21,147,109,.08);
+}
+
+#tjmJournalModal .tjm-task-option input:checked + .tjm-task-option-content
+.tjm-task-option-icon {
+    color: #08775b;
+    background: #d9f1e4;
+}
+
+#tjmJournalModal .tjm-task-option input:checked + .tjm-task-option-content strong {
+    color: #08775b;
+}
+
+#tjmJournalModal .tjm-task-option input:focus-visible + .tjm-task-option-content {
+    outline: 3px solid rgba(8,119,91,.18);
+    outline-offset: 3px;
+}
+
+/* TASK DETAIL PANEL */
+
+#tjmJournalModal .tjm-task-fields {
+    margin-top: 15px;
+    padding: 17px;
+    border: 1px solid #dcebe2;
+    border-radius: 15px;
+    background: #fbfdfb;
+    animation: tjmTaskReveal .25s ease both;
+}
+
+#tjmJournalModal .tjm-task-fields[hidden] {
+    display: none !important;
+}
+
+@keyframes tjmTaskReveal {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#tjmJournalModal .tjm-task-fields-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 17px;
+    color: #08775b;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.1px;
+}
+
+#tjmJournalModal .tjm-task-fields-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #13a477;
+    box-shadow: 0 0 0 4px rgba(19,164,119,.10);
+}
+
+#tjmJournalModal .tjm-task-fields .tjm-studio-field + .tjm-studio-field {
+    margin-top: 15px;
+}
+
+/* TASK INPUT */
+
+#tjmJournalModal #tjmTaskJudul,
+#tjmJournalModal #tjmTaskBentuk {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    border: 0;
+    outline: 0;
+    color: #34483d;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+#tjmJournalModal #tjmTaskJudul::placeholder {
+    color: #a5b0a9;
+    font-weight: 400;
+}
+
+#tjmJournalModal #tjmTaskBentuk {
+    cursor: pointer;
+}
+
+#tjmJournalModal #tjmTaskBentuk:invalid {
+    color: #9aa69e;
+}
+
+#tjmJournalModal #tjmTaskDeskripsi {
+    min-height: 85px;
+}
+
+/* TASK NOTE */
+
+#tjmJournalModal .tjm-task-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 14px;
+    padding: 11px 12px;
+    border: 1px solid #e7eee9;
+    border-radius: 10px;
+    color: #718278;
+    background: #f4f8f5;
+    font-size: 9px;
+    line-height: 1.65;
+}
+
+#tjmJournalModal .tjm-task-note i {
+    margin-top: 2px;
+    color: #0b9670;
+    font-size: 12px;
+}
+
+#tjmJournalModal .tjm-task-note span {
+    flex: 1;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    #tjmJournalModal .tjm-task-intro {
+        gap: 10px;
+        padding: 13px;
+    }
+
+    #tjmJournalModal .tjm-task-intro-icon {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        font-size: 14px;
+    }
+
+    #tjmJournalModal .tjm-task-intro strong {
+        font-size: 10px;
+    }
+
+    #tjmJournalModal .tjm-task-intro p {
+        font-size: 9px;
+    }
+
+    #tjmJournalModal .tjm-task-choice {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    #tjmJournalModal .tjm-task-option-content {
+        min-height: 65px;
+        padding: 10px 12px;
+    }
+
+    #tjmJournalModal .tjm-task-fields {
+        padding: 13px;
+    }
+}
+
+@media (max-width: 380px) {
+    #tjmJournalModal .tjm-task-option-content strong {
+        font-size: 10px;
+    }
+
+    #tjmJournalModal .tjm-task-option-content small {
+        font-size: 8px;
+    }
+}
+
+select#tjmTaskBentuk {
+    padding-left: 36px;
+}
+
 </style>
+
 <script>
 /* =====================================================
    TUNGGU BOOTSTRAP SEBELUM INISIALISASI HALAMAN
@@ -3610,6 +4041,12 @@ let tjmBootstrapAttempts = 0;
                 catatan: document.getElementById('tjmJournalCatatan'),
 
                 materiCount: document.getElementById('tjmMateriCount'),
+
+                taskFields: document.getElementById('tjmTaskFields'),
+                taskJudul: document.getElementById('tjmTaskJudul'),
+                taskBentuk: document.getElementById('tjmTaskBentuk'),
+                taskDeskripsi: document.getElementById('tjmTaskDeskripsi'),
+
                 submit: document.getElementById('tjmJournalSubmit')
             };
 
@@ -3626,6 +4063,10 @@ let tjmBootstrapAttempts = 0;
                 'timeError',
                 'materi',
                 'materiCount',
+                'taskFields',
+                'taskJudul',
+                'taskBentuk',
+                'taskDeskripsi',
                 'submit'
             ];
 
@@ -3734,11 +4175,38 @@ let tjmBootstrapAttempts = 0;
                 }
 
                 /* -----------------------------------------
-                   COUNTER MATERI
+                    COUNTER MATERI
                 ----------------------------------------- */
                 function updateMateriCount() {
                     el.materiCount.textContent = el.materi.value.length;
                 }
+
+                /* -----------------------------------------
+                PILIHAN ADA / TIDAK ADA TUGAS
+                ----------------------------------------- */
+                function updateTaskFields() {
+                    const pilihan = form.querySelector(
+                        'input[name="ada_tugas"]:checked'
+                    )?.value || 'tidak';
+
+                    const adaTugas = pilihan === 'ya';
+
+                    el.taskFields.hidden = !adaTugas;
+
+                    el.taskJudul.disabled = !adaTugas;
+                    el.taskBentuk.disabled = !adaTugas;
+                    el.taskDeskripsi.disabled = !adaTugas;
+
+                    el.taskJudul.required = adaTugas;
+                    el.taskBentuk.required = adaTugas;
+
+                    if (!adaTugas) {
+                        el.taskJudul.value = '';
+                        el.taskBentuk.value = '';
+                        el.taskDeskripsi.value = '';
+                    }
+                }
+
 
                 /* -----------------------------------------
                    RESET MODAL
@@ -3765,6 +4233,7 @@ let tjmBootstrapAttempts = 0;
 
                     updateSelectedDay();
                     updateMateriCount();
+                    updateTaskFields();
 
                     el.submit.disabled = false;
                     el.submit.innerHTML = submitDefault;
@@ -3855,6 +4324,13 @@ let tjmBootstrapAttempts = 0;
                 );
 
                 /* -----------------------------------------
+                EVENT PILIHAN PENUGASAN
+                ----------------------------------------- */
+                form.querySelectorAll('input[name="ada_tugas"]').forEach(radio => {
+                    radio.addEventListener('change', updateTaskFields);
+                });
+
+                /* -----------------------------------------
                    SUBMIT JURNAL
                 ----------------------------------------- */
                 form.addEventListener('submit', event => {
@@ -3880,6 +4356,26 @@ let tjmBootstrapAttempts = 0;
                         el.materi.focus();
                         return;
                     }
+
+
+                    const pilihanTugas = form.querySelector(
+                        'input[name="ada_tugas"]:checked'
+                    )?.value || 'tidak';
+
+                    if (pilihanTugas === 'ya') {
+                        if (!el.taskJudul.value.trim()) {
+                            event.preventDefault();
+                            el.taskJudul.focus();
+                            return;
+                        }
+
+                        if (!el.taskBentuk.value) {
+                            event.preventDefault();
+                            el.taskBentuk.focus();
+                            return;
+                        }
+                    }
+
 
                     if (!updateDuration()) {
                         event.preventDefault();

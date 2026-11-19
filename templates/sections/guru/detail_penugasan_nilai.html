@@ -1,0 +1,264 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/input_nilai.css') }}">
+
+<div class="nilai-page">
+
+    <!-- HEADER -->
+    <section class="nilai-hero">
+        <div class="nilai-hero-content">
+            <div class="nilai-eyebrow">
+                <span class="nilai-eyebrow-dot"></span>
+                TEACHER ASSESSMENT WORKSPACE
+            </div>
+
+            <h1>Kelola Penilaian</h1>
+
+            <p>
+                Kelola komponen penilaian dan nilai hasil belajar
+                siswa pada kelas dan mata pelajaran ini.
+            </p>
+
+            <div class="nilai-hero-meta">
+                <span>
+                    <i class="fas fa-user-tie"></i>
+                    {{ guru.nama }}
+                </span>
+
+                <span>
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ tahun_aktif.nama }}
+                </span>
+            </div>
+        </div>
+
+        <div class="nilai-hero-icon">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+    </section>
+
+    <!-- NAVIGASI KEMBALI -->
+    <a href="{{ url_for('input_nilai_guru.index') }}"
+       class="nilai-back-link">
+        <i class="fas fa-arrow-left"></i>
+        Kembali ke Daftar Penugasan
+    </a>
+
+    <!-- INFORMASI PENUGASAN -->
+    <section class="nilai-section">
+        <div class="nilai-section-header">
+            <div>
+                <span class="nilai-section-eyebrow">
+                    ASSIGNMENT OVERVIEW
+                </span>
+                <h2>
+                    {{ penugasan.mata_pelajaran.nama_pelajaran }}
+                </h2>
+                <p>
+                    Kelas {{ penugasan.kelas.nama_kelas }}
+                </p>
+            </div>
+            <a href="{{ url_for(
+                'input_nilai_guru.tambah_penilaian',
+                penugasan_id=penugasan.id
+            ) }}" class="nilai-add-button">
+                <i class="fas fa-plus"></i>
+                Tambah Penilaian
+            </a>
+        </div>
+
+        <div class="nilai-stats">
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <span>Total Siswa</span>
+                    <strong>{{ total_siswa }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon purple">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <span>Komponen Penilaian</span>
+                    <strong>{{ daftar_penilaian|length }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon green">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <span>Alokasi Mengajar</span>
+                    <strong>{{ penugasan.jumlah_jp }} JP</strong>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DAFTAR KOMPONEN PENILAIAN -->
+    <section class="nilai-section">
+
+        <div class="nilai-section-header">
+            <div>
+                <span class="nilai-section-eyebrow">
+                    ASSESSMENT COMPONENTS
+                </span>
+                <h2>Daftar Penilaian</h2>
+                <p>
+                    Komponen penilaian yang telah dibuat untuk
+                    kelas dan mata pelajaran ini.
+                </p>
+            </div>
+        </div>
+
+        {% if daftar_penilaian %}
+
+            <div class="nilai-assignment-grid">
+
+                {% for item in daftar_penilaian %}
+
+                <article class="nilai-assignment-card">
+
+                    <div class="assignment-top">
+                        <div class="assignment-icon">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+
+                        <span class="assignment-status">
+                            <span></span>
+                            {{ item.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <div class="assignment-info">
+
+                        <span class="assignment-label">
+                            {{ item.jenis|replace('_', ' ')|upper }}
+                        </span>
+
+                        <h3>{{ item.judul }}</h3>
+
+                        {% if item.jurnal %}
+
+                            <div class="assignment-journal-context">
+
+                                <div class="journal-context-heading">
+                                    <i class="fas fa-book-open"></i>
+                                    SUMBER TUGAS: JURNAL MENGAJAR
+                                </div>
+
+                                <div class="journal-context-item">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>
+                                        Pertemuan
+                                        {{ nomor_pertemuan_map.get(item.jurnal_id, '-') }}
+                                    </span>
+                                </div>
+
+                                <div class="journal-context-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>
+                                        {{ item.jurnal.tanggal.strftime('%d-%m-%Y') }}
+                                    </span>
+                                </div>
+
+                                {% if item.jurnal.materi %}
+                                <div class="journal-context-material">
+                                    <small>Materi Pembelajaran</small>
+                                    <p>{{ item.jurnal.materi }}</p>
+                                </div>
+                                {% endif %}
+
+                                {% if item.bentuk_tugas %}
+                                <span class="journal-task-type">
+                                    <i class="fas fa-users"></i>
+                                    {{ item.bentuk_tugas|capitalize }}
+                                </span>
+                                {% endif %}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="assignment-class">
+                                <i class="fas fa-calendar"></i>
+                                {{ item.tanggal.strftime('%d-%m-%Y') }}
+                            </div>
+
+                        {% endif %}
+
+                        {% if item.deskripsi %}
+                        <p>{{ item.deskripsi }}</p>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="assignment-footer">
+                        <div>
+                            <small>Nilai Maksimal</small>
+                            <strong>{{ item.nilai_maksimal }}</strong>
+                        </div>
+
+                        {% if item.jenis != 'tugas' %}
+                        <div>
+                            <small>Bobot</small>
+                            <strong>{{ item.bobot }}%</strong>
+                        </div>
+                        {% else %}
+                        <div>
+                            <small>Komponen</small>
+                            <strong>Tugas</strong>
+                        </div>
+                        {% endif %}
+
+                        <a href="{{ url_for('input_nilai_guru.input_nilai_siswa', penilaian_id=item.id) }}" class="assignment-next">
+
+                            {% if item.status == 'ditutup' %}
+                                Lihat Nilai
+                            {% else %}
+                                Input Nilai
+                            {% endif %}
+
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="nilai-empty">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Belum Ada Komponen Penilaian</h3>
+                <p>
+                    Anda belum membuat komponen penilaian untuk
+                    kelas dan mata pelajaran ini.
+                </p>
+                <span>
+                    Pada tahap berikutnya, Anda dapat menambahkan
+                    tugas, kuis, praktik, PTS, PAS, dan komponen lainnya.
+                </span>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,699 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="rp-page">
+
+    <!-- HERO -->
+    <section class="rp-hero">
+        <div class="rp-hero-content">
+            <div class="rp-eyebrow">
+                <span class="rp-eyebrow-dot"></span>
+                WALI KELAS WORKSPACE
+            </div>
+
+            <h1>Riwayat Pembinaan Siswa</h1>
+
+            <p>
+                Dokumentasikan proses pembinaan, tindakan pendampingan,
+                dan perkembangan perilaku siswa secara terstruktur.
+            </p>
+
+            <div class="rp-hero-meta">
+                <span>
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ tahun_aktif.kode }}
+                </span>
+                <span>
+                    <i class="fas fa-user-tie"></i>
+                    {{ guru.nama }}
+                </span>
+            </div>
+        </div>
+
+        <div class="rp-hero-decoration">
+            <div class="rp-decoration-circle rp-circle-one"></div>
+            <div class="rp-decoration-circle rp-circle-two"></div>
+            <div class="rp-decoration-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- STATISTIK -->
+    <section class="rp-stats">
+
+        <div class="rp-stat-card">
+            <div class="rp-stat-top">
+                <div class="rp-stat-icon rp-icon-blue">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <span class="rp-stat-caption">Total Catatan</span>
+            </div>
+            <div class="rp-stat-number">
+                {{ statistik.total }}
+            </div>
+            <div class="rp-stat-label">Riwayat pembinaan tercatat</div>
+        </div>
+
+        <div class="rp-stat-card">
+            <div class="rp-stat-top">
+                <div class="rp-stat-icon rp-icon-orange">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span class="rp-stat-caption">Pemantauan</span>
+            </div>
+            <div class="rp-stat-number">
+                {{ statistik.pemantauan }}
+            </div>
+            <div class="rp-stat-label">Masih dalam pemantauan</div>
+        </div>
+
+        <div class="rp-stat-card">
+            <div class="rp-stat-top">
+                <div class="rp-stat-icon rp-icon-green">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="rp-stat-caption">Membaik</span>
+            </div>
+            <div class="rp-stat-number">
+                {{ statistik.membaik }}
+            </div>
+            <div class="rp-stat-label">Menunjukkan perkembangan</div>
+        </div>
+
+        <div class="rp-stat-card">
+            <div class="rp-stat-top">
+                <div class="rp-stat-icon rp-icon-purple">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <span class="rp-stat-caption">Selesai</span>
+            </div>
+            <div class="rp-stat-number">
+                {{ statistik.selesai }}
+            </div>
+            <div class="rp-stat-label">Pembinaan telah diselesaikan</div>
+        </div>
+
+    </section>
+
+
+    <!-- WORKSPACE -->
+    <section class="rp-workspace">
+
+        <div class="rp-workspace-header">
+            <div>
+                <div class="rp-section-label">STUDENT GUIDANCE MANAGEMENT</div>
+                <h2>Daftar Riwayat Pembinaan</h2>
+                <p>Kelola dokumentasi pembinaan siswa di kelas yang Anda ampu.</p>
+            </div>
+
+            <button type="button" class="rp-primary-btn"
+                    onclick="rpBukaTambah()">
+                <i class="fas fa-plus"></i>
+                <span>Tambah Pembinaan</span>
+            </button>
+        </div>
+
+
+        <!-- FILTER -->
+        <form method="GET"
+              action="{{ url_for('riwayat_pembinaan.index') }}"
+              class="rp-filter">
+
+            <div class="rp-search">
+                <i class="fas fa-search"></i>
+                <input type="text"
+                       name="q"
+                       value="{{ pencarian }}"
+                       placeholder="Cari nama siswa, judul, atau kronologi...">
+            </div>
+
+            <select name="kelas" class="rp-select">
+                <option value="">Semua Kelas</option>
+                {% for kelas in daftar_kelas %}
+                <option value="{{ kelas.id }}"
+                    {% if filter_kelas|string == kelas.id|string %}selected{% endif %}>
+                    {{ kelas.nama_kelas }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="kategori" class="rp-select">
+                <option value="">Semua Kategori</option>
+                <option value="kedisiplinan" {% if filter_kategori == 'kedisiplinan' %}selected{% endif %}>Kedisiplinan</option>
+                <option value="akademik" {% if filter_kategori == 'akademik' %}selected{% endif %}>Akademik</option>
+                <option value="perilaku" {% if filter_kategori == 'perilaku' %}selected{% endif %}>Perilaku</option>
+                <option value="sosial" {% if filter_kategori == 'sosial' %}selected{% endif %}>Sosial</option>
+                <option value="kehadiran" {% if filter_kategori == 'kehadiran' %}selected{% endif %}>Kehadiran</option>
+                <option value="lainnya" {% if filter_kategori == 'lainnya' %}selected{% endif %}>Lainnya</option>
+            </select>
+
+            <select name="status" class="rp-select">
+                <option value="">Semua Status</option>
+                <option value="dalam_pemantauan" {% if filter_status == 'dalam_pemantauan' %}selected{% endif %}>Dalam Pemantauan</option>
+                <option value="membaik" {% if filter_status == 'membaik' %}selected{% endif %}>Membaik</option>
+                <option value="selesai" {% if filter_status == 'selesai' %}selected{% endif %}>Selesai</option>
+                <option value="dirujuk_bk" {% if filter_status == 'dirujuk_bk' %}selected{% endif %}>Dirujuk BK</option>
+            </select>
+
+            <button type="submit" class="rp-filter-btn">
+                <i class="fas fa-filter"></i>
+                Filter
+            </button>
+
+            <a href="{{ url_for('riwayat_pembinaan.index') }}"
+               class="rp-reset-btn" title="Reset filter">
+                <i class="fas fa-undo"></i>
+            </a>
+        </form>
+
+
+        <!-- TABLE -->
+        <div class="rp-table-wrapper">
+
+            <div class="rp-table-heading">
+                <div>
+                    <h3>Riwayat Pembinaan</h3>
+                    <span>{{ daftar_pembinaan|length }} catatan ditemukan</span>
+                </div>
+
+                <div class="rp-live-indicator">
+                    <span></span>
+                    DATA TAHUN PELAJARAN AKTIF
+                </div>
+            </div>
+
+            <div class="rp-table-scroll">
+                <table class="rp-table">
+                    <thead>
+                        <tr>
+                            <th>SISWA</th>
+                            <th>TANGGAL</th>
+                            <th>KATEGORI</th>
+                            <th>PEMBINAAN</th>
+                            <th>STATUS</th>
+                            <th>PEMANTAUAN</th>
+                            <th class="rp-action-heading">AKSI</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in daftar_pembinaan %}
+
+                        <tr>
+                            <td>
+                                <div class="rp-student-cell">
+                                    <div class="rp-avatar">
+                                        {{ item.siswa.nama[:1]|upper }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ item.siswa.nama }}</strong>
+                                        <small>{{ item.kelas.nama_kelas }}</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="rp-date">
+                                    <strong>{{ item.tanggal_kejadian.strftime('%d/%m/%Y') }}</strong>
+                                    <small>Tanggal kejadian</small>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="rp-category rp-category-{{ item.kategori }}">
+                                    {% if item.kategori == 'kedisiplinan' %}
+                                        Kedisiplinan
+                                    {% elif item.kategori == 'akademik' %}
+                                        Akademik
+                                    {% elif item.kategori == 'perilaku' %}
+                                        Perilaku
+                                    {% elif item.kategori == 'sosial' %}
+                                        Sosial
+                                    {% elif item.kategori == 'kehadiran' %}
+                                        Kehadiran
+                                    {% else %}
+                                        Lainnya
+                                    {% endif %}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="rp-note-cell">
+                                    <strong>{{ item.judul }}</strong>
+                                    <small>
+                                        {% if item.tingkat_pembinaan == 'pembinaan_awal' %}
+                                            Pembinaan Awal
+                                        {% elif item.tingkat_pembinaan == 'pembinaan_lanjutan' %}
+                                            Pembinaan Lanjutan
+                                        {% else %}
+                                            Pembinaan Khusus
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if item.status == 'dalam_pemantauan' %}
+                                    <span class="rp-status rp-status-pending">Dalam Pemantauan</span>
+                                {% elif item.status == 'membaik' %}
+                                    <span class="rp-status rp-status-progress">Membaik</span>
+                                {% elif item.status == 'selesai' %}
+                                    <span class="rp-status rp-status-done">Selesai</span>
+                                {% else %}
+                                    <span class="rp-status rp-status-referred">Dirujuk BK</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.perlu_pemantauan %}
+                                    <div class="rp-followup">
+                                        <i class="fas fa-calendar-check"></i>
+                                        {% if item.tanggal_pemantauan %}
+                                            {{ item.tanggal_pemantauan.strftime('%d/%m/%Y') }}
+                                        {% else %}
+                                            Terjadwal
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="rp-no-followup">Tidak diperlukan</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="rp-actions">
+
+                                    <button type="button"
+                                            class="rp-action-btn rp-view-btn"
+                                            title="Lihat detail"
+                                            onclick="rpLihatDetail(this)"
+                                            data-nama="{{ item.siswa.nama }}"
+                                            data-kelas="{{ item.kelas.nama_kelas }}"
+                                            data-tanggal="{{ item.tanggal_kejadian.strftime('%d/%m/%Y') }}"
+                                            data-kategori="{{ item.kategori }}"
+                                            data-tingkat="{{ item.tingkat_pembinaan }}"
+                                            data-judul="{{ item.judul }}"
+                                            data-kronologi="{{ item.kronologi }}"
+                                            data-tindakan="{{ item.tindakan_pembinaan }}"
+                                            data-hasil="{{ item.hasil_pembinaan or '' }}"
+                                            data-pemantauan="{{ '1' if item.perlu_pemantauan else '0' }}"
+                                            data-tanggal-pemantauan="{{ item.tanggal_pemantauan.strftime('%d/%m/%Y') if item.tanggal_pemantauan else '' }}"
+                                            data-status="{{ item.status }}"
+                                            data-komunikasi="{{ '1' if item.komunikasi_orang_tua else '0' }}"
+                                            data-catatan-orang-tua="{{ item.catatan_orang_tua or '' }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="rp-action-btn rp-edit-btn"
+                                            title="Edit"
+                                            onclick="rpBukaEdit(this)"
+                                            data-id="{{ item.id }}"
+                                            data-siswa="{{ item.siswa_id }}"
+                                            data-kelas="{{ item.kelas_id }}"
+                                            data-tanggal="{{ item.tanggal_kejadian.isoformat() }}"
+                                            data-kategori="{{ item.kategori }}"
+                                            data-tingkat="{{ item.tingkat_pembinaan }}"
+                                            data-judul="{{ item.judul }}"
+                                            data-kronologi="{{ item.kronologi }}"
+                                            data-tindakan="{{ item.tindakan_pembinaan }}"
+                                            data-hasil="{{ item.hasil_pembinaan or '' }}"
+                                            data-pemantauan="{{ '1' if item.perlu_pemantauan else '0' }}"
+                                            data-tanggal-pemantauan="{{ item.tanggal_pemantauan.isoformat() if item.tanggal_pemantauan else '' }}"
+                                            data-status="{{ item.status }}"
+                                            data-komunikasi="{{ '1' if item.komunikasi_orang_tua else '0' }}"
+                                            data-catatan-orang-tua="{{ item.catatan_orang_tua or '' }}">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="rp-action-btn rp-delete-btn"
+                                            title="Hapus"
+                                            onclick="rpKonfirmasiHapus('{{ item.id }}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% else %}
+                        <tr>
+                            <td colspan="7">
+                                <div class="rp-empty">
+                                    <div class="rp-empty-icon">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <h3>Belum Ada Riwayat Pembinaan</h3>
+                                    <p>
+                                        Belum ada catatan pembinaan yang sesuai.
+                                        Mulai dokumentasikan proses pembinaan siswa.
+                                    </p>
+                                    <button type="button"
+                                            class="rp-primary-btn"
+                                            onclick="rpBukaTambah()">
+                                        <i class="fas fa-plus"></i>
+                                        Tambah Pembinaan
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+</div>
+
+
+<!-- =====================================================
+     MODAL TAMBAH / EDIT
+====================================================== -->
+
+<div class="rp-modal-backdrop" id="rpModalForm"
+     onclick="if(event.target === this) rpTutupForm()">
+
+    <div class="rp-modal-dialog">
+
+        <div class="rp-modal-header">
+            <div>
+                <span class="rp-modal-eyebrow">STUDENT GUIDANCE</span>
+                <h2 id="rpFormTitle">Tambah Riwayat Pembinaan</h2>
+                <p>Lengkapi informasi proses pembinaan siswa.</p>
+            </div>
+
+            <button type="button" class="rp-modal-close"
+                    onclick="rpTutupForm()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="rpForm"
+              method="POST"
+              action="{{ url_for('riwayat_pembinaan.tambah') }}">
+
+            <div class="rp-modal-body">
+
+                <div class="rp-form-section">
+                    <div class="rp-form-section-title">
+                        <i class="fas fa-user-graduate"></i>
+                        Identitas Siswa
+                    </div>
+
+                    <div class="rp-form-grid">
+
+                        <div class="rp-form-group">
+                            <label for="rpSiswa">Nama Siswa <span>*</span></label>
+                            <select id="rpSiswa" name="siswa_id" required>
+                                <option value="">Pilih siswa</option>
+                                {% for siswa, kelas_id in daftar_siswa %}
+                                <option value="{{ siswa.id }}"
+                                        data-kelas="{{ kelas_id }}">
+                                    {{ siswa.nama }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="rp-form-group">
+                            <label for="rpKelas">Kelas <span>*</span></label>
+                            <select id="rpKelas" name="kelas_id" required>
+                                <option value="">Pilih kelas</option>
+                                {% for kelas in daftar_kelas %}
+                                <option value="{{ kelas.id }}">
+                                    {{ kelas.nama_kelas }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="rp-form-group">
+                            <label for="rpTanggal">Tanggal Kejadian <span>*</span></label>
+                            <input type="date" id="rpTanggal"
+                                   name="tanggal_kejadian" required>
+                        </div>
+
+                        <div class="rp-form-group">
+                            <label for="rpKategori">Kategori <span>*</span></label>
+                            <select id="rpKategori" name="kategori" required>
+                                <option value="">Pilih kategori</option>
+                                <option value="kedisiplinan">Kedisiplinan</option>
+                                <option value="akademik">Akademik</option>
+                                <option value="perilaku">Perilaku</option>
+                                <option value="sosial">Sosial</option>
+                                <option value="kehadiran">Kehadiran</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="rp-form-section">
+                    <div class="rp-form-section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        Informasi Pembinaan
+                    </div>
+
+                    <div class="rp-form-grid">
+
+                        <div class="rp-form-group">
+                            <label for="rpTingkat">Tingkat Pembinaan <span>*</span></label>
+                            <select id="rpTingkat" name="tingkat_pembinaan" required>
+                                <option value="pembinaan_awal">Pembinaan Awal</option>
+                                <option value="pembinaan_lanjutan">Pembinaan Lanjutan</option>
+                                <option value="pembinaan_khusus">Pembinaan Khusus</option>
+                            </select>
+                        </div>
+
+                        <div class="rp-form-group">
+                            <label for="rpStatus">Status Pembinaan <span>*</span></label>
+                            <select id="rpStatus" name="status" required>
+                                <option value="dalam_pemantauan">Dalam Pemantauan</option>
+                                <option value="membaik">Membaik</option>
+                                <option value="selesai">Selesai</option>
+                                <option value="dirujuk_bk">Dirujuk BK</option>
+                            </select>
+                        </div>
+
+                        <div class="rp-form-group rp-full">
+                            <label for="rpJudul">Judul Pembinaan <span>*</span></label>
+                            <input type="text" id="rpJudul" name="judul"
+                                   maxlength="150"
+                                   placeholder="Contoh: Pembinaan kedisiplinan dan ketepatan waktu"
+                                   required>
+                        </div>
+
+                        <div class="rp-form-group rp-full">
+                            <label for="rpKronologi">Kronologi / Permasalahan <span>*</span></label>
+                            <textarea id="rpKronologi" name="kronologi"
+                                      rows="4"
+                                      placeholder="Jelaskan kondisi atau permasalahan yang terjadi..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="rp-form-group rp-full">
+                            <label for="rpTindakan">Tindakan Pembinaan <span>*</span></label>
+                            <textarea id="rpTindakan" name="tindakan_pembinaan"
+                                      rows="4"
+                                      placeholder="Jelaskan tindakan pembinaan yang telah dilakukan..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="rp-form-group rp-full">
+                            <label for="rpHasil">Hasil Pembinaan</label>
+                            <textarea id="rpHasil" name="hasil_pembinaan"
+                                      rows="3"
+                                      placeholder="Tuliskan hasil atau respons siswa setelah pembinaan..."></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="rp-form-section">
+                    <div class="rp-form-section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Pemantauan dan Komunikasi
+                    </div>
+
+                    <div class="rp-toggle-row">
+                        <div>
+                            <strong>Perlu pemantauan lanjutan?</strong>
+                            <small>Tentukan apakah siswa perlu dipantau kembali.</small>
+                        </div>
+                        <label class="rp-switch">
+                            <input type="checkbox" id="rpPemantauan"
+                                   name="perlu_pemantauan" value="1" checked>
+                            <span class="rp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="rp-form-group rp-followup-field" id="rpTanggalPemantauanGroup">
+                        <label for="rpTanggalPemantauan">Tanggal Pemantauan</label>
+                        <input type="date" id="rpTanggalPemantauan"
+                               name="tanggal_pemantauan">
+                    </div>
+
+                    <div class="rp-toggle-row rp-parent-row">
+                        <div>
+                            <strong>Sudah berkomunikasi dengan orang tua?</strong>
+                            <small>Catat jika orang tua sudah dihubungi.</small>
+                        </div>
+                        <label class="rp-switch">
+                            <input type="checkbox" id="rpKomunikasi"
+                                   name="komunikasi_orang_tua" value="1">
+                            <span class="rp-switch-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="rp-form-group rp-full">
+                        <label for="rpCatatanOrangTua">Catatan Komunikasi Orang Tua</label>
+                        <textarea id="rpCatatanOrangTua"
+                                  name="catatan_orang_tua"
+                                  rows="3"
+                                  placeholder="Catatan hasil komunikasi dengan orang tua..."></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="rp-modal-footer">
+                <button type="button" class="rp-secondary-btn"
+                        onclick="rpTutupForm()">Batal</button>
+
+                <button type="submit" class="rp-primary-btn">
+                    <i class="fas fa-save"></i>
+                    Simpan Pembinaan
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODAL DETAIL
+====================================================== -->
+
+<div class="rp-modal-backdrop" id="rpModalDetail"
+     onclick="if(event.target === this) rpTutupDetail()">
+
+    <div class="rp-modal-dialog rp-detail-dialog">
+
+        <div class="rp-modal-header">
+            <div>
+                <span class="rp-modal-eyebrow">STUDENT GUIDANCE RECORD</span>
+                <h2>Detail Riwayat Pembinaan</h2>
+                <p>Informasi lengkap dokumentasi pembinaan siswa.</p>
+            </div>
+
+            <button type="button" class="rp-modal-close"
+                    onclick="rpTutupDetail()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="rp-modal-body">
+
+            <div class="rp-detail-student">
+                <div class="rp-detail-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div>
+                    <strong id="rpDetailNama">-</strong>
+                    <span id="rpDetailKelas">-</span>
+                </div>
+            </div>
+
+            <div class="rp-detail-grid">
+
+                <div class="rp-detail-item">
+                    <small>Tanggal Kejadian</small>
+                    <strong id="rpDetailTanggal">-</strong>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Kategori</small>
+                    <strong id="rpDetailKategori">-</strong>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Tingkat Pembinaan</small>
+                    <strong id="rpDetailTingkat">-</strong>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Status</small>
+                    <strong id="rpDetailStatus">-</strong>
+                </div>
+
+                <div class="rp-detail-item rp-detail-full">
+                    <small>Judul Pembinaan</small>
+                    <strong id="rpDetailJudul">-</strong>
+                </div>
+
+                <div class="rp-detail-item rp-detail-full">
+                    <small>Kronologi / Permasalahan</small>
+                    <p id="rpDetailKronologi">-</p>
+                </div>
+
+                <div class="rp-detail-item rp-detail-full">
+                    <small>Tindakan Pembinaan</small>
+                    <p id="rpDetailTindakan">-</p>
+                </div>
+
+                <div class="rp-detail-item rp-detail-full">
+                    <small>Hasil Pembinaan</small>
+                    <p id="rpDetailHasil">-</p>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Pemantauan</small>
+                    <strong id="rpDetailPemantauan">-</strong>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Tanggal Pemantauan</small>
+                    <strong id="rpDetailTanggalPemantauan">-</strong>
+                </div>
+
+                <div class="rp-detail-item">
+                    <small>Komunikasi Orang Tua</small>
+                    <strong id="rpDetailKomunikasi">-</strong>
+                </div>
+
+                <div class="rp-detail-item rp-detail-full">
+                    <small>Catatan Orang Tua</small>
+                    <p id="rpDetailCatatanOrangTua">-</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="rp-modal-footer">
+            <button type="button" class="rp-secondary-btn"
+                    onclick="rpTutupDetail()">Tutup</button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- FORM HAPUS -->
+<form id="rpFormHapus" method="POST" style="display:none;"></form>
+
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/wali_kelas/riwayat_pembinaan.css') }}">
+
+<script src="{{ url_for('static', filename='js/wali_kelas/riwayat_pembinaan.js') }}"></script>
+
+{% endblock %}

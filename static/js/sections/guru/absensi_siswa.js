@@ -35,6 +35,14 @@
             studentList.querySelectorAll('.as-status-select')
         );
 
+        const participationInputs = Array.from(
+            studentList.querySelectorAll('.as-participation-input')
+        );
+
+        const participationNotes = Array.from(
+            studentList.querySelectorAll('.as-participation-note')
+        );
+
         const counters = {
             hadir: document.getElementById('asHadir'),
             izin: document.getElementById('asIzin'),
@@ -51,6 +59,43 @@
             alpha: 'Alpa',
             belum: 'Belum dipilih'
         };
+
+
+        // =====================================================
+        // PENGELOLAAN INPUT PARTISIPASI
+        // =====================================================
+
+        function updateParticipationState(select, reset = false) {
+            const row = select.closest('.as-student-row');
+
+            if (!row) return;
+
+            const isHadir = select.value === 'hadir';
+
+            const nilaiInput = row.querySelector(
+                '.as-participation-input'
+            );
+
+            const catatanInput = row.querySelector(
+                '.as-participation-note'
+            );
+
+            if (nilaiInput) {
+                nilaiInput.disabled = !isHadir;
+
+                if (!isHadir || reset) {
+                    nilaiInput.value = '';
+                }
+            }
+
+            if (catatanInput) {
+                catatanInput.disabled = !isHadir;
+
+                if (!isHadir || reset) {
+                    catatanInput.value = '';
+                }
+            }
+        }
 
         // =====================================================
         // UPDATE STATUS VISUAL
@@ -169,16 +214,26 @@
         // =====================================================
         // EVENT STATUS SELECT
         // =====================================================
-
+        
         statusSelects.forEach(function (select) {
+
             updateStatusAppearance(select);
 
+            // Sinkronkan input partisipasi saat halaman dibuka
+            updateParticipationState(select);
+
             select.addEventListener('change', function () {
+
                 updateStatusAppearance(select);
+
+                // Reset nilai dan catatan jika bukan hadir
+                updateParticipationState(select, true);
+
                 updateStatistics();
                 filterStudents();
             });
         });
+
 
         // =====================================================
         // EVENT SEARCH DAN FILTER
@@ -222,6 +277,7 @@
                 statusSelects.forEach(function (select) {
                     select.value = 'hadir';
                     updateStatusAppearance(select);
+                    updateParticipationState(select);
                 });
 
                 updateStatistics();
@@ -232,9 +288,10 @@
         // =====================================================
         // VALIDASI SEBELUM SIMPAN
         // =====================================================
-
+        
         if (form) {
             form.addEventListener('submit', function (event) {
+
                 const belumDipilih = statusSelects.filter(function (select) {
                     return !select.value;
                 });
@@ -258,6 +315,44 @@
 
                     return;
                 }
+
+                // =========================================
+                // VALIDASI NILAI PARTISIPASI
+                // =========================================
+
+                for (const input of participationInputs) {
+
+                    if (input.disabled || input.value.trim() === '') {
+                        continue;
+                    }
+
+                    const nilai = Number(input.value);
+
+                    if (
+                        !Number.isFinite(nilai) ||
+                        nilai < 0 ||
+                        nilai > 100
+                    ) {
+                        event.preventDefault();
+
+                        input.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        input.focus();
+
+                        window.alert(
+                            'Nilai partisipasi harus berada antara 0 sampai 100.'
+                        );
+
+                        return;
+                    }
+                }
+
+                // =========================================
+                // KONFIRMASI SIMPAN
+                // =========================================
 
                 const confirmed = window.confirm(
                     'Simpan absensi untuk ' + rows.length +
@@ -288,6 +383,7 @@
                 }
             });
         }
+
 
         // =====================================================
         // INITIALIZATION

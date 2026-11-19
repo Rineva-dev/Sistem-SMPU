@@ -1,0 +1,206 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/jabatan/guru/input_nilai.css') }}">
+
+<div class="nilai-page">
+
+    <!-- HERO -->
+    <section class="nilai-hero">
+        <div class="nilai-hero-content">
+            <div class="nilai-eyebrow">
+                <span class="nilai-eyebrow-dot"></span>
+                TEACHER ASSESSMENT WORKSPACE
+            </div>
+
+            <h1>Penilaian Akademik</h1>
+
+            <p>
+                Kelola penilaian, input nilai siswa, dan pantau
+                perkembangan hasil belajar dari satu tempat.
+            </p>
+
+            <div class="nilai-hero-meta">
+                <span>
+                    <i class="fas fa-user-tie"></i>
+                    {{ guru.nama }}
+                </span>
+
+                {% if tahun_aktif %}
+                <span>
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ tahun_aktif.nama }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="nilai-hero-icon">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+    </section>
+
+    {% if not tahun_aktif %}
+
+        <div class="nilai-empty">
+            <i class="fas fa-calendar-xmark"></i>
+            <h3>Tahun Pelajaran Belum Aktif</h3>
+            <p>
+                Silakan aktifkan tahun pelajaran terlebih dahulu
+                melalui pengaturan akademik.
+            </p>
+        </div>
+
+    {% else %}
+
+        <!-- STATISTIK -->
+        <section class="nilai-stats">
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon blue">
+                    <i class="fas fa-door-open"></i>
+                </div>
+                <div>
+                    <span>Total Kelas</span>
+                    <strong>{{ total_kelas }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon purple">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <span>Mata Pelajaran</span>
+                    <strong>{{ total_mapel }}</strong>
+                </div>
+            </div>
+
+            <div class="nilai-stat-card">
+                <div class="nilai-stat-icon green">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div>
+                    <span>Penugasan</span>
+                    <strong>{{ daftar_penugasan|length }}</strong>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- DAFTAR PENUGASAN -->
+        <section class="nilai-section">
+
+            <div class="nilai-section-header">
+                <div>
+                    <span class="nilai-section-eyebrow">
+                        MY TEACHING ASSIGNMENTS
+                    </span>
+                    <h2>Kelas dan Mata Pelajaran</h2>
+                    <p>
+                        Pilih penugasan yang ingin dikelola penilaiannya.
+                    </p>
+                </div>
+
+                <div class="nilai-search">
+                    <i class="fas fa-search"></i>
+                    <input
+                        type="text"
+                        id="cariPenugasan"
+                        placeholder="Cari kelas atau mapel..."
+                        autocomplete="off">
+                </div>
+            </div>
+
+            {% if daftar_penugasan %}
+
+                <div class="nilai-assignment-grid" id="daftarPenugasan">
+
+                    {% for item in daftar_penugasan %}
+
+                    <article class="nilai-assignment-card"
+                             data-search="{{ (item.kelas.nama_kelas ~ ' ' ~ item.mata_pelajaran.nama_pelajaran)|lower }}">
+
+                        <div class="assignment-top">
+                            <div class="assignment-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+
+                            <span class="assignment-status">
+                                <span></span>
+                                Aktif
+                            </span>
+                        </div>
+
+                        <div class="assignment-info">
+                            <span class="assignment-label">
+                                MATA PELAJARAN
+                            </span>
+
+                            <h3>
+                                {{ item.mata_pelajaran.nama_pelajaran }}
+                            </h3>
+
+                            <div class="assignment-class">
+                                <i class="fas fa-users"></i>
+                                {{ item.kelas.nama_kelas }}
+                            </div>
+                        </div>
+
+                        <div class="assignment-footer">
+                            <div>
+                                <small>Alokasi</small>
+                                <strong>{{ item.jumlah_jp }} JP</strong>
+                            </div>
+
+                            <a href="{{ url_for(
+                                'input_nilai_guru.detail_penugasan',
+                                penugasan_id=item.id
+                            ) }}" class="assignment-next">
+                                Kelola Penilaian
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </article>
+
+                    {% endfor %}
+
+                </div>
+
+                <div class="nilai-search-empty" id="hasilKosong" hidden>
+                    <i class="fas fa-search"></i>
+                    <strong>Penugasan tidak ditemukan</strong>
+                    <span>Coba gunakan kata kunci yang berbeda.</span>
+                </div>
+
+            {% else %}
+
+                <div class="nilai-empty">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Belum Ada Penugasan Mengajar</h3>
+                    <p>
+                        Belum ditemukan kelas dan mata pelajaran yang
+                        ditugaskan kepada Anda pada tahun pelajaran
+                        {{ tahun_aktif.nama }}.
+                    </p>
+                    <span>
+                        Hubungi administrator atau Waka Kurikulum
+                        untuk memeriksa pengaturan guru dan mata pelajaran.
+                    </span>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='js/sections/guru/input_nilai.js') }}" defer></script>
+
+{% endblock %}

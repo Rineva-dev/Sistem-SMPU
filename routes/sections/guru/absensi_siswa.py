@@ -15,6 +15,7 @@ from models import (
     Kelas
 )
 
+from decimal import Decimal, InvalidOperation
 
 absensi_siswa_bp = Blueprint(
     'absensi_siswa',
@@ -124,7 +125,15 @@ def halaman_absensi(jurnal_id):
             'nama': siswa.nama,
             'jenis_kelamin': siswa.jenis_kelamin,
             'status_absensi': absensi.status if absensi else None,
-            'keterangan': absensi.keterangan if absensi else ''
+            'keterangan': absensi.keterangan if absensi else '',
+
+            'nilai_partisipasi': (
+                absensi.nilai_partisipasi if absensi else None
+            ),
+
+            'catatan_partisipasi': (
+                absensi.catatan_partisipasi if absensi else ''
+            )
         })
 
     user = {
@@ -160,7 +169,7 @@ def halaman_absensi(jurnal_id):
 
 
 # =========================================================
-# SIMPAN / PERBARUI ABSENSI SISWA
+# SIMPAN / PERBARUI ABSENSI DAN PARTISIPASI SISWA
 # =========================================================
 @absensi_siswa_bp.route('/<int:jurnal_id>/simpan', methods=['POST'])
 @guru_wajib
@@ -189,13 +198,19 @@ def simpan_absensi(jurnal_id):
                 'warning'
             )
             return redirect(
-                url_for('absensi_siswa.halaman_absensi', jurnal_id=jurnal.id)
+                url_for(
+                    'absensi_siswa.halaman_absensi',
+                    jurnal_id=jurnal.id
+                )
             )
 
         data_absensi = []
 
-        # Validasi seluruh data terlebih dahulu
+        # =================================================
+        # 1. VALIDASI SEMUA DATA SEBELUM DISIMPAN
+        # =================================================
         for siswa_id in siswa_valid:
+
             status = (
                 request.form.get(f'status_{siswa_id}') or ''
             ).strip().lower()
@@ -209,63 +224,101 @@ def simpan_absensi(jurnal_id):
                     f'Status absensi siswa ID {siswa_id} tidak valid.'
                 )
 
+            nilai_partisipasi = None
+            catatan_partisipasi = None
+
+            # Partisipasi hanya dinilai untuk siswa hadir
+            if status == 'hadir':
+
+                nilai_raw = (
+                    request.form.get(f'partisipasi_{siswa_id}') or ''
+                ).strip()
+
+                catatan_partisipasi = (
+                    request.form.get(
+                        f'catatan_partisipasi_{siswa_id}'
+                    ) or ''
+                ).strip() or None
+
+                if nilai_raw:
+                    try:
+                        nilai_partisipasi = Decimal(nilai_raw)
+                    except InvalidOperation:
+                        raise ValueError(
+                            f'Nilai partisipasi siswa ID {siswa_id} '
+                            'harus berupa angka.'
+                        )
+
+                    if (
+                        not nilai_partisipasi.is_finite()
+                        or nilai_partisipasi < 0
+                        or nilai_partisipasi > 100
+                    ):
+                        raise ValueError(
+                            f'Nilai partisipasi siswa ID {siswa_id} '
+                            'harus antara 0 sampai 100.'
+                        )
+
             data_absensi.append({
                 'siswa_id': siswa_id,
                 'status': status,
-                'keterangan': keterangan or None
+                'keterangan': keterangan or None,
+                'nilai_partisipasi': nilai_partisipasi,
+                'catatan_partisipasi': catatan_partisipasi
             })
 
-        # Setelah semua valid, baru simpan
+        # =================================================
+        # 2. AMBIL DATA ABSENSI YANG SUDAH ADA
+        # =================================================
+        absensi_lama = AbsensiJurnalMengajar.query.filter_by(
+            jurnal_id=jurnal.id
+        ).all()
+
+        absensi_map = {
+            item.siswa_id: item
+            for item in absensi_lama
+        }
+
+        # =================================================
+        # 3. SIMPAN / PERBARUI SATU KALI SAJA
+        # =================================================
         for item in data_absensi:
-            siswa_id = item['siswa_id']
 
-            absensi = AbsensiJurnalMengajar.query.filter_by(
-                jurnal_id=jurnal.id,
-                siswa_id=siswa_id
-            ).first()
+            absensi = absensi_map.get(item['siswa_id'])
 
-            if absensi:
-                absensi.status = item['status']
-                absensi.keterangan = item['keterangan']
-            else:
-                db.session.add(
-                    AbsensiJurnalMengajar(
-                        jurnal_id=jurnal.id,
-                        siswa_id=siswa_id,
-                        status=item['status'],
-                        keterangan=item['keterangan']
-                    )
+            if not absensi:
+                absensi = AbsensiJurnalMengajar(
+                    jurnal_id=jurnal.id,
+                    siswa_id=item['siswa_id']
                 )
+                db.session.add(absensi)
 
-            if status not in status_valid:
-                raise ValueError(
-                    f'Status absensi siswa ID {siswa_id} tidak valid.'
-                )
+            absensi.status = item['status']
+            absensi.keterangan = item['keterangan']
 
-            absensi = AbsensiJurnalMengajar.query.filter_by(
-                jurnal_id=jurnal.id,
-                siswa_id=siswa_id
-            ).first()
+            absensi.nilai_partisipasi = (
+                item['nilai_partisipasi']
+            )
 
-            if absensi:
-                absensi.status = status
-                absensi.keterangan = keterangan or None
-            else:
-                db.session.add(
-                    AbsensiJurnalMengajar(
-                        jurnal_id=jurnal.id,
-                        siswa_id=siswa_id,
-                        status=status,
-                        keterangan=keterangan or None
-                    )
-                )
+            absensi.catatan_partisipasi = (
+                item['catatan_partisipasi']
+            )
 
+        # =================================================
+        # 4. SIMPAN TRANSAKSI
+        # =================================================
         db.session.commit()
 
         flash(
-            f'Absensi {len(siswa_valid)} siswa berhasil disimpan.',
+            f'Absensi dan data partisipasi {len(data_absensi)} '
+            'siswa berhasil disimpan.',
             'success'
         )
+
+    except ValueError as e:
+        db.session.rollback()
+
+        flash(str(e), 'warning')
 
     except Exception:
         db.session.rollback()

@@ -380,6 +380,7 @@ from routes.sections.kepsek.agenda import agenda_bp
 from routes.sections.guru.dashboard_guru import dashboard_guru_bp
 from routes.sections.guru.jadwal_mengajar import jadwal_mengajar_bp
 from routes.sections.guru.absensi_siswa import absensi_siswa_bp
+from routes.sections.guru.input_nilai import input_nilai_guru_bp
 from routes.umum import umum_bp
 from routes.kalender_pendidikan import kalender_bp
 from routes.sections.waka_kurikulum.dashboard_wakakur import bp as dashboard_wakakur_bp
@@ -413,6 +414,7 @@ from routes.sections.wali_kelas.siswa_wali import siswa_wali_bp
 from routes.sections.wali_kelas.rekap_kehadiran import rekap_kehadiran_bp
 from routes.sections.wali_kelas.jadwal_wali import jadwal_wali_bp
 from routes.sections.wali_kelas.catatan_perkembangan import catatan_perkembangan_bp
+from routes.sections.wali_kelas.riwayat_pembinaan import (riwayat_pembinaan_bp)
 
 # --- Daftarkan Sistem Utama ---
 app.register_blueprint(login_bp)
@@ -426,6 +428,7 @@ app.register_blueprint(dashboard_kepsek_bp)
 app.register_blueprint(agenda_bp)
 app.register_blueprint(dashboard_guru_bp)
 app.register_blueprint(jadwal_mengajar_bp)
+app.register_blueprint(input_nilai_guru_bp)
 app.register_blueprint(umum_bp)
 app.register_blueprint(kalender_bp)
 app.register_blueprint(dashboard_wakakur_bp)
@@ -455,6 +458,7 @@ app.register_blueprint(siswa_wali_bp)
 app.register_blueprint(rekap_kehadiran_bp)
 app.register_blueprint(jadwal_wali_bp)
 app.register_blueprint(catatan_perkembangan_bp)
+app.register_blueprint(riwayat_pembinaan_bp)
 
 # ✅ SISTEM ABSENSI — beri nama BERBEDA agar tidak bentrok
 from routes.profil import profil_bp as absensi_profil_bp

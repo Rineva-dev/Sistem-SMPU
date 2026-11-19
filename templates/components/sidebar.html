@@ -707,6 +707,14 @@
                           <span>Catatan Perkembangan</span>
                       </a>
                   </li>
+
+                  <li class="menu-item">
+                      <a href="{{ url_for('riwayat_pembinaan.index') }}"
+                        class="menu-link {% if active_page == 'riwayat_pembinaan_wali' %}active{% endif %}">
+                          <i class="fas fa-user-shield"></i>
+                          <span>Riwayat Pembinaan</span>
+                      </a>
+                  </li>
               </ul>
           </div>
 

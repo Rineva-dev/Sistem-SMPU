@@ -1131,9 +1131,10 @@
                  return;
              }
 
-             const isSidebarMenu = link.matches(
-                 "#mainSidebar .sidebar-menu-wrapper a.menu-link"
-             );
+            const isSidebarMenu = link.matches(
+                "#mainSidebar .sidebar-menu-wrapper a.menu-link, " +
+                "#mainSidebar .sidebar-menu-wrapper a.sidebar-link"
+            );
 
              if (!isSidebarMenu) {
 

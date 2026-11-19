@@ -3,7 +3,7 @@ from datetime import datetime
 from models import (
     db, Guru, User, MataPelajaran, PengaturanMapelKelas,
     JadwalPelajaran, Kelas, JurnalMengajar, TahunPelajaran,
-    Siswa, RiwayatKelas, AbsensiJurnalMengajar
+    Siswa, RiwayatKelas, AbsensiJurnalMengajar, Penilaian
 )
 
 jurnal_mengajar_bp = Blueprint(
@@ -187,6 +187,27 @@ def simpan_jurnal():
         metode = (request.form.get('metode') or '').strip()
         catatan = (request.form.get('catatan') or '').strip()
 
+        # ==========================================
+        # DATA TUGAS PEMBELAJARAN
+        # ==========================================
+        ada_tugas = (
+            request.form.get('ada_tugas', 'tidak')
+            .strip()
+            .lower()
+        )
+
+        tugas_judul = (
+            request.form.get('tugas_judul') or ''
+        ).strip()
+
+        tugas_bentuk = (
+            request.form.get('tugas_bentuk') or ''
+        ).strip().lower()
+
+        tugas_deskripsi = (
+            request.form.get('tugas_deskripsi') or ''
+        ).strip()
+
         halaman_kembali = (
             request.referrer
             or url_for('jurnal_mengajar.halaman_jurnal')
@@ -210,6 +231,31 @@ def simpan_jurnal():
         if not materi:
             flash('Materi pembelajaran wajib diisi.', 'warning')
             return redirect(halaman_kembali)
+
+        # ==========================================
+        # VALIDASI TUGAS
+        # ==========================================
+        if ada_tugas not in ('ya', 'tidak'):
+            flash('Pilihan tugas tidak valid.', 'warning')
+            return redirect(halaman_kembali)
+
+        if ada_tugas == 'ya':
+
+            if not tugas_judul:
+                flash('Judul tugas wajib diisi.', 'warning')
+                return redirect(halaman_kembali)
+
+            if len(tugas_judul) > 225:
+                flash('Judul tugas maksimal 225 karakter.', 'warning')
+                return redirect(halaman_kembali)
+
+            if tugas_bentuk not in ('individu', 'kelompok'):
+                flash('Bentuk tugas tidak valid.', 'warning')
+                return redirect(halaman_kembali)
+
+            if len(tugas_deskripsi) > 10000:
+                flash('Deskripsi tugas terlalu panjang.', 'warning')
+                return redirect(halaman_kembali)
 
         # ==========================================
         # 4. VALIDASI FORMAT TANGGAL
@@ -347,7 +393,46 @@ def simpan_jurnal():
         )
 
 
+        # ==========================================
+        # SIMPAN JURNAL DAN TUGAS DALAM SATU TRANSAKSI
+        # ==========================================
+
         db.session.add(jurnal)
+
+        # Flush agar jurnal.id sudah tersedia
+        # sebelum membuat relasi Penilaian.
+        db.session.flush()
+
+        penilaian_tugas = None
+
+        if ada_tugas == 'ya':
+
+            penilaian_tugas = Penilaian(
+                jurnal_id=jurnal.id,
+
+                pengaturan_mapel_kelas_id=penugasan.id,
+                guru_id=guru_data.id,
+                tahun_pelajaran=kode_tahun,
+
+                jenis='tugas',
+                judul=tugas_judul,
+                deskripsi=tugas_deskripsi or None,
+
+                tanggal=tanggal_jurnal,
+                nilai_maksimal=100,
+
+                # Bobot tidak diberikan per tugas.
+                # Bobot kategori Tugas adalah 20%.
+                bobot=0,
+
+                bentuk_tugas=tugas_bentuk,
+                status='draft'
+            )
+
+            db.session.add(penilaian_tugas)
+
+        # Jurnal dan tugas disimpan bersamaan.
+        # Jika salah satunya gagal, keduanya dibatalkan.
         db.session.commit()
 
         current_app.logger.info(
@@ -357,10 +442,17 @@ def simpan_jurnal():
             kelas.nama_kelas
         )
 
-        flash(
-            'Jurnal berhasil disimpan. Silakan lanjutkan absensi siswa.',
-            'success'
-        )
+        if penilaian_tugas:
+            flash(
+                'Jurnal dan tugas pembelajaran berhasil disimpan. '
+                'Nilai tugas dapat diinput melalui halaman Input Nilai.',
+                'success'
+            )
+        else:
+            flash(
+                'Jurnal berhasil disimpan. Silakan lanjutkan absensi siswa.',
+                'success'
+            )
 
         # Langsung menuju halaman absensi untuk jurnal yang baru dibuat
         return redirect(
@@ -386,8 +478,6 @@ def simpan_jurnal():
             request.referrer
             or url_for('jurnal_mengajar.halaman_jurnal')
         )
-
-
 
 @jurnal_mengajar_bp.route('/riwayat/<int:mapel_id>')
 @guru_wajib
