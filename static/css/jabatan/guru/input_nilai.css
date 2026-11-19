@@ -753,3 +753,90 @@
     font-size: 11px;
     font-weight: 700;
 }
+
+/* =========================================
+   JOURNAL CONTEXT - STUDENT GRADING
+========================================= */
+
+.nilai-journal-context {
+    margin-bottom: 24px;
+    padding: 20px;
+    border: 1px solid rgba(16, 185, 129, .2);
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, .07),
+        rgba(16, 185, 129, .015)
+    );
+}
+
+.nilai-journal-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.nilai-journal-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #d1fae5;
+    color: #047857;
+    font-size: 17px;
+}
+
+.nilai-journal-heading span,
+.nilai-journal-details small,
+.nilai-journal-material small {
+    display: block;
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .7px;
+}
+
+.nilai-journal-heading strong {
+    color: #065f46;
+    font-size: 15px;
+}
+
+.nilai-journal-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding: 14px 0;
+    border-top: 1px solid rgba(16, 185, 129, .15);
+    border-bottom: 1px solid rgba(16, 185, 129, .15);
+}
+
+.nilai-journal-details strong {
+    color: #1e293b;
+    font-size: 13px;
+}
+
+.nilai-journal-material {
+    margin-top: 14px;
+}
+
+.nilai-journal-material p {
+    margin: 0;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.65;
+    font-weight: 500;
+}
+
+@media (max-width: 576px) {
+    .nilai-journal-context {
+        padding: 15px;
+    }
+
+    .nilai-journal-details {
+        gap: 16px;
+    }
+}

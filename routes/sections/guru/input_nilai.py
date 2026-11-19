@@ -96,7 +96,7 @@ def index():
             total_kelas=0,
             total_mapel=0,
             active_page='nilai_guru',
-            halaman_aktif='guru'
+            halaman_aktif='utama'
         )
 
     daftar_penugasan = (
@@ -137,7 +137,7 @@ def index():
         total_kelas=total_kelas,
         total_mapel=total_mapel,
         active_page='nilai_guru',
-        halaman_aktif='guru'
+        halaman_aktif='utama'
     )
 
 @input_nilai_guru_bp.route(
@@ -245,7 +245,7 @@ def detail_penugasan(penugasan_id):
 
         # Navigasi
         active_page='nilai_guru',
-        halaman_aktif='guru'
+        halaman_aktif='utama'
     )
 
 
@@ -370,7 +370,7 @@ def tambah_penilaian(penugasan_id):
         jenis_valid=jenis_valid,
         tanggal_default=date.today().isoformat(),
         active_page='nilai_guru',
-        halaman_aktif='guru'
+        halaman_aktif='utama'
     )
 
 
@@ -419,6 +419,38 @@ def input_nilai_siswa(penilaian_id):
     if not penugasan or str(penugasan.guru_id) != str(guru.id):
         flash('Penugasan penilaian tidak valid.', 'danger')
         return redirect(url_for('input_nilai_guru.index'))
+
+    # Informasi pertemuan jika penilaian berasal dari Jurnal Mengajar
+    jurnal_terkait = None
+    nomor_pertemuan = None
+
+    if penilaian.jurnal_id:
+
+        jurnal_terkait = JurnalMengajar.query.get(
+            penilaian.jurnal_id
+        )
+
+        if jurnal_terkait:
+            daftar_jurnal = (
+                JurnalMengajar.query
+                .filter(
+                    JurnalMengajar.guru_id == guru.id,
+                    JurnalMengajar.mata_pelajaran_id == penugasan.mata_pelajaran_id,
+                    JurnalMengajar.kelas_id == penugasan.kelas_id,
+                    JurnalMengajar.tahun_pelajaran == tahun_aktif.kode
+                )
+                .order_by(
+                    JurnalMengajar.tanggal.asc(),
+                    JurnalMengajar.jam_mulai.asc(),
+                    JurnalMengajar.id.asc()
+                )
+                .all()
+            )
+
+            for nomor, jurnal in enumerate(daftar_jurnal, start=1):
+                if jurnal.id == jurnal_terkait.id:
+                    nomor_pertemuan = nomor
+                    break
 
     # Ambil siswa berdasarkan riwayat kelas semester aktif
     daftar_siswa = (
@@ -540,8 +572,10 @@ def input_nilai_siswa(penilaian_id):
         tahun_aktif=tahun_aktif,
         penugasan=penugasan,
         penilaian=penilaian,
+        jurnal_terkait=jurnal_terkait,
+        nomor_pertemuan=nomor_pertemuan,
         daftar_siswa=daftar_siswa,
         nilai_map=nilai_map,
         active_page='nilai_guru',
-        halaman_aktif='guru'
+        halaman_aktif='utama'
     )

@@ -71,6 +71,57 @@
             </span>
         </div>
 
+        {% if jurnal_terkait %}
+
+        <div class="nilai-journal-context">
+
+            <div class="nilai-journal-heading">
+                <div class="nilai-journal-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+
+                <div>
+                    <span>JURNAL MENGAJAR</span>
+                    <strong>
+                        Pertemuan {{ nomor_pertemuan or '-' }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="nilai-journal-details">
+
+                <div>
+                    <small>Tanggal Pertemuan</small>
+                    <strong>
+                        {{ jurnal_terkait.tanggal.strftime('%d-%m-%Y') }}
+                    </strong>
+                </div>
+
+                <div>
+                    <small>Bentuk Tugas</small>
+                    <strong>
+                        {{ penilaian.bentuk_tugas|capitalize if penilaian.bentuk_tugas else '-' }}
+                    </strong>
+                </div>
+
+            </div>
+
+            <div class="nilai-journal-material">
+                <small>Materi Pembelajaran</small>
+                <p>{{ jurnal_terkait.materi or 'Materi belum dicatat.' }}</p>
+            </div>
+
+            {% if jurnal_terkait.kegiatan %}
+            <div class="nilai-journal-material">
+                <small>Kegiatan Pembelajaran</small>
+                <p>{{ jurnal_terkait.kegiatan }}</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
         <div class="nilai-stats">
 
             <div class="nilai-stat-card">

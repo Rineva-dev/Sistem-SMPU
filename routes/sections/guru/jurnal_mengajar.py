@@ -65,13 +65,13 @@ def halaman_jurnal():
     daftar_mapel = []
     sudah_diproses = set()
     
+    
     for aturan in pengaturan_list:
 
-        # Ambil data berdasarkan foreign key secara langsung
+        # Ambil data mapel dan kelas
         mapel = MataPelajaran.query.get(aturan.mata_pelajaran_id)
         kelas = Kelas.query.get(aturan.kelas_id)
 
-        # Pastikan relasi masih memiliki data yang valid
         if not mapel or not kelas:
             current_app.logger.warning(
                 f"Pengaturan mapel-kelas tidak valid: "
@@ -82,15 +82,11 @@ def halaman_jurnal():
             )
             continue
 
-        kunci = (mapel.id, kelas.id)
-
-        if kunci in sudah_diproses:
-            continue
-
-        sudah_diproses.add(kunci)
-        
-        # Ambil jadwal pelajaran untuk mapel + kelas ini
+        # ==========================================
+        # WAJIB ADA JADWAL MILIK GURU YANG LOGIN
+        # ==========================================
         jadwal_list = JadwalPelajaran.query.filter_by(
+            guru_id=guru_data.id,
             kelas_id=kelas.id,
             mata_pelajaran_id=mapel.id,
             tahun_pelajaran=kode_tahun
@@ -105,17 +101,40 @@ def halaman_jurnal():
             ),
             JadwalPelajaran.jam_mulai
         ).all()
-        
-        # Format jadwal untuk template
+
+        # Tidak ada jadwal = jangan tampilkan mapel
+        if not jadwal_list:
+            current_app.logger.info(
+                f"Mapel dilewati karena belum memiliki jadwal: "
+                f"{mapel.nama_pelajaran}, "
+                f"Kelas: {kelas.nama_kelas}, "
+                f"Guru: {guru_data.id}"
+            )
+            continue
+
+        # Cegah mapel dan kelas yang sama muncul berulang
+        kunci = (mapel.id, kelas.id)
+
+        if kunci in sudah_diproses:
+            continue
+
+        sudah_diproses.add(kunci)
+
+        # ==========================================
+        # FORMAT JADWAL
+        # ==========================================
         jadwal_formatted = []
+
         for j in jadwal_list:
             jadwal_formatted.append({
                 'hari': j.hari,
                 'waktu_mulai': j.jam_mulai,
                 'waktu_selesai': j.jam_selesai
             })
-        
-        # === HITUNG JUMLAH JURNAL & JURNAL TERAKHIR ===
+
+        # ==========================================
+        # HITUNG JUMLAH JURNAL
+        # ==========================================
         total_jurnal = JurnalMengajar.query.filter_by(
             guru_id=guru_data.id,
             mata_pelajaran_id=mapel.id,
@@ -128,8 +147,13 @@ def halaman_jurnal():
             mata_pelajaran_id=mapel.id,
             kelas_id=kelas.id,
             tahun_pelajaran=kode_tahun
-        ).order_by(JurnalMengajar.tanggal.desc()).first()
+        ).order_by(
+            JurnalMengajar.tanggal.desc()
+        ).first()
 
+        # ==========================================
+        # MASUKKAN KE DAFTAR MAPEL
+        # ==========================================
         daftar_mapel.append({
             'id': mapel.id,
             'nama_mapel': mapel.nama_pelajaran,
@@ -139,10 +163,17 @@ def halaman_jurnal():
             'jadwal': jadwal_formatted,
             'total_jurnal': total_jurnal,
             'jurnal_terakhir': {
-                'tanggal': jurnal_terakhir.tanggal.strftime('%d/%m/%Y') if jurnal_terakhir else '-',
-                'materi': jurnal_terakhir.materi if jurnal_terakhir else '-'
+                'tanggal': (
+                    jurnal_terakhir.tanggal.strftime('%d/%m/%Y')
+                    if jurnal_terakhir else '-'
+                ),
+                'materi': (
+                    jurnal_terakhir.materi
+                    if jurnal_terakhir else '-'
+                )
             }
         })
+
     
     context = {
         'user': user,
@@ -457,7 +488,7 @@ def simpan_jurnal():
         # Langsung menuju halaman absensi untuk jurnal yang baru dibuat
         return redirect(
             url_for(
-                'jurnal_mengajar.absensi_siswa',
+                'absensi_siswa.halaman_absensi',
                 jurnal_id=jurnal.id
             )
         )
